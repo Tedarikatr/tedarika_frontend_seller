@@ -1,34 +1,28 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import './index.css' // Tailwind burada aktifleşiyor
 
 function App() {
   const [count, setCount] = useState(0)
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
+    <div className="min-h-screen bg-gradient-to-br from-blue-100 to-purple-200 flex flex-col items-center justify-center p-10">
+      <h1 className="text-4xl font-bold text-gray-800 mb-6">Tailwind CSS Çalışıyor Mu?</h1>
+
+      <button
+        onClick={() => setCount(count + 1)}
+        className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition"
+      >
+        Sayaç: {count}
+      </button>
+
+      <p className="mt-6 text-gray-700 text-sm">
+        Bu sayfa <code className="bg-white px-2 py-1 rounded shadow">App.jsx</code> dosyasıdır.
       </p>
-    </>
+
+      <div className="mt-10 border-t pt-6 w-full max-w-md text-center text-xs text-gray-500">
+        Tailwind versiyonun doğru kuruluysa yukarıdaki buton mavi olmalı.
+      </div>
+    </div>
   )
 }
 
