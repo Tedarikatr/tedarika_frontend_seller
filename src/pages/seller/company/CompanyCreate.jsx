@@ -1,4 +1,3 @@
-// src/pages/seller/company/CompanyCreate.jsx
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { createCompany, hasCompany } from "@/api/sellerCompanyService";
@@ -56,33 +55,50 @@ const CompanyCreate = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-[#002c2c] flex justify-center items-center px-4">
-      <form onSubmit={handleSubmit} className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-2xl">
-        <h2 className="text-2xl font-bold text-[#003636] mb-6 text-center">Şirket Kaydı</h2>
+    <div className="min-h-screen bg-[#002c2c] flex justify-center items-center px-4 py-12">
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white p-10 rounded-3xl shadow-2xl w-full max-w-3xl space-y-6"
+      >
+        <div className="text-center">
+          <h2 className="text-3xl font-bold text-[#003636] mb-2">Şirket Bilgileri</h2>
+          <p className="text-gray-600 text-sm">
+            Satıcı paneline erişebilmeniz için şirket bilgilerinizi eksiksiz girmeniz gerekmektedir.
+          </p>
+        </div>
+
+        <div className="bg-[#F0FDF9] border border-emerald-300 text-emerald-800 px-4 py-3 rounded-xl text-sm">
+          📌 <strong>Not:</strong> Bilgileriniz yalnızca doğrulama amaçlı kullanılacak olup, üçüncü şahıslarla paylaşılmayacaktır.
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {fields.map(({ name, label }) => (
-            <input
-              key={name}
-              name={name}
-              value={form[name]}
-              onChange={handleChange}
-              placeholder={label}
-              required
-              className="p-2 border border-gray-300 rounded-md text-sm text-[#003636]"
-            />
+            <div key={name}>
+              <input
+                name={name}
+                value={form[name]}
+                onChange={handleChange}
+                placeholder={label}
+                required
+                className="w-full p-3 border border-gray-300 rounded-lg text-sm text-[#003636] focus:outline-none focus:ring-2 focus:ring-emerald-400"
+              />
+            </div>
           ))}
         </div>
 
         <button
           type="submit"
-          className="mt-6 w-full bg-[#003636] hover:bg-[#004848] text-white font-semibold py-2 rounded-lg transition"
+          className="w-full bg-[#003636] hover:bg-[#004848] text-white font-semibold py-3 rounded-xl transition"
         >
-          Kaydet
+          Kaydet ve Devam Et
         </button>
 
         {message && (
-          <div className="mt-4 text-center text-sm font-medium text-red-600">
+          <div
+            className={`mt-3 text-center text-sm font-medium ${
+              message.startsWith("❌") ? "text-red-600" : "text-emerald-600"
+            }`}
+          >
             {message}
           </div>
         )}
