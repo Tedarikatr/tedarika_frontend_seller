@@ -1,5 +1,16 @@
 import { NavLink, useNavigate } from "react-router-dom";
-import { Home, Package, ShoppingCart, LogOut, Store } from "lucide-react";
+import {
+  Home,
+  Package,
+  ShoppingCart,
+  Store,
+  ClipboardList,
+  FileText,
+  LogOut,
+  Settings,
+  MessageSquare,
+  Briefcase, // 🏢 Şirket bilgileri için uygun ikon
+} from "lucide-react";
 
 const Sidebar = () => {
   const navigate = useNavigate();
@@ -12,7 +23,7 @@ const Sidebar = () => {
   };
 
   return (
-    <aside className="w-64 min-h-screen bg-gradient-to-b from-indigo-800 to-purple-700 text-white shadow-xl flex flex-col">
+    <aside className="w-64 min-h-screen bg-[#002c2c] text-white shadow-xl flex flex-col">
       <div className="p-6 font-bold text-3xl tracking-wide flex items-center gap-2">
         <Store size={26} /> Tedarika
       </div>
@@ -21,6 +32,12 @@ const Sidebar = () => {
         <SidebarLink to="/seller/dashboard" icon={<Home size={18} />}>Dashboard</SidebarLink>
         <SidebarLink to="/seller/products" icon={<Package size={18} />}>Ürünler</SidebarLink>
         <SidebarLink to="/seller/orders" icon={<ShoppingCart size={18} />}>Siparişler</SidebarLink>
+        <SidebarLink to="/seller/store" icon={<Store size={18} />}>Mağazam</SidebarLink>
+        <SidebarLink to="/seller/quotations" icon={<ClipboardList size={18} />}>Teklifler</SidebarLink>
+        <SidebarLink to="/seller/reviews" icon={<MessageSquare size={18} />}>Yorumlar</SidebarLink>
+        <SidebarLink to="/seller/requests" icon={<FileText size={18} />}>İstekler</SidebarLink>
+        <SidebarLink to="/seller/company-view" icon={<Briefcase size={18} />}>Şirket Bilgilerim</SidebarLink>
+        <SidebarLink to="/seller/profile" icon={<Settings size={18} />}>Profil</SidebarLink>
       </nav>
 
       <div className="mt-auto px-4 pt-6 pb-4">
