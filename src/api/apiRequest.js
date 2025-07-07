@@ -13,10 +13,7 @@ export async function apiRequest(endpoint, method = "GET", data = null, useAuth 
     }
   }
 
-  const config = {
-    method,
-    headers,
-  };
+  const config = { method, headers };
 
   if (data) {
     config.body = JSON.stringify(data);
@@ -26,15 +23,24 @@ export async function apiRequest(endpoint, method = "GET", data = null, useAuth 
 
   if (!response.ok) {
     const errorText = await response.text();
+    let errorMessage = "Sunucu hatası.";
+
     try {
       const json = JSON.parse(errorText);
       console.error("API JSON Error:", json);
-      throw new Error(json.title || "Bir hata oluştu.");
+      errorMessage = json.title || json.message || json.error || errorText;
     } catch {
       console.error("API Text Error:", errorText);
-      throw new Error("Sunucu hatası.");
+      errorMessage = errorText;
     }
+
+    throw new Error(errorMessage);
   }
 
-  return await response.json();
+  try {
+    return await response.json();
+  } catch (jsonError) {
+    console.warn("⚠️ Yanıt JSON değil:", jsonError);
+    return {};
+  }
 }
