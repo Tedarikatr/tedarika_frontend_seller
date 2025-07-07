@@ -1,9 +1,11 @@
 import { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import { registerSeller } from "@/api/sellerAuthService";
 import { Mail, Lock, User, Phone } from "lucide-react";
-import { Link } from "react-router-dom";
 
 const RegisterPage = () => {
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     name: "",
     lastName: "",
@@ -48,9 +50,11 @@ const RegisterPage = () => {
     };
 
     try {
-      const result = await registerSeller(payload);
-      setMessage("✅ Kayıt başarılı!");
-      console.log(result);
+      await registerSeller(payload);
+      setMessage("✅ Kayıt başarılı! Giriş sayfasına yönlendiriliyorsunuz...");
+      setTimeout(() => {
+        navigate("/seller/login");
+      }, 1500); // 1.5 saniye sonra yönlendir
     } catch (err) {
       console.error("Kayıt Hatası:", err);
       setMessage("❌ " + (err.message || "Kayıt sırasında bir hata oluştu."));
