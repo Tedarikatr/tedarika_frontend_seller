@@ -1,11 +1,10 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { registerSeller } from "@/api/sellerAuthService";
-import { Mail, Lock, User, Phone } from "lucide-react";
+import { Mail, Lock, User, Phone, CheckCircle } from "lucide-react";
 
 const RegisterPage = () => {
   const navigate = useNavigate();
-
   const [formData, setFormData] = useState({
     name: "",
     lastName: "",
@@ -13,7 +12,6 @@ const RegisterPage = () => {
     phone: "",
     password: "",
   });
-
   const [message, setMessage] = useState("");
 
   const handleChange = (e) => {
@@ -54,96 +52,78 @@ const RegisterPage = () => {
       setMessage("✅ Kayıt başarılı! Giriş sayfasına yönlendiriliyorsunuz...");
       setTimeout(() => {
         navigate("/seller/login");
-      }, 1500); // 1.5 saniye sonra yönlendir
+      }, 1500);
     } catch (err) {
-      console.error("Kayıt Hatası:", err);
       setMessage("❌ " + (err.message || "Kayıt sırasında bir hata oluştu."));
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#002c2c] flex items-center justify-center px-4">
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white/90 backdrop-blur-md border border-white/20 rounded-2xl shadow-2xl p-10 max-w-md w-full"
-      >
-        <h2 className="text-3xl font-bold text-[#003636] text-center mb-8 tracking-wide">
-          Satıcı Kayıt
+    <div className="min-h-screen flex flex-col md:flex-row bg-[#0f172a] text-white">
+      {/* Sol Tanıtım Alanı */}
+      <div className="w-full md:w-1/2 flex flex-col justify-center items-start px-10 py-20 space-y-8">
+        <h2 className="text-4xl font-extrabold">
+          Tedarika ile Dakikalar İçinde Satışa Başlayın
         </h2>
+        <p className="text-gray-400 max-w-md">
+          Şirketini oluştur, mağazanı aç ve on binlerce işletmeye ulaş.
+        </p>
+        <ul className="space-y-4">
+          <li className="flex items-start gap-3">
+            <CheckCircle className="text-green-400" size={20} />
+            <span>Kolay ve hızlı kayıt süreci</span>
+          </li>
+          <li className="flex items-start gap-3">
+            <CheckCircle className="text-green-400" size={20} />
+            <span>Geniş müşteri kitlesi</span>
+          </li>
+          <li className="flex items-start gap-3">
+            <CheckCircle className="text-green-400" size={20} />
+            <span>Ücretsiz ve güvenli altyapı</span>
+          </li>
+        </ul>
+      </div>
 
-        <div className="space-y-4 text-[#003636]">
-          <FormInput
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            placeholder="Ad"
-            icon={<User size={18} />}
-          />
-          <FormInput
-            name="lastName"
-            value={formData.lastName}
-            onChange={handleChange}
-            placeholder="Soyad"
-            icon={<User size={18} />}
-          />
-          <FormInput
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            placeholder="Email"
-            icon={<Mail size={18} />}
-            type="email"
-          />
-          <FormInput
-            name="phone"
-            value={formData.phone}
-            onChange={handleChange}
-            placeholder="Telefon (05XXXXXXXXX)"
-            icon={<Phone size={18} />}
-          />
-          <FormInput
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
-            placeholder="Şifre"
-            icon={<Lock size={18} />}
-            type="password"
-          />
-        </div>
+      {/* Sağ Form Alanı */}
+      <div className="w-full md:w-1/2 bg-white text-[#003636] flex items-center justify-center py-16 px-8">
+        <form onSubmit={handleSubmit} className="w-full max-w-md">
+          <h3 className="text-3xl font-bold text-center mb-8">Satıcı Kaydı</h3>
 
-        <button
-          type="submit"
-          className="mt-8 w-full bg-[#003636] hover:bg-[#004848] text-white font-semibold py-2 rounded-lg transition-all duration-300"
-        >
-          Kayıt Ol
-        </button>
-
-        {message && (
-          <div
-            className={`mt-6 text-center text-sm font-medium ${
-              message.startsWith("✅") ? "text-green-600" : "text-red-600"
-            }`}
-          >
-            {message}
+          <div className="space-y-4">
+            <FormInput name="name" value={formData.name} onChange={handleChange} placeholder="Ad" icon={<User size={18} />} />
+            <FormInput name="lastName" value={formData.lastName} onChange={handleChange} placeholder="Soyad" icon={<User size={18} />} />
+            <FormInput name="email" value={formData.email} onChange={handleChange} placeholder="E-posta" icon={<Mail size={18} />} type="email" />
+            <FormInput name="phone" value={formData.phone} onChange={handleChange} placeholder="Telefon (05XXXXXXXXX)" icon={<Phone size={18} />} />
+            <FormInput name="password" value={formData.password} onChange={handleChange} placeholder="Şifre" icon={<Lock size={18} />} type="password" />
           </div>
-        )}
 
-        <div className="mt-6 text-center text-sm text-[#003636]">
-          Hesabın var mı?{" "}
-          <Link
-            to="/seller/login"
-            className="font-semibold text-[#005e5e] hover:underline"
+          <button
+            type="submit"
+            className="mt-6 w-full bg-gradient-to-r from-[#003636] to-[#005e5e] hover:brightness-110 text-white font-semibold py-3 rounded-xl transition"
           >
-            Giriş Yap
-          </Link>
-        </div>
-      </form>
+            Hesap Oluştur
+          </button>
+
+          {message && (
+            <p className={`mt-4 text-sm text-center font-medium ${message.startsWith("✅") ? "text-green-600" : "text-red-500"}`}>
+              {message}
+            </p>
+          )}
+
+          <p className="mt-6 text-center text-sm">
+            Hesabın var mı?{" "}
+            <Link to="/seller/login" className="text-emerald-700 font-semibold hover:underline">
+              Giriş Yap
+            </Link>
+          </p>
+        </form>
+      </div>
     </div>
   );
 };
 
 const FormInput = ({ name, value, onChange, placeholder, icon, type = "text" }) => (
-  <div className="flex items-center gap-3 px-4 py-2 rounded-lg bg-[#e6f0ef] border border-[#b6d3d2] focus-within:ring-2 ring-[#80c1bd] transition">
+  <div className="flex items-center gap-3 px-4 py-2 rounded-lg bg-[#f0fdfa] border border-[#c0e5e2] focus-within:ring-2 ring-[#80c1bd] transition">
     {icon}
     <input
       type={type}
@@ -152,7 +132,7 @@ const FormInput = ({ name, value, onChange, placeholder, icon, type = "text" }) 
       onChange={onChange}
       required
       placeholder={placeholder}
-      className="w-full bg-transparent outline-none text-[#002c2c] placeholder-[#6b9b99] text-sm"
+      className="w-full bg-transparent outline-none text-[#003636] placeholder-[#7aa5a2] text-sm"
     />
   </div>
 );
