@@ -41,28 +41,35 @@ const CompanyView = () => {
   ];
 
   return (
-    <div className="max-w-5xl mx-auto px-6 py-12">
-      <div className="bg-white rounded-3xl shadow-xl border border-gray-100 p-10">
+    <div className="min-h-screen bg-white py-16 px-6">
+      <div className="max-w-5xl mx-auto bg-white border border-gray-200 shadow-2xl rounded-3xl p-10">
+        {/* Header */}
         <div className="flex items-center gap-3 mb-10">
-          <Briefcase size={36} className="text-[#003636]" />
-          <h2 className="text-3xl font-bold text-[#003636]">Şirket Bilgileri</h2>
+          <Briefcase size={32} className="text-[#003636]" />
+          <h2 className="text-3xl font-extrabold text-[#003636]">Şirket Bilgileriniz</h2>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-12">
+        {/* Grid alanı */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-6 gap-x-10">
           {fields.map((field, index) => (
             <div key={index}>
-              <label className="block text-sm font-medium text-gray-600 mb-1">{field.label}:</label>
-              <p className="text-base text-gray-900">{field.value || "-"}</p>
+              <label className="block text-sm font-semibold text-[#005e5e] mb-1">{field.label}</label>
+              <div
+                className="bg-[#f5fefd] text-[#003636] text-sm px-4 py-2 rounded-xl border border-[#c4e4e2] select-none cursor-default"
+              >
+                {field.value || "-"}
+              </div>
             </div>
           ))}
         </div>
 
+        {/* Buton */}
         <div className="flex justify-end mt-10">
           <button
             onClick={() => navigate("/seller/company-profile")}
-            className="bg-[#003636] hover:bg-[#004848] text-white py-2 px-6 rounded-xl font-medium transition"
+            className="bg-gradient-to-r from-[#003636] to-[#005e5e] hover:brightness-110 text-white font-semibold py-2 px-6 rounded-xl transition"
           >
-            Güncelle
+            Bilgileri Güncelle
           </button>
         </div>
       </div>
