@@ -1,37 +1,53 @@
 import { useEffect, useState } from "react";
-import { getMyStore, updateStore } from "@/api/sellerStoreService";
+import { getMyStore, updateStore, getAllCategories } from "@/api/sellerStoreService";
 import { useNavigate } from "react-router-dom";
 
 const StoreUpdate = () => {
   const [form, setForm] = useState(null);
+  const [categories, setCategories] = useState([]);
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchStore = async () => {
+    const fetchData = async () => {
       try {
-        const store = await getMyStore();
-        setForm(store);
+        const [store, cats] = await Promise.all([getMyStore(), getAllCategories()]);
+
+        const filteredStore = {
+          id: store.id, // 🔥 GEREKLİ: API'de ID lazımsa buraya ekle
+          storeName: store.storeName || "",
+          storeDescription: store.storeDescription || "",
+          imageUrl: store.imageUrl || "",
+          storePhone: store.storePhone || "",
+          storeMail: store.storeMail || "",
+          storeProvince: store.storeProvince || "",
+          storeDistrict: store.storeDistrict || "",
+          categoryIds: store.categoryIds || [],
+        };
+
+        setForm(filteredStore);
+        setCategories(cats);
       } catch {
-        setMessage("❌ Mağaza bilgileri alınamadı.");
+        setMessage("❌ Mağaza veya kategori bilgileri alınamadı.");
       }
     };
-    fetchStore();
+    fetchData();
   }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleCategoryChange = (e) => {
+    const selected = Array.from(e.target.selectedOptions).map((opt) => parseInt(opt.value));
+    setForm((prev) => ({ ...prev, categoryIds: selected }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setMessage("");
     try {
-      await updateStore(form.id, form);
+      await updateStore(form.id, form); // ✅ ID artık burada mevcut
       setMessage("✅ Mağaza başarıyla güncellendi.");
       setTimeout(() => navigate("/seller/store"), 1000);
     } catch {
@@ -63,29 +79,46 @@ const StoreUpdate = () => {
           <input
             key={key}
             name={key}
-            value={form[key] || ""}
+            value={form[key]}
             onChange={handleChange}
-            placeholder={key.charAt(0).toUpperCase() + key.slice(1)}
+            placeholder={key}
             className="p-2 border border-gray-300 rounded-md text-sm text-[#003636]"
           />
         ))}
 
-        {/* Kategori ID’leri string olarak veriliyor (örn: 1,2,3) */}
-        <input
-          name="categoryIds"
-          value={(form.categoryIds || []).join(",")}
-          onChange={(e) =>
-            setForm((prev) => ({
-              ...prev,
-              categoryIds: e.target.value
-                .split(",")
-                .map((id) => parseInt(id.trim()))
-                .filter((id) => !isNaN(id)),
-            }))
-          }
-          placeholder="Kategori ID’leri (virgülle ayrılmış)"
-          className="col-span-full p-2 border border-gray-300 rounded-md text-sm text-[#003636]"
-        />
+        {/* Kategori çoklu seçim alanı */}
+        <div className="col-span-full">
+          <label className="block mb-1 text-sm font-semibold text-gray-700">Kategoriler</label>
+          <select
+            multiple
+            value={form.categoryIds}
+            onChange={handleCategoryChange}
+            className="w-full p-2 border border-gray-300 rounded-md text-sm text-[#003636] bg-white"
+          >
+            {categories.map((cat) => (
+              <option key={cat.id} value={cat.id}>
+                {cat.name}
+              </option>
+            ))}
+          </select>
+
+          {/* Seçili kategorileri etiket olarak göster */}
+          {form.categoryIds.length > 0 && (
+            <div className="flex flex-wrap gap-2 mt-2">
+              {form.categoryIds.map((id) => {
+                const cat = categories.find((c) => c.id === id);
+                return (
+                  <span
+                    key={id}
+                    className="bg-[#E6F4F1] text-[#00665A] px-3 py-1 rounded-full text-sm font-medium"
+                  >
+                    {cat?.name || `Kategori ${id}`}
+                  </span>
+                );
+              })}
+            </div>
+          )}
+        </div>
 
         <div className="col-span-full">
           <button
