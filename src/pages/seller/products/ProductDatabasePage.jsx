@@ -58,10 +58,12 @@ const ProductDatabasePage = () => {
   const visibleProducts = filteredProducts.slice(startIdx, startIdx + ITEMS_PER_PAGE);
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
-        <h1 className="text-3xl font-bold text-gray-800">Ürün Veritabanı</h1>
-        <div className="flex flex-col sm:flex-row gap-2 sm:items-center w-full md:w-auto">
+    <div className="p-4 sm:p-6 bg-gray-50 min-h-screen">
+      {/* Header */}
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-6">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">Ürün Veritabanı</h1>
+
+        <div className="flex flex-col sm:flex-row sm:items-center gap-2 w-full md:w-auto">
           <input
             type="text"
             placeholder="Ürün, marka, kategori, barkod ara..."
@@ -72,20 +74,24 @@ const ProductDatabasePage = () => {
               setCurrentPage(1);
             }}
           />
-          <div className="flex justify-between sm:justify-start gap-2">
-            <span className="text-sm text-gray-600 flex items-center">
+
+          <div className="flex justify-between sm:justify-start gap-2 items-center">
+            <span className="text-sm text-gray-600 whitespace-nowrap">
               {filteredProducts.length} ürün bulundu
             </span>
+
             <button
               onClick={() => setShowForm(true)}
-              className="bg-green-600 text-white px-4 py-2 rounded text-sm hover:bg-green-700 flex items-center gap-1"
+              className="bg-green-600 text-white px-3 py-2 rounded text-sm hover:bg-green-700 flex items-center gap-1"
             >
-              <PlusCircle size={16} /> Yeni Ürün Başvurusu
+              <PlusCircle size={16} />
+              <span className="hidden sm:inline">Yeni Başvuru</span>
             </button>
           </div>
         </div>
       </div>
 
+      {/* Başvuru Formu */}
       {showForm && (
         <div className="mb-6">
           <ProductRequestForm
@@ -98,6 +104,7 @@ const ProductDatabasePage = () => {
         </div>
       )}
 
+      {/* Tablo */}
       {loading ? (
         <div className="text-gray-600 text-sm">Ürünler yükleniyor, lütfen bekleyin...</div>
       ) : (
