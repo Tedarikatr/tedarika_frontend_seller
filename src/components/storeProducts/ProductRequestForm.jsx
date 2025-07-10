@@ -70,67 +70,76 @@ const ProductRequestForm = ({ onSuccess, onCancel }) => {
   return (
     <form
       onSubmit={handleSubmit}
-      className="w-full max-w-4xl mx-auto bg-white rounded-xl shadow-lg border border-gray-200 p-8 space-y-8"
+      className="w-full max-w-4xl mx-auto bg-white border border-gray-200 rounded-2xl shadow-md px-6 sm:px-10 py-8 space-y-8"
     >
-      <div className="border-b pb-4 mb-4">
+      <header className="border-b border-gray-200 pb-5">
         <h2 className="text-2xl font-bold text-gray-800">Yeni Ürün Başvurusu</h2>
-        <p className="text-sm text-gray-500">Aşağıdaki formu eksiksiz doldurarak ürün talebinizi oluşturabilirsiniz.</p>
-      </div>
+        <p className="text-sm text-gray-500 mt-1">
+          Ürünü mağazanıza eklenmek üzere talep edebilirsiniz.
+        </p>
+      </header>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Ürün Adı */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Ürün Adı</label>
+          <label className="block mb-1 text-sm font-medium text-gray-700">Ürün Adı</label>
           <input
             name="name"
             value={form.name}
             onChange={handleChange}
             required
-            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="Örn. Bluetooth Hoparlör"
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
           />
         </div>
+
+        {/* Marka */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Marka</label>
+          <label className="block mb-1 text-sm font-medium text-gray-700">Marka</label>
           <input
             name="brand"
             value={form.brand}
             onChange={handleChange}
             required
-            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="Örn. JBL"
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
           />
         </div>
 
+        {/* Birim Tipleri */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Birim Tipleri</label>
+          <label className="block mb-1 text-sm font-medium text-gray-700">Birim Tipleri</label>
           <input
             name="unitTypes"
             value={form.unitTypes}
             onChange={handleChange}
             placeholder="Örn. Paket, Adet, Kutu"
-            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
           />
         </div>
+
+        {/* Birim Tipi */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Birim Tipi (int)</label>
+          <label className="block mb-1 text-sm font-medium text-gray-700">Birim Tipi (int)</label>
           <input
             name="unitType"
             type="number"
             value={form.unitType}
             onChange={handleChange}
             placeholder="Örn. 1"
-            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
           />
         </div>
 
+        {/* Ana Kategori */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Ana Kategori</label>
+          <label className="block mb-1 text-sm font-medium text-gray-700">Ana Kategori</label>
           <select
             name="categoryId"
             value={form.categoryId}
             onChange={handleChange}
             required
-            className="w-full border border-gray-300 rounded-md px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
           >
             <option value="">Seçiniz</option>
             {categories.map((cat) => (
@@ -141,14 +150,15 @@ const ProductRequestForm = ({ onSuccess, onCancel }) => {
           </select>
         </div>
 
+        {/* Alt Kategori */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Alt Kategori</label>
+          <label className="block mb-1 text-sm font-medium text-gray-700">Alt Kategori</label>
           <select
             name="categorySubId"
             value={form.categorySubId}
             onChange={handleChange}
             disabled={!subcategories.length}
-            className="w-full border border-gray-300 rounded-md px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
           >
             <option value="">Seçiniz</option>
             {subcategories.map((sub) => (
@@ -159,31 +169,34 @@ const ProductRequestForm = ({ onSuccess, onCancel }) => {
           </select>
         </div>
 
+        {/* Görsel Yükleme */}
         <div className="md:col-span-2">
-          <label className="block text-sm font-medium text-gray-700 mb-1">Görsel</label>
+          <label className="block mb-1 text-sm font-medium text-gray-700">Ürün Görseli</label>
           <input
             type="file"
             name="image"
             accept="image/*"
             onChange={handleChange}
-            className="w-full border border-gray-300 rounded-md px-3 py-2 bg-white text-sm file:mr-3 file:py-2 file:px-4 file:rounded file:border-0 file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+            className="w-full text-sm border border-gray-300 rounded-lg px-3 py-2 bg-white file:mr-3 file:py-2 file:px-4 file:border-0 file:rounded file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
           />
         </div>
       </div>
 
+      {/* Açıklama */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Açıklama</label>
+        <label className="block mb-1 text-sm font-medium text-gray-700">Ürün Açıklaması</label>
         <textarea
           name="description"
           value={form.description}
           onChange={handleChange}
-          rows="4"
+          rows={4}
           placeholder="Ürün hakkında detaylı bilgi giriniz..."
-          className="w-full border border-gray-300 rounded-md px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm resize-none focus:ring-2 focus:ring-blue-500 focus:outline-none"
         />
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-4 text-sm">
+      {/* Checkbox'lar */}
+      <div className="flex flex-col sm:flex-row gap-4 text-sm text-gray-700">
         <label className="flex items-center gap-2">
           <input
             type="checkbox"
@@ -206,18 +219,19 @@ const ProductRequestForm = ({ onSuccess, onCancel }) => {
         </label>
       </div>
 
+      {/* Butonlar */}
       <div className="flex justify-end gap-3 pt-4">
         <button
           type="button"
           onClick={onCancel}
-          className="px-5 py-2 rounded-md text-sm bg-gray-200 text-gray-800 hover:bg-gray-300 transition"
+          className="px-5 py-2 rounded-lg text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 transition"
         >
           İptal
         </button>
         <button
           type="submit"
           disabled={loading}
-          className="px-5 py-2 rounded-md text-sm bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-60 transition"
+          className="px-5 py-2 rounded-lg text-sm bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-60 transition"
         >
           {loading ? "Gönderiliyor..." : "Gönder"}
         </button>
