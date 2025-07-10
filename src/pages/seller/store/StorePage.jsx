@@ -56,20 +56,6 @@ const StorePage = () => {
                 <StoreField label="İlçe" value={store.storeDistrict} />
               </div>
 
-              <div className="mt-6">
-                <label className="font-semibold text-gray-700 block mb-2">Kategoriler:</label>
-                <div className="flex flex-wrap gap-2">
-                  {(store.categoryIds || []).map((category, index) => (
-                    <span
-                      key={index}
-                      className="bg-[#E6F4F1] text-[#00665A] px-3 py-1 rounded-full text-sm font-medium"
-                    >
-                      {category}
-                    </span>
-                  ))}
-                </div>
-              </div>
-
               <div className="mt-8 text-right">
                 <button
                   onClick={() => navigate("/seller/store/update")}
