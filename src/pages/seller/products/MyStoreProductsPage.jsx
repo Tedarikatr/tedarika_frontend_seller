@@ -36,13 +36,11 @@ const MyStoreProductsPage = () => {
   const visibleProducts = products.slice(startIdx, startIdx + ITEMS_PER_PAGE);
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
-      <div className="flex items-center justify-between mb-5">
-        <h1 className="text-2xl font-bold text-gray-800">Mağaza Ürünlerim</h1>
+    <div className="p-4 md:p-6 bg-gray-50 min-h-screen">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-5">
+        <h1 className="text-xl md:text-2xl font-bold text-gray-800">Mağaza Ürünlerim</h1>
         {!loading && (
-          <span className="text-sm text-gray-600">
-            {products.length} ürün listelendi
-          </span>
+          <span className="text-sm text-gray-600">{products.length} ürün listelendi</span>
         )}
       </div>
 
@@ -58,7 +56,7 @@ const MyStoreProductsPage = () => {
         </div>
       )}
 
-      <div className="overflow-x-auto rounded-xl border border-gray-300 shadow bg-white">
+      <div className="w-full overflow-auto rounded-xl border border-gray-300 shadow bg-white">
         {loading ? (
           <div className="text-center text-gray-600 py-6">Ürünler yükleniyor...</div>
         ) : (
