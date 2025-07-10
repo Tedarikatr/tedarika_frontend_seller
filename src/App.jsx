@@ -17,6 +17,11 @@ import {
   StorePage,
 } from "@/pages/seller/store";
 
+import MyStoreProductsPage from "@/pages/seller/products/MyStoreProductsPage";
+import ProductDatabasePage from "@/pages/seller/products/ProductDatabasePage";
+import ProductRequestListPage from "@/pages/seller/products/ProductRequestListPage";        // ✅ Eklendi
+  
+
 import SellerLayout from "@/components/layout/SellerLayout";
 import PrivateRoute from "@/routes/PrivateRoute";
 
@@ -46,6 +51,12 @@ function App() {
         <Route path="store" element={<StorePage />} />
         <Route path="store/create" element={<StoreCreate />} />
         <Route path="store/update" element={<StoreUpdate />} />
+        <Route path="products/my-store" element={<MyStoreProductsPage />} />
+        <Route path="products/database" element={<ProductDatabasePage />} />
+
+        {/* ✅ Yeni ürün başvuru rotaları */}
+        <Route path="products/requests" element={<ProductRequestListPage />} />
+        
       </Route>
 
       {/* Tüm bilinmeyen yollar tanıtım sayfasına yönlensin */}
