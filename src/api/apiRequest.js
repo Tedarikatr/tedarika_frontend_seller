@@ -2,7 +2,6 @@ const BASE_URL = "https://tedarikamarketplaces-dea5htdedkb6hsgv.eastus-01.azurew
 
 export async function apiRequest(endpoint, method = "GET", data = null, useAuth = false) {
   const headers = {
-    "Content-Type": "application/json",
     Accept: "*/*",
   };
 
@@ -15,8 +14,15 @@ export async function apiRequest(endpoint, method = "GET", data = null, useAuth 
 
   const config = { method, headers };
 
+  // 🔧 Eğer data varsa ve FormData değilse JSON.stringify et
   if (data) {
-    config.body = JSON.stringify(data);
+    if (data instanceof FormData) {
+      config.body = data;
+      // ❌ Content-Type setleme — tarayıcı kendisi ayarlıyor
+    } else {
+      headers["Content-Type"] = "application/json";
+      config.body = JSON.stringify(data);
+    }
   }
 
   const response = await fetch(`${BASE_URL}${endpoint}`, config);
