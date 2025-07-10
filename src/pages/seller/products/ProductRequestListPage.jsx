@@ -13,7 +13,7 @@ const ProductRequestListPage = () => {
   const [expandedId, setExpandedId] = useState(null);
   const [details, setDetails] = useState({});
   const [categoryMap, setCategoryMap] = useState({});
-  const [subcategoryMap, setSubcategoryMap] = useState({}); // { [categoryId]: { subId: name } }
+  const [subcategoryMap, setSubcategoryMap] = useState({});
 
   useEffect(() => {
     const loadData = async () => {
@@ -22,6 +22,7 @@ const ProductRequestListPage = () => {
           fetchProductRequests(),
           getAllCategories(),
         ]);
+
         setRequests(reqs);
 
         const catMap = {};
@@ -47,7 +48,6 @@ const ProductRequestListPage = () => {
         const detail = await fetchProductRequestDetail(id);
         setDetails((prev) => ({ ...prev, [id]: detail }));
 
-        // alt kategori adlarını da getir
         const categoryId = detail.categoryId;
         if (!subcategoryMap[categoryId]) {
           try {
@@ -65,7 +65,6 @@ const ProductRequestListPage = () => {
           }
         }
       }
-
       setExpandedId(id);
     }
   };
@@ -75,13 +74,13 @@ const ProductRequestListPage = () => {
 
   const getStatusColor = (status) =>
     status === true
-      ? "text-green-600 bg-green-100"
+      ? "text-green-700 bg-green-100 border border-green-300"
       : status === false
-      ? "text-yellow-600 bg-yellow-100"
-      : "text-red-600 bg-red-100";
+      ? "text-yellow-800 bg-yellow-100 border border-yellow-300"
+      : "text-red-700 bg-red-100 border border-red-300";
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
+    <div className="p-4 md:p-6 bg-gray-50 min-h-screen">
       <h1 className="text-2xl font-bold text-gray-800 mb-6">Ürün Başvurularım</h1>
 
       {loading ? (
@@ -91,17 +90,22 @@ const ProductRequestListPage = () => {
       ) : (
         <div className="space-y-4">
           {requests.map((r) => (
-            <div key={r.id} className="bg-white border border-gray-300 rounded-xl shadow">
+            <div
+              key={r.id}
+              className="bg-white border border-gray-300 rounded-xl shadow-sm transition-all"
+            >
               <div
-                className="flex justify-between items-center px-6 py-4 cursor-pointer hover:bg-gray-50"
+                className="flex justify-between items-center px-4 md:px-6 py-4 cursor-pointer hover:bg-gray-100 transition"
                 onClick={() => toggleExpand(r.id)}
               >
                 <div>
-                  <h2 className="text-sm font-semibold text-gray-800">
+                  <h2 className="text-sm font-semibold text-gray-800 mb-1">
                     {r.name} — <span className="text-gray-500">{r.brand}</span>
                   </h2>
                   <span
-                    className={`text-xs px-2 py-1 rounded ${getStatusColor(r.isApproved)}`}
+                    className={`text-xs font-medium px-2 py-1 rounded-md inline-block ${getStatusColor(
+                      r.isApproved
+                    )}`}
                   >
                     {getStatusText(r.isApproved)}
                   </span>
@@ -112,9 +116,13 @@ const ProductRequestListPage = () => {
               </div>
 
               {expandedId === r.id && details[r.id] && (
-                <div className="px-6 pb-4 pt-2 border-t bg-gray-50 text-sm text-gray-700 grid grid-cols-1 md:grid-cols-2 gap-3">
-                  <div><strong>Açıklama:</strong> {details[r.id].description}</div>
-                  <div><strong>Birim Tipleri:</strong> {details[r.id].unitTypes}</div>
+                <div className="px-4 md:px-6 pb-4 pt-2 border-t bg-gray-50 text-sm text-gray-700 grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <strong>Açıklama:</strong> {details[r.id].description}
+                  </div>
+                  <div>
+                    <strong>Birim Tipleri:</strong> {details[r.id].unitTypes}
+                  </div>
                   <div>
                     <strong>Kategori:</strong>{" "}
                     {categoryMap[details[r.id].categoryId] || `#${details[r.id].categoryId}`}
@@ -124,10 +132,21 @@ const ProductRequestListPage = () => {
                     {subcategoryMap[details[r.id].categoryId]?.[details[r.id].categorySubId] ||
                       `#${details[r.id].categorySubId}`}
                   </div>
-                  <div><strong>Yurt içi:</strong> {details[r.id].allowedDomestic ? "Evet" : "Hayır"}</div>
-                  <div><strong>Yurt dışı:</strong> {details[r.id].allowedInternational ? "Evet" : "Hayır"}</div>
-                  <div><strong>Durum:</strong> {getStatusText(details[r.id].status)}</div>
-                  <div><strong>Oluşturulma:</strong> {new Date(details[r.id].createdAt).toLocaleString()}</div>
+                  <div>
+                    <strong>Yurt içi:</strong>{" "}
+                    {details[r.id].allowedDomestic ? "Evet" : "Hayır"}
+                  </div>
+                  <div>
+                    <strong>Yurt dışı:</strong>{" "}
+                    {details[r.id].allowedInternational ? "Evet" : "Hayır"}
+                  </div>
+                  <div>
+                    <strong>Durum:</strong> {getStatusText(details[r.id].status)}
+                  </div>
+                  <div>
+                    <strong>Oluşturulma:</strong>{" "}
+                    {new Date(details[r.id].createdAt).toLocaleString()}
+                  </div>
                 </div>
               )}
             </div>
