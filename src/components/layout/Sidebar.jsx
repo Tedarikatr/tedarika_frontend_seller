@@ -9,7 +9,8 @@ import {
   LogOut,
   Settings,
   MessageSquare,
-  Briefcase, // 🏢 Şirket bilgileri için uygun ikon
+  Briefcase,
+  ChevronRight,
 } from "lucide-react";
 
 const Sidebar = () => {
@@ -30,7 +31,15 @@ const Sidebar = () => {
 
       <nav className="flex flex-col gap-1 px-4 text-sm mt-6">
         <SidebarLink to="/seller/dashboard" icon={<Home size={18} />}>Dashboard</SidebarLink>
-        <SidebarLink to="/seller/products" icon={<Package size={18} />}>Ürünler</SidebarLink>
+
+        {/* Ürünler Menüsü */}
+        <SidebarLink to="/seller/products/my-store" icon={<Package size={18} />}>Ürünler</SidebarLink>
+        <div className="ml-6 flex flex-col gap-1">
+          <SidebarLink to="/seller/products/my-store" icon={<ChevronRight size={14} />}>Ürünlerim</SidebarLink>
+          <SidebarLink to="/seller/products/database" icon={<ChevronRight size={14} />}>Ürün Veritabanı</SidebarLink>
+          <SidebarLink to="/seller/products/requests" icon={<ChevronRight size={14} />}>Başvurularım</SidebarLink>
+        </div>
+
         <SidebarLink to="/seller/orders" icon={<ShoppingCart size={18} />}>Siparişler</SidebarLink>
         <SidebarLink to="/seller/store" icon={<Store size={18} />}>Mağazam</SidebarLink>
         <SidebarLink to="/seller/quotations" icon={<ClipboardList size={18} />}>Teklifler</SidebarLink>
