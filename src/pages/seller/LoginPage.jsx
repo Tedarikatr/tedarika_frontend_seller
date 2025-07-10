@@ -9,6 +9,7 @@ const LoginPage = () => {
     password: "",
   });
   const [message, setMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const navigate = useNavigate();
 
@@ -22,22 +23,26 @@ const LoginPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage("");
+    setIsSubmitting(true);
 
     try {
       const result = await loginSeller(formData);
-      const token = result?.token?.token;
+      const tokenData = result?.token;
 
-      if (typeof token === "string" && token.length > 0) {
-        localStorage.setItem("sellerToken", token);
-        localStorage.setItem("sellerEmail", result.token.email);
-        localStorage.setItem("sellerRole", result.token.role);
+      if (tokenData && typeof tokenData.token === "string") {
+        localStorage.setItem("sellerToken", tokenData.token);
+        localStorage.setItem("sellerEmail", tokenData.email);
+        localStorage.setItem("sellerRole", tokenData.role);
+        setMessage("✅ Giriş başarılı, yönlendiriliyorsunuz...");
         navigate("/seller/dashboard");
       } else {
-        setMessage("❌ Token alınamadı.");
+        setMessage("❌ Beklenen token verisi alınamadı.");
       }
     } catch (err) {
       console.error("Login Hatası:", err);
-      setMessage("❌ " + (err?.response?.data?.message || err.message || "Giriş hatası."));
+      setMessage("❌ " + (err?.response?.data?.message || err.message || "Giriş sırasında hata oluştu."));
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -79,6 +84,7 @@ const LoginPage = () => {
               onChange={handleChange}
               placeholder="Email veya Telefon"
               icon={<Mail size={18} />}
+              autoComplete="username"
             />
             <FormInput
               name="password"
@@ -87,14 +93,16 @@ const LoginPage = () => {
               placeholder="Şifre"
               type="password"
               icon={<Lock size={18} />}
+              autoComplete="current-password"
             />
           </div>
 
           <button
             type="submit"
-            className="mt-6 w-full bg-gradient-to-r from-[#003636] to-[#005e5e] hover:brightness-110 text-white font-semibold py-3 rounded-xl transition"
+            disabled={isSubmitting}
+            className="mt-6 w-full bg-gradient-to-r from-[#003636] to-[#005e5e] hover:brightness-110 text-white font-semibold py-3 rounded-xl transition disabled:opacity-50"
           >
-            Giriş Yap
+            {isSubmitting ? "Giriş Yapılıyor..." : "Giriş Yap"}
           </button>
 
           {message && (
@@ -122,7 +130,15 @@ const LoginPage = () => {
   );
 };
 
-const FormInput = ({ name, value, onChange, placeholder, icon, type = "text" }) => (
+const FormInput = ({
+  name,
+  value,
+  onChange,
+  placeholder,
+  icon,
+  type = "text",
+  autoComplete,
+}) => (
   <div className="flex items-center gap-3 px-4 py-2 rounded-lg bg-[#f0fdfa] border border-[#c0e5e2] focus-within:ring-2 ring-[#80c1bd] transition">
     {icon}
     <input
@@ -132,6 +148,7 @@ const FormInput = ({ name, value, onChange, placeholder, icon, type = "text" }) 
       onChange={onChange}
       required
       placeholder={placeholder}
+      autoComplete={autoComplete}
       className="w-full bg-transparent outline-none text-[#003636] placeholder-[#7aa5a2] text-sm"
     />
   </div>
