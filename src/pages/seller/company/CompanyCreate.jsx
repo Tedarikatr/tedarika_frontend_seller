@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { createCompany, hasCompany } from "@/api/sellerCompanyService";
-import { Building2, CheckCircle } from "lucide-react";
+import { Building2, CheckCircle, Info } from "lucide-react";
 
 const CompanyCreate = () => {
   const navigate = useNavigate();
@@ -29,14 +29,13 @@ const CompanyCreate = () => {
     try {
       await createCompany(trimmedForm);
       const confirmed = await hasCompany();
-
       if (confirmed) {
         navigate("/seller/dashboard");
       } else {
-        setMessage("⚠️ Kaydedildi ama sistemde görünmüyor.");
+        setMessage("Sistemsel hata: şirket oluşturuldu ancak görünmüyor.");
       }
     } catch (err) {
-      console.error("❌ Şirket oluşturma hatası:", err);
+      console.error("Şirket oluşturma hatası:", err);
       setMessage("❌ " + (err.message || "Sunucu hatası."));
     }
   };
@@ -55,9 +54,9 @@ const CompanyCreate = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-[#0f172a] text-white flex items-center justify-center px-6">
+    <div className="min-h-screen bg-[#0f172a] text-white flex items-center justify-center px-4 py-10">
       <div className="flex flex-col md:flex-row bg-[#1e293b] rounded-3xl shadow-2xl overflow-hidden max-w-6xl w-full">
-        {/* Sol Tanıtım Alanı */}
+        {/* Sol Alan */}
         <div className="hidden md:flex flex-col justify-center bg-[#003636] text-white w-full md:w-1/2 p-10">
           <h2 className="text-3xl font-bold mb-6">Tedarika'da Şirket Oluştur</h2>
           <ul className="space-y-4 text-sm">
@@ -76,14 +75,14 @@ const CompanyCreate = () => {
           </ul>
         </div>
 
-        {/* Sağ Form Alanı */}
+        {/* Sağ Form */}
         <form
           onSubmit={handleSubmit}
-          className="w-full md:w-1/2 bg-white text-[#003636] p-10"
+          className="w-full md:w-1/2 bg-white text-[#003636] p-8 sm:p-10"
         >
           <div className="flex items-center gap-2 mb-6">
-            <Building2 size={28} className="text-[#003636]" />
-            <h2 className="text-2xl font-bold">Şirket Bilgileri</h2>
+            <Building2 size={26} className="text-[#003636]" />
+            <h2 className="text-xl sm:text-2xl font-bold">Şirket Bilgileri</h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -100,8 +99,9 @@ const CompanyCreate = () => {
             ))}
           </div>
 
-          <div className="mt-6 text-xs bg-[#f0fdfa] text-emerald-900 px-4 py-3 rounded-lg border border-emerald-300">
-            📌 Bilgileriniz yalnızca doğrulama amaçlı kullanılacaktır.
+          <div className="mt-6 flex items-start gap-2 text-sm text-emerald-900 bg-[#f0fdfa] px-4 py-3 rounded-lg border border-emerald-300">
+            <Info className="w-5 h-5 mt-0.5 text-emerald-600" />
+            <span>Bilgileriniz yalnızca doğrulama amaçlı kullanılacaktır.</span>
           </div>
 
           <button
