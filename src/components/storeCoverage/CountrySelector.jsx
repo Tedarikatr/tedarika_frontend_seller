@@ -11,22 +11,23 @@ const CountrySelector = ({ regionId, selectedCountries, onChange }) => {
       return;
     }
 
-    const fetch = async () => {
+    const fetchCountries = async () => {
       setLoading(true);
       try {
         const data = await getCountriesByRegionId(regionId);
         setCountries(data);
       } catch (err) {
         console.error("Ülkeler alınamadı:", err);
+        setCountries([]);
       } finally {
         setLoading(false);
       }
     };
 
-    fetch();
+    fetchCountries();
   }, [regionId]);
 
-  const toggle = (id) => {
+  const toggleCountry = (id) => {
     if (selectedCountries.includes(id)) {
       onChange(selectedCountries.filter((c) => c !== id));
     } else {
@@ -48,7 +49,7 @@ const CountrySelector = ({ regionId, selectedCountries, onChange }) => {
             <button
               key={c.id}
               type="button"
-              onClick={() => toggle(c.id)}
+              onClick={() => toggleCountry(c.id)}
               className={`px-3 py-1.5 rounded-full text-sm border transition ${
                 selectedCountries.includes(c.id)
                   ? "bg-blue-600 text-white border-blue-600"
