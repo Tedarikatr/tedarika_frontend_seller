@@ -34,31 +34,39 @@ const Sidebar = ({ isOpen, onClose }) => {
 
       {/* Menü */}
       <nav className="flex flex-col gap-1 px-4 py-6 text-sm">
-        <SidebarLink to="/seller/dashboard" icon={<Home size={18} />}>Dashboard</SidebarLink>
+        <SidebarLink to="/seller/dashboard" icon={<Home size={18} />}>
+          Dashboard
+        </SidebarLink>
 
-        {/* Ürünler Bölümü */}
-        <div className="mt-3 mb-1 px-3 text-xs uppercase tracking-wide text-white/50 font-semibold">
-          Ürün Yönetimi
-        </div>
-        <SidebarLink to="/seller/products/my-store" icon={<ChevronRight size={14} />}>Ürünlerim</SidebarLink>
-        <SidebarLink to="/seller/products/database" icon={<ChevronRight size={14} />}>Ürün Veritabanı</SidebarLink>
-        <SidebarLink to="/seller/products/requests" icon={<ChevronRight size={14} />}>Başvurularım</SidebarLink>
-
-        {/* Diğer */}
+        {/* Mağaza Yönetimi */}
         <div className="mt-4 mb-1 px-3 text-xs uppercase tracking-wide text-white/50 font-semibold">
-          Mağaza
+          Mağaza Yönetimi
         </div>
-        <SidebarLink to="/seller/orders" icon={<ShoppingCart size={18} />}>Siparişler</SidebarLink>
         <SidebarLink to="/seller/store" icon={<Store size={18} />}>Mağaza Bilgileri</SidebarLink>
         <SidebarLink to="/seller/store/coverage" icon={<MapPin size={18} />}>Lokasyonlarım</SidebarLink>
+        <SidebarLink to="/seller/company-view" icon={<Briefcase size={18} />}>Şirket Bilgilerim</SidebarLink>
+
+        {/* Ürünler */}
+        <div className="mt-4 mb-1 px-3 text-xs uppercase tracking-wide text-white/50 font-semibold">
+          Ürünler
+        </div>
+        <SidebarLink to="/seller/products/my-store" icon={<ChevronRight size={14} />}>Ürünlerim</SidebarLink>
+        <SidebarLink to="/seller/products/database" icon={<ChevronRight size={14} />}>Veritabanı</SidebarLink>
+        <SidebarLink to="/seller/products/requests" icon={<ChevronRight size={14} />}>Başvurularım</SidebarLink>
+
+        {/* Sipariş & İşlemler */}
+        <div className="mt-4 mb-1 px-3 text-xs uppercase tracking-wide text-white/50 font-semibold">
+          İşlemler
+        </div>
+        <SidebarLink to="/seller/orders" icon={<ShoppingCart size={18} />}>Siparişler</SidebarLink>
         <SidebarLink to="/seller/quotations" icon={<ClipboardList size={18} />}>Teklifler</SidebarLink>
         <SidebarLink to="/seller/reviews" icon={<MessageSquare size={18} />}>Yorumlar</SidebarLink>
         <SidebarLink to="/seller/requests" icon={<FileText size={18} />}>İstekler</SidebarLink>
 
+        {/* Hesap */}
         <div className="mt-4 mb-1 px-3 text-xs uppercase tracking-wide text-white/50 font-semibold">
           Hesap
         </div>
-        <SidebarLink to="/seller/company-view" icon={<Briefcase size={18} />}>Şirket Bilgilerim</SidebarLink>
         <SidebarLink to="/seller/profile" icon={<Settings size={18} />}>Profil</SidebarLink>
       </nav>
 
