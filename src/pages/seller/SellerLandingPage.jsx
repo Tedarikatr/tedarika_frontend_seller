@@ -4,6 +4,7 @@ import FeaturesSection from "@/components/sellerLanding/FeaturesSection";
 import StepsSection from "@/components/sellerLanding/StepsSection";
 import TestimonialsSection from "@/components/sellerLanding/TestimonialsSection";
 import CTASection from "@/components/sellerLanding/CTASection";
+import PricingSection from "@/components/sellerLanding/PricingSection";
 
 const SellerLandingPage = () => {
   return (
@@ -12,6 +13,7 @@ const SellerLandingPage = () => {
       <HeroSection />
       <FeaturesSection />
       <StepsSection />
+      <PricingSection /> {/* <-- BURAYA EKLENDİ */}
       <TestimonialsSection />
       <CTASection />
     </div>
