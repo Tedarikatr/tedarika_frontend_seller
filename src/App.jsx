@@ -11,7 +11,11 @@ import { StoreCreate, StoreUpdate, StorePage } from "@/pages/seller/store";
 import MyStoreProductsPage from "@/pages/seller/products/MyStoreProductsPage";
 import ProductDatabasePage from "@/pages/seller/products/ProductDatabasePage";
 import ProductRequestListPage from "@/pages/seller/products/ProductRequestListPage";
+
 import StoreCoveragePage from "@/pages/seller/location/StoreCoveragePage"; // ✅ Lokasyon sayfası
+
+import OrderListPage from "@/pages/seller/orders/OrderListPage"; // ✅ Sipariş listesi
+import OrderDetailPage from "@/pages/seller/orders/OrderDetailPage"; // ✅ Sipariş detayı
 
 import SellerLayout from "@/components/layout/SellerLayout";
 import PrivateRoute from "@/routes/PrivateRoute";
@@ -39,13 +43,19 @@ function App() {
         <Route path="dashboard" element={<DashboardPage />} />
         <Route path="company-profile" element={<CompanyUpdate />} />
         <Route path="company-view" element={<CompanyView />} />
+
         <Route path="store" element={<StorePage />} />
         <Route path="store/create" element={<StoreCreate />} />
         <Route path="store/update" element={<StoreUpdate />} />
-        <Route path="store/coverage" element={<StoreCoveragePage />} /> {/* ✅ Lokasyon Sayfası */}
+        <Route path="store/coverage" element={<StoreCoveragePage />} />
+
         <Route path="products/my-store" element={<MyStoreProductsPage />} />
         <Route path="products/database" element={<ProductDatabasePage />} />
         <Route path="products/requests" element={<ProductRequestListPage />} />
+
+        {/* ✅ Siparişler */}
+        <Route path="orders" element={<OrderListPage />} />
+        <Route path="orders/:orderId" element={<OrderDetailPage />} />
       </Route>
 
       {/* Tüm bilinmeyen yollar tanıtım sayfasına yönlensin */}
