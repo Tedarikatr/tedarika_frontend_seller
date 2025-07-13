@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import RegionSelector from "./RegionSelector";
 import CountrySelector from "./CountrySelector";
 import { addStoreCoverage } from "@/api/sellerLocationService";
@@ -8,6 +8,11 @@ const StoreCoverageForm = ({ onSuccess }) => {
   const [selectedCountryIds, setSelectedCountryIds] = useState([]);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState(null);
+
+  // Bölge değiştiğinde ülke seçimlerini sıfırla
+  useEffect(() => {
+    setSelectedCountryIds([]);
+  }, [selectedRegionId]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -54,7 +59,8 @@ const StoreCoverageForm = ({ onSuccess }) => {
         </div>
       )}
 
-      <RegionSelector selectedRegionId={selectedRegionId} onChange={setSelectedRegionId} />
+      {/* ✅ Prop adı düzeltildi: value olmalı */}
+      <RegionSelector value={selectedRegionId} onChange={setSelectedRegionId} />
 
       <CountrySelector
         regionId={selectedRegionId}
