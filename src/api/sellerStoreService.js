@@ -81,3 +81,11 @@ export const fetchProductRequestDetail = (requestId) =>
 // ✅ Özet veriyi getir
 export const fetchProductRequestSummary = () =>
   apiRequest("/SellerStoreProductRequest/request-summary", "GET", null, true);
+// ✅ Stok güncelle
+export const updateProductStock = (productId, stock) =>
+  apiRequest(
+    `/SellerStoreProduct/update-stock-productId=${productId}&stock=${stock}`,
+    "PUT",
+    null,
+    true
+  );

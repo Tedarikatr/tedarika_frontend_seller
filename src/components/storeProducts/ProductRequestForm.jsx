@@ -5,6 +5,15 @@ import {
   getSubCategoriesByCategoryId,
 } from "@/api/sellerStoreService";
 
+// Birim tipleri için etiketler
+const UNIT_TYPE_LABELS = {
+  1: "Adet", 2: "Ambalaj", 3: "Bidon", 4: "Çuval", 5: "Düzine",
+  6: "Galon", 7: "Gram", 8: "Gramaj", 9: "Karat", 10: "Kasa",
+  11: "kg", 12: "Koli", 13: "Litre", 14: "Metre", 15: "Metrekare",
+  16: "Metreküp", 17: "Mililitre", 18: "Paket", 19: "Palet", 20: "Rulo",
+  21: "Sandık", 22: "Santimetre", 23: "Şişe", 24: "Tane", 25: "Takım", 26: "Ton"
+};
+
 const initialState = {
   name: "",
   description: "",
@@ -108,7 +117,7 @@ const ProductRequestForm = ({ onSuccess, onCancel }) => {
 
         {/* Birim Tipleri */}
         <div>
-          <label className="block mb-1 text-sm font-medium text-gray-700">Birim Tipleri</label>
+          <label className="block mb-1 text-sm font-medium text-gray-700">Birim Tipleri (Açıklama)</label>
           <input
             name="unitTypes"
             value={form.unitTypes}
@@ -120,15 +129,21 @@ const ProductRequestForm = ({ onSuccess, onCancel }) => {
 
         {/* Birim Tipi */}
         <div>
-          <label className="block mb-1 text-sm font-medium text-gray-700">Birim Tipi (int)</label>
-          <input
+          <label className="block mb-1 text-sm font-medium text-gray-700">Birim Tipi</label>
+          <select
             name="unitType"
-            type="number"
             value={form.unitType}
             onChange={handleChange}
-            placeholder="Örn. 1"
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
-          />
+            required
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
+          >
+            <option value="">Seçiniz</option>
+            {Object.entries(UNIT_TYPE_LABELS).map(([key, label]) => (
+              <option key={key} value={key}>
+                {label}
+              </option>
+            ))}
+          </select>
         </div>
 
         {/* Ana Kategori */}
@@ -169,7 +184,7 @@ const ProductRequestForm = ({ onSuccess, onCancel }) => {
           </select>
         </div>
 
-        {/* Görsel Yükleme */}
+        {/* Görsel */}
         <div className="md:col-span-2">
           <label className="block mb-1 text-sm font-medium text-gray-700">Ürün Görseli</label>
           <input
@@ -195,7 +210,7 @@ const ProductRequestForm = ({ onSuccess, onCancel }) => {
         />
       </div>
 
-      {/* Checkbox'lar */}
+      {/* Checkbox Alanı */}
       <div className="flex flex-col sm:flex-row gap-4 text-sm text-gray-700">
         <label className="flex items-center gap-2">
           <input

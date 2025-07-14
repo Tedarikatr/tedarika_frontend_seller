@@ -21,6 +21,7 @@ const MyStoreProductTable = ({ products, onRefresh, onFeedback }) => {
             <th className="px-5 py-3 border-b border-gray-300 whitespace-nowrap">Limit</th>
             <th className="px-5 py-3 border-b border-gray-300 whitespace-nowrap">Görsel</th>
             <th className="px-5 py-3 border-b border-gray-300 whitespace-nowrap">Durum</th>
+            <th className="px-5 py-3 border-b border-gray-300 whitespace-nowrap">Stok</th>
             <th className="px-5 py-3 border-b border-gray-300 whitespace-nowrap">İşlemler</th>
           </tr>
         </thead>
