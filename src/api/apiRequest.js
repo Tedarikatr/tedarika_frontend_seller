@@ -9,16 +9,16 @@ export async function apiRequest(endpoint, method = "GET", data = null, useAuth 
     const token = localStorage.getItem("sellerToken");
     if (token) {
       headers["Authorization"] = `Bearer ${token}`;
+    } else {
+      console.warn("⚠️ Seller token not found in localStorage");
     }
   }
 
   const config = { method, headers };
 
-  // 🔧 Eğer data varsa ve FormData değilse JSON.stringify et
   if (data) {
     if (data instanceof FormData) {
       config.body = data;
-      // ❌ Content-Type setleme — tarayıcı kendisi ayarlıyor
     } else {
       headers["Content-Type"] = "application/json";
       config.body = JSON.stringify(data);
@@ -43,10 +43,17 @@ export async function apiRequest(endpoint, method = "GET", data = null, useAuth 
     throw new Error(errorMessage);
   }
 
-  try {
-    return await response.json();
-  } catch (jsonError) {
-    console.warn("⚠️ Yanıt JSON değil:", jsonError);
-    return {};
+  const contentType = response.headers.get("content-type");
+
+  if (contentType && contentType.includes("application/json")) {
+    try {
+      return await response.json();
+    } catch (jsonError) {
+      console.warn("⚠️ JSON parse hatası:", jsonError);
+      return {};
+    }
+  } else {
+    const text = await response.text();
+    return { message: text };
   }
 }
