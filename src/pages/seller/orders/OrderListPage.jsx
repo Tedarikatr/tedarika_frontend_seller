@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { fetchStoreOrders } from "@/api/sellerOrderService";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 // Sipariş durumlarına göre etiket stilleri
 const getStatusLabel = (status) => {
@@ -17,8 +17,15 @@ const getStatusLabel = (status) => {
 const OrderListPage = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
+    const token = localStorage.getItem("sellerToken");
+    if (!token) {
+      navigate("/seller/login");
+      return;
+    }
+
     const loadOrders = async () => {
       try {
         const res = await fetchStoreOrders();
@@ -31,7 +38,7 @@ const OrderListPage = () => {
     };
 
     loadOrders();
-  }, []);
+  }, [navigate]);
 
   return (
     <div className="p-6 max-w-6xl mx-auto">
@@ -89,6 +96,7 @@ const OrderListPage = () => {
                     <td className="px-4 py-3 text-center">
                       <Link
                         to={`/seller/orders/${order.id}`}
+                        state={{ order }} // opsiyonel, OrderDetailPage'de optimize render için
                         className="text-blue-600 hover:underline font-medium text-sm"
                       >
                         Detay
