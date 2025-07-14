@@ -7,8 +7,16 @@ const CompanyCreate = () => {
   const navigate = useNavigate();
 
   const [form, setForm] = useState({
-    name: "", taxNumber: "", taxOffice: "", companyNumber: "",
-    industry: "", country: "", city: "", address: "", email: "", phone: "",
+    name: "",
+    taxNumber: "",
+    taxOffice: "",
+    companyNumber: "",
+    industry: "",
+    country: "",
+    city: "",
+    address: "",
+    email: "",
+    phone: "",
   });
 
   const [message, setMessage] = useState("");
@@ -30,7 +38,7 @@ const CompanyCreate = () => {
       await createCompany(trimmedForm);
       const confirmed = await hasCompany();
       if (confirmed) {
-        navigate("/seller/dashboard");
+        navigate("/seller/subscription"); // ✅ Artık subscription sayfasına yönlendir
       } else {
         setMessage("Sistemsel hata: şirket oluşturuldu ancak görünmüyor.");
       }
@@ -56,7 +64,7 @@ const CompanyCreate = () => {
   return (
     <div className="min-h-screen bg-[#0f172a] text-white flex items-center justify-center px-4 py-10">
       <div className="flex flex-col md:flex-row bg-[#1e293b] rounded-3xl shadow-2xl overflow-hidden max-w-6xl w-full">
-        {/* Sol Alan */}
+        {/* Sol Bilgi Alanı */}
         <div className="hidden md:flex flex-col justify-center bg-[#003636] text-white w-full md:w-1/2 p-10">
           <h2 className="text-3xl font-bold mb-6">Tedarika'da Şirket Oluştur</h2>
           <ul className="space-y-4 text-sm">
@@ -75,7 +83,7 @@ const CompanyCreate = () => {
           </ul>
         </div>
 
-        {/* Sağ Form */}
+        {/* Sağ Form Alanı */}
         <form
           onSubmit={handleSubmit}
           className="w-full md:w-1/2 bg-white text-[#003636] p-8 sm:p-10"
