@@ -12,10 +12,11 @@ import MyStoreProductsPage from "@/pages/seller/products/MyStoreProductsPage";
 import ProductDatabasePage from "@/pages/seller/products/ProductDatabasePage";
 import ProductRequestListPage from "@/pages/seller/products/ProductRequestListPage";
 
-import StoreCoveragePage from "@/pages/seller/location/StoreCoveragePage"; // ✅ Lokasyon sayfası
+import StoreCoveragePage from "@/pages/seller/location/StoreCoveragePage";
+import OrderListPage from "@/pages/seller/orders/OrderListPage";
+import OrderDetailPage from "@/pages/seller/orders/OrderDetailPage";
 
-import OrderListPage from "@/pages/seller/orders/OrderListPage"; // ✅ Sipariş listesi
-import OrderDetailPage from "@/pages/seller/orders/OrderDetailPage"; // ✅ Sipariş detayı
+import SubscriptionPage from "@/pages/seller/subscription/SubscriptionPage"; // ✅ Bağımsız abonelik sayfası
 
 import SellerLayout from "@/components/layout/SellerLayout";
 import PrivateRoute from "@/routes/PrivateRoute";
@@ -30,6 +31,16 @@ function App() {
       <Route path="/seller/register" element={<RegisterPage />} />
       <Route path="/seller/login" element={<LoginPage />} />
       <Route path="/seller/company" element={<CompanyCreate />} />
+
+      {/* ✅ Abonelik sayfası layout DIŞINDA */}
+      <Route
+        path="/seller/subscription"
+        element={
+          <PrivateRoute>
+            <SubscriptionPage />
+          </PrivateRoute>
+        }
+      />
 
       {/* 🔒 Giriş gerektiren seller layout'lu alanlar */}
       <Route
@@ -53,12 +64,11 @@ function App() {
         <Route path="products/database" element={<ProductDatabasePage />} />
         <Route path="products/requests" element={<ProductRequestListPage />} />
 
-        {/* ✅ Siparişler */}
         <Route path="orders" element={<OrderListPage />} />
         <Route path="orders/:orderId" element={<OrderDetailPage />} />
       </Route>
 
-      {/* Tüm bilinmeyen yollar tanıtım sayfasına yönlensin */}
+      {/* ⛔ Catch-all */}
       <Route path="*" element={<Navigate to="/seller" replace />} />
     </Routes>
   );
