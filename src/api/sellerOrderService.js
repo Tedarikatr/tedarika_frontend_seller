@@ -1,6 +1,6 @@
 import { apiRequest } from "./apiRequest";
 
-// 1. Tüm siparişleri getir (mağaza bazlı)
+// 1. Mağazaya ait siparişlerin listesi
 export const fetchStoreOrders = () =>
   apiRequest("/SellerOrder/store-orders", "GET", null, true);
 
@@ -12,7 +12,7 @@ export const fetchPagedOrders = (page = 1, size = 10) =>
 export const fetchOrderDetail = (orderId) =>
   apiRequest(`/SellerOrder/detail/${orderId}`, "GET", null, true);
 
-// 4. Sipariş durumu güncelle (örneğin: Shipped, Completed vs.)
+// 4. Sipariş durumu güncelle
 export const updateOrderStatus = (orderId, newStatus) =>
   apiRequest(`/SellerOrder/update-status/${orderId}`, "PUT", { status: newStatus }, true);
 
