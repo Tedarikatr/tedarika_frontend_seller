@@ -8,18 +8,20 @@ import {
 import { ArrowPathIcon, XCircleIcon } from "@heroicons/react/24/solid";
 
 const statusOptions = [
-  { value: 0, label: "Beklemede" },
-  { value: 1, label: "Hazırlanıyor" },
-  { value: 2, label: "Kargoda" },
-  { value: 3, label: "Teslim Edildi" },
+  { value: 1, label: "Oluşturuldu" },
+  { value: 2, label: "Ödeme Bekleniyor" },
+  { value: 3, label: "Ödendi" },
+  { value: 4, label: "Kargoya Verildi" },
+  { value: 5, label: "Teslim Edildi" },
 ];
 
 const statusLabels = {
-  0: { text: "Beklemede", color: "bg-yellow-100 text-yellow-800" },
-  1: { text: "Hazırlanıyor", color: "bg-blue-100 text-blue-800" },
-  2: { text: "Kargoda", color: "bg-indigo-100 text-indigo-800" },
-  3: { text: "Teslim Edildi", color: "bg-green-100 text-green-800" },
-  4: { text: "İptal Edildi", color: "bg-red-100 text-red-800" },
+  1: { text: "Oluşturuldu", color: "bg-gray-100 text-gray-800" },
+  2: { text: "Ödeme Bekleniyor", color: "bg-yellow-100 text-yellow-700" },
+  3: { text: "Ödendi", color: "bg-blue-100 text-blue-700" },
+  4: { text: "Kargoya Verildi", color: "bg-purple-100 text-purple-700" },
+  5: { text: "Teslim Edildi", color: "bg-green-100 text-green-700" },
+  6: { text: "İptal Edildi", color: "bg-red-100 text-red-700" },
 };
 
 const OrderDetailPage = () => {
@@ -80,7 +82,7 @@ const OrderDetailPage = () => {
   };
 
   if (loading) {
-    return <div className="p-6 text-center text-gray-600 animate-pulse">Yükleniyor...</div>;
+    return <div className="p-6 text-center text-gray-500 animate-pulse">Yükleniyor...</div>;
   }
 
   if (!order) {
@@ -97,11 +99,13 @@ const OrderDetailPage = () => {
   };
 
   return (
-    <div className="p-6 max-w-5xl mx-auto space-y-6">
-      <h1 className="text-3xl font-semibold text-gray-800 border-b pb-2">Sipariş Detayı</h1>
+    <div className="p-6 max-w-6xl mx-auto space-y-6">
+      <h1 className="text-3xl font-bold text-gray-800 border-b pb-2">
+        Sipariş Detayı
+      </h1>
 
       {/* Genel Bilgiler */}
-      <div className="bg-white border rounded-md shadow-sm p-6 space-y-4">
+      <section className="bg-white border border-gray-200 rounded-md shadow-sm p-6 space-y-4">
         <ul className="text-sm text-gray-700 space-y-1">
           <li><strong>Sipariş No:</strong> {order.orderNumber}</li>
           <li><strong>Mağaza:</strong> {order.storeName}</li>
@@ -120,13 +124,13 @@ const OrderDetailPage = () => {
         {/* Statü Güncelleme */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 border-t pt-4">
           <select
-            className="border rounded-md px-4 py-2 text-sm focus:ring-emerald-500 focus:border-emerald-500"
+            className="border rounded-md px-4 py-2 text-sm shadow-sm focus:ring-emerald-500 focus:border-emerald-500"
             value={selectedStatus}
             onChange={(e) => setSelectedStatus(Number(e.target.value))}
             disabled={updating}
           >
             {statusOptions.map((opt) => (
-              <option key={opt.value} value={opt.value}>
+              <option key={opt.value} value={opt.value} disabled={opt.value === order.status}>
                 {opt.label}
               </option>
             ))}
@@ -135,50 +139,60 @@ const OrderDetailPage = () => {
           <button
             onClick={handleStatusUpdate}
             disabled={updating || selectedStatus === order.status}
-            className="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2 rounded-md text-sm font-medium inline-flex items-center gap-2 disabled:opacity-50"
+            className="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2 rounded-md text-sm font-semibold inline-flex items-center gap-2 transition-transform hover:scale-105 disabled:opacity-50"
           >
-            <ArrowPathIcon className="w-4 h-4" />
+            <ArrowPathIcon className="w-5 h-5" />
             {updating ? "Güncelleniyor..." : "Durumu Güncelle"}
           </button>
 
           <button
             onClick={handleCancel}
-            disabled={updating || order.status === 4}
-            className="bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded-md text-sm font-medium inline-flex items-center gap-2 disabled:opacity-50"
+            disabled={updating || order.status === 6}
+            className="bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded-md text-sm font-semibold inline-flex items-center gap-2 transition-transform hover:scale-105 disabled:opacity-50"
           >
-            <XCircleIcon className="w-4 h-4" />
+            <XCircleIcon className="w-5 h-5" />
             {updating ? "İptal Ediliyor..." : "Siparişi İptal Et"}
           </button>
         </div>
-      </div>
+      </section>
 
-      {/* Ödeme Bilgisi */}
-      <div className="bg-white border rounded-md shadow-sm p-6">
+      {/* Ödeme Bilgileri */}
+      <section className="bg-white border border-gray-200 rounded-md shadow-sm p-6">
         <h2 className="text-lg font-semibold text-gray-800 mb-3">Ödeme Bilgileri</h2>
         <ul className="text-sm text-gray-700 space-y-1">
           <li><strong>Yöntem:</strong> {order.payment?.name}</li>
           <li><strong>Tutar:</strong> ₺{order.payment?.totalAmount?.toFixed(2)}</li>
           <li><strong>Durum:</strong> {order.payment?.status === 1 ? "Ödenmedi" : "Ödendi"}</li>
         </ul>
-      </div>
+      </section>
 
       {/* Ürünler */}
-      <div className="bg-white border rounded-md shadow-sm p-6">
-        <h2 className="text-lg font-semibold text-gray-800 mb-3">Ürünler</h2>
-        <div className="space-y-3">
+      <section className="bg-white border border-gray-200 rounded-md shadow-sm p-6">
+        <h2 className="text-lg font-semibold text-gray-800 mb-5">Ürünler</h2>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {order.items.map((item, i) => (
-            <div key={i} className="flex items-center gap-4 border-b pb-3">
-              <img src={item.storeProductImageUrl} alt={item.productName} className="w-16 h-16 rounded border object-cover" />
-              <div className="text-sm text-gray-700">
-                <div className="font-medium">{item.productName}</div>
-                <div>Adet: {item.quantity}</div>
-                <div>Birim Fiyat: ₺{item.unitPrice.toFixed(2)}</div>
-                <div className="font-semibold">Toplam: ₺{item.totalPrice.toFixed(2)}</div>
+            <div
+              key={i}
+              className="bg-white border border-gray-300 rounded-lg shadow-sm hover:shadow-md transition duration-300 p-4 flex flex-col gap-3"
+            >
+              <div className="flex justify-center">
+                <img
+                  src={item.storeProductImageUrl}
+                  alt={item.productName}
+                  className="w-24 h-24 object-cover rounded-md border"
+                />
+              </div>
+              <div className="text-sm text-gray-700 space-y-1">
+                <h3 className="text-base font-semibold text-gray-800">{item.productName}</h3>
+                <p>Adet: <span className="font-medium">{item.quantity}</span></p>
+                <p>Birim Fiyat: ₺{item.unitPrice.toFixed(2)}</p>
+                <p className="font-semibold text-gray-900">Toplam: ₺{item.totalPrice.toFixed(2)}</p>
               </div>
             </div>
           ))}
         </div>
-      </div>
+      </section>
     </div>
   );
 };
