@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { activateSubscription } from "@/api/sellerSubscriptionService";
 import { toast } from "react-hot-toast";
@@ -54,6 +55,22 @@ const plans = [
 export default function SubscriptionPage() {
   const navigate = useNavigate();
 
+  useEffect(() => {
+    const raw = localStorage.getItem("sellerToken");
+    if (raw) {
+      try {
+        const payload = JSON.parse(atob(raw.split(".")[1])); // JWT'den payload decode
+        const isActive = payload?.SubscriptionActive === true || payload?.SubscriptionActive === "true";
+
+        if (isActive) {
+          navigate("/seller/dashboard");
+        }
+      } catch (err) {
+        console.error("🔑 Token çözümlenemedi:", err);
+      }
+    }
+  }, [navigate]);
+
   const handleSubscribe = async (packageId) => {
     try {
       await activateSubscription({
@@ -89,8 +106,7 @@ export default function SubscriptionPage() {
             >
               <h3 className="text-xl font-semibold text-green-700">{plan.name}</h3>
               <p className="text-4xl font-bold my-4">
-                {plan.price}{" "}
-                <span className="text-base font-medium text-gray-600">/ay</span>
+                {plan.price} <span className="text-base font-medium text-gray-600">/ay</span>
               </p>
               <p className="mb-6 text-gray-600">{plan.description}</p>
               <ul className="space-y-2 text-left text-sm text-gray-700">
