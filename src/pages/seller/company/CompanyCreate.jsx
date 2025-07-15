@@ -10,13 +10,12 @@ const CompanyCreate = () => {
     name: "",
     taxNumber: "",
     taxOffice: "",
-    companyNumber: "",
-    industry: "",
     country: "",
     city: "",
     address: "",
     email: "",
     phone: "",
+    industry: "",
   });
 
   const [message, setMessage] = useState("");
@@ -38,7 +37,7 @@ const CompanyCreate = () => {
       await createCompany(trimmedForm);
       const confirmed = await hasCompany();
       if (confirmed) {
-        navigate("/seller/subscription"); // ✅ Artık subscription sayfasına yönlendir
+        navigate("/seller/subscription");
       } else {
         setMessage("Sistemsel hata: şirket oluşturuldu ancak görünmüyor.");
       }
@@ -50,15 +49,14 @@ const CompanyCreate = () => {
 
   const fields = [
     { name: "name", label: "Şirket Adı" },
-    { name: "taxNumber", label: "Vergi No" },
+    { name: "taxNumber", label: "Vergi Numarası" },
     { name: "taxOffice", label: "Vergi Dairesi" },
-    { name: "companyNumber", label: "Sicil No" },
-    { name: "industry", label: "Sektör" },
     { name: "country", label: "Ülke" },
     { name: "city", label: "Şehir" },
     { name: "address", label: "Adres" },
     { name: "email", label: "E-posta" },
     { name: "phone", label: "Telefon" },
+    { name: "industry", label: "Sektör" },
   ];
 
   return (
