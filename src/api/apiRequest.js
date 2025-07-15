@@ -1,4 +1,4 @@
-const BASE_URL = "https://tedarikamarketplaces-dea5htdedkb6hsgv.eastus-01.azurewebsites.net/api";
+const BASE_URL = "https://tedarikamarketplaces-akdph0cvdrezedgk.westeurope-01.azurewebsites.net/api";
 
 export async function apiRequest(endpoint, method = "GET", data = null, useAuth = false) {
   const headers = {
