@@ -12,9 +12,9 @@ export const fetchPagedOrders = (page = 1, size = 10) =>
 export const fetchOrderDetail = (orderId) =>
   apiRequest(`/SellerOrder/detail/${orderId}`, "GET", null, true);
 
-// 4. Sipariş durumu güncelle
+// ✅ 4. Sipariş durumu güncelle — sadece düz integer gönderiyoruz
 export const updateOrderStatus = (orderId, newStatus) =>
-  apiRequest(`/SellerOrder/update-status/${orderId}`, "PUT", { status: newStatus }, true);
+  apiRequest(`/SellerOrder/update-status/${orderId}`, "PUT", newStatus, true);
 
 // 5. Sipariş iptali
 export const cancelOrder = (orderId) =>
