@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 
+// Seller sayfaları
 import RegisterPage from "@/pages/seller/RegisterPage";
 import LoginPage from "@/pages/seller/LoginPage";
 import DashboardPage from "@/pages/seller/DashboardPage";
@@ -15,34 +16,33 @@ import ProductRequestListPage from "@/pages/seller/products/ProductRequestListPa
 import StoreCoveragePage from "@/pages/seller/location/StoreCoveragePage";
 import OrderListPage from "@/pages/seller/orders/OrderListPage";
 import OrderDetailPage from "@/pages/seller/orders/OrderDetailPage";
-
-import SubscriptionPage from "@/pages/seller/subscription/SubscriptionPage"; // ✅ Bağımsız abonelik sayfası
+import SellerQuotationListPage from "./pages/seller/quotations/QuotationListPage";
+import SubscriptionPage from "@/pages/seller/subscription/SubscriptionPage";
 
 import SellerLayout from "@/components/layout/SellerLayout";
 import PrivateRoute from "@/routes/PrivateRoute";
+import SemiPrivateRoute from "@/routes/SemiPrivateRoute";
 
 function App() {
   return (
     <Routes>
-      {/* 🎯 Tanıtım sayfası */}
+      {/* Açık seller sayfaları */}
       <Route path="/seller" element={<SellerLandingPage />} />
-
-      {/* Herkese açık seller sayfaları */}
       <Route path="/seller/register" element={<RegisterPage />} />
       <Route path="/seller/login" element={<LoginPage />} />
       <Route path="/seller/company" element={<CompanyCreate />} />
 
-      {/* ✅ Abonelik sayfası layout DIŞINDA */}
+      {/* 🟡 Girişli ama abone olmayanlara açık: */}
       <Route
         path="/seller/subscription"
         element={
-          <PrivateRoute>
+          <SemiPrivateRoute>
             <SubscriptionPage />
-          </PrivateRoute>
+          </SemiPrivateRoute>
         }
       />
 
-      {/* 🔒 Giriş gerektiren seller layout'lu alanlar */}
+      {/* 🔒 Giriş + abonelik gereken seller panel alanı */}
       <Route
         path="/seller"
         element={
@@ -63,12 +63,12 @@ function App() {
         <Route path="products/my-store" element={<MyStoreProductsPage />} />
         <Route path="products/database" element={<ProductDatabasePage />} />
         <Route path="products/requests" element={<ProductRequestListPage />} />
-
+        <Route path="/seller/quotations" element={<SellerQuotationListPage />} />
         <Route path="orders" element={<OrderListPage />} />
         <Route path="orders/:orderId" element={<OrderDetailPage />} />
       </Route>
 
-      {/* ⛔ Catch-all */}
+      {/* 404 */}
       <Route path="*" element={<Navigate to="/seller" replace />} />
     </Routes>
   );
