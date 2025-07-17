@@ -1,18 +1,17 @@
 import React, { useState } from "react";
 import {
   updateProductPrice,
-  toggleProductActiveStatus,
   toggleProductOnSale,
   updateProductQuantityLimits,
   uploadProductImage,
   updateProductStock,
 } from "@/api/sellerStoreService";
 
-const ProductRow = ({ product, onRefresh, onFeedback }) => {
+const ProductRow = ({ product, onRefresh, onFeedback, hasCoverage }) => {
   const [price, setPrice] = useState(product.unitPrice);
   const [minQty, setMinQty] = useState(product.minOrderQuantity);
   const [maxQty, setMaxQty] = useState(product.maxOrderQuantity);
-  const [stock, setStock] = useState(product.stockQuantity ?? 0); // ✅ Doğru alan kullanıldı
+  const [stock, setStock] = useState(product.stockQuantity ?? 0);
   const [imageFile, setImageFile] = useState(null);
 
   const handleAction = async (actionFn, successMessage) => {
@@ -33,7 +32,7 @@ const ProductRow = ({ product, onRefresh, onFeedback }) => {
 
   return (
     <tr className="border-b border-gray-200 hover:bg-gray-50 transition">
-      {/* Ürün */}
+      {/* Ürün Bilgisi */}
       <td className="px-4 py-3">
         <div className="flex items-center gap-3">
           <img
@@ -54,7 +53,7 @@ const ProductRow = ({ product, onRefresh, onFeedback }) => {
         <div className="text-xs text-gray-500">{product.categorySubName}</div>
       </td>
 
-      {/* Fiyat */}
+      {/* Fiyat Güncelle */}
       <td className="px-4 py-3">
         <div className="flex items-center gap-2">
           <input
@@ -72,7 +71,7 @@ const ProductRow = ({ product, onRefresh, onFeedback }) => {
         </div>
       </td>
 
-      {/* Limit */}
+      {/* Limit Güncelle */}
       <td className="px-4 py-3">
         <div className="flex items-center gap-2">
           <input
@@ -117,20 +116,15 @@ const ProductRow = ({ product, onRefresh, onFeedback }) => {
         </div>
       </td>
 
-      {/* Durum */}
+      {/* Satış Durumu */}
       <td className="px-4 py-3 text-sm">
-        <div className="flex flex-col gap-1">
-          <span className={`px-2 py-1 rounded text-xs font-medium w-fit ${
-            product.isActive ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
-          }`}>
-            {product.isActive ? "Aktif" : "Pasif"}
-          </span>
-          <span className={`px-2 py-1 rounded text-xs font-medium w-fit ${
+        <span
+          className={`px-2 py-1 rounded text-xs font-medium w-fit ${
             product.isOnSale ? "bg-blue-100 text-blue-700" : "bg-gray-100 text-gray-600"
-          }`}>
-            {product.isOnSale ? "Satışta" : "Satışta Değil"}
-          </span>
-        </div>
+          }`}
+        >
+          {product.isOnSale ? "Satışta" : "Satışta Değil"}
+        </span>
       </td>
 
       {/* Stok */}
@@ -151,20 +145,9 @@ const ProductRow = ({ product, onRefresh, onFeedback }) => {
         </div>
       </td>
 
-      {/* İşlemler */}
+      {/* İşlem Butonları */}
       <td className="px-4 py-3 text-sm">
         <div className="flex flex-col gap-1">
-          <button
-            onClick={() =>
-              handleAction(
-                () => toggleProductActiveStatus(product.id, !product.isActive),
-                product.isActive ? "Ürün pasifleştirildi." : "Ürün aktifleştirildi."
-              )
-            }
-            className="text-blue-700 hover:underline"
-          >
-            {product.isActive ? "Pasifleştir" : "Aktifleştir"}
-          </button>
           <button
             onClick={() =>
               handleAction(
@@ -172,7 +155,15 @@ const ProductRow = ({ product, onRefresh, onFeedback }) => {
                 product.isOnSale ? "Satış kapatıldı." : "Satışa açıldı."
               )
             }
-            className="text-yellow-600 hover:underline"
+            disabled={!hasCoverage}
+            title={
+              !hasCoverage
+                ? "Satışa açmak için mağazanızda en az bir hizmet bölgesi tanımlı olmalıdır."
+                : ""
+            }
+            className={`text-yellow-600 hover:underline ${
+              !hasCoverage ? "opacity-50 cursor-not-allowed" : ""
+            }`}
           >
             {product.isOnSale ? "Satışı Kapat" : "Satışa Aç"}
           </button>
