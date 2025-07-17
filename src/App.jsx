@@ -18,7 +18,8 @@ import OrderListPage from "@/pages/seller/orders/OrderListPage";
 import OrderDetailPage from "@/pages/seller/orders/OrderDetailPage";
 import SellerQuotationListPage from "./pages/seller/quotations/QuotationListPage";
 import SubscriptionPage from "@/pages/seller/subscription/SubscriptionPage";
-
+import StoreReviewsPage from "@/pages/seller/reviews/StoreReviewsPage";
+import ProductReviewsPage from "@/pages/seller/reviews/ProductReviewsPage";
 import SellerLayout from "@/components/layout/SellerLayout";
 import PrivateRoute from "@/routes/PrivateRoute";
 import SemiPrivateRoute from "@/routes/SemiPrivateRoute";
@@ -59,6 +60,8 @@ function App() {
         <Route path="store/create" element={<StoreCreate />} />
         <Route path="store/update" element={<StoreUpdate />} />
         <Route path="store/coverage" element={<StoreCoveragePage />} />
+        <Route path="/seller/reviews" element={<StoreReviewsPage />} />
+        <Route path="/seller/products/:productId/reviews" element={<ProductReviewsPage />} />
 
         <Route path="products/my-store" element={<MyStoreProductsPage />} />
         <Route path="products/database" element={<ProductDatabasePage />} />
