@@ -15,6 +15,7 @@ export const updateStore = (id, data) =>
 // Kategori listesi
 export const getAllCategories = () =>
   apiRequest("/AdminCategory/all", "GET");
+
 export const getSubCategoriesByCategoryId = (categoryId) =>
   apiRequest(`/AdminCategorySub/by-category?categoryId=${categoryId}`, "GET");
 
@@ -34,15 +35,9 @@ export const addProductToStore = (productId) =>
 export const updateProductPrice = (productId, price) =>
   apiRequest(`/SellerStoreProduct/update-price-productId=${productId}&price=${price}`, "PUT", null, true);
 
-// ✅ Aktif/Pasif
-// ✅ Aktif/Pasif durumu ayarla
-export const toggleProductActiveStatus = (productId, isActive) =>
-  apiRequest("/SellerStoreProduct/set-active-status", "PUT", { productId, isActive }, true);
-
-// ✅ Satış durumu ayarla
+// ✅ Satış durumu ayarla (aktiflik kaldırıldı!)
 export const toggleProductOnSale = (productId, isOnSale) =>
   apiRequest("/SellerStoreProduct/set-on-sale", "PUT", { productId, isOnSale }, true);
-
 
 // ✅ Min/Max limiti güncelle
 export const updateProductQuantityLimits = (productId, minQty, maxQty) =>
@@ -53,7 +48,7 @@ export const updateProductQuantityLimits = (productId, minQty, maxQty) =>
     true
   );
 
-// ✅ Görsel yükle (DÜZENLENMİŞ)
+// ✅ Görsel yükle
 export const uploadProductImage = (productId, file) => {
   const formData = new FormData();
   formData.append("file", file);
@@ -66,9 +61,18 @@ export const uploadProductImage = (productId, file) => {
   );
 };
 
+// ✅ Stok güncelle
+export const updateProductStock = (productId, stock) =>
+  apiRequest(
+    `/SellerStoreProduct/update-stock-productId=${productId}&stock=${stock}`,
+    "PUT",
+    null,
+    true
+  );
+
+// ✅ İstek oluştur
 export const createProductRequest = (formData) =>
   apiRequest("/SellerStoreProductRequest/create", "POST", formData, true);
-
 
 // ✅ Tüm istekleri getir
 export const fetchProductRequests = () =>
@@ -81,11 +85,7 @@ export const fetchProductRequestDetail = (requestId) =>
 // ✅ Özet veriyi getir
 export const fetchProductRequestSummary = () =>
   apiRequest("/SellerStoreProductRequest/request-summary", "GET", null, true);
-// ✅ Stok güncelle
-export const updateProductStock = (productId, stock) =>
-  apiRequest(
-    `/SellerStoreProduct/update-stock-productId=${productId}&stock=${stock}`,
-    "PUT",
-    null,
-    true
-  );
+
+// ✅ Hizmet bölgeleri
+export const getStoreCoverage = () =>
+  apiRequest("/SellerStoreCoverage/my-coverage", "GET", null, true);
