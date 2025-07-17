@@ -1,7 +1,7 @@
 import React from "react";
 import ProductRow from "./ProductRow";
 
-const MyStoreProductTable = ({ products, onRefresh, onFeedback }) => {
+const MyStoreProductTable = ({ products, onRefresh, onFeedback, hasCoverage }) => {
   if (!products?.length) {
     return (
       <div className="p-6 text-gray-500 text-sm border border-gray-200 rounded-md bg-white shadow-sm">
@@ -32,6 +32,7 @@ const MyStoreProductTable = ({ products, onRefresh, onFeedback }) => {
               product={product}
               onRefresh={onRefresh}
               onFeedback={onFeedback}
+              hasCoverage={hasCoverage} // ✅ EKLENDİ!
             />
           ))}
         </tbody>
