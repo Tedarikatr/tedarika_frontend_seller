@@ -6,30 +6,28 @@ const ProductDatabaseTable = ({ products, onAdd, addingId, addedIds }) => {
       <table className="min-w-full text-sm bg-white border border-gray-200 rounded-lg shadow-sm">
         <thead className="bg-gray-100 text-gray-700 font-semibold">
           <tr>
-            <th className="px-4 py-3 text-left whitespace-nowrap">ID</th>
-            <th className="px-4 py-3 text-left whitespace-nowrap">Ürün Adı</th>
-            <th className="px-4 py-3 text-left whitespace-nowrap">Kategori</th>
-            <th className="px-4 py-3 text-left whitespace-nowrap">Marka</th>
-            <th className="px-4 py-3 text-left whitespace-nowrap">Barkod</th>
-            <th className="px-4 py-3 text-center whitespace-nowrap">İşlem</th>
+            <th className="px-4 py-3 text-left">ID</th>
+            <th className="px-4 py-3 text-left">Ürün Adı</th>
+            <th className="px-4 py-3 text-left">Kategori</th>
+            <th className="px-4 py-3 text-left">Marka</th>
+            <th className="px-4 py-3 text-left">Barkod</th>
+            <th className="px-4 py-3 text-center">İşlem</th>
           </tr>
         </thead>
         <tbody>
           {products.map((prod, index) => (
             <tr
               key={prod.id}
-              className={`transition-colors ${
-                index % 2 === 0 ? "bg-white" : "bg-gray-50"
-              } hover:bg-blue-50`}
+              className={`${index % 2 === 0 ? "bg-white" : "bg-gray-50"} hover:bg-blue-50 transition-colors`}
             >
-              <td className="px-4 py-3 text-gray-800 border-t">{prod.id}</td>
-              <td className="px-4 py-3 font-medium text-gray-900 border-t">{prod.name}</td>
-              <td className="px-4 py-3 text-gray-700 border-t">
+              <td className="px-4 py-3 border-t">{prod.id}</td>
+              <td className="px-4 py-3 border-t font-medium">{prod.name}</td>
+              <td className="px-4 py-3 border-t">
                 {prod.categoryName}
                 <div className="text-xs text-gray-500">{prod.categorySubName}</div>
               </td>
-              <td className="px-4 py-3 text-gray-700 border-t">{prod.brand}</td>
-              <td className="px-4 py-3 text-gray-700 border-t">{prod.barcode}</td>
+              <td className="px-4 py-3 border-t">{prod.brand}</td>
+              <td className="px-4 py-3 border-t">{prod.barcode}</td>
               <td className="px-4 py-3 text-center border-t">
                 {addedIds.includes(prod.id) ? (
                   <span className="inline-block text-green-700 bg-green-100 border border-green-200 px-2 py-1 rounded text-xs font-semibold">
