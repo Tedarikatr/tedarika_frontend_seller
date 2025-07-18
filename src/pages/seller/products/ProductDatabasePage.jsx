@@ -1,5 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { fetchProductDatabase, addProductToStore } from "@/api/sellerStoreService";
+import {
+  fetchProductDatabase,
+  addProductToStore,
+  fetchMyStoreProducts,
+} from "@/api/sellerStoreService";
 import ProductDatabaseTable from "@/components/storeProducts/ProductDatabaseTable";
 import ProductRequestForm from "@/components/storeProducts/ProductRequestForm";
 import Pagination from "@/components/ui/Pagination";
@@ -19,10 +23,14 @@ const ProductDatabasePage = () => {
   const loadProducts = async () => {
     setLoading(true);
     try {
-      const result = await fetchProductDatabase();
-      setProducts(result);
+      const [allProducts, myProducts] = await Promise.all([
+        fetchProductDatabase(),
+        fetchMyStoreProducts(),
+      ]);
+      setProducts(allProducts);
+      setAddedProductIds(myProducts.map((p) => p.id));
     } catch (err) {
-      console.error("Ürün veritabanı alınamadı:", err);
+      console.error("Ürünler alınamadı:", err.response?.data || err.message);
     } finally {
       setLoading(false);
     }
@@ -31,10 +39,17 @@ const ProductDatabasePage = () => {
   const handleAddProduct = async (productId) => {
     setAddingId(productId);
     try {
+      if (addedProductIds.includes(productId)) {
+        alert("Bu ürün zaten mağazanızda mevcut.");
+        return;
+      }
+
       await addProductToStore(productId);
       setAddedProductIds((prev) => [...prev, productId]);
-    } catch {
-      alert("Ürün eklenemedi!");
+    } catch (err) {
+      const errorMsg =
+        err?.response?.data?.error || err?.message || "Bilinmeyen bir hata oluştu.";
+      alert("Ürün eklenemedi: " + errorMsg);
     } finally {
       setAddingId(null);
     }
@@ -59,7 +74,6 @@ const ProductDatabasePage = () => {
 
   return (
     <div className="p-4 sm:p-6 bg-gray-50 min-h-screen">
-      {/* Header */}
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-6">
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">Ürün Veritabanı</h1>
 
@@ -74,12 +88,10 @@ const ProductDatabasePage = () => {
               setCurrentPage(1);
             }}
           />
-
           <div className="flex justify-between sm:justify-start gap-2 items-center">
             <span className="text-sm text-gray-600 whitespace-nowrap">
               {filteredProducts.length} ürün bulundu
             </span>
-
             <button
               onClick={() => setShowForm(true)}
               className="bg-green-600 text-white px-3 py-2 rounded text-sm hover:bg-green-700 flex items-center gap-1"
@@ -91,7 +103,6 @@ const ProductDatabasePage = () => {
         </div>
       </div>
 
-      {/* Başvuru Formu */}
       {showForm && (
         <div className="mb-6">
           <ProductRequestForm
@@ -104,7 +115,6 @@ const ProductDatabasePage = () => {
         </div>
       )}
 
-      {/* Tablo */}
       {loading ? (
         <div className="text-gray-600 text-sm">Ürünler yükleniyor, lütfen bekleyin...</div>
       ) : (
