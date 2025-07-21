@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { activateSubscription } from "@/api/sellerSubscriptionService";
+import { refreshToken } from "@/api/sellerAuthService";
 import { toast } from "react-hot-toast";
 
 const plans = [
@@ -80,8 +81,22 @@ export default function SubscriptionPage() {
         paymentReference: "initial-subscription",
       });
 
-      toast.success("Abonelik başarıyla başlatıldı");
-      navigate("/seller/dashboard");
+      const oldToken = localStorage.getItem("sellerToken");
+      if (!oldToken) {
+        toast.error("Token bulunamadı");
+        return;
+      }
+
+      const response = await refreshToken({ token: oldToken });
+      const newToken = response.token;
+
+      if (newToken) {
+        localStorage.setItem("sellerToken", newToken);
+        toast.success("Abonelik başarıyla başlatıldı");
+        navigate("/seller/dashboard");
+      } else {
+        toast.error("Yeni token alınamadı");
+      }
     } catch (err) {
       console.error(err);
       toast.error("Abonelik başlatılamadı");
