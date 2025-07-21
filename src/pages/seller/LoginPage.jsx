@@ -27,12 +27,10 @@ const LoginPage = () => {
 
     try {
       const result = await loginSeller(formData);
-      const tokenData = result?.token;
-
-      if (tokenData && typeof tokenData.token === "string") {
-        localStorage.setItem("sellerToken", tokenData.token);
-        localStorage.setItem("sellerEmail", tokenData.email);
-        localStorage.setItem("sellerRole", tokenData.role);
+      if (typeof result?.token === "string") {
+        localStorage.setItem("sellerToken", result.token);
+        localStorage.setItem("sellerEmail", result.email);
+        localStorage.setItem("sellerRole", result.role);
         setMessage("✅ Giriş başarılı, yönlendiriliyorsunuz...");
         navigate("/seller/dashboard");
       } else {
@@ -44,6 +42,7 @@ const LoginPage = () => {
     } finally {
       setIsSubmitting(false);
     }
+    
   };
 
   return (
