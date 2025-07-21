@@ -31,30 +31,31 @@ export const fetchProductDatabase = () =>
 export const addProductToStore = (productId) =>
   apiRequest(`/SellerStoreProduct/${productId}/add`, "POST", null, true);
 
-// ✅ Fiyat güncelle
-export const updateProductPrice = (productId, price) =>
-  apiRequest(`/SellerStoreProduct/update-price-productId=${productId}&price=${price}`, "PUT", null, true);
+// ✅ Fiyat güncelle (storeProductId gerekiyor)
+export const updateProductPrice = (storeProductId, price) =>
+  apiRequest(`/SellerStoreProduct/update-price-storeProductId=${storeProductId}&price=${price}`, "PUT", null, true);
 
-// ✅ Satış durumu ayarla (aktiflik kaldırıldı!)
-export const toggleProductOnSale = (productId, isOnSale) =>
-  apiRequest("/SellerStoreProduct/set-on-sale", "PUT", { productId, isOnSale }, true);
+// ✅ Satış durumu ayarla
+export const toggleProductOnSale = (storeProductId, isOnSale) =>
+  apiRequest("/SellerStoreProduct/set-on-sale", "PUT", { storeProductId, isOnSale }, true);
+
 
 // ✅ Min/Max limiti güncelle
-export const updateProductQuantityLimits = (productId, minQty, maxQty) =>
+export const updateProductQuantityLimits = (storeProductId, minQty, maxQty) =>
   apiRequest(
-    `/SellerStoreProduct/set-quantity-limits-productId=${productId}&minQty=${minQty}&maxQty=${maxQty}`,
+    `/SellerStoreProduct/set-quantity-limits-storeProductId=${storeProductId}&minQty=${minQty}&maxQty=${maxQty}`,
     "PUT",
     null,
     true
   );
 
 // ✅ Görsel yükle
-export const uploadProductImage = (productId, file) => {
+export const uploadProductImage = (storeProductId, file) => {
   const formData = new FormData();
   formData.append("file", file);
 
   return apiRequest(
-    `/SellerStoreProduct/upload-image?productId=${productId}`,
+    `/SellerStoreProduct/upload-image?storeProductId=${storeProductId}`,
     "POST",
     formData,
     true
@@ -62,9 +63,9 @@ export const uploadProductImage = (productId, file) => {
 };
 
 // ✅ Stok güncelle
-export const updateProductStock = (productId, stock) =>
+export const updateProductStock = (storeProductId, stock) =>
   apiRequest(
-    `/SellerStoreProduct/update-stock-productId=${productId}&stock=${stock}`,
+    `/SellerStoreProduct/update-stock-storeProductId=${storeProductId}&stock=${stock}`,
     "PUT",
     null,
     true
