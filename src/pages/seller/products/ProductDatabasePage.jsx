@@ -43,13 +43,10 @@ const ProductDatabasePage = () => {
         alert("Bu ürün zaten mağazanızda mevcut.");
         return;
       }
-
       await addProductToStore(productId);
       setAddedProductIds((prev) => [...prev, productId]);
     } catch (err) {
-      const errorMsg =
-        err?.response?.data?.error || err?.message || "Bilinmeyen bir hata oluştu.";
-      alert("Ürün eklenemedi: " + errorMsg);
+      alert("Ürün eklenemedi: " + (err?.response?.data?.error || err.message));
     } finally {
       setAddingId(null);
     }
@@ -74,8 +71,8 @@ const ProductDatabasePage = () => {
 
   return (
     <div className="p-4 sm:p-6 bg-gray-50 min-h-screen">
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-6">
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">Ürün Veritabanı</h1>
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+        <h1 className="text-2xl font-bold text-gray-800">Ürün Veritabanı</h1>
 
         <div className="flex flex-col sm:flex-row sm:items-center gap-2 w-full md:w-auto">
           <input
@@ -88,7 +85,7 @@ const ProductDatabasePage = () => {
               setCurrentPage(1);
             }}
           />
-          <div className="flex justify-between sm:justify-start gap-2 items-center">
+          <div className="flex items-center gap-2">
             <span className="text-sm text-gray-600 whitespace-nowrap">
               {filteredProducts.length} ürün bulundu
             </span>
@@ -116,10 +113,10 @@ const ProductDatabasePage = () => {
       )}
 
       {loading ? (
-        <div className="text-gray-600 text-sm">Ürünler yükleniyor, lütfen bekleyin...</div>
+        <div className="text-gray-600 text-sm py-6">Ürünler yükleniyor, lütfen bekleyin...</div>
       ) : (
         <>
-          <div className="overflow-x-auto rounded-xl border border-gray-300 shadow-sm bg-white">
+          <div className="overflow-x-auto border border-gray-300 rounded-xl shadow-sm bg-white">
             <ProductDatabaseTable
               products={visibleProducts}
               onAdd={handleAddProduct}
