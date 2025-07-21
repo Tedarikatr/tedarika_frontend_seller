@@ -10,3 +10,6 @@ export function loginSeller(data) {
 export function fetchSellerProfile() {
     return apiRequest("/SellerUser/profile", "GET");
   }
+  export function refreshToken(data) {
+    return apiRequest("/SellerUser/refresh-token", "POST", data);
+  }
