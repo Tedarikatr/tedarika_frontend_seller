@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { activateSubscription } from "@/api/sellerSubscriptionService";
 import { refreshToken } from "@/api/sellerAuthService";
@@ -55,16 +55,18 @@ const plans = [
 
 export default function SubscriptionPage() {
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const raw = localStorage.getItem("sellerToken");
     if (raw) {
       try {
-        const payload = JSON.parse(atob(raw.split(".")[1])); // JWT'den payload decode
+        const payload = JSON.parse(atob(raw.split(".")[1]));
         const isActive = payload?.SubscriptionActive === true || payload?.SubscriptionActive === "true";
 
         if (isActive) {
-          navigate("/seller/dashboard");
+          const hasCompany = payload?.HasCompany === true || payload?.HasCompany === "true";
+          navigate(hasCompany ? "/seller/dashboard" : "/seller/company");
         }
       } catch (err) {
         console.error("🔑 Token çözümlenemedi:", err);
@@ -74,16 +76,19 @@ export default function SubscriptionPage() {
 
   const handleSubscribe = async (packageId) => {
     try {
+      setIsLoading(true);
+
       await activateSubscription({
         subscriptionPackageId: packageId,
         startDate: new Date().toISOString(),
-        endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // +30 gün
+        endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
         paymentReference: "initial-subscription",
       });
 
       const oldToken = localStorage.getItem("sellerToken");
       if (!oldToken) {
         toast.error("Token bulunamadı");
+        setIsLoading(false);
         return;
       }
 
@@ -93,15 +98,31 @@ export default function SubscriptionPage() {
       if (newToken) {
         localStorage.setItem("sellerToken", newToken);
         toast.success("Abonelik başarıyla başlatıldı");
-        navigate("/seller/dashboard");
+
+        const payload = JSON.parse(atob(newToken.split(".")[1]));
+        const hasCompany = payload?.HasCompany === true || payload?.HasCompany === "true";
+
+        setTimeout(() => {
+          navigate(hasCompany ? "/seller/dashboard" : "/seller/company");
+        }, 800);
       } else {
         toast.error("Yeni token alınamadı");
+        setIsLoading(false);
       }
     } catch (err) {
       console.error(err);
       toast.error("Abonelik başlatılamadı");
+      setIsLoading(false);
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-green-900 text-white text-xl font-semibold">
+        Abonelik başlatılıyor, lütfen bekleyin...
+      </div>
+    );
+  }
 
   return (
     <section className="py-20 bg-green-900 text-white min-h-screen">
