@@ -1,3 +1,4 @@
+// src/components/sellerLanding/FeaturesSection.jsx
 import { Rocket, BadgeCheck, ShieldCheck } from "lucide-react";
 
 const features = [
@@ -27,10 +28,11 @@ const FeaturesSection = () => (
       {/* Başlık */}
       <h2 className="text-4xl font-extrabold text-center text-[#003636] mb-4">Neden Tedarika?</h2>
       <p className="text-center text-gray-600 mb-16 max-w-2xl mx-auto text-lg">
-        Tedarika, size sadece bir mağaza değil; <span className="font-semibold text-emerald-700">güvenli, hızlı ve erişilebilir bir satış altyapısı</span> sunar.
+        Tedarika size yalnızca bir mağaza değil;{" "}
+        <span className="font-semibold text-emerald-700">güvenli, hızlı ve erişilebilir bir satış altyapısı</span> sunar.
       </p>
 
-      {/* Özellik Kartları */}
+      {/* Kartlar */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {features.map(({ icon, title, desc, bg }, i) => (
           <div
