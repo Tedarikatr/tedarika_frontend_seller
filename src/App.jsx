@@ -23,6 +23,7 @@ import ProductReviewsPage from "@/pages/seller/reviews/ProductReviewsPage";
 import SellerLayout from "@/components/layout/SellerLayout";
 import PrivateRoute from "@/routes/PrivateRoute";
 import SemiPrivateRoute from "@/routes/SemiPrivateRoute";
+import QuotationDetailPage from "@/pages/seller/quotations/QuotationDetailPage";
 
 function App() {
   return (
@@ -69,6 +70,8 @@ function App() {
         <Route path="/seller/quotations" element={<SellerQuotationListPage />} />
         <Route path="orders" element={<OrderListPage />} />
         <Route path="orders/:orderId" element={<OrderDetailPage />} />
+        <Route path="quotations/:id" element={<QuotationDetailPage />} />
+
       </Route>
 
       {/* 404 */}
