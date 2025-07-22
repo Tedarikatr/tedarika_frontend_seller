@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getMySellerQuotations } from "../../../api/sellerQuotationService";
+import { getMySellerQuotations } from "@/api/sellerQuotationService";
 import { toast } from "react-hot-toast";
 import { Link } from "react-router-dom";
 
@@ -24,11 +24,23 @@ const QuotationListPage = () => {
   const getStatusLabel = (status) => {
     switch (status) {
       case 1:
-        return <span className="text-green-600 font-medium">Kabul Edildi</span>;
+        return (
+          <span className="inline-block text-xs font-semibold px-3 py-1 rounded-full bg-green-100 text-green-700 border border-green-200">
+            Kabul Edildi
+          </span>
+        );
       case 2:
-        return <span className="text-red-500 font-medium">Reddedildi</span>;
+        return (
+          <span className="inline-block text-xs font-semibold px-3 py-1 rounded-full bg-red-100 text-red-700 border border-red-200">
+            Reddedildi
+          </span>
+        );
       default:
-        return <span className="text-gray-500 font-medium">Beklemede</span>;
+        return (
+          <span className="inline-block text-xs font-semibold px-3 py-1 rounded-full bg-yellow-100 text-yellow-800 border border-yellow-200">
+            Beklemede
+          </span>
+        );
     }
   };
 
@@ -39,42 +51,44 @@ const QuotationListPage = () => {
     });
 
   return (
-    <div className="max-w-6xl mx-auto px-6 py-10">
-      <h1 className="text-2xl font-bold text-gray-800 mb-6 border-b pb-3">
+    <div className="max-w-6xl mx-auto px-4 py-10">
+      <h1 className="text-3xl font-bold text-[#003636] mb-8 text-center sm:text-left">
         Alıcı Teklifleri
       </h1>
 
       {loading ? (
-        <p className="text-center text-gray-500">Yükleniyor...</p>
+        <p className="text-center text-gray-500 text-sm">Yükleniyor...</p>
       ) : quotations.length === 0 ? (
-        <p className="text-center text-gray-500">Henüz teklif bulunmamaktadır.</p>
+        <div className="bg-white p-8 rounded-xl shadow-sm text-center text-gray-600">
+          Henüz teklif bulunmamaktadır.
+        </div>
       ) : (
-        <div className="overflow-x-auto border rounded-lg shadow-sm bg-white">
+        <div className="overflow-x-auto rounded-2xl border border-gray-200 shadow-sm bg-white">
           <table className="min-w-full divide-y divide-gray-200 text-sm">
-            <thead className="bg-gray-50 text-gray-700">
+            <thead className="bg-gray-50 text-gray-700 font-semibold text-xs uppercase">
               <tr>
-                <th className="px-4 py-3 text-left">Alıcı</th>
-                <th className="px-4 py-3 text-left">Ürün</th>
-                <th className="px-4 py-3 text-left">Tarih</th>
-                <th className="px-4 py-3 text-left">Fiyat</th>
-                <th className="px-4 py-3 text-left">Miktar</th>
-                <th className="px-4 py-3 text-left">Durum</th>
-                <th className="px-4 py-3 text-center">İşlem</th>
+                <th className="px-5 py-4 text-left">Alıcı</th>
+                <th className="px-5 py-4 text-left">Ürün</th>
+                <th className="px-5 py-4 text-left">Tarih</th>
+                <th className="px-5 py-4 text-left">Fiyat</th>
+                <th className="px-5 py-4 text-left">Miktar</th>
+                <th className="px-5 py-4 text-left">Durum</th>
+                <th className="px-5 py-4 text-center">İncele</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-gray-100 text-gray-800">
               {quotations.map((q) => (
                 <tr key={q.id} className="hover:bg-gray-50 transition">
-                  <td className="px-4 py-3">{q.buyerName || "Bilinmeyen Alıcı"}</td>
-                  <td className="px-4 py-3">{q.storeProductName}</td>
-                  <td className="px-4 py-3">{formatDate(q.requestedAt)}</td>
-                  <td className="px-4 py-3">{q.unitPrice} ₺</td>
-                  <td className="px-4 py-3">{q.quantity}</td>
-                  <td className="px-4 py-3">{getStatusLabel(q.status)}</td>
-                  <td className="px-4 py-3 text-center">
+                  <td className="px-5 py-4">{q.buyerName || "Bilinmeyen Alıcı"}</td>
+                  <td className="px-5 py-4">{q.storeProductName}</td>
+                  <td className="px-5 py-4">{formatDate(q.requestedAt)}</td>
+                  <td className="px-5 py-4">{q.unitPrice} ₺</td>
+                  <td className="px-5 py-4">{q.quantity}</td>
+                  <td className="px-5 py-4">{getStatusLabel(q.status)}</td>
+                  <td className="px-5 py-4 text-center">
                     <Link
                       to={`/seller/quotations/${q.id}`}
-                      className="text-blue-600 hover:underline font-medium"
+                      className="inline-block text-blue-600 hover:text-blue-800 text-sm font-medium transition"
                     >
                       Detay
                     </Link>
