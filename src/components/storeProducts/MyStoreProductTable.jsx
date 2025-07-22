@@ -11,29 +11,30 @@ const MyStoreProductTable = ({ products, onRefresh, onFeedback, hasCoverage }) =
   }
 
   return (
-    <div className="overflow-x-auto">
-      <table className="min-w-full table-auto text-sm text-left">
-        <thead className="bg-gray-100 text-gray-700">
+    <div className="overflow-x-auto rounded-lg shadow border border-gray-200 bg-white">
+      <table className="min-w-full divide-y divide-gray-200 text-sm text-gray-800">
+        <thead className="bg-emerald-50 text-emerald-800 font-semibold text-[13px] uppercase tracking-wide">
           <tr>
-            <th className="px-5 py-3">Ürün</th>
-            <th className="px-5 py-3">Kategori</th>
-            <th className="px-5 py-3">Fiyat</th>
-            <th className="px-5 py-3">Limit</th>
-            <th className="px-5 py-3">Görsel</th>
-            <th className="px-5 py-3">Durum</th>
-            <th className="px-5 py-3">Stok</th>
-            <th className="px-5 py-3">İşlemler</th>
+            <th className="px-5 py-3 text-left whitespace-nowrap">Ürün</th>
+            <th className="px-5 py-3 text-left whitespace-nowrap">Kategori</th>
+            <th className="px-5 py-3 text-left whitespace-nowrap">Fiyat</th>
+            <th className="px-5 py-3 text-left whitespace-nowrap">Limit</th>
+            <th className="px-5 py-3 text-left whitespace-nowrap">Görsel</th>
+            <th className="px-5 py-3 text-left whitespace-nowrap">Durum</th>
+            <th className="px-5 py-3 text-left whitespace-nowrap">Stok</th>
+            <th className="px-5 py-3 text-left whitespace-nowrap">İşlemler</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-200">
-          {products.map((product) => (
-            <ProductRow
-              key={product.id}
-              product={product}
-              onRefresh={onRefresh}
-              onFeedback={onFeedback}
-              hasCoverage={hasCoverage}
-            />
+        <tbody className="divide-y divide-gray-100 bg-white">
+          {products.map((product, index) => (
+            <tr key={product.id} className={index % 2 === 1 ? "bg-gray-50" : ""}>
+              <ProductRow
+                product={product}
+                onRefresh={onRefresh}
+                onFeedback={onFeedback}
+                hasCoverage={hasCoverage}
+              />
+            </tr>
           ))}
         </tbody>
       </table>
