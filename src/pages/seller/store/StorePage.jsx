@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getMyStore } from "@/api/sellerStoreService";
-import { StoreIcon } from "lucide-react";
+import { StoreIcon, PlusCircle } from "lucide-react";
 
 const StorePage = () => {
   const [store, setStore] = useState(null);
@@ -25,33 +25,35 @@ const StorePage = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-64">
-        <span className="text-lg text-gray-500 animate-pulse">Yükleniyor...</span>
+      <div className="flex justify-center items-center h-80">
+        <span className="text-lg text-gray-500 animate-pulse">Mağaza bilgileri yükleniyor...</span>
       </div>
     );
   }
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-10">
-      <h2 className="text-4xl font-bold text-center text-[#003636] mb-10">Mağaza Bilgileri</h2>
+      <h2 className="text-3xl sm:text-4xl font-bold text-center text-[#003636] mb-10">
+        Mağaza Bilgilerim
+      </h2>
 
       {store ? (
         <div className="bg-white shadow-xl rounded-3xl border border-gray-100 overflow-hidden">
-          <div className="flex flex-col sm:flex-row gap-8 p-8 items-start">
-            {/* Sol kısım - İkon veya mağaza görseli */}
+          <div className="flex flex-col sm:flex-row gap-6 sm:gap-10 p-8 items-start">
+            {/* Sol: İkon */}
             <div className="flex-shrink-0">
-              <div className="bg-[#003636] text-white p-4 rounded-2xl shadow-md">
+              <div className="bg-[#003636] text-white p-5 rounded-2xl shadow-md flex items-center justify-center">
                 <StoreIcon className="h-10 w-10" />
               </div>
             </div>
 
-            {/* Sağ kısım - Bilgiler */}
+            {/* Sağ: Bilgiler */}
             <div className="w-full">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-6 gap-x-12">
-                <StoreField label="Ad" value={store.storeName} />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-6 gap-x-10">
+                <StoreField label="Mağaza Adı" value={store.storeName} />
                 <StoreField label="Açıklama" value={store.storeDescription} />
                 <StoreField label="Telefon" value={store.storePhone} />
-                <StoreField label="Email" value={store.storeMail} />
+                <StoreField label="E-posta" value={store.storeMail} />
                 <StoreField label="İl" value={store.storeProvince} />
                 <StoreField label="İlçe" value={store.storeDistrict} />
               </div>
@@ -59,21 +61,27 @@ const StorePage = () => {
               <div className="mt-8 text-right">
                 <button
                   onClick={() => navigate("/seller/store/update")}
-                  className="bg-[#003636] hover:bg-[#004848] text-white py-2 px-6 rounded-xl text-sm font-semibold transition"
+                  className="bg-[#003636] hover:bg-[#004848] text-white py-2.5 px-6 rounded-xl text-sm font-semibold transition"
                 >
-                  Güncelle
+                  Mağaza Bilgilerini Güncelle
                 </button>
               </div>
             </div>
           </div>
         </div>
       ) : (
-        <div className="bg-white p-10 rounded-2xl shadow-lg text-center">
-          <p className="text-gray-600 text-lg mb-4">Henüz bir mağazanız yok. Hemen oluşturarak satış yapmaya başlayabilirsiniz.</p>
+        <div className="bg-white p-10 rounded-3xl shadow-md flex flex-col items-center text-center border border-gray-100">
+          <div className="bg-[#e0f2f1] text-[#003636] p-4 rounded-full mb-4">
+            <StoreIcon className="h-8 w-8" />
+          </div>
+          <p className="text-gray-600 text-lg mb-4 max-w-md">
+            Henüz bir mağazanız bulunmuyor. Aşağıdaki buton ile mağazanızı oluşturabilir ve satışa başlayabilirsiniz.
+          </p>
           <button
             onClick={() => navigate("/seller/store/create")}
-            className="bg-[#003636] hover:bg-[#004848] text-white py-2 px-6 rounded-xl text-sm font-medium transition"
+            className="bg-[#003636] hover:bg-[#004848] text-white py-2.5 px-5 rounded-xl text-sm font-medium flex items-center gap-2 transition"
           >
+            <PlusCircle size={18} />
             Mağaza Oluştur
           </button>
         </div>
@@ -84,8 +92,8 @@ const StorePage = () => {
 
 const StoreField = ({ label, value }) => (
   <div>
-    <label className="block text-sm font-semibold text-gray-700 mb-1">{label}:</label>
-    <p className="text-gray-800">{value || "-"}</p>
+    <label className="block text-sm font-medium text-gray-500 mb-1">{label}</label>
+    <p className="text-gray-800 font-medium">{value || "-"}</p>
   </div>
 );
 
