@@ -12,9 +12,8 @@ const StoreUpdate = () => {
     const fetchData = async () => {
       try {
         const [store, cats] = await Promise.all([getMyStore(), getAllCategories()]);
-
-        const filteredStore = {
-          id: store.id, // 🔥 GEREKLİ: API'de ID lazımsa buraya ekle
+        setForm({
+          id: store.id,
           storeName: store.storeName || "",
           storeDescription: store.storeDescription || "",
           imageUrl: store.imageUrl || "",
@@ -23,9 +22,7 @@ const StoreUpdate = () => {
           storeProvince: store.storeProvince || "",
           storeDistrict: store.storeDistrict || "",
           categoryIds: store.categoryIds || [],
-        };
-
-        setForm(filteredStore);
+        });
         setCategories(cats);
       } catch {
         setMessage("❌ Mağaza veya kategori bilgileri alınamadı.");
@@ -39,19 +36,24 @@ const StoreUpdate = () => {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleCategoryChange = (e) => {
-    const selected = Array.from(e.target.selectedOptions).map((opt) => parseInt(opt.value));
-    setForm((prev) => ({ ...prev, categoryIds: selected }));
+  const toggleCategory = (catId) => {
+    setForm((prev) => {
+      const alreadySelected = prev.categoryIds.includes(catId);
+      const updated = alreadySelected
+        ? prev.categoryIds.filter((id) => id !== catId)
+        : [...prev.categoryIds, catId];
+      return { ...prev, categoryIds: updated };
+    });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await updateStore(form.id, form); // ✅ ID artık burada mevcut
+      await updateStore(form.id, form);
       setMessage("✅ Mağaza başarıyla güncellendi.");
-      setTimeout(() => navigate("/seller/store"), 1000);
+      setTimeout(() => navigate("/seller/store"), 1200);
     } catch {
-      setMessage("❌ Güncelleme sırasında hata oluştu.");
+      setMessage("❌ Güncelleme sırasında bir hata oluştu.");
     }
   };
 
@@ -65,46 +67,59 @@ const StoreUpdate = () => {
 
       <form
         onSubmit={handleSubmit}
-        className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white p-6 rounded-xl shadow"
+        className="grid grid-cols-1 md:grid-cols-2 gap-5 bg-white p-6 rounded-xl shadow border"
       >
         {[
-          "storeName",
-          "storeDescription",
-          "imageUrl",
-          "storePhone",
-          "storeMail",
-          "storeProvince",
-          "storeDistrict",
-        ].map((key) => (
-          <input
-            key={key}
-            name={key}
-            value={form[key]}
-            onChange={handleChange}
-            placeholder={key}
-            className="p-2 border border-gray-300 rounded-md text-sm text-[#003636]"
-          />
+          { name: "storeName", label: "Mağaza Adı" },
+          { name: "storeDescription", label: "Açıklama" },
+          { name: "imageUrl", label: "Görsel URL" },
+          { name: "storePhone", label: "Telefon" },
+          { name: "storeMail", label: "E-posta" },
+          { name: "storeProvince", label: "İl" },
+          { name: "storeDistrict", label: "İlçe" },
+        ].map(({ name, label }) => (
+          <div key={name}>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
+            <input
+              name={name}
+              value={form[name]}
+              onChange={handleChange}
+              placeholder={label}
+              className="w-full p-2 border border-gray-300 rounded-md text-sm text-[#003636] shadow-sm focus:ring-2 focus:ring-green-600 focus:outline-none"
+            />
+          </div>
         ))}
 
-        {/* Kategori çoklu seçim alanı */}
-        <div className="col-span-full">
-          <label className="block mb-1 text-sm font-semibold text-gray-700">Kategoriler</label>
-          <select
-            multiple
-            value={form.categoryIds}
-            onChange={handleCategoryChange}
-            className="w-full p-2 border border-gray-300 rounded-md text-sm text-[#003636] bg-white"
-          >
-            {categories.map((cat) => (
-              <option key={cat.id} value={cat.id}>
-                {cat.name}
-              </option>
-            ))}
-          </select>
+        {/* Kategori Seçimi */}
+        <div className="md:col-span-2">
+          <label className="block text-sm font-medium text-gray-700 mb-2">Kategoriler</label>
+          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3">
+            {categories.map((cat) => {
+              const isSelected = form.categoryIds.includes(cat.id);
+              return (
+                <label
+                  key={cat.id}
+                  className={`flex items-center gap-2 px-3 py-2 border rounded-md text-sm cursor-pointer transition
+                    ${
+                      isSelected
+                        ? "bg-green-100 border-green-400 text-green-800 font-medium"
+                        : "bg-white border-gray-300 hover:border-green-500"
+                    }`}
+                >
+                  <input
+                    type="checkbox"
+                    checked={isSelected}
+                    onChange={() => toggleCategory(cat.id)}
+                    className="accent-green-600"
+                  />
+                  {cat.name}
+                </label>
+              );
+            })}
+          </div>
 
-          {/* Seçili kategorileri etiket olarak göster */}
           {form.categoryIds.length > 0 && (
-            <div className="flex flex-wrap gap-2 mt-2">
+            <div className="flex flex-wrap gap-2 mt-4">
               {form.categoryIds.map((id) => {
                 const cat = categories.find((c) => c.id === id);
                 return (
@@ -120,6 +135,7 @@ const StoreUpdate = () => {
           )}
         </div>
 
+        {/* Güncelle Butonu */}
         <div className="col-span-full">
           <button
             type="submit"
@@ -129,8 +145,13 @@ const StoreUpdate = () => {
           </button>
         </div>
 
+        {/* Bilgilendirme Mesajı */}
         {message && (
-          <div className="col-span-full text-center text-sm font-medium mt-2 text-red-600">
+          <div
+            className={`col-span-full text-center text-sm font-medium mt-2 ${
+              message.startsWith("✅") ? "text-green-700" : "text-red-600"
+            }`}
+          >
             {message}
           </div>
         )}
