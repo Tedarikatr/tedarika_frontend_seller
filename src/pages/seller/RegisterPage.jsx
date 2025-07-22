@@ -59,37 +59,35 @@ const RegisterPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row bg-[#0f172a] text-white">
+    <div className="min-h-screen flex flex-col md:flex-row bg-[#002d2f] text-white">
       {/* Sol Tanıtım Alanı */}
-      <div className="w-full md:w-1/2 flex flex-col justify-center items-start px-10 py-20 space-y-8">
-        <h2 className="text-4xl font-extrabold">
+      <div className="w-full md:w-1/2 flex flex-col justify-center items-start px-10 py-20 space-y-8 bg-gradient-to-br from-[#003e3f] via-[#004b49] to-[#005c5a]">
+        <h2 className="text-4xl font-extrabold leading-tight tracking-tight">
           Tedarika ile Dakikalar İçinde Satışa Başlayın
         </h2>
-        <p className="text-gray-400 max-w-md">
+        <p className="text-[#b8dedb] max-w-md text-sm leading-relaxed">
           Şirketini oluştur, mağazanı aç ve on binlerce işletmeye ulaş.
         </p>
-        <ul className="space-y-4">
-          <li className="flex items-start gap-3">
-            <CheckCircle className="text-green-400" size={20} />
-            <span>Kolay ve hızlı kayıt süreci</span>
-          </li>
-          <li className="flex items-start gap-3">
-            <CheckCircle className="text-green-400" size={20} />
-            <span>Geniş müşteri kitlesi</span>
-          </li>
-          <li className="flex items-start gap-3">
-            <CheckCircle className="text-green-400" size={20} />
-            <span>Ücretsiz ve güvenli altyapı</span>
-          </li>
+        <ul className="space-y-3 text-sm">
+          {[
+            "Kolay ve hızlı kayıt süreci",
+            "Geniş müşteri kitlesi",
+            "Ücretsiz ve güvenli altyapı",
+          ].map((item, i) => (
+            <li key={i} className="flex items-center gap-2">
+              <CheckCircle size={18} className="text-emerald-400" />
+              <span>{item}</span>
+            </li>
+          ))}
         </ul>
       </div>
 
       {/* Sağ Form Alanı */}
       <div className="w-full md:w-1/2 bg-white text-[#003636] flex items-center justify-center py-16 px-8">
         <form onSubmit={handleSubmit} className="w-full max-w-md">
-          <h3 className="text-3xl font-bold text-center mb-8">Satıcı Kaydı</h3>
+          <h3 className="text-3xl font-bold text-center mb-10">Satıcı Kaydı</h3>
 
-          <div className="space-y-4">
+          <div className="space-y-5">
             <FormInput name="name" value={formData.name} onChange={handleChange} placeholder="Ad" icon={<User size={18} />} />
             <FormInput name="lastName" value={formData.lastName} onChange={handleChange} placeholder="Soyad" icon={<User size={18} />} />
             <FormInput name="email" value={formData.email} onChange={handleChange} placeholder="E-posta" icon={<Mail size={18} />} type="email" />
@@ -99,20 +97,27 @@ const RegisterPage = () => {
 
           <button
             type="submit"
-            className="mt-6 w-full bg-gradient-to-r from-[#003636] to-[#005e5e] hover:brightness-110 text-white font-semibold py-3 rounded-xl transition"
+            className="mt-8 w-full bg-gradient-to-r from-[#00d18c] to-[#00a980] hover:opacity-90 text-white font-semibold py-3 rounded-xl transition"
           >
             Hesap Oluştur
           </button>
 
           {message && (
-            <p className={`mt-4 text-sm text-center font-medium ${message.startsWith("✅") ? "text-green-600" : "text-red-500"}`}>
+            <p
+              className={`mt-4 text-sm text-center font-medium ${
+                message.startsWith("✅") ? "text-green-600" : "text-red-500"
+              }`}
+            >
               {message}
             </p>
           )}
 
-          <p className="mt-6 text-center text-sm">
+          <p className="mt-6 text-center text-sm text-gray-600">
             Hesabın var mı?{" "}
-            <Link to="/seller/login" className="text-emerald-700 font-semibold hover:underline">
+            <Link
+              to="/seller/login"
+              className="text-emerald-600 font-semibold hover:underline"
+            >
               Giriş Yap
             </Link>
           </p>
@@ -123,7 +128,7 @@ const RegisterPage = () => {
 };
 
 const FormInput = ({ name, value, onChange, placeholder, icon, type = "text" }) => (
-  <div className="flex items-center gap-3 px-4 py-2 rounded-lg bg-[#f0fdfa] border border-[#c0e5e2] focus-within:ring-2 ring-[#80c1bd] transition">
+  <div className="flex items-center gap-3 px-4 py-2 rounded-lg bg-[#f0fdfa] border border-[#bde7e3] focus-within:ring-2 ring-[#00d18c] transition">
     {icon}
     <input
       type={type}
