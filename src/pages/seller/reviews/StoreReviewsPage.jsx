@@ -1,8 +1,8 @@
-// src/pages/seller/reviews/StoreReviewsPage.jsx
-
 import React, { useEffect, useState } from "react";
 import { fetchStoreReviews, replyToStoreReview } from "@/api/sellerReviewService";
 import StoreReviewItem from "@/components/storeProducts/StoreReviewItem";
+import { LoaderCircle } from "lucide-react";
+import toast from "react-hot-toast";
 
 const StoreReviewsPage = () => {
   const [reviews, setReviews] = useState([]);
@@ -23,10 +23,11 @@ const StoreReviewsPage = () => {
   const handleReply = async (reviewId, reply) => {
     try {
       await replyToStoreReview(reviewId, reply);
-      alert("Yanıt gönderildi.");
+      toast.success("Yanıt gönderildi.");
       loadReviews();
     } catch (err) {
-      console.error("Yanıt gönderilemedi:", err);
+      toast.error("Yanıt gönderilemedi.");
+      console.error("Yanıt gönderme hatası:", err);
     }
   };
 
@@ -35,19 +36,34 @@ const StoreReviewsPage = () => {
   }, []);
 
   return (
-    <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4">Mağaza Yorumları</h1>
+    <section className="max-w-5xl mx-auto px-4 py-8">
+      {/* Başlık */}
+      <div className="mb-6 text-center">
+        <h1 className="text-3xl font-bold text-[#003333]">Mağaza Yorumları</h1>
+        <p className="text-sm text-gray-500 mt-1">Müşterilerinizin mağaza deneyimlerine verdiği puan ve yorumları inceleyin.</p>
+      </div>
+
+      {/* İçerik */}
       {loading ? (
-        <p>Yükleniyor...</p>
+        <div className="flex justify-center items-center h-40 text-gray-500">
+          <LoaderCircle className="animate-spin w-6 h-6 mr-2" />
+          Yorumlar yükleniyor...
+        </div>
       ) : reviews.length === 0 ? (
-        <p>Henüz yorum yok.</p>
+        <div className="flex flex-col items-center justify-center text-center py-12 text-gray-500">
+          <img src="/tedarika/assets/images/empty-state.svg" alt="Boş" className="w-32 mb-4 opacity-80" />
+          <p className="text-lg font-medium">Henüz yorum yapılmamış</p>
+          <p className="text-sm mt-1">Mağazanız hakkında yapılan yorumlar burada yer alacak.</p>
+        </div>
       ) : (
-        reviews.map((review) => (
-          <StoreReviewItem key={review.id} review={review} onReply={handleReply} />
-        ))
+        <div className="space-y-6">
+          {reviews.map((review) => (
+            <StoreReviewItem key={review.id} review={review} onReply={handleReply} />
+          ))}
+        </div>
       )}
-    </div>
+    </section>
   );
 };
 
-export default StoreReviewsPage; // ✅ Burası şart
+export default StoreReviewsPage;
