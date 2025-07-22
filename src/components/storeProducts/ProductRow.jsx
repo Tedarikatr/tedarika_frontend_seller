@@ -7,6 +7,10 @@ import {
   updateProductStock,
 } from "@/api/sellerStoreService";
 
+// Boşluklara karşı güvenli input
+const safeNumberInput = (value) =>
+  value === null || value === undefined || value === "NaN" ? "" : value;
+
 const ProductRow = ({ product, onRefresh, onFeedback, hasCoverage }) => {
   const [price, setPrice] = useState(product.unitPrice);
   const [minQty, setMinQty] = useState(product.minOrderQuantity);
@@ -21,8 +25,8 @@ const ProductRow = ({ product, onRefresh, onFeedback, hasCoverage }) => {
       await fn();
       onRefresh();
       onFeedback(msg, "success");
-    } catch (e) {
-      console.error(e);
+    } catch (error) {
+      console.error(error);
       onFeedback("İşlem başarısız oldu!", "error");
     }
   };
@@ -32,43 +36,59 @@ const ProductRow = ({ product, onRefresh, onFeedback, hasCoverage }) => {
     return uploadProductImage(storeProductId, imageFile);
   };
 
+  const inputStyle =
+    "px-3 py-1.5 text-sm border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-1 focus:ring-emerald-500 transition";
+
+  const buttonStyle =
+    "px-3 py-1 text-xs font-semibold rounded-md transition text-white";
+
   return (
-    <tr className="hover:bg-gray-50 transition">
+    <>
       {/* Ürün */}
-      <td className="px-4 py-3">
+      <td className="px-5 py-3 whitespace-nowrap">
         <div className="flex items-center gap-3">
           <img
-            src={imageFile ? URL.createObjectURL(imageFile) : product.imageUrl || "/placeholder.png"}
-            alt={product.name}
+            src={
+              imageFile
+                ? URL.createObjectURL(imageFile)
+                : product.imageUrl || "/placeholder.png"
+            }
+            alt={product.name || "Ürün görseli"}
             className="w-12 h-12 object-cover rounded border"
           />
           <div>
-            <div className="font-medium text-gray-800">{product.name}</div>
-            <div className="text-xs text-gray-500">#{storeProductId}</div>
+            <div className="font-semibold text-gray-800 text-sm">
+              {product.name}
+            </div>
+            <div className="text-[11px] text-gray-500">#{storeProductId}</div>
           </div>
         </div>
       </td>
 
       {/* Kategori */}
-      <td className="px-4 py-3">
-        <div className="text-gray-700">{product.categoryName}</div>
+      <td className="px-5 py-3">
+        <div className="text-sm">{product.categoryName}</div>
         <div className="text-xs text-gray-500">{product.categorySubName}</div>
       </td>
 
       {/* Fiyat */}
-      <td className="px-4 py-3">
+      <td className="px-5 py-3">
         <div className="flex items-center gap-2">
           <input
             type="number"
-            value={price}
+            value={safeNumberInput(price)}
             onChange={(e) => setPrice(e.target.value)}
-            className="w-20 border rounded px-2 py-1"
+            className={`${inputStyle} min-w-[100px] max-w-[140px]`}
+            placeholder="₺"
           />
           <button
             onClick={() =>
-              handleAction(() => updateProductPrice(storeProductId, price), "Fiyat güncellendi.")
+              handleAction(
+                () => updateProductPrice(storeProductId, price),
+                "Fiyat güncellendi."
+              )
             }
-            className="bg-green-600 text-white text-xs px-3 py-1 rounded hover:bg-green-700"
+            className={`${buttonStyle} bg-emerald-600 hover:bg-emerald-700`}
           >
             Kaydet
           </button>
@@ -76,30 +96,31 @@ const ProductRow = ({ product, onRefresh, onFeedback, hasCoverage }) => {
       </td>
 
       {/* Limit */}
-      <td className="px-4 py-3">
+      <td className="px-5 py-3">
         <div className="flex items-center gap-2">
           <input
             type="number"
-            value={minQty}
+            value={safeNumberInput(minQty)}
             onChange={(e) => setMinQty(e.target.value)}
-            className="w-14 border px-2 py-1 rounded"
+            className={`${inputStyle} w-16`}
             placeholder="Min"
           />
           <input
             type="number"
-            value={maxQty}
+            value={safeNumberInput(maxQty)}
             onChange={(e) => setMaxQty(e.target.value)}
-            className="w-14 border px-2 py-1 rounded"
+            className={`${inputStyle} w-16`}
             placeholder="Max"
           />
           <button
             onClick={() =>
               handleAction(
-                () => updateProductQuantityLimits(storeProductId, minQty, maxQty),
+                () =>
+                  updateProductQuantityLimits(storeProductId, minQty, maxQty),
                 "Limit güncellendi."
               )
             }
-            className="bg-gray-600 text-white text-xs px-3 py-1 rounded hover:bg-gray-700"
+            className={`${buttonStyle} bg-gray-600 hover:bg-gray-700`}
           >
             Kaydet
           </button>
@@ -107,16 +128,17 @@ const ProductRow = ({ product, onRefresh, onFeedback, hasCoverage }) => {
       </td>
 
       {/* Görsel */}
-      <td className="px-4 py-3">
+      <td className="px-5 py-3">
         <div className="flex items-center gap-2">
           <input
             type="file"
+            accept="image/*"
             onChange={(e) => setImageFile(e.target.files[0])}
-            className="text-xs"
+            className="text-xs text-gray-600"
           />
           <button
             onClick={() => handleAction(handleImageUpload, "Görsel yüklendi.")}
-            className="bg-blue-600 text-white text-xs px-3 py-1 rounded hover:bg-blue-700"
+            className={`${buttonStyle} bg-blue-600 hover:bg-blue-700`}
           >
             Yükle
           </button>
@@ -124,55 +146,67 @@ const ProductRow = ({ product, onRefresh, onFeedback, hasCoverage }) => {
       </td>
 
       {/* Durum */}
-      <td className="px-4 py-3">
+      <td className="px-5 py-3">
         <span
-          className={`px-2 py-1 rounded text-xs font-medium ${
-            product.isOnSale ? "bg-blue-100 text-blue-700" : "bg-gray-100 text-gray-600"
+          className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+            product.isOnSale
+              ? "bg-emerald-100 text-emerald-700"
+              : "bg-gray-100 text-gray-600"
           }`}
         >
-          {product.isOnSale ? "Satışta" : "Satışta Değil"}
+          {product.isOnSale ? "Satışta" : "Pasif"}
         </span>
       </td>
 
       {/* Stok */}
-      <td className="px-4 py-3">
+      <td className="px-5 py-3">
         <div className="flex items-center gap-2">
           <input
             type="number"
-            value={stock}
+            value={safeNumberInput(stock)}
             onChange={(e) => setStock(e.target.value)}
-            className="w-16 border px-2 py-1 rounded"
+            className={`${inputStyle} w-20`}
           />
           <button
             onClick={() =>
-              handleAction(() => updateProductStock(storeProductId, stock), "Stok güncellendi.")
+              handleAction(
+                () => updateProductStock(storeProductId, stock),
+                "Stok güncellendi."
+              )
             }
-            className="bg-indigo-600 text-white text-xs px-3 py-1 rounded hover:bg-indigo-700"
+            className={`${buttonStyle} bg-indigo-600 hover:bg-indigo-700`}
           >
             Kaydet
           </button>
         </div>
       </td>
 
-      {/* İşlemler */}
-      <td className="px-4 py-3">
+      {/* Satışa Aç/Kapat */}
+      <td className="px-5 py-3">
         <button
           onClick={() =>
             handleAction(
-              () => toggleProductOnSale(storeProductId, !product.isOnSale),
+              () =>
+                toggleProductOnSale(storeProductId, !product.isOnSale),
               product.isOnSale ? "Satış kapatıldı." : "Satışa açıldı."
             )
           }
           disabled={!hasCoverage}
-          title={!hasCoverage ? "Satışa açmak için hizmet bölgesi tanımlayın." : ""}
-          className={`text-yellow-600 hover:underline text-sm ${
-            !hasCoverage ? "opacity-50 cursor-not-allowed" : ""
+          title={
+            !hasCoverage
+              ? "Satışa açmak için hizmet bölgesi tanımlayın."
+              : ""
+          }
+          className={`text-sm font-medium underline ${
+            !hasCoverage
+              ? "text-gray-400 cursor-not-allowed"
+              : "text-yellow-600 hover:text-yellow-700"
           }`}
         >
           {product.isOnSale ? "Satışı Kapat" : "Satışa Aç"}
         </button>
       </td>
-    </tr>
+    </>
   );
 };
 
