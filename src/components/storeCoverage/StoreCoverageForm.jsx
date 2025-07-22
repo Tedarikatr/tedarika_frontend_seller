@@ -9,7 +9,6 @@ const StoreCoverageForm = ({ onSuccess }) => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState(null);
 
-  // Bölge değiştiğinde ülke seçimlerini sıfırla
   useEffect(() => {
     setSelectedCountryIds([]);
   }, [selectedRegionId]);
@@ -44,35 +43,50 @@ const StoreCoverageForm = ({ onSuccess }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white p-6 rounded-xl border shadow space-y-4">
-      <h2 className="text-lg font-semibold text-gray-800">Mağaza Kapsama Alanı Ekle</h2>
+    <form
+      onSubmit={handleSubmit}
+      className="bg-white p-6 sm:p-8 rounded-2xl shadow-md border border-gray-200 max-w-3xl mx-auto space-y-6"
+    >
+      {/* Başlık */}
+      <div className="border-b pb-4">
+        <h2 className="text-xl sm:text-2xl font-bold text-gray-800">
+          Mağaza Kapsama Alanı Ekle
+        </h2>
+        <p className="text-sm text-gray-500 mt-1">
+          Bölge ve ülke seçimi yaparak mağazanızın hizmet verdiği alanları tanımlayın.
+        </p>
+      </div>
 
+      {/* Mesaj kutusu */}
       {message && (
         <div
-          className={`text-sm px-4 py-2 rounded ${
+          className={`text-sm px-4 py-3 rounded-md font-medium ${
             message.type === "success"
-              ? "bg-green-100 text-green-700"
-              : "bg-red-100 text-red-700"
+              ? "bg-green-100 text-green-800 border border-green-200"
+              : "bg-red-100 text-red-800 border border-red-200"
           }`}
         >
           {message.text}
         </div>
       )}
 
-      {/* ✅ Prop adı düzeltildi: value olmalı */}
-      <RegionSelector value={selectedRegionId} onChange={setSelectedRegionId} />
+      {/* Region & Country Selectors */}
+      <div className="space-y-4">
+        <RegionSelector value={selectedRegionId} onChange={setSelectedRegionId} />
 
-      <CountrySelector
-        regionId={selectedRegionId}
-        selectedCountries={selectedCountryIds}
-        onChange={setSelectedCountryIds}
-      />
+        <CountrySelector
+          regionId={selectedRegionId}
+          selectedCountries={selectedCountryIds}
+          onChange={setSelectedCountryIds}
+        />
+      </div>
 
-      <div className="flex justify-end">
+      {/* Submit Button */}
+      <div className="pt-4 border-t flex justify-end">
         <button
           type="submit"
           disabled={loading}
-          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
+          className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg text-sm font-semibold transition disabled:opacity-50"
         >
           {loading ? "Kaydediliyor..." : "Kapsama Alanı Ekle"}
         </button>
