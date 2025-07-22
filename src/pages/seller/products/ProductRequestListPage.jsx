@@ -80,7 +80,7 @@ const ProductRequestListPage = () => {
       : "text-red-700 bg-red-100 border border-red-300";
 
   return (
-    <div className="p-4 md:p-6 bg-gray-50 min-h-screen">
+    <div className="p-4 sm:p-6 bg-gray-50 min-h-screen">
       <h1 className="text-2xl font-bold text-gray-800 mb-6">Ürün Başvurularım</h1>
 
       {loading ? (
@@ -92,20 +92,20 @@ const ProductRequestListPage = () => {
           {requests.map((r) => (
             <div
               key={r.id}
-              className="bg-white border border-gray-300 rounded-xl shadow-sm transition-all"
+              className="bg-white border border-gray-200 rounded-xl shadow-md transition-all"
             >
-              <div
-                className="flex justify-between items-center px-4 md:px-6 py-4 cursor-pointer hover:bg-gray-100 transition"
+              <button
+                type="button"
+                className="w-full text-left flex justify-between items-center px-4 sm:px-6 py-4 hover:bg-gray-50 transition"
                 onClick={() => toggleExpand(r.id)}
               >
                 <div>
-                  <h2 className="text-sm font-semibold text-gray-800 mb-1">
-                    {r.name} — <span className="text-gray-500">{r.brand}</span>
+                  <h2 className="text-sm sm:text-base font-semibold text-gray-800 mb-1">
+                    {r.name}
+                    <span className="text-gray-500 font-normal"> — {r.brand}</span>
                   </h2>
                   <span
-                    className={`text-xs font-medium px-2 py-1 rounded-md inline-block ${getStatusColor(
-                      r.isApproved
-                    )}`}
+                    className={`text-xs font-medium px-2 py-1 rounded ${getStatusColor(r.isApproved)}`}
                   >
                     {getStatusText(r.isApproved)}
                   </span>
@@ -113,40 +113,30 @@ const ProductRequestListPage = () => {
                 <div className="text-gray-500">
                   {expandedId === r.id ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
                 </div>
-              </div>
+              </button>
 
               {expandedId === r.id && details[r.id] && (
-                <div className="px-4 md:px-6 pb-4 pt-2 border-t bg-gray-50 text-sm text-gray-700 grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <strong>Açıklama:</strong> {details[r.id].description}
-                  </div>
-                  <div>
-                    <strong>Birim Tipleri:</strong> {details[r.id].unitTypes}
-                  </div>
-                  <div>
-                    <strong>Kategori:</strong>{" "}
-                    {categoryMap[details[r.id].categoryId] || `#${details[r.id].categoryId}`}
-                  </div>
-                  <div>
-                    <strong>Alt Kategori:</strong>{" "}
-                    {subcategoryMap[details[r.id].categoryId]?.[details[r.id].categorySubId] ||
-                      `#${details[r.id].categorySubId}`}
-                  </div>
-                  <div>
-                    <strong>Yurt içi:</strong>{" "}
-                    {details[r.id].allowedDomestic ? "Evet" : "Hayır"}
-                  </div>
-                  <div>
-                    <strong>Yurt dışı:</strong>{" "}
-                    {details[r.id].allowedInternational ? "Evet" : "Hayır"}
-                  </div>
-                  <div>
-                    <strong>Durum:</strong> {getStatusText(details[r.id].status)}
-                  </div>
-                  <div>
-                    <strong>Oluşturulma:</strong>{" "}
-                    {new Date(details[r.id].createdAt).toLocaleString()}
-                  </div>
+                <div className="px-4 sm:px-6 py-4 border-t text-sm text-gray-700 bg-gray-50 grid grid-cols-1 sm:grid-cols-2 gap-y-3 gap-x-6">
+                  <Field label="Açıklama" value={details[r.id].description} />
+                  <Field label="Birim Tipleri" value={details[r.id].unitTypes} />
+                  <Field
+                    label="Kategori"
+                    value={categoryMap[details[r.id].categoryId] || `#${details[r.id].categoryId}`}
+                  />
+                  <Field
+                    label="Alt Kategori"
+                    value={
+                      subcategoryMap[details[r.id].categoryId]?.[details[r.id].categorySubId] ||
+                      `#${details[r.id].categorySubId}`
+                    }
+                  />
+                  <Field label="Yurt içi satış" value={details[r.id].allowedDomestic ? "Evet" : "Hayır"} />
+                  <Field label="Yurt dışı satış" value={details[r.id].allowedInternational ? "Evet" : "Hayır"} />
+                  <Field label="Durum" value={getStatusText(details[r.id].status)} />
+                  <Field
+                    label="Oluşturulma"
+                    value={new Date(details[r.id].createdAt).toLocaleString("tr-TR")}
+                  />
                 </div>
               )}
             </div>
@@ -158,3 +148,11 @@ const ProductRequestListPage = () => {
 };
 
 export default ProductRequestListPage;
+
+// ✅ Yardımcı alan bileşeni
+const Field = ({ label, value }) => (
+  <div>
+    <span className="block text-gray-500 font-medium">{label}:</span>
+    <span className="block">{value}</span>
+  </div>
+);
