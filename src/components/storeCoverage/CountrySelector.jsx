@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { getCountriesByRegionId } from "@/api/sellerLocationService";
+import { Loader2 } from "lucide-react";
 
 const CountrySelector = ({ regionId, selectedCountries, onChange }) => {
   const [countries, setCountries] = useState([]);
@@ -36,29 +37,37 @@ const CountrySelector = ({ regionId, selectedCountries, onChange }) => {
   };
 
   return (
-    <div className="space-y-1">
-      <label className="text-sm font-medium text-gray-700">Ülkeleri Seç</label>
+    <div className="space-y-2">
+      <label className="text-sm font-semibold text-gray-800">
+        Ülkeleri Seç <span className="text-red-500">*</span>
+      </label>
 
       {loading ? (
-        <p className="text-xs text-gray-500">Yükleniyor...</p>
+        <div className="flex items-center gap-2 text-xs text-gray-500 animate-pulse">
+          <Loader2 className="w-4 h-4 animate-spin" />
+          Ülkeler yükleniyor...
+        </div>
       ) : countries.length === 0 ? (
-        <p className="text-xs text-gray-500">Bu bölgeye ait ülke bulunamadı.</p>
+        <p className="text-sm text-gray-500 italic">Bu bölgeye ait ülke bulunamadı.</p>
       ) : (
-        <div className="flex flex-wrap gap-2 mt-1">
-          {countries.map((c) => (
-            <button
-              key={c.id}
-              type="button"
-              onClick={() => toggleCountry(c.id)}
-              className={`px-3 py-1.5 rounded-full text-sm border transition ${
-                selectedCountries.includes(c.id)
-                  ? "bg-blue-600 text-white border-blue-600"
-                  : "bg-gray-100 text-gray-800 border-gray-300 hover:bg-blue-50"
-              }`}
-            >
-              {c.name}
-            </button>
-          ))}
+        <div className="flex flex-wrap gap-2">
+          {countries.map((c) => {
+            const isSelected = selectedCountries.includes(c.id);
+            return (
+              <button
+                key={c.id}
+                type="button"
+                onClick={() => toggleCountry(c.id)}
+                className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all border shadow-sm ${
+                  isSelected
+                    ? "bg-blue-600 text-white border-blue-600 hover:bg-blue-700"
+                    : "bg-white text-gray-800 border-gray-300 hover:bg-gray-100"
+                }`}
+              >
+                {c.name}
+              </button>
+            );
+          })}
         </div>
       )}
     </div>
