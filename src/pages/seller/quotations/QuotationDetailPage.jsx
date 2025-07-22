@@ -4,14 +4,13 @@ import {
   getSellerQuotationById,
   respondToQuotation,
   updateQuotationStatus,
-} from "../../../api/sellerQuotationService";
+} from "@/api/sellerQuotationService";
 import { toast } from "react-hot-toast";
 
 const QuotationDetailPage = () => {
   const { id } = useParams();
   const [quotation, setQuotation] = useState(null);
   const [loading, setLoading] = useState(true);
-
   const [form, setForm] = useState({
     offeredUnitPrice: "",
     minOrderQuantity: "",
@@ -19,7 +18,6 @@ const QuotationDetailPage = () => {
     notes: "",
   });
 
-  // Fetch quotation on mount
   useEffect(() => {
     const fetchQuotation = async () => {
       try {
@@ -79,85 +77,94 @@ const QuotationDetailPage = () => {
     }
   };
 
-  if (loading) return <div className="p-6 text-gray-600">Yükleniyor...</div>;
-  if (!quotation)
-    return <div className="p-6 text-red-600">Teklif bulunamadı.</div>;
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 1:
+        return "bg-green-100 text-green-800 border-green-200";
+      case 2:
+        return "bg-red-100 text-red-800 border-red-200";
+      default:
+        return "bg-yellow-100 text-yellow-800 border-yellow-200";
+    }
+  };
+
+  if (loading) return <div className="p-6 text-gray-600 animate-pulse">Yükleniyor...</div>;
+  if (!quotation) return <div className="p-6 text-red-600">Teklif bulunamadı.</div>;
 
   return (
-    <div className="max-w-5xl mx-auto px-6 py-8">
-      <h1 className="text-2xl font-semibold text-gray-800 mb-6">
-        Teklif Detayı
-      </h1>
+    <div className="max-w-5xl mx-auto px-4 py-10 space-y-8">
+      <h1 className="text-3xl font-bold text-[#003636]">Teklif Detayı</h1>
 
-      {/* Quotation Info */}
-      <div className="bg-white shadow rounded-lg p-6 border border-gray-200 mb-8">
+      {/* Teklif Bilgileri */}
+      <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6 space-y-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm text-gray-700">
-          <p><strong>Ürün:</strong> {quotation.storeProductName}</p>
-          <p><strong>Talep Edilen Fiyat:</strong> {quotation.unitPrice} ₺</p>
-          <p><strong>Talep Miktarı:</strong> {quotation.quantity}</p>
-          <p><strong>Mesaj:</strong> {quotation.message || "-"}</p>
-          <p><strong>Talep Tarihi:</strong> {formatDate(quotation.requestedAt)}</p>
-          <p><strong>Durum:</strong> {getStatusLabel(quotation.status)}</p>
+          <Info label="Ürün" value={quotation.storeProductName} />
+          <Info label="Talep Edilen Fiyat" value={`${quotation.unitPrice} ₺`} />
+          <Info label="Talep Miktarı" value={quotation.quantity} />
+          <Info label="Mesaj" value={quotation.message || "-"} />
+          <Info label="Talep Tarihi" value={formatDate(quotation.requestedAt)} />
+          <div>
+            <span className={`inline-block text-xs font-semibold px-3 py-1 rounded-full border ${getStatusColor(quotation.status)}`}>
+              {getStatusLabel(quotation.status)}
+            </span>
+          </div>
         </div>
       </div>
 
-      {/* Response Form */}
-      <div className="bg-white shadow rounded-lg p-6 border border-gray-200 mb-8">
-        <h2 className="text-lg font-semibold mb-4">Karşı Teklif Gönder</h2>
+      {/* Karşı Teklif Formu */}
+      <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
+        <h2 className="text-lg font-semibold text-gray-800 mb-4">Karşı Teklif Gönder</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <input
-            type="number"
+          <Input
             name="offeredUnitPrice"
+            type="number"
             value={form.offeredUnitPrice}
             onChange={handleInputChange}
             placeholder="Birim Fiyat (₺)"
-            className="border rounded px-3 py-2 text-sm"
           />
-          <input
-            type="number"
+          <Input
             name="minOrderQuantity"
+            type="number"
             value={form.minOrderQuantity}
             onChange={handleInputChange}
             placeholder="Min. Sipariş Miktarı"
-            className="border rounded px-3 py-2 text-sm"
           />
-          <input
-            type="datetime-local"
+          <Input
             name="validUntil"
+            type="datetime-local"
             value={form.validUntil}
             onChange={handleInputChange}
-            className="border rounded px-3 py-2 text-sm"
           />
           <textarea
             name="notes"
             value={form.notes}
             onChange={handleInputChange}
-            placeholder="Notlar"
             rows={3}
-            className="border rounded px-3 py-2 text-sm col-span-full"
+            placeholder="Notlar"
+            className="col-span-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"
           />
         </div>
         <button
           onClick={handleRespond}
-          className="mt-4 bg-blue-600 hover:bg-blue-700 text-white text-sm px-5 py-2 rounded"
+          className="mt-5 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg text-sm transition"
         >
           Karşı Teklifi Gönder
         </button>
       </div>
 
-      {/* Status Buttons */}
-      <div className="bg-white shadow rounded-lg p-6 border border-gray-200">
-        <h2 className="text-lg font-semibold mb-4">Durumu Güncelle</h2>
+      {/* Durum Güncelleme */}
+      <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
+        <h2 className="text-lg font-semibold text-gray-800 mb-4">Durumu Güncelle</h2>
         <div className="flex gap-4">
           <button
             onClick={() => handleStatusChange(1)}
-            className="bg-green-600 hover:bg-green-700 text-white text-sm px-5 py-2 rounded"
+            className="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-lg text-sm"
           >
             Kabul Et
           </button>
           <button
             onClick={() => handleStatusChange(2)}
-            className="bg-red-600 hover:bg-red-700 text-white text-sm px-5 py-2 rounded"
+            className="bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded-lg text-sm"
           >
             Reddet
           </button>
@@ -166,5 +173,22 @@ const QuotationDetailPage = () => {
     </div>
   );
 };
+
+const Info = ({ label, value }) => (
+  <p>
+    <strong className="text-gray-600">{label}:</strong> {value}
+  </p>
+);
+
+const Input = ({ name, value, onChange, type = "text", placeholder }) => (
+  <input
+    type={type}
+    name={name}
+    value={value}
+    onChange={onChange}
+    placeholder={placeholder}
+    className="border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"
+  />
+);
 
 export default QuotationDetailPage;
