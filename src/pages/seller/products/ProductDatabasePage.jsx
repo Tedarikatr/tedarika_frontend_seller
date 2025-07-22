@@ -71,6 +71,7 @@ const ProductDatabasePage = () => {
 
   return (
     <div className="p-4 sm:p-6 bg-gray-50 min-h-screen">
+      {/* Üst Alan */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
         <h1 className="text-2xl font-bold text-gray-800">Ürün Veritabanı</h1>
 
@@ -78,7 +79,7 @@ const ProductDatabasePage = () => {
           <input
             type="text"
             placeholder="Ürün, marka, kategori, barkod ara..."
-            className="border border-gray-300 px-4 py-2 rounded-md text-sm w-full sm:w-72 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white"
+            className="border border-gray-300 px-4 py-2 rounded-md text-sm w-full sm:w-72 shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white transition"
             value={searchTerm}
             onChange={(e) => {
               setSearchTerm(e.target.value);
@@ -91,7 +92,7 @@ const ProductDatabasePage = () => {
             </span>
             <button
               onClick={() => setShowForm(true)}
-              className="bg-green-600 text-white px-3 py-2 rounded text-sm hover:bg-green-700 flex items-center gap-1"
+              className="bg-emerald-600 text-white px-3 py-2 rounded text-sm hover:bg-emerald-700 flex items-center gap-1"
             >
               <PlusCircle size={16} />
               <span className="hidden sm:inline">Yeni Başvuru</span>
@@ -100,6 +101,7 @@ const ProductDatabasePage = () => {
         </div>
       </div>
 
+      {/* Başvuru Formu */}
       {showForm && (
         <div className="mb-6">
           <ProductRequestForm
@@ -112,11 +114,14 @@ const ProductDatabasePage = () => {
         </div>
       )}
 
+      {/* İçerik */}
       {loading ? (
-        <div className="text-gray-600 text-sm py-6">Ürünler yükleniyor, lütfen bekleyin...</div>
+        <div className="py-10 text-center text-gray-600 text-sm">Ürünler yükleniyor, lütfen bekleyin...</div>
+      ) : filteredProducts.length === 0 ? (
+        <div className="py-10 text-center text-gray-500">Aradığınız kriterlere uygun ürün bulunamadı.</div>
       ) : (
         <>
-          <div className="overflow-x-auto border border-gray-300 rounded-xl shadow-sm bg-white">
+          <div className="overflow-x-auto border border-gray-200 rounded-xl shadow bg-white">
             <ProductDatabaseTable
               products={visibleProducts}
               onAdd={handleAddProduct}
