@@ -16,19 +16,24 @@ const ProductDatabasePage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(false);
-  const [addedProductIds, setAddedProductIds] = useState([]);
+  const [addedProductNames, setAddedProductNames] = useState([]);
   const [addingId, setAddingId] = useState(null);
   const [showForm, setShowForm] = useState(false);
 
   const loadProducts = async () => {
     setLoading(true);
     try {
-      const [allProducts, myProducts] = await Promise.all([
+      const [allProducts, myStoreProducts] = await Promise.all([
         fetchProductDatabase(),
         fetchMyStoreProducts(),
       ]);
-      setProducts(allProducts);
-      setAddedProductIds(myProducts.map((p) => p.id));
+
+      setProducts(allProducts || []);
+
+      const addedNames = (myStoreProducts || []).map((p) =>
+        p.name?.trim().toLowerCase()
+      );
+      setAddedProductNames(addedNames);
     } catch (err) {
       console.error("Ürünler alınamadı:", err.response?.data || err.message);
     } finally {
@@ -36,15 +41,17 @@ const ProductDatabasePage = () => {
     }
   };
 
-  const handleAddProduct = async (productId) => {
+  const handleAddProduct = async (productId, productName) => {
+    const nameKey = productName?.trim().toLowerCase();
+    if (addedProductNames.includes(nameKey)) {
+      alert("Bu ürün zaten mağazanızda mevcut.");
+      return;
+    }
+
     setAddingId(productId);
     try {
-      if (addedProductIds.includes(productId)) {
-        alert("Bu ürün zaten mağazanızda mevcut.");
-        return;
-      }
       await addProductToStore(productId);
-      setAddedProductIds((prev) => [...prev, productId]);
+      setAddedProductNames((prev) => [...prev, nameKey]);
     } catch (err) {
       alert("Ürün eklenemedi: " + (err?.response?.data?.error || err.message));
     } finally {
@@ -59,22 +66,23 @@ const ProductDatabasePage = () => {
   const filteredProducts = products.filter((prod) => {
     const term = searchTerm.toLowerCase();
     return (
-      prod.name.toLowerCase().includes(term) ||
-      prod.brand.toLowerCase().includes(term) ||
-      prod.categoryName.toLowerCase().includes(term) ||
+      prod.name?.toLowerCase().includes(term) ||
+      prod.brand?.toLowerCase().includes(term) ||
+      prod.categoryName?.toLowerCase().includes(term) ||
       prod.barcode?.toLowerCase().includes(term)
     );
   });
 
   const startIdx = (currentPage - 1) * ITEMS_PER_PAGE;
-  const visibleProducts = filteredProducts.slice(startIdx, startIdx + ITEMS_PER_PAGE);
+  const visibleProducts = filteredProducts.slice(
+    startIdx,
+    startIdx + ITEMS_PER_PAGE
+  );
 
   return (
     <div className="p-4 sm:p-6 bg-gray-50 min-h-screen">
-      {/* Üst Alan */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
         <h1 className="text-2xl font-bold text-gray-800">Ürün Veritabanı</h1>
-
         <div className="flex flex-col sm:flex-row sm:items-center gap-2 w-full md:w-auto">
           <input
             type="text"
@@ -101,7 +109,6 @@ const ProductDatabasePage = () => {
         </div>
       </div>
 
-      {/* Başvuru Formu */}
       {showForm && (
         <div className="mb-6">
           <ProductRequestForm
@@ -114,22 +121,31 @@ const ProductDatabasePage = () => {
         </div>
       )}
 
-      {/* İçerik */}
       {loading ? (
-        <div className="py-10 text-center text-gray-600 text-sm">Ürünler yükleniyor, lütfen bekleyin...</div>
+        <div className="py-10 text-center text-gray-600 text-sm">
+          Ürünler yükleniyor, lütfen bekleyin...
+        </div>
       ) : filteredProducts.length === 0 ? (
-        <div className="py-10 text-center text-gray-500">Aradığınız kriterlere uygun ürün bulunamadı.</div>
+        <div className="py-10 text-center text-gray-500">
+          Aradığınız kriterlere uygun ürün bulunamadı.
+        </div>
       ) : (
         <>
           <div className="overflow-x-auto border border-gray-200 rounded-xl shadow bg-white">
             <ProductDatabaseTable
               products={visibleProducts}
-              onAdd={handleAddProduct}
+              onAdd={(id) => {
+                const prod = products.find((p) => String(p.id) === String(id));
+                handleAddProduct(id, prod?.name);
+              }}
               addingId={addingId}
-              addedIds={addedProductIds}
+              addedIds={products
+                .filter((p) =>
+                  addedProductNames.includes(p.name?.trim().toLowerCase())
+                )
+                .map((p) => String(p.id))}
             />
           </div>
-
           {filteredProducts.length > ITEMS_PER_PAGE && (
             <div className="mt-6 flex justify-center">
               <Pagination
