@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
-import { getMyStore, updateStore, getAllCategories } from "@/api/sellerStoreService";
+import { getMyStore, updateStore, getAllCategories, uploadProductImage } from "@/api/sellerStoreService";
 import { useNavigate } from "react-router-dom";
 
 const StoreUpdate = () => {
   const [form, setForm] = useState(null);
   const [categories, setCategories] = useState([]);
   const [message, setMessage] = useState("");
+  const [imageFile, setImageFile] = useState(null);
+  const [uploading, setUploading] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -46,6 +48,27 @@ const StoreUpdate = () => {
     });
   };
 
+  const handleImageChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setImageFile(file);
+    setUploading(true);
+    try {
+      // örnek: uploadProductImage API’si mağaza görseli için kullanılabiliyorsa
+      const storeProductId = 0; // veya gerek yoksa API’nizde değiştirin
+      const response = await uploadProductImage(storeProductId, file);
+      if (response?.url) {
+        setForm((prev) => ({ ...prev, imageUrl: response.url }));
+      } else {
+        alert("Görsel yüklenemedi.");
+      }
+    } catch {
+      alert("❌ Görsel yükleme hatası.");
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -69,10 +92,10 @@ const StoreUpdate = () => {
         onSubmit={handleSubmit}
         className="grid grid-cols-1 md:grid-cols-2 gap-5 bg-white p-6 rounded-xl shadow border"
       >
+        {/* Text Fields */}
         {[
           { name: "storeName", label: "Mağaza Adı" },
           { name: "storeDescription", label: "Açıklama" },
-          { name: "imageUrl", label: "Görsel URL" },
           { name: "storePhone", label: "Telefon" },
           { name: "storeMail", label: "E-posta" },
           { name: "storeProvince", label: "İl" },
@@ -90,9 +113,23 @@ const StoreUpdate = () => {
           </div>
         ))}
 
+        {/* Görsel Yükleme */}
+        <div className="col-span-full">
+          <label className="block text-sm font-medium text-gray-700 mb-2">Mağaza Görseli</label>
+          <input type="file" accept="image/*" onChange={handleImageChange} />
+          {uploading && <p className="text-sm text-gray-500 mt-1">Yükleniyor...</p>}
+          {form.imageUrl && (
+            <img
+              src={form.imageUrl}
+              alt="Mağaza Görseli"
+              className="mt-3 w-32 h-32 object-cover rounded-md"
+            />
+          )}
+        </div>
+
         {/* Kategori Seçimi */}
         <div className="md:col-span-2">
-          <label className="block text-sm font-medium text-gray-700 mb-2">Kategoriler</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Sektörler (Kategoriler)</label>
           <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3">
             {categories.map((cat) => {
               const isSelected = form.categoryIds.includes(cat.id);
@@ -145,7 +182,7 @@ const StoreUpdate = () => {
           </button>
         </div>
 
-        {/* Bilgilendirme Mesajı */}
+        {/* Mesaj */}
         {message && (
           <div
             className={`col-span-full text-center text-sm font-medium mt-2 ${
