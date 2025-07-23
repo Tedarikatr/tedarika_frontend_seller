@@ -13,13 +13,12 @@ const StorePage = () => {
       try {
         const data = await getMyStore();
         setStore(data);
-      } catch (err) {
+      } catch {
         setStore(null);
       } finally {
         setLoading(false);
       }
     };
-
     fetchStore();
   }, []);
 
@@ -40,11 +39,19 @@ const StorePage = () => {
       {store ? (
         <div className="bg-white shadow-xl rounded-3xl border border-gray-100 overflow-hidden">
           <div className="flex flex-col sm:flex-row gap-6 sm:gap-10 p-8 items-start">
-            {/* Sol: İkon */}
+            {/* Sol: Görsel veya İkon */}
             <div className="flex-shrink-0">
-              <div className="bg-[#003636] text-white p-5 rounded-2xl shadow-md flex items-center justify-center">
-                <StoreIcon className="h-10 w-10" />
-              </div>
+              {store.imageUrl ? (
+                <img
+                  src={store.imageUrl}
+                  alt="Mağaza Görseli"
+                  className="w-28 h-28 rounded-2xl object-cover border border-gray-200 shadow"
+                />
+              ) : (
+                <div className="bg-[#003636] text-white p-5 rounded-2xl shadow-md flex items-center justify-center w-28 h-28">
+                  <StoreIcon className="h-10 w-10" />
+                </div>
+              )}
             </div>
 
             {/* Sağ: Bilgiler */}
