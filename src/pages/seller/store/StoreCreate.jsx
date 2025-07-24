@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { createStore, getAllCategories, uploadProductImage } from "@/api/sellerStoreService";
+import { createStore, getAllCategories } from "@/api/sellerStoreService";
 
 const StoreCreate = () => {
   const [form, setForm] = useState({
     storeName: "",
     storeDescription: "",
-    imageUrl: "",
+    imageFile: null,
     storePhone: "",
     storeMail: "",
     storeProvince: "",
@@ -16,14 +16,12 @@ const StoreCreate = () => {
 
   const [categories, setCategories] = useState([]);
   const [message, setMessage] = useState("");
-  const [imageFile, setImageFile] = useState(null);
-  const [uploading, setUploading] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     getAllCategories()
       .then(setCategories)
-      .catch(() => setMessage("❌ Kategoriler alınamadı."));
+      .catch(() => setMessage("Kategoriler alınamadı."));
   }, []);
 
   const handleChange = (e) => {
@@ -37,55 +35,54 @@ const StoreCreate = () => {
     setForm({ ...form, categoryIds: selected });
   };
 
-  const handleImageChange = async (e) => {
+  const handleImageChange = (e) => {
     const file = e.target.files[0];
-    if (!file) return;
-    setImageFile(file);
-    setUploading(true);
-    try {
-      // Görsel yükleme
-      const storeProductId = 0; // Bu sadece görsel yükleme API'ye özel, gerekmeyebilir veya değiştirilebilir
-      const formData = new FormData();
-      formData.append("file", file);
-
-      // API endpoint'ine uygun şekilde güncelle (kendi mağaza görsel yükleme endpoint'in varsa onu kullan!)
-      const response = await uploadProductImage(storeProductId, file);
-
-      if (response?.url) {
-        setForm({ ...form, imageUrl: response.url });
-      } else {
-        alert("Görsel yüklenemedi.");
-      }
-    } catch (err) {
-      alert("❌ Görsel yükleme hatası.");
-    } finally {
-      setUploading(false);
+    if (file) {
+      setForm((prev) => ({ ...prev, imageFile: file }));
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!form.storeName.trim()) {
+      return setMessage("Mağaza adı zorunludur.");
+    }
+    if (form.categoryIds.length === 0) {
+      return setMessage("En az bir kategori seçilmelidir.");
+    }
+
     try {
+      setMessage("Mağaza oluşturuluyor...");
       await createStore(form);
       navigate("/seller/store");
-    } catch (err) {
-      setMessage("❌ Mağaza oluşturulamadı.");
+    } catch {
+      setMessage("Mağaza oluşturulamadı.");
     }
   };
 
   return (
-    <div className="max-w-xl mx-auto p-6">
-      <h2 className="text-2xl font-bold mb-6 text-[#003636] text-center">Mağaza Oluştur</h2>
+    <div className="max-w-2xl mx-auto p-6">
+      <h2 className="text-3xl font-bold text-center text-[#003636] mb-8">
+        Mağaza Oluştur
+      </h2>
 
-      <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-4 bg-white p-6 rounded-xl shadow">
+      {message && (
+        <div className="mb-6 text-sm px-4 py-3 border rounded-md bg-yellow-50 text-yellow-800 border-yellow-300 text-center">
+          {message}
+        </div>
+      )}
 
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white p-6 rounded-2xl shadow-lg grid gap-5"
+      >
         <input
           name="storeName"
           value={form.storeName}
           onChange={handleChange}
-          placeholder="Mağaza Adı"
-          required
-          className="p-2 border border-gray-300 rounded-md"
+          placeholder="Mağaza Adı *"
+          className="p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#003636]"
         />
 
         <textarea
@@ -93,79 +90,81 @@ const StoreCreate = () => {
           value={form.storeDescription}
           onChange={handleChange}
           placeholder="Mağaza Açıklaması"
-          required
-          className="p-2 border border-gray-300 rounded-md"
+          className="p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#003636]"
         />
 
-        {/* Görsel Yükleme */}
-        <div>
-          <label className="block text-sm font-medium mb-1">Mağaza Görseli</label>
-          <input type="file" onChange={handleImageChange} accept="image/*" className="w-full" />
-          {uploading && <p className="text-sm text-gray-500 mt-1">Yükleniyor...</p>}
-          {form.imageUrl && (
-            <img src={form.imageUrl} alt="Mağaza Görseli" className="mt-2 w-32 h-32 object-cover rounded-md" />
+        <div className="flex flex-col gap-2">
+          <label className="text-sm font-medium text-gray-700">Mağaza Görseli</label>
+          <input
+            type="file"
+            onChange={handleImageChange}
+            accept="image/*"
+            className="text-sm"
+          />
+          {form.imageFile && (
+            <span className="text-sm text-gray-600">{form.imageFile.name}</span>
           )}
         </div>
 
         <input
           name="storePhone"
+          type="tel"
           value={form.storePhone}
           onChange={handleChange}
-          placeholder="Mağaza Telefonu"
-          required
-          className="p-2 border border-gray-300 rounded-md"
+          placeholder="Telefon"
+          className="p-3 border border-gray-300 rounded-md"
         />
 
         <input
           name="storeMail"
+          type="email"
           value={form.storeMail}
           onChange={handleChange}
-          placeholder="Mağaza E-posta"
-          required
-          className="p-2 border border-gray-300 rounded-md"
+          placeholder="E-posta"
+          className="p-3 border border-gray-300 rounded-md"
         />
 
-        <input
-          name="storeProvince"
-          value={form.storeProvince}
-          onChange={handleChange}
-          placeholder="İl"
-          required
-          className="p-2 border border-gray-300 rounded-md"
-        />
+        <div className="grid grid-cols-2 gap-4">
+          <input
+            name="storeProvince"
+            value={form.storeProvince}
+            onChange={handleChange}
+            placeholder="İl"
+            className="p-3 border border-gray-300 rounded-md"
+          />
+          <input
+            name="storeDistrict"
+            value={form.storeDistrict}
+            onChange={handleChange}
+            placeholder="İlçe"
+            className="p-3 border border-gray-300 rounded-md"
+          />
+        </div>
 
-        <input
-          name="storeDistrict"
-          value={form.storeDistrict}
-          onChange={handleChange}
-          placeholder="İlçe"
-          required
-          className="p-2 border border-gray-300 rounded-md"
-        />
-
-        {/* Sektör / Kategori Seçimi */}
-        <select
-          multiple
-          value={form.categoryIds}
-          onChange={handleCategoryChange}
-          className="p-2 border border-gray-300 rounded-md"
-        >
-          <option disabled>📂 Sektör Seçin (CTRL + Click ile çoklu)</option>
-          {categories.map((cat) => (
-            <option key={cat.id} value={cat.id}>
-              {cat.name}
-            </option>
-          ))}
-        </select>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Kategoriler
+          </label>
+          <select
+            multiple
+            value={form.categoryIds}
+            onChange={handleCategoryChange}
+            className="w-full p-3 border border-gray-300 rounded-md text-sm"
+          >
+            {categories.map((cat) => (
+              <option key={cat.id} value={cat.id}>
+                {cat.name}
+              </option>
+            ))}
+          </select>
+        </div>
 
         <button
           type="submit"
-          className="bg-[#003636] text-white py-2 rounded-lg hover:bg-[#004848]"
+          className="w-full bg-[#003636] hover:bg-[#004848] text-white font-semibold py-2 rounded-lg transition"
         >
           Mağazayı Oluştur
         </button>
-
-        {message && <p className="text-center text-red-600">{message}</p>}
       </form>
     </div>
   );
