@@ -13,3 +13,7 @@ export function fetchSellerProfile() {
   export function refreshToken(data) {
     return apiRequest("/SellerUser/refresh-token", "POST", data);
   }
+
+  export function getSellerProfile() {
+    return apiRequest("/SellerUser/profile", "GET", null, true); // <== useAuth: true
+  }
