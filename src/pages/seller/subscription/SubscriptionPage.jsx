@@ -1,163 +1,138 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { activateSubscription } from "@/api/sellerSubscriptionService";
-import { refreshToken } from "@/api/sellerAuthService";
 import { toast } from "react-hot-toast";
+import {
+  createSubscription,
+  checkoutSubscription,
+  getCurrentSubscription,
+} from "@/api/sellerSubscriptionService";
 
 const plans = [
   {
     id: 1,
     name: "Başlangıç",
     price: "₺0",
-    description:
-      "Mağazanızı keşfetmeye başlayın, ürünlerinizi listeleyin ve Tedarika'yı deneyimleyin.",
-    features: [
-      "Ücretsiz mağaza açılışı",
-      "Sınırsız ürün listeleme",
-      "Temel istatistik görünümü",
-      "Kargo & teslimat entegrasyonu",
-      "Temel müşteri mesajlaşma",
-    ],
+    description: "Mağazanızı keşfetmeye başlayın, ürünlerinizi listeleyin ve Tedarika'yı deneyin.",
+    features: ["Ücretsiz mağaza açılışı", "Sınırsız ürün listeleme", "Temel istatistik görünümü"],
   },
   {
     id: 2,
     name: "Standart",
     price: "₺299",
     highlight: true,
-    description:
-      "Markanızı yansıtın, satışlarınızı artırın ve güçlü entegrasyonlarla işinizi büyütün.",
-    features: [
-      "Başlangıç paketine ek olarak:",
-      "Gelişmiş satış raporları",
-      "Özel mağaza sayfası & markalama",
-      "Stok & fiyat yönetimi araçları",
-      "Sipariş ve iade yönetimi",
-      "WhatsApp & e-posta entegrasyonu",
-      "Mobil panel erişimi",
-    ],
+    description: "Markanızı yansıtın, satışlarınızı artırın ve işinizi büyütün.",
+    features: ["Gelişmiş raporlar", "Özel mağaza sayfası", "Stok & fiyat yönetimi"],
   },
   {
     id: 3,
     name: "Premium",
     price: "₺499",
-    description:
-      "En yüksek verimlilik ve otomasyonla Tedarika’nın tüm gücünden faydalanın.",
-    features: [
-      "Standart pakete ek olarak:",
-      "Asistan hesabı yönetimi",
-      "İleri düzey müşteri analizleri",
-      "Kampanya ve indirim yönetimi",
-      "Otomatik fiyat optimizasyonu",
-      "Özel destek ve danışmanlık",
-    ],
+    description: "En yüksek verimlilik ve destekle tüm gücümüz yanınızda.",
+    features: ["Asistan hesapları", "Kampanya yönetimi", "Özel destek"],
   },
 ];
 
 export default function SubscriptionPage() {
+  const [loadingId, setLoadingId] = useState(null);
   const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    const raw = localStorage.getItem("sellerToken");
-    if (raw) {
-      try {
-        const payload = JSON.parse(atob(raw.split(".")[1]));
-        const isActive = payload?.SubscriptionActive === true || payload?.SubscriptionActive === "true";
+    const verifySubscription = async () => {
+      const params = new URLSearchParams(window.location.search);
+      const status = params.get("status");
 
-        if (isActive) {
-          const hasCompany = payload?.HasCompany === true || payload?.HasCompany === "true";
-          navigate(hasCompany ? "/seller/dashboard" : "/seller/company");
+      try {
+        const result = await getCurrentSubscription();
+
+        if (result?.isActive) {
+          if (status === "success") {
+            toast.success("Ödemeniz başarıyla alındı.");
+          } else if (status === "fail") {
+            toast.error("Ödeme işlemi başarısız veya iptal edildi.");
+            return;
+          }
+
+          navigate("/seller/dashboard");
         }
-      } catch (err) {
-        console.error("🔑 Token çözümlenemedi:", err);
+      } catch (error) {
+        console.error("Abonelik kontrolü sırasında hata:", error);
+        toast.error("Abonelik durumu alınamadı.");
       }
-    }
+    };
+
+    verifySubscription();
   }, [navigate]);
 
   const handleSubscribe = async (packageId) => {
+    if (!plans.some((p) => p.id === packageId)) {
+      toast.error("Geçersiz plan seçimi.");
+      return;
+    }
+
+    setLoadingId(packageId);
     try {
-      setIsLoading(true);
+      const created = await createSubscription(packageId, "Monthly");
+      const subscriptionId = created?.subscriptionId || created?.id;
 
-      await activateSubscription({
-        subscriptionPackageId: packageId,
-        startDate: new Date().toISOString(),
-        endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-        paymentReference: "initial-subscription",
-      });
+      if (!subscriptionId) throw new Error("Abonelik oluşturulamadı.");
 
-      const oldToken = localStorage.getItem("sellerToken");
-      if (!oldToken) {
-        toast.error("Token bulunamadı");
-        setIsLoading(false);
-        return;
-      }
+      const checkout = await checkoutSubscription(subscriptionId);
+      const paymentUrl = checkout?.paymentPageUrl || checkout?.url;
 
-      const response = await refreshToken({ token: oldToken });
-      const newToken = response.token;
+      if (!paymentUrl) throw new Error("Ödeme bağlantısı alınamadı.");
 
-      if (newToken) {
-        localStorage.setItem("sellerToken", newToken);
-        toast.success("Abonelik başarıyla başlatıldı");
-
-        const payload = JSON.parse(atob(newToken.split(".")[1]));
-        const hasCompany = payload?.HasCompany === true || payload?.HasCompany === "true";
-
-        setTimeout(() => {
-          navigate(hasCompany ? "/seller/dashboard" : "/seller/company");
-        }, 800);
-      } else {
-        toast.error("Yeni token alınamadı");
-        setIsLoading(false);
-      }
+      toast.success("İyzico ödeme sayfasına yönlendiriliyorsunuz...");
+      window.location.href = paymentUrl;
     } catch (err) {
-      console.error(err);
-      toast.error("Abonelik başlatılamadı");
-      setIsLoading(false);
+      console.error("Abonelik başlatılamadı:", err);
+      toast.error(err?.message || "İşlem sırasında beklenmedik bir hata oluştu.");
+    } finally {
+      setLoadingId(null);
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-green-900 text-white text-xl font-semibold">
-        Abonelik başlatılıyor, lütfen bekleyin...
-      </div>
-    );
-  }
-
   return (
-    <section className="py-20 bg-green-900 text-white min-h-screen">
-      <div className="max-w-7xl mx-auto px-4 text-center">
-        <h2 className="text-4xl font-bold mb-4">Satışa Güçlü Bir Başlangıç Yap</h2>
-        <p className="mb-16 text-lg">
-          İster yeni başlıyor olun, ister markanızı büyütmek isteyin — Tedarika sizin için burada.
-        </p>
+    <section className="min-h-screen py-20 bg-gradient-to-b from-green-950 to-green-800 text-white">
+      <div className="max-w-6xl mx-auto px-6 text-center">
+        <h2 className="text-4xl font-bold mb-4">Abonelik Planları</h2>
+        <p className="text-lg mb-12 text-green-200">Tedarika ile işinizi büyütmeye bugün başlayın</p>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
           {plans.map((plan) => (
             <div
               key={plan.id}
-              className={`rounded-2xl shadow-lg p-8 bg-white text-gray-800 transition-all ${
-                plan.highlight ? "border-4 border-green-500 scale-105" : "border"
+              className={`relative p-8 rounded-2xl shadow-2xl transform transition duration-300 hover:scale-105 ${
+                plan.highlight
+                  ? "bg-white text-green-900 border-4 border-green-500"
+                  : "bg-green-100 text-gray-900 border"
               }`}
             >
-              <h3 className="text-xl font-semibold text-green-700">{plan.name}</h3>
-              <p className="text-4xl font-bold my-4">
-                {plan.price} <span className="text-base font-medium text-gray-600">/ay</span>
-              </p>
-              <p className="mb-6 text-gray-600">{plan.description}</p>
-              <ul className="space-y-2 text-left text-sm text-gray-700">
+              {plan.highlight && (
+                <span className="absolute top-0 right-0 mt-4 mr-4 bg-green-600 text-white text-xs px-3 py-1 rounded-full font-semibold shadow">
+                  En Popüler
+                </span>
+              )}
+              <h3 className="text-xl font-bold text-green-700">{plan.name}</h3>
+              <p className="text-3xl my-4 font-extrabold">{plan.price}</p>
+              <p className="mb-6 text-sm text-gray-600">{plan.description}</p>
+              <ul className="text-left text-sm space-y-2 text-gray-700">
                 {plan.features.map((feature, i) => (
                   <li key={i} className="flex items-start">
-                    <span className="text-green-600 font-bold mr-2">✔</span>
-                    <span>{feature}</span>
+                    <span className="text-green-600 mr-2">✔</span>
+                    {feature}
                   </li>
                 ))}
               </ul>
               <button
                 onClick={() => handleSubscribe(plan.id)}
-                className="mt-6 w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg font-semibold transition"
+                className={`mt-6 w-full py-2 rounded-lg font-semibold transition ${
+                  loadingId === plan.id
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-green-600 hover:bg-green-700 text-white"
+                }`}
+                disabled={!!loadingId}
               >
-                Hemen Başla
+                {loadingId === plan.id ? "İşleniyor..." : "Hemen Başla"}
               </button>
             </div>
           ))}
