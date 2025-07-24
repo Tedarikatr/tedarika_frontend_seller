@@ -5,19 +5,35 @@ export const getMyStore = () =>
   apiRequest("/SellerStore/my-store", "GET", null, true);
 
 // Mağaza oluştur
-export const createStore = (data) =>
-  apiRequest("/SellerStore/create-store", "POST", data, true);
+export const createStore = (form) => {
+  const formData = new FormData();
+  formData.append("StoreName", form.storeName);
+  formData.append("StoreDescription", form.storeDescription || "");
+  formData.append("ImageUrl", form.imageFile || ""); // dosya olarak gelmeli
+  formData.append("StorePhone", form.storePhone || "");
+  formData.append("StoreMail", form.storeMail || "");
+  formData.append("StoreProvince", form.storeProvince || "");
+  formData.append("StoreDistrict", form.storeDistrict || "");
+
+  // Kategori ID'leri ayrı ayrı append edilmeli
+  form.categoryIds.forEach((id) => {
+    formData.append("CategoryIds", id);
+  });
+
+  return apiRequest("/SellerStore/create-store", "POST", formData, true, true); // 5. parametre isFormData = true
+};
 
 // Mağaza güncelle
 export const updateStore = (id, data) =>
   apiRequest(`/SellerStore/update-store/${id}`, "PUT", data, true);
 
-// Kategori listesi
+// ✅ Kategori listesi (withAuth=true → 401 hatası çözülür!)
 export const getAllCategories = () =>
-  apiRequest("/AdminCategory/all", "GET");
+  apiRequest("/AdminCategory/all", "GET", null, true);
 
+// ✅ Alt kategori getir
 export const getSubCategoriesByCategoryId = (categoryId) =>
-  apiRequest(`/AdminCategorySub/by-category?categoryId=${categoryId}`, "GET");
+  apiRequest(`/AdminCategorySub/by-category?categoryId=${categoryId}`, "GET", null, true);
 
 // ✅ Mağazadaki ürünleri getir
 export const fetchMyStoreProducts = () =>
@@ -31,14 +47,18 @@ export const fetchProductDatabase = () =>
 export const addProductToStore = (productId) =>
   apiRequest(`/SellerStoreProduct/${productId}/add`, "POST", null, true);
 
-// ✅ Fiyat güncelle (storeProductId gerekiyor)
+// ✅ Fiyat güncelle
 export const updateProductPrice = (storeProductId, price) =>
-  apiRequest(`/SellerStoreProduct/update-price-storeProductId=${storeProductId}&price=${price}`, "PUT", null, true);
+  apiRequest(
+    `/SellerStoreProduct/update-price-storeProductId=${storeProductId}&price=${price}`,
+    "PUT",
+    null,
+    true
+  );
 
 // ✅ Satış durumu ayarla
 export const toggleProductOnSale = (storeProductId, isOnSale) =>
   apiRequest("/SellerStoreProduct/set-on-sale", "PUT", { storeProductId, isOnSale }, true);
-
 
 // ✅ Min/Max limiti güncelle
 export const updateProductQuantityLimits = (storeProductId, minQty, maxQty) =>
@@ -53,7 +73,6 @@ export const updateProductQuantityLimits = (storeProductId, minQty, maxQty) =>
 export const uploadProductImage = (storeProductId, file) => {
   const formData = new FormData();
   formData.append("file", file);
-
   return apiRequest(
     `/SellerStoreProduct/upload-image?storeProductId=${storeProductId}`,
     "POST",
@@ -71,7 +90,7 @@ export const updateProductStock = (storeProductId, stock) =>
     true
   );
 
-// ✅ İstek oluştur
+// ✅ Ürün isteği oluştur
 export const createProductRequest = (formData) =>
   apiRequest("/SellerStoreProductRequest/create", "POST", formData, true);
 
