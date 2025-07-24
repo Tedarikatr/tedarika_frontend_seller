@@ -1,19 +1,27 @@
 import { useEffect, useState } from "react";
-import { getMyStore, updateStore, getAllCategories, uploadProductImage } from "@/api/sellerStoreService";
+import {
+  getMyStore,
+  updateStore,
+  getAllCategories,
+  uploadProductImage,
+} from "@/api/sellerStoreService";
 import { useNavigate } from "react-router-dom";
+import { Store, Upload } from "lucide-react";
 
 const StoreUpdate = () => {
   const [form, setForm] = useState(null);
   const [categories, setCategories] = useState([]);
   const [message, setMessage] = useState("");
-  const [imageFile, setImageFile] = useState(null);
   const [uploading, setUploading] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [store, cats] = await Promise.all([getMyStore(), getAllCategories()]);
+        const [store, cats] = await Promise.all([
+          getMyStore(),
+          getAllCategories(),
+        ]);
         setForm({
           id: store.id,
           storeName: store.storeName || "",
@@ -40,8 +48,7 @@ const StoreUpdate = () => {
 
   const toggleCategory = (catId) => {
     setForm((prev) => {
-      const alreadySelected = prev.categoryIds.includes(catId);
-      const updated = alreadySelected
+      const updated = prev.categoryIds.includes(catId)
         ? prev.categoryIds.filter((id) => id !== catId)
         : [...prev.categoryIds, catId];
       return { ...prev, categoryIds: updated };
@@ -51,12 +58,9 @@ const StoreUpdate = () => {
   const handleImageChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    setImageFile(file);
     setUploading(true);
     try {
-      // örnek: uploadProductImage API’si mağaza görseli için kullanılabiliyorsa
-      const storeProductId = 0; // veya gerek yoksa API’nizde değiştirin
-      const response = await uploadProductImage(storeProductId, file);
+      const response = await uploadProductImage(0, file);
       if (response?.url) {
         setForm((prev) => ({ ...prev, imageUrl: response.url }));
       } else {
@@ -71,92 +75,127 @@ const StoreUpdate = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setMessage("");
     try {
       await updateStore(form.id, form);
       setMessage("✅ Mağaza başarıyla güncellendi.");
-      setTimeout(() => navigate("/seller/store"), 1200);
+      setTimeout(() => navigate("/seller/store"), 1500);
     } catch {
       setMessage("❌ Güncelleme sırasında bir hata oluştu.");
     }
   };
 
-  if (!form) return <div className="p-6">Yükleniyor...</div>;
+  if (!form) {
+    return (
+      <div className="flex justify-center items-center h-64 text-gray-500 animate-pulse">
+        Mağaza bilgileri yükleniyor...
+      </div>
+    );
+  }
 
   return (
-    <div className="max-w-3xl mx-auto p-6">
-      <h2 className="text-2xl font-bold mb-6 text-[#003636] text-center">
-        Mağaza Bilgilerini Güncelle
-      </h2>
-
-      <form
-        onSubmit={handleSubmit}
-        className="grid grid-cols-1 md:grid-cols-2 gap-5 bg-white p-6 rounded-xl shadow border"
-      >
-        {/* Text Fields */}
-        {[
-          { name: "storeName", label: "Mağaza Adı" },
-          { name: "storeDescription", label: "Açıklama" },
-          { name: "storePhone", label: "Telefon" },
-          { name: "storeMail", label: "E-posta" },
-          { name: "storeProvince", label: "İl" },
-          { name: "storeDistrict", label: "İlçe" },
-        ].map(({ name, label }) => (
-          <div key={name}>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
-            <input
-              name={name}
-              value={form[name]}
-              onChange={handleChange}
-              placeholder={label}
-              className="w-full p-2 border border-gray-300 rounded-md text-sm text-[#003636] shadow-sm focus:ring-2 focus:ring-green-600 focus:outline-none"
-            />
+    <div className="min-h-screen bg-gradient-to-b from-[#f8fafb] to-[#e6f3f2] py-12 px-4 sm:px-6 lg:px-12">
+      <div className="max-w-5xl mx-auto bg-white border border-gray-200 shadow-2xl rounded-2xl p-10">
+        {/* Başlık */}
+        <div className="flex items-center gap-3 mb-10">
+          <div className="bg-[#003636] text-white p-3 rounded-full">
+            <Store size={22} />
           </div>
-        ))}
-
-        {/* Görsel Yükleme */}
-        <div className="col-span-full">
-          <label className="block text-sm font-medium text-gray-700 mb-2">Mağaza Görseli</label>
-          <input type="file" accept="image/*" onChange={handleImageChange} />
-          {uploading && <p className="text-sm text-gray-500 mt-1">Yükleniyor...</p>}
-          {form.imageUrl && (
-            <img
-              src={form.imageUrl}
-              alt="Mağaza Görseli"
-              className="mt-3 w-32 h-32 object-cover rounded-md"
-            />
-          )}
+          <div>
+            <h2 className="text-2xl font-bold text-[#003636]">
+              Mağaza Bilgilerini Güncelle
+            </h2>
+            <p className="text-sm text-gray-600 mt-1">
+              Mağazanıza ait bilgileri güncelleyin ve görünürlüğünüzü artırın.
+            </p>
+          </div>
         </div>
 
-        {/* Kategori Seçimi */}
-        <div className="md:col-span-2">
-          <label className="block text-sm font-medium text-gray-700 mb-2">Sektörler (Kategoriler)</label>
-          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3">
-            {categories.map((cat) => {
-              const isSelected = form.categoryIds.includes(cat.id);
-              return (
-                <label
-                  key={cat.id}
-                  className={`flex items-center gap-2 px-3 py-2 border rounded-md text-sm cursor-pointer transition
-                    ${
-                      isSelected
-                        ? "bg-green-100 border-green-400 text-green-800 font-medium"
-                        : "bg-white border-gray-300 hover:border-green-500"
-                    }`}
-                >
-                  <input
-                    type="checkbox"
-                    checked={isSelected}
-                    onChange={() => toggleCategory(cat.id)}
-                    className="accent-green-600"
-                  />
-                  {cat.name}
-                </label>
-              );
-            })}
+        {/* Form */}
+        <form
+          onSubmit={handleSubmit}
+          className="grid grid-cols-1 sm:grid-cols-2 gap-6"
+        >
+          {/* Text input alanları */}
+          {[
+            { name: "storeName", label: "Mağaza Adı" },
+            { name: "storeDescription", label: "Açıklama" },
+            { name: "storePhone", label: "Telefon" },
+            { name: "storeMail", label: "E-posta" },
+            { name: "storeProvince", label: "İl" },
+            { name: "storeDistrict", label: "İlçe" },
+          ].map((field) => (
+            <div key={field.name} className="flex flex-col">
+              <label className="text-sm text-gray-600 font-medium mb-1">
+                {field.label}
+              </label>
+              <input
+                name={field.name}
+                value={form[field.name]}
+                onChange={handleChange}
+                placeholder={field.label}
+                className="p-2.5 border border-gray-300 rounded-md text-sm text-gray-800 focus:ring-2 focus:ring-[#00665a] focus:outline-none bg-gray-50"
+              />
+            </div>
+          ))}
+
+          {/* Görsel alanı */}
+          <div className="col-span-full">
+            <label className="text-sm font-medium text-gray-700 mb-2 block">
+              Mağaza Görseli
+            </label>
+            <div className="flex items-center gap-4">
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                className="text-sm"
+              />
+              {uploading && <span className="text-sm text-gray-500">Yükleniyor...</span>}
+            </div>
+            {form.imageUrl && (
+              <img
+                src={form.imageUrl}
+                alt="Mağaza Görseli"
+                className="mt-3 w-32 h-32 object-cover border border-gray-200 rounded-lg shadow"
+              />
+            )}
           </div>
 
+          {/* Kategori seçimi */}
+          <div className="col-span-full mt-2">
+            <label className="text-sm font-medium text-gray-700 mb-2 block">
+              Kategori Seçimi
+            </label>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              {categories.map((cat) => {
+                const selected = form.categoryIds.includes(cat.id);
+                return (
+                  <label
+                    key={cat.id}
+                    className={`flex items-center gap-2 px-3 py-2 border rounded-lg text-sm transition cursor-pointer
+                      ${
+                        selected
+                          ? "bg-green-100 border-green-500 text-green-800 font-semibold"
+                          : "bg-white border-gray-300 hover:border-green-400"
+                      }`}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={selected}
+                      onChange={() => toggleCategory(cat.id)}
+                      className="accent-green-600"
+                    />
+                    {cat.name}
+                  </label>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Seçilen kategoriler etiketi */}
           {form.categoryIds.length > 0 && (
-            <div className="flex flex-wrap gap-2 mt-4">
+            <div className="col-span-full flex flex-wrap gap-2 mt-4">
               {form.categoryIds.map((id) => {
                 const cat = categories.find((c) => c.id === id);
                 return (
@@ -170,29 +209,29 @@ const StoreUpdate = () => {
               })}
             </div>
           )}
-        </div>
 
-        {/* Güncelle Butonu */}
-        <div className="col-span-full">
-          <button
-            type="submit"
-            className="w-full bg-[#003636] hover:bg-[#004848] text-white font-semibold py-2 rounded-lg transition"
-          >
-            Güncelle
-          </button>
-        </div>
-
-        {/* Mesaj */}
-        {message && (
-          <div
-            className={`col-span-full text-center text-sm font-medium mt-2 ${
-              message.startsWith("✅") ? "text-green-700" : "text-red-600"
-            }`}
-          >
-            {message}
+          {/* Submit butonu */}
+          <div className="col-span-full mt-4">
+            <button
+              type="submit"
+              className="w-full bg-gradient-to-r from-[#003636] to-[#005e5e] text-white font-semibold py-3 rounded-lg shadow-lg hover:brightness-110 transition"
+            >
+              Güncelle
+            </button>
           </div>
-        )}
-      </form>
+
+          {/* Mesaj */}
+          {message && (
+            <div
+              className={`col-span-full text-center mt-3 text-sm font-medium ${
+                message.startsWith("✅") ? "text-green-600" : "text-red-600"
+              }`}
+            >
+              {message}
+            </div>
+          )}
+        </form>
+      </div>
     </div>
   );
 };
