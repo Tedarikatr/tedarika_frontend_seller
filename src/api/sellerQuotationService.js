@@ -1,17 +1,21 @@
 import { apiRequest } from "./apiRequest";
 
-// ✅ Teklif listesini getir
+// ✅ Tüm gelen teklifleri çek
 export const getMySellerQuotations = () =>
   apiRequest("/SellerQuotation/my-requests", "GET", null, true);
 
-// ✅ Belirli teklif detayı
+// ✅ Tek teklif detayını getir
 export const getSellerQuotationById = (id) =>
   apiRequest(`/SellerQuotation/${id}`, "GET", null, true);
 
-// ✅ Karşı teklif gönder
+// ✅ Alıcı teklifine yanıt ver (karşı teklif)
 export const respondToQuotation = (id, data) =>
   apiRequest(`/SellerQuotation/${id}/respond`, "POST", data, true);
 
-// ✅ Teklifin durumunu güncelle
-export const updateQuotationStatus = (id, data) =>
-  apiRequest(`/SellerQuotation/${id}/status`, "PUT", data, true); // 🔧 düzeltildi
+// ✅ Teklifin durumunu güncelle (1: Kabul, 2: Reddet)
+// sellerQuotationService.js
+export const updateQuotationStatus = (id, status) => {
+  return apiRequest(`/SellerQuotation/${id}/status?status=${status}`, "PUT", null, true);
+};
+
+
