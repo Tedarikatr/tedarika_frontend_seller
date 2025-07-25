@@ -3,6 +3,16 @@ import { getMySellerQuotations } from "@/api/sellerQuotationService";
 import { toast } from "react-hot-toast";
 import { Link } from "react-router-dom";
 
+// String-based status map
+const statusMap = {
+  Pending: { label: "Beklemede", color: "bg-yellow-100 text-yellow-800 border-yellow-200" },
+  Countered: { label: "Karşı Teklif Verildi", color: "bg-blue-100 text-blue-700 border-blue-200" },
+  SellerAccepted: { label: "Kabul Edildi", color: "bg-green-100 text-green-700 border-green-200" },
+  SellerRejected: { label: "Reddedildi", color: "bg-red-100 text-red-700 border-red-200" },
+  Cancelled: { label: "İptal Edildi", color: "bg-gray-100 text-gray-500 border-gray-200" },
+  Expired: { label: "Süresi Doldu", color: "bg-orange-100 text-orange-700 border-orange-200" },
+};
+
 const QuotationListPage = () => {
   const [quotations, setQuotations] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -20,29 +30,6 @@ const QuotationListPage = () => {
     };
     fetchQuotations();
   }, []);
-
-  const getStatusLabel = (status) => {
-    switch (status) {
-      case 1:
-        return (
-          <span className="inline-block text-xs font-semibold px-3 py-1 rounded-full bg-green-100 text-green-700 border border-green-200">
-            Kabul Edildi
-          </span>
-        );
-      case 2:
-        return (
-          <span className="inline-block text-xs font-semibold px-3 py-1 rounded-full bg-red-100 text-red-700 border border-red-200">
-            Reddedildi
-          </span>
-        );
-      default:
-        return (
-          <span className="inline-block text-xs font-semibold px-3 py-1 rounded-full bg-yellow-100 text-yellow-800 border border-yellow-200">
-            Beklemede
-          </span>
-        );
-    }
-  };
 
   const formatDate = (date) =>
     new Date(date).toLocaleString("tr-TR", {
@@ -77,28 +64,40 @@ const QuotationListPage = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100 text-gray-800">
-              {quotations.map((q) => (
-                <tr key={q.id} className="hover:bg-gray-50 transition">
-                  <td className="px-5 py-4">{q.buyerName || "Bilinmeyen Alıcı"}</td>
-                  <td className="px-5 py-4">{q.storeProductName}</td>
-                  <td className="px-5 py-4">{formatDate(q.requestedAt)}</td>
-                  <td className="px-5 py-4">{q.unitPrice} ₺</td>
-                  <td className="px-5 py-4">{q.quantity}</td>
-                  <td className="px-5 py-4">{getStatusLabel(q.status)}</td>
-                  <td className="px-5 py-4 text-center">
-                    <Link
-                      to={`/seller/quotations/${q.id}`}
-                      className="inline-block text-blue-600 hover:text-blue-800 text-sm font-medium transition"
-                    >
-                      Detay
-                    </Link>
-                  </td>
-                </tr>
-              ))}
+              {quotations.map((q) => {
+                const status = statusMap[q.status] || {
+                  label: q.status || "Bilinmeyen",
+                  color: "bg-gray-100 text-gray-600 border-gray-200",
+                };
+                return (
+                  <tr key={q.id} className="hover:bg-gray-50 transition">
+                    <td className="px-5 py-4">{q.buyerName || "Bilinmeyen Alıcı"}</td>
+                    <td className="px-5 py-4">{q.storeProductName}</td>
+                    <td className="px-5 py-4">{formatDate(q.requestedAt)}</td>
+                    <td className="px-5 py-4">{q.unitPrice} ₺</td>
+                    <td className="px-5 py-4">{q.quantity}</td>
+                    <td className="px-5 py-4">
+                      <span
+                        className={`inline-block text-xs font-semibold px-3 py-1 rounded-full border ${status.color}`}
+                      >
+                        {status.label}
+                      </span>
+                    </td>
+                    <td className="px-5 py-4 text-center">
+                      <Link
+                        to={`/seller/quotations/${q.id}`}
+                        className="inline-block text-blue-600 hover:text-blue-800 text-sm font-medium transition"
+                      >
+                        Detay
+                      </Link>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
-      )}
+      )}  
     </div>
   );
 };
