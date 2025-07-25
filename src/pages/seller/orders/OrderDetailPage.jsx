@@ -75,6 +75,8 @@ const OrderDetailPage = () => {
     color: "bg-gray-100 text-gray-700",
   };
 
+  const isFinalStatus = order.status === "Delivered" || order.status === "Cancelled";
+
   return (
     <div className="max-w-6xl mx-auto px-4 py-10 space-y-8">
       <h1 className="text-3xl font-bold text-[#003636] border-b pb-4">Sipariş Detayı</h1>
@@ -96,13 +98,20 @@ const OrderDetailPage = () => {
           </li>
         </ul>
 
+        {/* Uyarı Banner */}
+        {isFinalStatus && (
+          <div className="mt-4 p-3 bg-yellow-50 border border-yellow-300 text-sm text-yellow-800 rounded">
+            Bu sipariş <strong>{status.text}</strong> durumunda olduğu için değiştirilemez veya iptal edilemez.
+          </div>
+        )}
+
         {/* İşlem Butonları */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 pt-4 border-t">
           <select
             className="border border-gray-300 rounded px-4 py-2 text-sm"
             value={selectedStatus}
             onChange={(e) => setSelectedStatus(e.target.value)}
-            disabled={updating}
+            disabled={updating || isFinalStatus}
           >
             {statusOptions.map((opt) => (
               <option key={opt.value} value={opt.value} disabled={opt.value === order.status}>
@@ -113,7 +122,7 @@ const OrderDetailPage = () => {
 
           <button
             onClick={handleStatusUpdate}
-            disabled={updating || selectedStatus === order.status}
+            disabled={updating || selectedStatus === order.status || isFinalStatus}
             className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-md text-sm font-semibold flex items-center gap-2 disabled:opacity-50"
           >
             <ArrowPathIcon className="w-5 h-5" />
@@ -122,7 +131,7 @@ const OrderDetailPage = () => {
 
           <button
             onClick={handleCancel}
-            disabled={updating || order.status === "Cancelled"}
+            disabled={updating || isFinalStatus}
             className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-semibold flex items-center gap-2 disabled:opacity-50"
           >
             <XCircleIcon className="w-5 h-5" />
