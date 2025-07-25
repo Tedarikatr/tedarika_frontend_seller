@@ -6,11 +6,15 @@ import {
   updateQuotationStatus,
 } from "@/api/sellerQuotationService";
 import { toast } from "react-hot-toast";
+import { getQuotationStatusProps } from "@/constants/quotationStatus";
 
 const QuotationDetailPage = () => {
   const { id } = useParams();
   const [quotation, setQuotation] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [statusMessage, setStatusMessage] = useState(null);
+
   const [form, setForm] = useState({
     offeredUnitPrice: "",
     minOrderQuantity: "",
@@ -19,18 +23,21 @@ const QuotationDetailPage = () => {
   });
 
   useEffect(() => {
-    const fetchQuotation = async () => {
-      try {
-        const data = await getSellerQuotationById(id);
-        setQuotation(data);
-      } catch {
-        toast.error("Teklif bilgisi alınamadı.");
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchQuotation();
   }, [id]);
+
+  const fetchQuotation = async () => {
+    setLoading(true);
+    try {
+      const data = await getSellerQuotationById(id);
+      setQuotation(data);
+      toast.success("Teklif başarıyla yüklendi.");
+    } catch {
+      toast.error("Teklif bilgisi alınamadı.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -38,6 +45,13 @@ const QuotationDetailPage = () => {
   };
 
   const handleRespond = async () => {
+    if (!form.offeredUnitPrice || !form.minOrderQuantity || !form.validUntil) {
+      toast.error("Lütfen tüm gerekli alanları doldurun.");
+      setStatusMessage({ type: "error", message: "Tüm gerekli alanları doldurmalısınız." });
+      return;
+    }
+
+    setSubmitting(true);
     try {
       await respondToQuotation(id, {
         offeredUnitPrice: parseFloat(form.offeredUnitPrice),
@@ -46,18 +60,50 @@ const QuotationDetailPage = () => {
         notes: form.notes,
       });
       toast.success("Karşı teklif başarıyla gönderildi.");
-    } catch {
+      setStatusMessage({ type: "success", message: "Karşı teklif başarıyla gönderildi." });
+      resetForm();
+      await fetchQuotation();
+    } catch (error) {
+      console.error("Karşı teklif hatası:", error.response?.data || error.message || error);
       toast.error("Karşı teklif gönderilemedi.");
+      setStatusMessage({ type: "error", message: "Karşı teklif gönderilirken hata oluştu." });
+    } finally {
+      setSubmitting(false);
     }
   };
 
   const handleStatusChange = async (status) => {
-    try {
-      await updateQuotationStatus(id, { status });
-      toast.success("Durum güncellendi.");
-    } catch {
-      toast.error("Durum güncelleme başarısız.");
+    if (quotation.status !== "Pending") {
+      toast.error("Bu teklifin durumu zaten güncellenmiş.");
+      return;
     }
+
+    setStatusMessage(null);
+    toast.loading("Durum güncelleniyor...");
+    try {
+      await updateQuotationStatus(id, status);
+      toast.dismiss();
+      toast.success("Durum başarıyla güncellendi.");
+      setStatusMessage({
+        type: "success",
+        message: `Durum "${status === "SellerAccepted" ? "Kabul Edildi" : "Reddedildi"}" olarak güncellendi.`,
+      });
+      await fetchQuotation();
+    } catch (error) {
+      console.error("Durum güncelleme hatası:", error.response?.data || error.message || error);
+      toast.dismiss();
+      toast.error("Durum güncellenemedi.");
+      setStatusMessage({ type: "error", message: "Durum güncellenirken hata oluştu." });
+    }
+  };
+
+  const resetForm = () => {
+    setForm({
+      offeredUnitPrice: "",
+      minOrderQuantity: "",
+      validUntil: "",
+      notes: "",
+    });
   };
 
   const formatDate = (date) =>
@@ -66,27 +112,7 @@ const QuotationDetailPage = () => {
       timeStyle: "short",
     });
 
-  const getStatusLabel = (status) => {
-    switch (status) {
-      case 1:
-        return "Kabul Edildi";
-      case 2:
-        return "Reddedildi";
-      default:
-        return "Beklemede";
-    }
-  };
-
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 1:
-        return "bg-green-100 text-green-800 border-green-200";
-      case 2:
-        return "bg-red-100 text-red-800 border-red-200";
-      default:
-        return "bg-yellow-100 text-yellow-800 border-yellow-200";
-    }
-  };
+  const status = getQuotationStatusProps(quotation?.status);
 
   if (loading) return <div className="p-6 text-gray-600 animate-pulse">Yükleniyor...</div>;
   if (!quotation) return <div className="p-6 text-red-600">Teklif bulunamadı.</div>;
@@ -104,71 +130,102 @@ const QuotationDetailPage = () => {
           <Info label="Mesaj" value={quotation.message || "-"} />
           <Info label="Talep Tarihi" value={formatDate(quotation.requestedAt)} />
           <div>
-            <span className={`inline-block text-xs font-semibold px-3 py-1 rounded-full border ${getStatusColor(quotation.status)}`}>
-              {getStatusLabel(quotation.status)}
+            <span className={`inline-block text-xs font-semibold px-3 py-1 rounded-full border ${status.color}`}>
+              {status.label}
             </span>
           </div>
         </div>
       </div>
 
       {/* Karşı Teklif Formu */}
-      <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
-        <h2 className="text-lg font-semibold text-gray-800 mb-4">Karşı Teklif Gönder</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <Input
-            name="offeredUnitPrice"
-            type="number"
-            value={form.offeredUnitPrice}
-            onChange={handleInputChange}
-            placeholder="Birim Fiyat (₺)"
-          />
-          <Input
-            name="minOrderQuantity"
-            type="number"
-            value={form.minOrderQuantity}
-            onChange={handleInputChange}
-            placeholder="Min. Sipariş Miktarı"
-          />
-          <Input
-            name="validUntil"
-            type="datetime-local"
-            value={form.validUntil}
-            onChange={handleInputChange}
-          />
-          <textarea
-            name="notes"
-            value={form.notes}
-            onChange={handleInputChange}
-            rows={3}
-            placeholder="Notlar"
-            className="col-span-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"
-          />
+      {quotation.status === "SellerAccepted" ? (
+        <div className="bg-white border border-yellow-200 rounded-2xl shadow-sm p-6 text-yellow-800 text-sm">
+          Bu teklif <strong>kabul edildiği</strong> için tekrar karşı teklif gönderemezsiniz.
         </div>
-        <button
-          onClick={handleRespond}
-          className="mt-5 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg text-sm transition"
-        >
-          Karşı Teklifi Gönder
-        </button>
-      </div>
+      ) : (
+        <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
+          <h2 className="text-lg font-semibold text-gray-800 mb-4">Karşı Teklif Gönder</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <Input
+              name="offeredUnitPrice"
+              type="number"
+              value={form.offeredUnitPrice}
+              onChange={handleInputChange}
+              placeholder="Birim Fiyat (₺)"
+            />
+            <Input
+              name="minOrderQuantity"
+              type="number"
+              value={form.minOrderQuantity}
+              onChange={handleInputChange}
+              placeholder="Min. Sipariş Miktarı"
+            />
+            <Input
+              name="validUntil"
+              type="datetime-local"
+              value={form.validUntil}
+              onChange={handleInputChange}
+            />
+            <textarea
+              name="notes"
+              value={form.notes}
+              onChange={handleInputChange}
+              rows={3}
+              placeholder="Notlar"
+              className="col-span-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          <button
+            onClick={handleRespond}
+            disabled={submitting}
+            className="mt-5 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg text-sm transition disabled:opacity-50"
+          >
+            {submitting ? "Gönderiliyor..." : "Karşı Teklifi Gönder"}
+          </button>
+          {statusMessage && (
+            <div className="mt-4">
+              <MessageBox type={statusMessage.type} message={statusMessage.message} />
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Durum Güncelleme */}
       <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
         <h2 className="text-lg font-semibold text-gray-800 mb-4">Durumu Güncelle</h2>
-        <div className="flex gap-4">
-          <button
-            onClick={() => handleStatusChange(1)}
-            className="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-lg text-sm"
-          >
-            Kabul Et
-          </button>
-          <button
-            onClick={() => handleStatusChange(2)}
-            className="bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded-lg text-sm"
-          >
-            Reddet
-          </button>
-        </div>
+
+        {quotation.status === "Pending" ? (
+          <div className="flex gap-4">
+            <button
+              onClick={() => handleStatusChange("SellerAccepted")}
+              className="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-lg text-sm"
+            >
+              Kabul Et
+            </button>
+            <button
+              onClick={() => handleStatusChange("SellerRejected")}
+              className="bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded-lg text-sm"
+            >
+              Reddet
+            </button>
+          </div>
+        ) : (
+          <div className="text-sm text-gray-600">
+            Teklif zaten{" "}
+            <strong>
+              {quotation.status === "SellerAccepted"
+                ? "KABUL EDİLDİ"
+                : "REDDEDİLDİ"}
+            </strong>
+            .
+          </div>
+        )}
+
+        {statusMessage && (
+          <div className="mt-4">
+            <MessageBox type={statusMessage.type} message={statusMessage.message} />
+          </div>
+        )}
       </div>
     </div>
   );
@@ -190,5 +247,17 @@ const Input = ({ name, value, onChange, type = "text", placeholder }) => (
     className="border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"
   />
 );
+
+const MessageBox = ({ type = "success", message }) => {
+  const color =
+    type === "error"
+      ? "bg-red-100 text-red-800 border-red-300"
+      : "bg-green-100 text-green-800 border-green-300";
+  return (
+    <div className={`border rounded-lg px-4 py-3 text-sm ${color}`}>
+      {message}
+    </div>
+  );
+};
 
 export default QuotationDetailPage;
