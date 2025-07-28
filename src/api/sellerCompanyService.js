@@ -16,3 +16,6 @@ export const getMyCompany = () => {
   export const updateCompany = (data) => {
     return apiRequest("/SellerCompany/update-my-company", "PUT", data, true);
   };
+
+
+  
