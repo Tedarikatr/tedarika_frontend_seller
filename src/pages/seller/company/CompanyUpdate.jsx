@@ -1,6 +1,17 @@
 import { useEffect, useState } from "react";
 import { getMyCompany, updateCompany } from "@/api/sellerCompanyService";
 
+// CompanyType enum için Türkçe select list
+const companyTypeOptions = [
+  { value: 1, label: "Şahıs" },
+  { value: 2, label: "Limited Şirket" },
+  { value: 3, label: "Anonim Şirket" },
+  { value: 4, label: "Kooperatif" },
+  { value: 5, label: "Şube" },
+  { value: 6, label: "Yabancı Şirket" },
+  { value: 99, label: "Diğer" },
+];
+
 const CompanyUpdate = () => {
   const [form, setForm] = useState(null);
   const [message, setMessage] = useState("");
@@ -10,8 +21,18 @@ const CompanyUpdate = () => {
     const fetchCompany = async () => {
       try {
         const data = await getMyCompany();
-        setForm(data);
+        setForm({
+          id: data.id,
+          name: data.name || "",
+          taxNumber: data.taxNumber || "",
+          taxOffice: data.taxOffice || "",
+          country: data.country || "",
+          province: data.province || "",
+          address: data.address || "",
+          type: data.type || "",
+        });
       } catch (err) {
+        console.error("Şirket bilgileri alınamadı", err);
         setMessage("❌ Şirket bilgileri alınamadı.");
       }
     };
@@ -30,7 +51,7 @@ const CompanyUpdate = () => {
     setMessage("");
     setLoading(true);
     try {
-      await updateCompany(form);
+      await updateCompany({ ...form, type: parseInt(form.type) }); // Enum integer olarak gönderilmeli
       setMessage("✅ Şirket bilgileri başarıyla güncellendi.");
     } catch (err) {
       setMessage("❌ Güncelleme sırasında bir hata oluştu.");
@@ -45,13 +66,9 @@ const CompanyUpdate = () => {
     { name: "name", label: "Şirket Adı" },
     { name: "taxNumber", label: "Vergi No" },
     { name: "taxOffice", label: "Vergi Dairesi" },
-    { name: "companyNumber", label: "Şirket Sicil No" },
-    { name: "industry", label: "Sektör" },
     { name: "country", label: "Ülke" },
-    { name: "city", label: "Şehir" },
+    { name: "province", label: "Şehir" },
     { name: "address", label: "Adres" },
-    { name: "email", label: "E-Posta" },
-    { name: "phone", label: "Telefon" },
   ];
 
   return (
@@ -71,13 +88,32 @@ const CompanyUpdate = () => {
             </label>
             <input
               name={field.name}
-              value={form[field.name] ?? ""}
+              value={form[field.name]}
               onChange={handleChange}
               placeholder={field.label}
+              required
               className="p-2 border border-gray-300 rounded-md text-sm text-[#003636] focus:outline-none focus:ring-2 focus:ring-[#004848]"
             />
           </div>
         ))}
+
+        <div className="flex flex-col md:col-span-2">
+          <label className="mb-1 text-sm text-gray-700 font-medium">Şirket Türü</label>
+          <select
+            name="type"
+            value={form.type}
+            onChange={handleChange}
+            required
+            className="p-2 border border-gray-300 rounded-md text-sm text-[#003636] bg-white focus:outline-none focus:ring-2 focus:ring-[#004848]"
+          >
+            <option value="">Seçiniz</option>
+            {companyTypeOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </div>
 
         <div className="md:col-span-2">
           <button

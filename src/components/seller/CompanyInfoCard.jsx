@@ -2,8 +2,24 @@ import React, { useEffect, useState } from "react";
 import { getMyCompany } from "@/api/sellerCompanyService";
 import { useNavigate } from "react-router-dom";
 
-// Badge bileşeni
-const StatusBadge = ({ status, labels = ["Pasif", "Aktif"], activeColor = "bg-green-100 text-green-700", passiveColor = "bg-gray-100 text-gray-600" }) => {
+// Türkçe CompanyType eşleştirmesi (string key'lerle)
+const companyTypeOptions = {
+  SoleProprietorship: "Şahıs",
+  Limited: "Limited Şirket",
+  JointStock: "Anonim Şirket",
+  Cooperative: "Kooperatif",
+  BranchOffice: "Şube",
+  ForeignCompany: "Yabancı Şirket",
+  Other: "Diğer",
+};
+
+// Rozet bileşeni
+const StatusBadge = ({
+  status,
+  labels = ["Pasif", "Aktif"],
+  activeColor = "bg-green-100 text-green-700",
+  passiveColor = "bg-gray-100 text-gray-600",
+}) => {
   const className = status ? activeColor : passiveColor;
   const label = status ? labels[1] : labels[0];
   return (
@@ -21,7 +37,7 @@ const Field = ({ label, value, children }) => (
   </div>
 );
 
-// Ana kart bileşeni
+// Ana bileşen
 const CompanyInfoCard = () => {
   const [company, setCompany] = useState(null);
   const navigate = useNavigate();
@@ -36,7 +52,6 @@ const CompanyInfoCard = () => {
 
   return (
     <div className="bg-white shadow-sm border border-gray-200 rounded-2xl p-6 w-full">
-      {/* Başlık */}
       <div className="mb-6 border-b pb-4 flex justify-between items-center">
         <div>
           <h2 className="text-2xl font-bold text-gray-800">Şirket Bilgileri</h2>
@@ -45,7 +60,6 @@ const CompanyInfoCard = () => {
           </p>
         </div>
 
-        {/* Güncelle Butonu */}
         <button
           onClick={() => navigate("/seller/company-profile")}
           className="bg-gradient-to-r from-[#003636] to-[#006666] hover:brightness-110 text-white font-semibold text-sm py-2 px-5 rounded-lg shadow-md transition"
@@ -54,18 +68,16 @@ const CompanyInfoCard = () => {
         </button>
       </div>
 
-      {/* İçerik Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-5 gap-x-10 text-sm text-gray-700">
         <Field label="Şirket Adı" value={company.name} />
         <Field label="Vergi No" value={company.taxNumber} />
         <Field label="Vergi Dairesi" value={company.taxOffice} />
         <Field label="Ülke" value={company.country} />
-        <Field label="Şehir" value={company.city} />
+        <Field label="Şehir" value={company.province} />
         <Field label="Adres" value={company.address} />
-        <Field label="E-posta" value={company.email} />
-        <Field label="Telefon" value={company.phone} />
         <Field label="Şirket No" value={company.companyNumber} />
-        <Field label="Sektör" value={company.industry} />
+        <Field label="Şirket Türü" value={companyTypeOptions[company.type] || company.type} />
+
         <Field label="Doğrulama Durumu">
           <StatusBadge
             status={company.isVerified}
@@ -74,6 +86,7 @@ const CompanyInfoCard = () => {
             passiveColor="bg-yellow-100 text-yellow-700"
           />
         </Field>
+
         <Field label="Şirket Durumu">
           <StatusBadge
             status={company.isActive}

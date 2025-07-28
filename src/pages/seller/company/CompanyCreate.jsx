@@ -3,19 +3,27 @@ import { useNavigate } from "react-router-dom";
 import { createCompany, hasCompany } from "@/api/sellerCompanyService";
 import { Building2, CheckCircle, Info } from "lucide-react";
 
+// 🔹 Türkçe CompanyType seçenekleri
+const companyTypeOptions = [
+  { value: 1, label: "Şahıs" },
+  { value: 2, label: "Limited Şirket" },
+  { value: 3, label: "Anonim Şirket" },
+  { value: 4, label: "Kooperatif" },
+  { value: 5, label: "Şube" },
+  { value: 6, label: "Yabancı Şirket" },
+  { value: 99, label: "Diğer" },
+];
+
 const CompanyCreate = () => {
   const navigate = useNavigate();
-
   const [form, setForm] = useState({
     name: "",
     taxNumber: "",
     taxOffice: "",
     country: "",
-    city: "",
+    province: "",
     address: "",
-    email: "",
-    phone: "",
-    industry: "",
+    type: "",
   });
 
   const [message, setMessage] = useState("");
@@ -29,9 +37,16 @@ const CompanyCreate = () => {
     e.preventDefault();
     setMessage("Kaydediliyor...");
 
-    const trimmedForm = Object.fromEntries(
-      Object.entries(form).map(([k, v]) => [k, v.trim()])
-    );
+    const trimmedForm = {
+      ...form,
+      name: form.name.trim(),
+      taxNumber: form.taxNumber.trim(),
+      taxOffice: form.taxOffice.trim(),
+      country: form.country.trim(),
+      province: form.province.trim(),
+      address: form.address.trim(),
+      type: parseInt(form.type), // enum olarak gönderilecek
+    };
 
     try {
       await createCompany(trimmedForm);
@@ -46,18 +61,6 @@ const CompanyCreate = () => {
       setMessage("❌ " + (err.message || "Sunucu hatası."));
     }
   };
-
-  const fields = [
-    { name: "name", label: "Şirket Adı" },
-    { name: "taxNumber", label: "Vergi Numarası" },
-    { name: "taxOffice", label: "Vergi Dairesi" },
-    { name: "country", label: "Ülke" },
-    { name: "city", label: "Şehir" },
-    { name: "address", label: "Adres" },
-    { name: "email", label: "E-posta" },
-    { name: "phone", label: "Telefon" },
-    { name: "industry", label: "Sektör" },
-  ];
 
   return (
     <div className="min-h-screen bg-[#0e1a2b] flex items-center justify-center px-4 py-10 text-white">
@@ -92,17 +95,68 @@ const CompanyCreate = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {fields.map(({ name, label }) => (
-              <input
-                key={name}
-                name={name}
-                value={form[name]}
-                onChange={handleChange}
-                placeholder={label}
-                required
-                className="w-full p-3 border border-gray-300 rounded-lg text-sm bg-[#f8fdfc] text-[#002222] placeholder-[#5a7d7c] focus:outline-none focus:ring-2 focus:ring-emerald-400 transition"
-              />
-            ))}
+            <input
+              name="name"
+              value={form.name}
+              onChange={handleChange}
+              placeholder="Şirket Adı"
+              required
+              className="input"
+            />
+            <input
+              name="taxNumber"
+              value={form.taxNumber}
+              onChange={handleChange}
+              placeholder="Vergi Numarası"
+              required
+              className="input"
+            />
+            <input
+              name="taxOffice"
+              value={form.taxOffice}
+              onChange={handleChange}
+              placeholder="Vergi Dairesi"
+              required
+              className="input"
+            />
+            <input
+              name="country"
+              value={form.country}
+              onChange={handleChange}
+              placeholder="Ülke"
+              required
+              className="input"
+            />
+            <input
+              name="province"
+              value={form.province}
+              onChange={handleChange}
+              placeholder="Şehir"
+              required
+              className="input"
+            />
+            <input
+              name="address"
+              value={form.address}
+              onChange={handleChange}
+              placeholder="Adres"
+              required
+              className="input"
+            />
+            <select
+              name="type"
+              value={form.type}
+              onChange={handleChange}
+              required
+              className="input bg-[#f8fdfc] text-[#002222] placeholder-[#5a7d7c]"
+            >
+              <option value="">Şirket Türü Seçin</option>
+              {companyTypeOptions.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div className="mt-6 flex items-start gap-2 text-sm text-emerald-900 bg-[#f0fdfa] px-4 py-3 rounded-lg border border-emerald-300">
