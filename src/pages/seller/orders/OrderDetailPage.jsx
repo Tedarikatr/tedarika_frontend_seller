@@ -5,8 +5,8 @@ import {
   updateOrderStatus,
   cancelOrder,
 } from "@/api/sellerOrderService";
-import { ArrowPathIcon, XCircleIcon } from "@heroicons/react/24/solid";
 import { statusLabels, statusOptions } from "@/constants/orderStatus";
+import { ArrowPathIcon, XCircleIcon } from "@heroicons/react/24/solid";
 
 const OrderDetailPage = () => {
   const { orderId } = useParams();
@@ -78,35 +78,36 @@ const OrderDetailPage = () => {
   const isFinalStatus = order.status === "Delivered" || order.status === "Cancelled";
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-10 space-y-8">
-      <h1 className="text-3xl font-bold text-[#003636] border-b pb-4">Sipariş Detayı</h1>
+    <div className="max-w-7xl mx-auto px-6 py-12 space-y-10">
+      <h1 className="text-3xl font-bold text-gray-900 border-b pb-4">Sipariş Detayı</h1>
 
-      {/* Sipariş Bilgileri */}
-      <section className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm space-y-4">
-        <ul className="grid sm:grid-cols-2 gap-y-3 text-sm text-gray-700">
-          <li><strong>Sipariş No:</strong> {order.orderNumber}</li>
-          <li><strong>Mağaza:</strong> {order.storeName}</li>
-          <li><strong>Oluşturulma:</strong> {new Date(order.createdAt).toLocaleString("tr-TR")}</li>
-          <li><strong>Kargo:</strong> {order.carrierName || "Tanımsız"}</li>
-          <li><strong>Adres:</strong> {order.shippingAddress}</li>
-          <li><strong>Toplam:</strong> ₺{order.totalAmount.toFixed(2)} {order.currency}</li>
-          <li className="col-span-2">
-            <strong>Durum:</strong>{" "}
+      {/* GENEL BİLGİLER */}
+      <section className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6 space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-y-3 text-sm text-gray-800">
+          <Info label="Sipariş No" value={order.orderNumber} />
+          <Info label="Mağaza" value={order.storeName} />
+          <Info label="Oluşturulma" value={new Date(order.createdAt).toLocaleString("tr-TR")} />
+          <Info label="Kargo" value={order.carrierName || "Tanımsız"} />
+          <Info label="Adres" value={order.shippingAddress} />
+          <Info
+            label="Toplam"
+            value={`₺${order.totalAmount.toFixed(2)} ${order.currency}`}
+          />
+          <div className="md:col-span-2">
+            <span className="font-medium">Durum: </span>
             <span className={`inline-block px-3 py-1 text-xs font-semibold rounded-full ${status.color}`}>
               {status.text}
             </span>
-          </li>
-        </ul>
+          </div>
+        </div>
 
-        {/* Uyarı Banner */}
         {isFinalStatus && (
-          <div className="mt-4 p-3 bg-yellow-50 border border-yellow-300 text-sm text-yellow-800 rounded">
-            Bu sipariş <strong>{status.text}</strong> durumunda olduğu için değiştirilemez veya iptal edilemez.
+          <div className="bg-yellow-50 border border-yellow-300 text-yellow-800 p-3 rounded-md text-sm">
+            Bu sipariş <strong>{status.text}</strong> durumundadır ve değiştirilemez.
           </div>
         )}
 
-        {/* İşlem Butonları */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 pt-4 border-t">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 border-t pt-4">
           <select
             className="border border-gray-300 rounded px-4 py-2 text-sm"
             value={selectedStatus}
@@ -123,7 +124,7 @@ const OrderDetailPage = () => {
           <button
             onClick={handleStatusUpdate}
             disabled={updating || selectedStatus === order.status || isFinalStatus}
-            className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-md text-sm font-semibold flex items-center gap-2 disabled:opacity-50"
+            className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-md text-sm font-medium flex items-center gap-2 disabled:opacity-50"
           >
             <ArrowPathIcon className="w-5 h-5" />
             {updating ? "Güncelleniyor..." : "Durumu Güncelle"}
@@ -132,7 +133,7 @@ const OrderDetailPage = () => {
           <button
             onClick={handleCancel}
             disabled={updating || isFinalStatus}
-            className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-semibold flex items-center gap-2 disabled:opacity-50"
+            className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium flex items-center gap-2 disabled:opacity-50"
           >
             <XCircleIcon className="w-5 h-5" />
             {updating ? "İptal Ediliyor..." : "Siparişi İptal Et"}
@@ -140,22 +141,25 @@ const OrderDetailPage = () => {
         </div>
       </section>
 
-      {/* Ödeme Bilgisi */}
-      <section className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
-        <h2 className="text-lg font-semibold mb-4">Ödeme Bilgileri</h2>
-        <ul className="text-sm space-y-1 text-gray-700">
-          <li><strong>Yöntem:</strong> {order.payment?.name}</li>
-          <li><strong>Tutar:</strong> ₺{order.payment?.totalAmount?.toFixed(2)}</li>
-          <li><strong>Durum:</strong> {order.payment?.status === "Pending" ? "Ödenmedi" : "Ödendi"}</li>
+      {/* ÖDEME */}
+      <section className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
+        <h2 className="text-xl font-semibold mb-4 text-gray-900">Ödeme Bilgileri</h2>
+        <ul className="text-sm text-gray-700 space-y-1">
+          <Info label="Yöntem" value={order.payment?.name} />
+          <Info label="Tutar" value={`₺${order.payment?.totalAmount?.toFixed(2)}`} />
+          <Info
+            label="Durum"
+            value={order.payment?.status === "Pending" ? "Ödenmedi" : "Ödendi"}
+          />
         </ul>
       </section>
 
-      {/* Ürünler */}
-      <section className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
-        <h2 className="text-lg font-semibold mb-5">Ürünler</h2>
+      {/* ÜRÜNLER */}
+      <section className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
+        <h2 className="text-xl font-semibold mb-6 text-gray-900">Ürünler</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {order.items.map((item, i) => (
-            <div key={i} className="border border-gray-200 rounded-lg p-4 shadow-sm space-y-2">
+            <div key={i} className="border border-gray-200 rounded-xl p-4 shadow-sm space-y-3">
               <div className="flex justify-center">
                 <img
                   src={item.storeProductImageUrl || "/tedarika/assets/images/product-placeholder.svg"}
@@ -176,5 +180,11 @@ const OrderDetailPage = () => {
     </div>
   );
 };
+
+const Info = ({ label, value }) => (
+  <li>
+    <strong>{label}:</strong> {value || "-"}
+  </li>
+);
 
 export default OrderDetailPage;
