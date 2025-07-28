@@ -6,8 +6,8 @@ import LoginPage from "@/pages/seller/LoginPage";
 import DashboardPage from "@/pages/seller/DashboardPage";
 import SellerLandingPage from "@/pages/seller/SellerLandingPage";
 
-import { CompanyCreate, CompanyUpdate, CompanyView } from "@/pages/seller/company";
-import { StoreCreate, StoreUpdate, StorePage } from "@/pages/seller/store";
+import { CompanyCreate, CompanyUpdate } from "@/pages/seller/company";
+import { StoreCreate, StoreUpdate } from "@/pages/seller/store";
 
 import MyStoreProductsPage from "@/pages/seller/products/MyStoreProductsPage";
 import ProductDatabasePage from "@/pages/seller/products/ProductDatabasePage";
@@ -63,9 +63,9 @@ function App() {
       >
         <Route path="dashboard" element={<DashboardPage />} />
         <Route path="company-profile" element={<CompanyUpdate />} />
-        <Route path="company-view" element={<CompanyView />} />
+        
 
-        <Route path="store" element={<StorePage />} />
+        
         <Route path="store/create" element={<StoreCreate />} />
         <Route path="store/update" element={<StoreUpdate />} />
         <Route path="store/coverage" element={<StoreCoveragePage />} />
