@@ -1,31 +1,32 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { createStore, getAllCategories } from "@/api/sellerStoreService";
+import { useNavigate } from "react-router-dom";
 
 const StoreCreate = () => {
   const [form, setForm] = useState({
     storeName: "",
     storeDescription: "",
-    imageFile: null,
-    storePhone: "",
-    storeMail: "",
-    storeProvince: "",
-    storeDistrict: "",
+    logoFile: null,
+    bannerFile: null,
     categoryIds: [],
   });
-
   const [categories, setCategories] = useState([]);
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
-    getAllCategories()
-      .then(setCategories)
-      .catch(() => setMessage("Kategoriler alınamadı."));
+    getAllCategories().then(setCategories).catch(() => {
+      setMessage("❌ Kategoriler alınamadı.");
+    });
   }, []);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleFileChange = (e, type) => {
+    const file = e.target.files[0];
+    if (file) setForm((prev) => ({ ...prev, [type]: file }));
   };
 
   const handleCategoryChange = (e) => {
@@ -35,29 +36,20 @@ const StoreCreate = () => {
     setForm({ ...form, categoryIds: selected });
   };
 
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setForm((prev) => ({ ...prev, imageFile: file }));
-    }
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!form.storeName.trim()) {
-      return setMessage("Mağaza adı zorunludur.");
-    }
-    if (form.categoryIds.length === 0) {
+    if (!form.storeName.trim()) return setMessage("Mağaza adı zorunludur.");
+    if (!form.logoFile) return setMessage("Logo zorunludur.");
+    if (form.categoryIds.length === 0)
       return setMessage("En az bir kategori seçilmelidir.");
-    }
 
     try {
       setMessage("Mağaza oluşturuluyor...");
       await createStore(form);
       navigate("/seller/store");
     } catch {
-      setMessage("Mağaza oluşturulamadı.");
+      setMessage("❌ Mağaza oluşturulamadı.");
     }
   };
 
@@ -73,16 +65,13 @@ const StoreCreate = () => {
         </div>
       )}
 
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white p-6 rounded-2xl shadow-lg grid gap-5"
-      >
+      <form onSubmit={handleSubmit} className="grid gap-5 bg-white p-6 rounded-xl shadow-md">
         <input
           name="storeName"
           value={form.storeName}
           onChange={handleChange}
           placeholder="Mağaza Adı *"
-          className="p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#003636]"
+          className="p-3 border rounded-md"
         />
 
         <textarea
@@ -90,67 +79,22 @@ const StoreCreate = () => {
           value={form.storeDescription}
           onChange={handleChange}
           placeholder="Mağaza Açıklaması"
-          className="p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#003636]"
+          className="p-3 border rounded-md"
         />
 
-        <div className="flex flex-col gap-2">
-          <label className="text-sm font-medium text-gray-700">Mağaza Görseli</label>
-          <input
-            type="file"
-            onChange={handleImageChange}
-            accept="image/*"
-            className="text-sm"
-          />
-          {form.imageFile && (
-            <span className="text-sm text-gray-600">{form.imageFile.name}</span>
-          )}
-        </div>
-
-        <input
-          name="storePhone"
-          type="tel"
-          value={form.storePhone}
-          onChange={handleChange}
-          placeholder="Telefon"
-          className="p-3 border border-gray-300 rounded-md"
-        />
-
-        <input
-          name="storeMail"
-          type="email"
-          value={form.storeMail}
-          onChange={handleChange}
-          placeholder="E-posta"
-          className="p-3 border border-gray-300 rounded-md"
-        />
-
-        <div className="grid grid-cols-2 gap-4">
-          <input
-            name="storeProvince"
-            value={form.storeProvince}
-            onChange={handleChange}
-            placeholder="İl"
-            className="p-3 border border-gray-300 rounded-md"
-          />
-          <input
-            name="storeDistrict"
-            value={form.storeDistrict}
-            onChange={handleChange}
-            placeholder="İlçe"
-            className="p-3 border border-gray-300 rounded-md"
-          />
+        <div>
+          <label className="text-sm font-semibold">Logo (zorunlu)</label>
+          <input type="file" accept="image/*" onChange={(e) => handleFileChange(e, "logoFile")} />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Kategoriler
-          </label>
-          <select
-            multiple
-            value={form.categoryIds}
-            onChange={handleCategoryChange}
-            className="w-full p-3 border border-gray-300 rounded-md text-sm"
-          >
+          <label className="text-sm font-semibold">Banner (opsiyonel)</label>
+          <input type="file" accept="image/*" onChange={(e) => handleFileChange(e, "bannerFile")} />
+        </div>
+
+        <div>
+          <label className="text-sm font-semibold">Kategoriler</label>
+          <select multiple value={form.categoryIds} onChange={handleCategoryChange} className="w-full border p-2 rounded-md">
             {categories.map((cat) => (
               <option key={cat.id} value={cat.id}>
                 {cat.name}
@@ -161,7 +105,7 @@ const StoreCreate = () => {
 
         <button
           type="submit"
-          className="w-full bg-[#003636] hover:bg-[#004848] text-white font-semibold py-2 rounded-lg transition"
+          className="bg-[#003636] hover:bg-[#004848] text-white font-semibold py-2 rounded-lg"
         >
           Mağazayı Oluştur
         </button>

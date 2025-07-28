@@ -3,7 +3,12 @@ import { getMyStore } from "@/api/sellerStoreService";
 import { useNavigate } from "react-router-dom";
 import { StoreIcon, PlusCircle } from "lucide-react";
 
-const StatusBadge = ({ status, labels = ["Hayır", "Evet"], activeColor = "bg-green-100 text-green-700", passiveColor = "bg-red-100 text-red-700" }) => {
+const StatusBadge = ({
+  status,
+  labels = ["Hayır", "Evet"],
+  activeColor = "bg-green-100 text-green-700",
+  passiveColor = "bg-red-100 text-red-700",
+}) => {
   const className = status ? activeColor : passiveColor;
   const label = status ? labels[1] : labels[0];
   return (
@@ -41,13 +46,14 @@ const StoreInfoCard = () => {
   }
 
   if (!store) {
-    // Mağaza yoksa boş durumu göster
     return (
       <div className="bg-white border border-dashed border-gray-300 p-8 rounded-2xl text-center flex flex-col items-center justify-center shadow-sm">
         <div className="bg-[#e0f2f1] p-4 rounded-full mb-4 text-[#003636]">
           <StoreIcon size={32} />
         </div>
-        <h3 className="text-lg font-semibold text-[#003636] mb-2">Henüz bir mağazanız bulunmuyor</h3>
+        <h3 className="text-lg font-semibold text-[#003636] mb-2">
+          Henüz bir mağazanız bulunmuyor
+        </h3>
         <p className="text-gray-600 mb-4 text-sm">
           Platformda ürün yayınlamak için bir mağaza oluşturmanız gerekiyor.
         </p>
@@ -62,7 +68,6 @@ const StoreInfoCard = () => {
     );
   }
 
-  // Mağaza varsa kart göster
   return (
     <div className="bg-white shadow-sm border border-gray-200 rounded-2xl p-6 w-full">
       <div className="mb-6 border-b pb-4 flex justify-between items-center">
@@ -81,6 +86,7 @@ const StoreInfoCard = () => {
       </div>
 
       <div className="flex flex-col sm:flex-row gap-6">
+        {/* Görsel varsa göster (şu an API'de yok) */}
         {store.imageUrl && (
           <img
             src={store.imageUrl}
@@ -91,11 +97,9 @@ const StoreInfoCard = () => {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-5 gap-x-10 text-sm text-gray-700 flex-1">
           <Field label="Mağaza Adı" value={store.storeName} />
-          <Field label="İl" value={store.storeProvince} />
-          <Field label="İlçe" value={store.storeDistrict} />
-          <Field label="Telefon" value={store.storePhone} />
-          <Field label="E-posta" value={store.storeMail} />
-          <Field label="Açıklama" value={store.storeDescription} />
+          <Field label="Mağaza Açıklaması" value={store.storeDescription} />
+          <Field label="Mağaza Konumu / No" value={store.storeNumber} />
+          <Field label="Slug" value={store.storeSlug} />
           <Field label="Onaylı mı?">
             <StatusBadge
               status={store.isApproved}
