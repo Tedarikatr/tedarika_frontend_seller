@@ -1,39 +1,67 @@
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 const SellerHeader = () => {
   const navigate = useNavigate();
+  const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <header className="bg-[#003032] h-20 flex items-center text-white px-4 sm:px-6 shadow z-50">
-      <div className="container mx-auto w-full flex justify-between items-center">
-        {/* Logo ve Başlık */}
-        <a href="/" className="flex items-center gap-3">
-          <img
-            src="/logo.svg"
-            alt="Tedarika Logo"
-            className="h-12 w-auto object-contain"
-          />
-          <span className="text-2xl sm:text-3xl font-extrabold tracking-tight leading-tight">
-            Tedarika<span className="text-emerald-400">Seller</span>
+    <header className="bg-[#003032] shadow-md px-4 sm:px-6 py-3 w-full">
+      <div className="w-full flex items-center justify-between">
+        <div className="flex items-center">
+          <span className="text-white text-xl sm:text-2xl font-bold">
+            Tedarika
+            <span className="text-emerald-400 font-semibold ml-1">Seller</span>
           </span>
-        </a>
+        </div>
 
-        {/* Giriş / Kayıt Butonları */}
-        <div className="flex items-center gap-3">
+        <div className="hidden sm:flex items-center gap-3">
           <button
             onClick={() => navigate("/seller/login")}
-            className="bg-white/90 hover:bg-white text-[#003636] font-semibold px-6 py-2 rounded-full shadow-sm hover:shadow-md transition text-sm sm:text-base"
+            className="bg-white text-[#003032] font-semibold text-sm px-4 py-2 rounded-full hover:bg-emerald-100 transition"
           >
             Giriş Yap
           </button>
           <button
             onClick={() => navigate("/seller/register")}
-            className="border border-white text-white font-semibold px-6 py-2 rounded-full hover:bg-white hover:text-[#003636] transition text-sm sm:text-base"
+            className="border border-white text-white font-semibold text-sm px-4 py-2 rounded-full hover:bg-white hover:text-[#003032] transition"
           >
             Hesap Aç
           </button>
         </div>
+
+        <div className="sm:hidden">
+          <button
+            onClick={() => setIsOpen(!isOpen)}
+            className="text-white font-semibold text-sm border px-3 py-2 rounded-full border-white"
+          >
+            {isOpen ? "Kapat" : "Menü"}
+          </button>
+        </div>
       </div>
+
+      {isOpen && (
+        <div className="sm:hidden mt-3 px-2 flex flex-col gap-2 animate-fade-in-down">
+          <button
+            onClick={() => {
+              navigate("/seller/login");
+              setIsOpen(false);
+            }}
+            className="bg-white text-[#003032] font-semibold text-sm px-4 py-2 rounded-full hover:bg-emerald-100 transition"
+          >
+            Giriş Yap
+          </button>
+          <button
+            onClick={() => {
+              navigate("/seller/register");
+              setIsOpen(false);
+            }}
+            className="border border-white text-white font-semibold text-sm px-4 py-2 rounded-full hover:bg-white hover:text-[#003032] transition"
+          >
+            Hesap Aç
+          </button>
+        </div>
+      )}
     </header>
   );
 };
