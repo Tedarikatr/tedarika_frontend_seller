@@ -14,9 +14,9 @@ const SellerApplicationForm = () => {
     email: "",
     productCategories: "",
     productCondition: "Branded",
-    taxCertificateUrl: "",
-    tradeRegistryGazetteUrl: "",
-    signatureCircularUrl: "",
+    taxCertificateFile: null,
+    tradeRegistryGazetteFile: null,
+    signatureCircularFile: null,
     ecommerceLinks: "",
     socialMediaLinks: "",
     kvkkApproved: false,
@@ -24,24 +24,64 @@ const SellerApplicationForm = () => {
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [statusMessage, setStatusMessage] = useState(null);
 
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
+    const { name, value, type, checked, files } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: type === "checkbox" ? checked : value,
+      [name]: type === "checkbox" ? checked : type === "file" ? files[0] : value,
     }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setStatusMessage(null);
+
+    if (!formData.kvkkApproved || !formData.contractApproved) {
+      toast.error("Lütfen KVKK ve Satıcı sözleşmesini onaylayın.");
+      return;
+    }
+
     setIsSubmitting(true);
     try {
-      await applySeller(formData);
-      toast.success("✅ Başvurunuz alınmıştır, en kısa sürede sizinle iletişime geçilecektir.");
+      const data = new FormData();
+      Object.entries(formData).forEach(([key, value]) => {
+        if (value !== null && value !== "") {
+          data.append(key, value);
+        }
+      });
+
+      await applySeller(data); // API FormData bekliyor
+
+      toast.success("✅ Başvurunuz alınmıştır.");
+      setStatusMessage({
+        type: "success",
+        message: "Başvurunuz başarıyla alındı. En kısa sürede sizinle iletişime geçilecektir.",
+      });
+
+      setFormData({
+        companyName: "",
+        taxNumber: "",
+        taxOffice: "",
+        companyType: "SoleProprietorship",
+        contactName: "",
+        phoneNumber: "",
+        email: "",
+        productCategories: "",
+        productCondition: "Branded",
+        taxCertificateFile: null,
+        tradeRegistryGazetteFile: null,
+        signatureCircularFile: null,
+        ecommerceLinks: "",
+        socialMediaLinks: "",
+        kvkkApproved: false,
+        contractApproved: false,
+      });
     } catch (err) {
-      const msg = err?.message || "❌ Beklenmeyen bir hata oluştu, lütfen tekrar deneyin.";
+      const msg = err?.message || "❌ Beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.";
       toast.error(msg);
+      setStatusMessage({ type: "error", message: msg });
     } finally {
       setIsSubmitting(false);
     }
@@ -49,7 +89,7 @@ const SellerApplicationForm = () => {
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row bg-[#002d2f] text-white">
-      {/* Sol Tanıtım Alanı */}
+      {/* Sol Tanıtım */}
       <div className="w-full md:w-1/2 flex flex-col justify-center items-start px-10 py-20 space-y-8 bg-gradient-to-br from-[#003e3f] via-[#004b49] to-[#005c5a]">
         <h2 className="text-4xl font-extrabold leading-tight tracking-tight">
           Tedarika Satıcı Başvuru
@@ -58,11 +98,7 @@ const SellerApplicationForm = () => {
           Satıcı olarak başvurarak ürünlerinizi Tedarika Marketplace'e taşıyın, potansiyelinizi büyütün.
         </p>
         <ul className="space-y-3 text-sm">
-          {[
-            "Hızlı başvuru süreci",
-            "Belgelerinizi dijital olarak sunun",
-            "Onay sonrası anında mağaza açın",
-          ].map((item, i) => (
+          {["Hızlı başvuru süreci", "Belgelerinizi dijital olarak sunun", "Onay sonrası anında mağaza açın"].map((item, i) => (
             <li key={i} className="flex items-center gap-2">
               <CheckCircle size={18} className="text-emerald-400" />
               <span>{item}</span>
@@ -71,9 +107,9 @@ const SellerApplicationForm = () => {
         </ul>
       </div>
 
-      {/* Sağ Başvuru Formu */}
+      {/* Sağ Form */}
       <div className="w-full md:w-1/2 bg-white text-[#003636] flex items-center justify-center py-16 px-8">
-        <form onSubmit={handleSubmit} className="w-full max-w-lg space-y-4">
+        <form onSubmit={handleSubmit} className="w-full max-w-lg space-y-4" encType="multipart/form-data">
           <h3 className="text-3xl font-bold text-center mb-6">Başvuru Formu</h3>
 
           <Input name="companyName" value={formData.companyName} onChange={handleChange} placeholder="Şirket Adı" required />
@@ -83,9 +119,11 @@ const SellerApplicationForm = () => {
           <Input name="email" type="email" value={formData.email} onChange={handleChange} placeholder="E-posta" required />
           <Input name="phoneNumber" value={formData.phoneNumber} onChange={handleChange} placeholder="Telefon" required />
           <Input name="productCategories" value={formData.productCategories} onChange={handleChange} placeholder="Ürün Kategorileri" required />
-          <Input name="taxCertificateUrl" value={formData.taxCertificateUrl} onChange={handleChange} placeholder="Vergi Sertifikası Linki" />
-          <Input name="tradeRegistryGazetteUrl" value={formData.tradeRegistryGazetteUrl} onChange={handleChange} placeholder="Ticaret Sicil Gazetesi Linki" />
-          <Input name="signatureCircularUrl" value={formData.signatureCircularUrl} onChange={handleChange} placeholder="İmza Sirküsü Linki" />
+
+          <FileInput name="taxCertificateFile" onChange={handleChange} label="Vergi Sertifikası Yükle" file={formData.taxCertificateFile} />
+          <FileInput name="tradeRegistryGazetteFile" onChange={handleChange} label="Ticaret Sicil Gazetesi Yükle" file={formData.tradeRegistryGazetteFile} />
+          <FileInput name="signatureCircularFile" onChange={handleChange} label="İmza Sirküsü Yükle" file={formData.signatureCircularFile} />
+
           <Input name="ecommerceLinks" value={formData.ecommerceLinks} onChange={handleChange} placeholder="E-Ticaret Linkleri" />
           <Input name="socialMediaLinks" value={formData.socialMediaLinks} onChange={handleChange} placeholder="Sosyal Medya Linkleri" />
 
@@ -98,6 +136,14 @@ const SellerApplicationForm = () => {
             <input type="checkbox" name="contractApproved" checked={formData.contractApproved} onChange={handleChange} />
             <label htmlFor="contractApproved" className="text-sm">Satıcı sözleşmesini kabul ediyorum.</label>
           </div>
+
+          {statusMessage && (
+            <div className={`text-sm text-center font-medium px-3 py-2 rounded-md ${
+              statusMessage.type === "success" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-700"
+            }`}>
+              {statusMessage.message}
+            </div>
+          )}
 
           <button
             type="submit"
@@ -112,14 +158,8 @@ const SellerApplicationForm = () => {
   );
 };
 
-const Input = ({
-  name,
-  value,
-  onChange,
-  placeholder,
-  type = "text",
-  required = false,
-}) => (
+// Input
+const Input = ({ name, value, onChange, placeholder, type = "text", required = false }) => (
   <input
     type={type}
     name={name}
@@ -129,6 +169,20 @@ const Input = ({
     required={required}
     className="w-full border border-[#bde7e3] rounded-lg px-4 py-2 text-sm placeholder-[#7aa5a2] focus:outline-none focus:ring-2 ring-[#00d18c] bg-[#f0fdfa] text-[#003636] transition"
   />
+);
+
+// FileInput
+const FileInput = ({ name, onChange, label, file }) => (
+  <div className="w-full flex flex-col gap-1">
+    <label className="text-sm text-[#003636] font-medium">{label}</label>
+    <input
+      type="file"
+      name={name}
+      onChange={onChange}
+      className="block w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100"
+    />
+    {file && <span className="text-xs text-gray-500">{file.name}</span>}
+  </div>
 );
 
 export default SellerApplicationForm;
