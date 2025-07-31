@@ -99,7 +99,11 @@ const LoginPage = () => {
           </button>
 
           {message && (
-            <p className={`mt-4 text-sm text-center font-medium ${message.startsWith("✅") ? "text-green-600" : "text-red-500"}`}>
+            <p
+              className={`mt-4 text-sm text-center font-medium ${
+                message.startsWith("✅") ? "text-green-600" : "text-red-500"
+              }`}
+            >
               {message}
             </p>
           )}
@@ -107,10 +111,10 @@ const LoginPage = () => {
           <p className="mt-6 text-center text-sm text-gray-600">
             Hesabınız yok mu?{" "}
             <Link
-              to="/seller/register"
+              to="/seller/apply"
               className="text-emerald-600 font-semibold hover:underline"
             >
-              Kayıt Ol
+              Başvuru Yap
             </Link>
           </p>
         </form>
