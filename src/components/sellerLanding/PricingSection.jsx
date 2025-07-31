@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 
 const pricingPlans = [
@@ -44,6 +45,8 @@ const pricingPlans = [
 ];
 
 export default function PricingSection() {
+  const navigate = useNavigate();
+
   return (
     <section className="py-24 bg-gradient-to-br from-green-900 via-emerald-800 to-green-900 text-white">
       <div className="max-w-7xl mx-auto px-4 text-center">
@@ -83,7 +86,10 @@ export default function PricingSection() {
                   </li>
                 ))}
               </ul>
-              <button className="mt-6 w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-lg font-semibold transition">
+              <button
+                onClick={() => navigate("/seller/apply")}
+                className="mt-6 w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-lg font-semibold transition"
+              >
                 Hemen Başla
               </button>
             </motion.div>
