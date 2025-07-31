@@ -51,7 +51,7 @@ const ProductRow = ({ product, onRefresh, onFeedback, hasCoverage }) => {
             src={
               imageFile
                 ? URL.createObjectURL(imageFile)
-                : product.imageUrl || "/placeholder.png"
+                : product.storeProductImageUrl || product.imageUrl || "/placeholder.png"
             }
             alt={product.name || "Ürün görseli"}
             className="w-12 h-12 object-cover rounded border"
