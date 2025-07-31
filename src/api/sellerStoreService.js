@@ -4,7 +4,6 @@ import { apiRequest } from "./apiRequest";
 export const getMyStore = () =>
   apiRequest("/SellerStore/my-store", "GET", null, true);
 
-// 🔹 Mağaza Oluştur
 export const createStore = (form) => {
   const formData = new FormData();
   formData.append("StoreName", form.storeName);
@@ -22,7 +21,6 @@ export const createStore = (form) => {
   return apiRequest("/SellerStore/create-store", "POST", formData, true, true);
 };
 
-// 🔹 Mağaza Güncelle
 export const updateStore = (form) => {
   const formData = new FormData();
   formData.append("StoreName", form.storeName);
@@ -40,7 +38,7 @@ export const updateStore = (form) => {
     formData.append("CategoryIds", id);
   });
 
-  return apiRequest("/SellerStore/update-store", "PUT", formData, true, true); // ✅ id kaldırıldı!
+  return apiRequest("/SellerStore/update-store", "PUT", formData, true, true);
 };
 
 // 🔹 Kategoriler
@@ -61,23 +59,29 @@ export const addProductToStore = (productId) =>
   apiRequest(`/SellerStoreProduct/${productId}/add`, "POST", null, true);
 
 export const updateProductPrice = (storeProductId, price) =>
-  apiRequest(
-    `/SellerStoreProduct/update-price-storeProductId=${storeProductId}&price=${price}`,
-    "PUT",
-    null,
-    true
-  );
+  apiRequest("/SellerStoreProduct/update-price", "PUT", {
+    storeProductId,
+    price,
+  }, true);
 
 export const toggleProductOnSale = (storeProductId, isOnSale) =>
-  apiRequest("/SellerStoreProduct/set-on-sale", "PUT", { storeProductId, isOnSale }, true);
+  apiRequest("/SellerStoreProduct/set-on-sale", "PUT", {
+    storeProductId,
+    isOnSale,
+  }, true);
 
 export const updateProductQuantityLimits = (storeProductId, minQty, maxQty) =>
-  apiRequest(
-    `/SellerStoreProduct/set-quantity-limits-storeProductId=${storeProductId}&minQty=${minQty}&maxQty=${maxQty}`,
-    "PUT",
-    null,
-    true
-  );
+  apiRequest("/SellerStoreProduct/set-quantity-limits", "PUT", {
+    storeProductId,
+    minQty,
+    maxQty,
+  }, true);
+
+export const updateProductStock = (storeProductId, stock) =>
+  apiRequest("/SellerStoreProduct/update-stock", "PUT", {
+    storeProductId,
+    stock,
+  }, true);
 
 export const uploadProductImage = (storeProductId, file) => {
   const formData = new FormData();
@@ -86,17 +90,10 @@ export const uploadProductImage = (storeProductId, file) => {
     `/SellerStoreProduct/upload-image?storeProductId=${storeProductId}`,
     "POST",
     formData,
+    true,
     true
   );
 };
-
-export const updateProductStock = (storeProductId, stock) =>
-  apiRequest(
-    `/SellerStoreProduct/update-stock-storeProductId=${storeProductId}&stock=${stock}`,
-    "PUT",
-    null,
-    true
-  );
 
 // 🔹 Ürün İstekleri
 export const createProductRequest = (formData) =>
