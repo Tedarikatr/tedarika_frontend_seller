@@ -4,19 +4,20 @@ import {
   updateStore,
   getAllCategories,
 } from "@/api/sellerStoreService";
-import { useNavigate } from "react-router-dom";
 import { Store } from "lucide-react";
 
 const StoreUpdate = () => {
   const [form, setForm] = useState(null);
   const [categories, setCategories] = useState([]);
   const [message, setMessage] = useState("");
-  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [store, cats] = await Promise.all([getMyStore(), getAllCategories()]);
+        const [store, cats] = await Promise.all([
+          getMyStore(),
+          getAllCategories(),
+        ]);
         setForm({
           storeName: store.storeName || "",
           storeDescription: store.storeDescription || "",
@@ -59,7 +60,7 @@ const StoreUpdate = () => {
     try {
       await updateStore(form);
       setMessage("✅ Mağaza başarıyla güncellendi.");
-      setTimeout(() => navigate("/seller/store"), 1500);
+      setTimeout(() => setMessage(""), 3000);
     } catch {
       setMessage("❌ Güncelleme sırasında bir hata oluştu.");
     }
