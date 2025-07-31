@@ -72,8 +72,8 @@ const QuotationDetailPage = () => {
     }
   };
 
-  const handleStatusChange = async (status) => {
-    if (quotation.status !== "Pending") {
+  const handleStatusChange = async (statusValue) => {
+    if (quotation.status !== 0) {
       toast.error("Bu teklifin durumu zaten güncellenmiş.");
       return;
     }
@@ -81,13 +81,11 @@ const QuotationDetailPage = () => {
     setStatusMessage(null);
     toast.loading("Durum güncelleniyor...");
     try {
-      await updateQuotationStatus(id, status);
+      await updateQuotationStatus(id, statusValue);
       toast.dismiss();
       toast.success("Durum başarıyla güncellendi.");
-      setStatusMessage({
-        type: "success",
-        message: `Durum "${status === "SellerAccepted" ? "Kabul Edildi" : "Reddedildi"}" olarak güncellendi.`,
-      });
+      const label = statusValue === 2 ? "Kabul Edildi" : "Reddedildi";
+      setStatusMessage({ type: "success", message: `Durum "${label}" olarak güncellendi.` });
       await fetchQuotation();
     } catch (error) {
       console.error("Durum güncelleme hatası:", error.response?.data || error.message || error);
@@ -112,7 +110,7 @@ const QuotationDetailPage = () => {
       timeStyle: "short",
     });
 
-  const status = getQuotationStatusProps(quotation?.status);
+  const status = quotation ? getQuotationStatusProps(quotation.status) : null;
 
   if (loading) return <div className="p-6 text-gray-600 animate-pulse">Yükleniyor...</div>;
   if (!quotation) return <div className="p-6 text-red-600">Teklif bulunamadı.</div>;
@@ -129,16 +127,20 @@ const QuotationDetailPage = () => {
           <Info label="Talep Miktarı" value={quotation.quantity} />
           <Info label="Mesaj" value={quotation.message || "-"} />
           <Info label="Talep Tarihi" value={formatDate(quotation.requestedAt)} />
-          <div>
-            <span className={`inline-block text-xs font-semibold px-3 py-1 rounded-full border ${status.color}`}>
-              {status.label}
-            </span>
-          </div>
+          {status && (
+            <div>
+              <span
+                className={`inline-block text-xs font-semibold px-3 py-1 rounded-full border ${status.color}`}
+              >
+                {status.label}
+              </span>
+            </div>
+          )}
         </div>
       </div>
 
       {/* Karşı Teklif Formu */}
-      {quotation.status === "SellerAccepted" ? (
+      {quotation.status === 2 ? (
         <div className="bg-white border border-yellow-200 rounded-2xl shadow-sm p-6 text-yellow-800 text-sm">
           Bu teklif <strong>kabul edildiği</strong> için tekrar karşı teklif gönderemezsiniz.
         </div>
@@ -193,17 +195,16 @@ const QuotationDetailPage = () => {
       {/* Durum Güncelleme */}
       <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
         <h2 className="text-lg font-semibold text-gray-800 mb-4">Durumu Güncelle</h2>
-
-        {quotation.status === "Pending" ? (
+        {quotation.status === 0 ? (
           <div className="flex gap-4">
             <button
-              onClick={() => handleStatusChange("SellerAccepted")}
+              onClick={() => handleStatusChange(2)}
               className="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-lg text-sm"
             >
               Kabul Et
             </button>
             <button
-              onClick={() => handleStatusChange("SellerRejected")}
+              onClick={() => handleStatusChange(3)}
               className="bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded-lg text-sm"
             >
               Reddet
@@ -213,14 +214,11 @@ const QuotationDetailPage = () => {
           <div className="text-sm text-gray-600">
             Teklif zaten{" "}
             <strong>
-              {quotation.status === "SellerAccepted"
-                ? "KABUL EDİLDİ"
-                : "REDDEDİLDİ"}
+              {quotation.status === 2 ? "KABUL EDİLDİ" : quotation.status === 3 ? "REDDEDİLDİ" : "GÜNCELLENMİŞ"}
             </strong>
             .
           </div>
         )}
-
         {statusMessage && (
           <div className="mt-4">
             <MessageBox type={statusMessage.type} message={statusMessage.message} />
