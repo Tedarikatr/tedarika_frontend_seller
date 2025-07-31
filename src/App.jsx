@@ -21,6 +21,8 @@ import QuotationDetailPage from "@/pages/seller/quotations/QuotationDetailPage";
 import SubscriptionPage from "@/pages/seller/subscription/SubscriptionPage";
 import StoreReviewsPage from "@/pages/seller/reviews/StoreReviewsPage";
 import ProductReviewsPage from "@/pages/seller/reviews/ProductReviewsPage";
+import SellerApplicationPage from "@/pages/seller/SellerApplicationPage"; // Yukarıya import ekle
+
 
 import SellerLayout from "@/components/layout/SellerLayout";
 import PrivateRoute from "@/routes/PrivateRoute";
@@ -35,7 +37,8 @@ function App() {
       <Route path="/seller/login" element={<LoginPage />} />
       <Route path="/seller/company" element={<CompanyCreate />} />
 
-      {/* 🟡 Girişli ama abone olmayanlara açık */}
+      <Route path="/seller/apply" element={<SellerApplicationPage />} />
+
       <Route
         path="/seller/subscription"
         element={
