@@ -29,7 +29,7 @@ const CTASection = () => {
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.96 }}
-          onClick={() => navigate("/seller/register")}
+          onClick={() => navigate("/seller/apply")} // ✅ Güncellendi
           className="bg-white text-[#003636] hover:bg-emerald-100 font-bold px-8 py-3 rounded-full text-lg shadow-lg transition-all duration-200"
         >
           Başvur ve Satışa Başla
