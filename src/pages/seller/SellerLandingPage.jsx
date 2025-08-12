@@ -5,6 +5,8 @@ import StepsSection from "@/components/sellerLanding/StepsSection";
 import TestimonialsSection from "@/components/sellerLanding/TestimonialsSection";
 import CTASection from "@/components/sellerLanding/CTASection";
 import PricingSection from "@/components/sellerLanding/PricingSection";
+import Footer from "@/components/sellerLanding/Footer";
+
 
 const SellerLandingPage = () => {
   return (
@@ -16,6 +18,7 @@ const SellerLandingPage = () => {
       <PricingSection /> {/* <-- BURAYA EKLENDİ */}
       <TestimonialsSection />
       <CTASection />
+       <Footer />
     </div>
   );
 };
