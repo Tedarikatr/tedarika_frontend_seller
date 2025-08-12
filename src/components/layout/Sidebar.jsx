@@ -13,6 +13,7 @@ const Sidebar = ({ isOpen, onClose }) => {
     navigate("/seller/login");
   };
 
+  // SidebarLink'e onClick props'u gönderilecek, mobilde onClose tetiklenmesi için
   return (
     <aside
       className={`fixed md:static inset-y-0 left-0 z-50 w-64 bg-[#002c2c] text-white shadow-xl transform transition-transform duration-300 ease-in-out
@@ -35,29 +36,42 @@ const Sidebar = ({ isOpen, onClose }) => {
 
         {/* Menü (Scroll edilebilir) */}
         <div className="flex-1 overflow-y-auto px-4 py-6 text-sm custom-scrollbar">
-          <SidebarLink to="/seller/dashboard" icon={<Home size={18} />}>Dashboard</SidebarLink>
+          <SidebarLink to="/seller/dashboard" icon={<Home size={18} />} onClick={onClose}>
+            Dashboard
+          </SidebarLink>
 
-          {/* Mağaza Yönetimi */}
           <SectionTitle title="Mağaza Yönetimi" />
-         
-          <SidebarLink to="/seller/store/coverage" icon={<MapPin size={18} />}>Lokasyonlarım</SidebarLink>
+          <SidebarLink to="/seller/store/coverage" icon={<MapPin size={18} />} onClick={onClose}>
+            Lokasyonlarım
+          </SidebarLink>
 
-          {/* Ürünler */}
           <SectionTitle title="Ürünler" />
-          <SidebarLink to="/seller/products/my-store" icon={<ChevronRight size={14} />}>Ürünlerim</SidebarLink>
-          <SidebarLink to="/seller/products/database" icon={<ChevronRight size={14} />}>Veritabanı</SidebarLink>
-          <SidebarLink to="/seller/products/requests" icon={<ChevronRight size={14} />}>Başvurularım</SidebarLink>
+          <SidebarLink to="/seller/products/my-store" icon={<ChevronRight size={14} />} onClick={onClose}>
+            Ürünlerim
+          </SidebarLink>
+          <SidebarLink to="/seller/products/database" icon={<ChevronRight size={14} />} onClick={onClose}>
+            Veritabanı
+          </SidebarLink>
+          <SidebarLink to="/seller/products/requests" icon={<ChevronRight size={14} />} onClick={onClose}>
+            Başvurularım
+          </SidebarLink>
 
-          {/* İşlemler */}
           <SectionTitle title="İşlemler" />
-          <SidebarLink to="/seller/orders" icon={<ShoppingCart size={18} />}>Siparişler</SidebarLink>
-          <SidebarLink to="/seller/quotations" icon={<ClipboardList size={18} />}>Teklifler</SidebarLink>
-          <SidebarLink to="/seller/reviews" icon={<MessageSquare size={18} />}>Yorumlar</SidebarLink>
-          <SidebarLink to="/seller/requests" icon={<FileText size={18} />}>İstekler</SidebarLink>
+          <SidebarLink to="/seller/orders" icon={<ShoppingCart size={18} />} onClick={onClose}>
+            Siparişler
+          </SidebarLink>
+          <SidebarLink to="/seller/quotations" icon={<ClipboardList size={18} />} onClick={onClose}>
+            Teklifler
+          </SidebarLink>
+          <SidebarLink to="/seller/reviews" icon={<MessageSquare size={18} />} onClick={onClose}>
+            Yorumlar
+          </SidebarLink>
+         
 
-          {/* Hesap */}
           <SectionTitle title="Hesap" />
-          <SidebarLink to="/seller/profile" icon={<Settings size={18} />}>Profil</SidebarLink>
+          <SidebarLink to="/seller/profile" icon={<Settings size={18} />} onClick={onClose}>
+            Profil
+          </SidebarLink>
         </div>
 
         {/* Çıkış Butonu */}
@@ -75,9 +89,11 @@ const Sidebar = ({ isOpen, onClose }) => {
   );
 };
 
-const SidebarLink = ({ to, icon, children }) => (
+// Tıklanınca onClick çağrılacak yapı (mobilde sidebar'ı kapatır)
+const SidebarLink = ({ to, icon, children, onClick }) => (
   <NavLink
     to={to}
+    onClick={onClick}
     className={({ isActive }) =>
       `flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-all group ${
         isActive
