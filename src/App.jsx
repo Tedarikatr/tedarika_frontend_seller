@@ -1,14 +1,18 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 
-// Açık sayfalar
+// Açık seller sayfaları
+import SellerLandingPage from "@/pages/seller/SellerLandingPage";
 import RegisterPage from "@/pages/seller/RegisterPage";
 import LoginPage from "@/pages/seller/LoginPage";
-import SellerLandingPage from "@/pages/seller/SellerLandingPage";
+import SellerApplicationPage from "@/pages/seller/SellerApplicationPage";
 
-// Giriş gerektiren sayfalar
+// Abonelik
+import SubscriptionPage from "@/pages/seller/subscription/SubscriptionPage";
+
+// Korumalı seller sayfaları
 import DashboardPage from "@/pages/seller/DashboardPage";
 import SellerProfilePage from "@/pages/seller/profile/SellerProfilePage";
-import { CompanyCreate, CompanyUpdate } from "@/pages/seller/company";
+import { CompanyUpdate } from "@/pages/seller/company";
 import { StoreCreate, StoreUpdate } from "@/pages/seller/store";
 import StoreCoveragePage from "@/pages/seller/location/StoreCoveragePage";
 import MyStoreProductsPage from "@/pages/seller/products/MyStoreProductsPage";
@@ -18,27 +22,30 @@ import OrderListPage from "@/pages/seller/orders/OrderListPage";
 import OrderDetailPage from "@/pages/seller/orders/OrderDetailPage";
 import SellerQuotationListPage from "@/pages/seller/quotations/QuotationListPage";
 import QuotationDetailPage from "@/pages/seller/quotations/QuotationDetailPage";
-import SubscriptionPage from "@/pages/seller/subscription/SubscriptionPage";
 import StoreReviewsPage from "@/pages/seller/reviews/StoreReviewsPage";
 import ProductReviewsPage from "@/pages/seller/reviews/ProductReviewsPage";
-import SellerApplicationPage from "@/pages/seller/SellerApplicationPage"; // Yukarıya import ekle
 
+// Bu sprintte eklenen sayfalar
+import CompanyCreate from "@/pages/seller/company/CompanyCreate";
+import SellerExtraInfoPage from "@/pages/seller/profile/SellerExtraInfoPage";
+import SellerCompanyDocuments from "@/pages/seller/company/SellerCompanyDocuments";
 
+// Layout & Guard
 import SellerLayout from "@/components/layout/SellerLayout";
 import PrivateRoute from "@/routes/PrivateRoute";
 import SemiPrivateRoute from "@/routes/SemiPrivateRoute";
+import SellerRouteWrapper from "@/components/SellerRouteWrapper";
 
 function App() {
   return (
     <Routes>
-      {/* Açık seller sayfaları */}
+      {/* ── Açık seller sayfaları ─────────────────────────────── */}
       <Route path="/seller" element={<SellerLandingPage />} />
       <Route path="/seller/register" element={<RegisterPage />} />
       <Route path="/seller/login" element={<LoginPage />} />
-      <Route path="/seller/company" element={<CompanyCreate />} />
-
       <Route path="/seller/apply" element={<SellerApplicationPage />} />
 
+      {/* Abonelik (login gerekli, aktif değilse erişir) */}
       <Route
         path="/seller/subscription"
         element={
@@ -48,15 +55,27 @@ function App() {
         }
       />
 
-      {/* 🔐 Giriş + abonelik gereken seller paneli */}
+      {/* ── Korumalı seller alanı (login + abonelik + iş kuralları) ───────── */}
       <Route
         path="/seller"
         element={
           <PrivateRoute>
-            <SellerLayout />
+            <SellerRouteWrapper>
+              <SellerLayout />
+            </SellerRouteWrapper>
           </PrivateRoute>
         }
       >
+        {/* Şirket oluşturma (yalnızca seller) */}
+        <Route path="company/create" element={<CompanyCreate />} />
+
+        {/* Tek-seferlik ekstra bilgiler (zorunlu) */}
+        <Route path="profile/extra-info" element={<SellerExtraInfoPage />} />
+
+        {/* Zorunlu belgeler */}
+        <Route path="company-documents" element={<SellerCompanyDocuments />} />
+
+        {/* Diğer korumalı sayfalar */}
         <Route path="dashboard" element={<DashboardPage />} />
         <Route path="company-profile" element={<CompanyUpdate />} />
         <Route path="store/create" element={<StoreCreate />} />
@@ -74,7 +93,7 @@ function App() {
         <Route path="profile" element={<SellerProfilePage />} />
       </Route>
 
-      {/* 404 fallback */}
+      {/* 404 */}
       <Route path="*" element={<Navigate to="/seller" replace />} />
     </Routes>
   );
