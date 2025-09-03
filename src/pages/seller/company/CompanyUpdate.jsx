@@ -1,8 +1,10 @@
-import { useEffect, useState } from "react";
+// src/pages/seller/company/CompanyUpdate.jsx
+import { useEffect, useMemo, useState } from "react";
 import { getMyCompany, updateCompany } from "@/api/sellerCompanyService";
 import TaxOfficeSelect from "@/components/seller/TaxOfficeSelect";
+import { Building2, Loader2, CheckCircle, AlertTriangle } from "lucide-react";
 
-// UI'da numeric seçenekler → backend string enum bekliyorsa submit'te dönüştür
+// UI (numeric) → API (string enum) map
 const COMPANY_TYPE_NUM2STR = {
   1: "SoleProprietorship",
   2: "Limited",
@@ -23,23 +25,37 @@ const companyTypeOptions = [
   { value: 99, label: "Diğer" },
 ];
 
-const CompanyUpdate = () => {
+const Field = ({ label, required, children, hint }) => (
+  <div className="flex flex-col gap-1">
+    <label className="text-sm font-medium text-gray-700">
+      {label} {required && <span className="text-rose-600">*</span>}
+    </label>
+    {children}
+    {hint && <p className="text-xs text-gray-500">{hint}</p>}
+  </div>
+);
+
+export default function CompanyUpdate() {
   const [form, setForm] = useState(null);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const [initializing, setInitializing] = useState(true);
 
   useEffect(() => {
-    const fetchCompany = async () => {
+    (async () => {
       try {
         const data = await getMyCompany();
-        // type backend'den string gelebilir → UI select'ine numeric düşürelim
-        let uiType = "";
-        if (typeof data.type === "number") uiType = data.type;
-        else if (typeof data.type === "string") {
-          // string'i numeric'e tahmini map'le
-          const str2num = Object.fromEntries(Object.entries(COMPANY_TYPE_NUM2STR).map(([k, v]) => [v, Number(k)]));
-          uiType = str2num[data.type] ?? "";
-        }
+
+        // backend type hem number hem string gelebilir → UI numeric'e normalize et
+        const str2num = Object.fromEntries(
+          Object.entries(COMPANY_TYPE_NUM2STR).map(([k, v]) => [v, Number(k)])
+        );
+        const uiType =
+          typeof data.type === "number"
+            ? data.type
+            : typeof data.type === "string"
+            ? str2num[data.type] ?? ""
+            : "";
 
         setForm({
           id: data.id,
@@ -52,25 +68,48 @@ const CompanyUpdate = () => {
           type: uiType,
         });
       } catch (err) {
-        console.error("Şirket bilgileri alınamadı", err);
         setMessage("❌ Şirket bilgileri alınamadı.");
+      } finally {
+        setInitializing(false);
       }
-    };
-    fetchCompany();
+    })();
   }, []);
 
   const handleChange = (e) => {
-    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
   };
+
+  const requiredOk = useMemo(() => {
+    if (!form) return false;
+    return (
+      form.name?.trim() &&
+      form.taxNumber?.trim() &&
+      form.taxOffice?.trim() &&
+      form.country?.trim() &&
+      form.province?.trim() &&
+      form.address?.trim() &&
+      (form.type !== "" && form.type !== null && form.type !== undefined)
+    );
+  }, [form]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage("");
     setLoading(true);
+
+    if (!requiredOk) {
+      setMessage("❌ Lütfen zorunlu alanları doldurun.");
+      setLoading(false);
+      return;
+    }
+
     try {
-      // UI numeric → backend string enum (Swagger örneği öyleydi)
+      // UI numeric → API string enum (Swagger örneği)
       const num = Number(form.type);
-      const apiType = Number.isNaN(num) ? form.type : (COMPANY_TYPE_NUM2STR[num] ?? form.type);
+      const apiType = Number.isNaN(num)
+        ? form.type || "Other"
+        : COMPANY_TYPE_NUM2STR[num] ?? "Other";
 
       await updateCompany({
         ...form,
@@ -85,86 +124,144 @@ const CompanyUpdate = () => {
 
       setMessage("✅ Şirket bilgileri başarıyla güncellendi.");
     } catch (err) {
-      console.error(err);
-      setMessage("❌ Güncelleme sırasında bir hata oluştu.");
+      setMessage("❌ " + (err?.message || "Güncelleme sırasında bir hata oluştu."));
     } finally {
       setLoading(false);
     }
   };
 
-  if (!form) return <div className="p-6">Şirket bilgileri yükleniyor...</div>;
+  if (initializing || !form) {
+    return (
+      <div className="px-6 py-10">
+        <div className="max-w-6xl mx-auto bg-white border rounded-2xl p-6 shadow-sm animate-pulse">
+          <div className="h-8 w-64 bg-gray-200 rounded mb-6" />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div key={i} className="h-12 bg-gray-100 rounded" />
+            ))}
+            <div className="md:col-span-2 h-12 bg-gray-200 rounded" />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const fields = [
-    { name: "name", label: "Şirket Adı" },
-    { name: "taxNumber", label: "Vergi No" },
-    // taxOffice alanını aşağıda select'e çevirdik
-    { name: "country", label: "Ülke" },
-    { name: "province", label: "Şehir" },
-    { name: "address", label: "Adres" },
+    { name: "name", label: "Şirket Adı", required: true },
+    { name: "taxNumber", label: "Vergi No", required: true },
+    { name: "country", label: "Ülke", required: true },
+    { name: "province", label: "Şehir", required: true },
   ];
 
   return (
-    <div className="max-w-4xl mx-auto px-6 py-10">
-      <h2 className="text-3xl font-bold mb-8 text-[#003636] text-center">
-        Şirket Bilgilerini Güncelle
-      </h2>
-
-      <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white p-8 rounded-2xl shadow-lg">
-        {fields.map((f) => (
-          <div key={f.name} className="flex flex-col">
-            <label className="mb-1 text-sm text-gray-700 font-medium">{f.label}</label>
-            <input
-              name={f.name}
-              value={form[f.name]}
-              onChange={handleChange}
-              placeholder={f.label}
-              required
-              className="p-2 border border-gray-300 rounded-md text-sm text-[#003636] focus:outline-none focus:ring-2 focus:ring-[#004848]"
-            />
+    <div className="min-h-screen bg-[#f9fafa]">
+      {/* Hero başlık - tam genişlik */}
+      <header className="bg-gradient-to-r from-[#e9f0ee] to-[#f3f8f7]">
+        <div className="max-w-6xl mx-auto px-6 py-10">
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-xl bg-[#003636]/10 text-[#003636]">
+              <Building2 className="w-5 h-5" />
+            </div>
+            <div>
+              <h2 className="text-3xl font-bold text-[#003636]">Şirket Bilgilerini Güncelle</h2>
+              <p className="text-sm text-gray-600 mt-1">Zorunlu alanları doldurun ve değişiklikleri kaydedin.</p>
+            </div>
           </div>
-        ))}
-
-        {/* Vergi Dairesi - JSON select */}
-        <div className="flex flex-col">
-          <label className="mb-1 text-sm text-gray-700 font-medium">Vergi Dairesi</label>
-          <TaxOfficeSelect value={form.taxOffice} onChange={handleChange} required />
         </div>
+      </header>
 
-        {/* Şirket Türü */}
-        <div className="flex flex-col md:col-span-2">
-          <label className="mb-1 text-sm text-gray-700 font-medium">Şirket Türü</label>
-          <select
-            name="type"
-            value={form.type}
-            onChange={handleChange}
-            required
-            className="p-2 border border-gray-300 rounded-md text-sm text-[#003636] bg-white focus:outline-none focus:ring-2 focus:ring-[#004848]"
-          >
-            <option value="">Seçiniz</option>
-            {companyTypeOptions.map((o) => (
-              <option key={o.value} value={o.value}>{o.label}</option>
-            ))}
-          </select>
-        </div>
+      <main className="max-w-6xl mx-auto px-6 py-8">
+        <form
+          onSubmit={handleSubmit}
+          className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white p-6 rounded-2xl shadow-sm border"
+        >
+          {fields.map((f) => (
+            <Field key={f.name} label={f.label} required={f.required}>
+              <input
+                name={f.name}
+                value={form[f.name]}
+                onChange={handleChange}
+                placeholder={f.label}
+                required={f.required}
+                className="input"
+              />
+            </Field>
+          ))}
 
-        <div className="md:col-span-2">
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-[#003636] hover:bg-[#004848] text-white font-semibold py-3 rounded-lg transition disabled:opacity-50"
-          >
-            {loading ? "Güncelleniyor..." : "Güncelle"}
-          </button>
-        </div>
-
-        {message && (
-          <div className={`md:col-span-2 text-center mt-4 text-sm font-medium ${message.startsWith("✅") ? "text-green-600" : "text-red-600"}`}>
-            {message}
+          {/* Adres */}
+          <div className="md:col-span-2">
+            <Field label="Adres" required>
+              <textarea
+                name="address"
+                value={form.address}
+                onChange={handleChange}
+                placeholder="Adres"
+                required
+                rows={3}
+                className="input min-h-[100px]"
+              />
+            </Field>
           </div>
-        )}
-      </form>
+
+          {/* Vergi Dairesi - JSON select */}
+          <div className="md:col-span-1">
+            <Field label="Vergi Dairesi" required>
+              <TaxOfficeSelect
+                name="taxOffice"
+                value={form.taxOffice}
+                onChange={handleChange}
+                required
+              />
+            </Field>
+          </div>
+
+          {/* Şirket Türü */}
+          <div className="md:col-span-1">
+            <Field label="Şirket Türü" required>
+              <select
+                name="type"
+                value={form.type}
+                onChange={handleChange}
+                required
+                className="input bg-white"
+              >
+                <option value="">Seçiniz</option>
+                {companyTypeOptions.map((o) => (
+                  <option key={o.value} value={o.value}>
+                    {o.label}
+                  </option>
+                ))}
+              </select>
+            </Field>
+          </div>
+
+          {/* Aksiyonlar */}
+          <div className="md:col-span-2 flex flex-col gap-3">
+            <button
+              type="submit"
+              disabled={loading || !requiredOk}
+              className="w-full bg-[#003636] hover:bg-[#004848] text-white font-semibold py-3 rounded-xl transition disabled:opacity-50 inline-flex items-center justify-center gap-2"
+            >
+              {loading ? (<><Loader2 className="w-5 h-5 animate-spin" /> Güncelleniyor...</>) : "Güncelle"}
+            </button>
+            {message && (
+              <div
+                className={`text-center text-sm font-medium ${
+                  message.startsWith("✅") ? "text-emerald-700 bg-emerald-50 border border-emerald-200" : "text-rose-700 bg-rose-50 border border-rose-200"
+                } py-2 rounded-lg`}
+              >
+                {message}
+              </div>
+            )}
+            {!requiredOk && (
+              <div className="flex items-start gap-2 text-amber-700 bg-amber-50 p-3 rounded-xl">
+                <AlertTriangle className="w-5 h-5 mt-0.5" />
+                <p className="text-sm">Lütfen tüm zorunlu alanları doldurun.</p>
+              </div>
+            )}
+          </div>
+        </form>
+      </main>
     </div>
   );
-};
-
-export default CompanyUpdate;
+}
