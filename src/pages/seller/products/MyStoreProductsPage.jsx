@@ -31,9 +31,10 @@ const MyStoreProductsPage = () => {
   const checkCoverage = async () => {
     try {
       const coverage = await getStoreCoverage();
-      const hasAny = coverage?.some(
-        (c) => (c.regions?.length ?? 0) > 0 || (c.countries?.length ?? 0) > 0
-      );
+      const hasAny =
+        coverage?.some(
+          (c) => (c.regions?.length ?? 0) > 0 || (c.countries?.length ?? 0) > 0
+        ) ?? false;
       setHasCoverage(hasAny);
     } catch (error) {
       console.error("Coverage kontrol hatası:", error);
@@ -56,7 +57,7 @@ const MyStoreProductsPage = () => {
 
   return (
     <div className="p-6 bg-[#f9f9f9] min-h-screen">
-      {/* Sayfa Başlığı */}
+      {/* Başlık */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-2">
         <h1 className="text-3xl font-extrabold text-gray-800">Mağaza Ürünlerim</h1>
         {!loading && (
@@ -66,7 +67,7 @@ const MyStoreProductsPage = () => {
         )}
       </div>
 
-      {/* Geri Bildirim Kartı */}
+      {/* Geri Bildirim */}
       {feedback && (
         <div
           className={`flex items-start gap-3 mb-6 px-5 py-3 rounded-xl text-sm font-medium shadow-md ${
@@ -84,7 +85,7 @@ const MyStoreProductsPage = () => {
         </div>
       )}
 
-      {/* Ürün Tablosu */}
+      {/* Tablo */}
       <div className="border border-gray-200 rounded-2xl shadow-xl bg-white overflow-hidden">
         {loading ? (
           <div className="text-center text-gray-500 py-10 animate-pulse">
