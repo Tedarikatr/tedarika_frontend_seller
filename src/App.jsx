@@ -30,6 +30,9 @@ import CompanyCreate from "@/pages/seller/company/CompanyCreate";
 import SellerExtraInfoPage from "@/pages/seller/profile/SellerExtraInfoPage";
 import SellerCompanyDocuments from "@/pages/seller/company/SellerCompanyDocuments";
 
+// 🔹 yeni eklediğimiz sayfa
+import ProductImagesPage from "@/pages/seller/products/ProductImagesPage";
+
 // Layout & Guard
 import SellerLayout from "@/components/layout/SellerLayout";
 import PrivateRoute from "@/routes/PrivateRoute";
@@ -55,7 +58,7 @@ function App() {
         }
       />
 
-      {/* ── Korumalı seller alanı (login + abonelik + iş kuralları) ───────── */}
+      {/* ── Korumalı seller alanı ─────────────────────────────── */}
       <Route
         path="/seller"
         element={
@@ -66,16 +69,10 @@ function App() {
           </PrivateRoute>
         }
       >
-        {/* Şirket oluşturma (yalnızca seller) */}
         <Route path="company/create" element={<CompanyCreate />} />
-
-        {/* Tek-seferlik ekstra bilgiler (zorunlu) */}
         <Route path="profile/extra-info" element={<SellerExtraInfoPage />} />
-
-        {/* Zorunlu belgeler */}
         <Route path="company-documents" element={<SellerCompanyDocuments />} />
 
-        {/* Diğer korumalı sayfalar */}
         <Route path="dashboard" element={<DashboardPage />} />
         <Route path="company-profile" element={<CompanyUpdate />} />
         <Route path="store/create" element={<StoreCreate />} />
@@ -86,6 +83,13 @@ function App() {
         <Route path="products/my-store" element={<MyStoreProductsPage />} />
         <Route path="products/database" element={<ProductDatabasePage />} />
         <Route path="products/requests" element={<ProductRequestListPage />} />
+
+        {/* 🔹 yeni ekledik */}
+        <Route
+          path="products/:storeProductId/images"
+          element={<ProductImagesPage />}
+        />
+
         <Route path="quotations" element={<SellerQuotationListPage />} />
         <Route path="quotations/:id" element={<QuotationDetailPage />} />
         <Route path="orders" element={<OrderListPage />} />
