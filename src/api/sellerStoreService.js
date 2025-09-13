@@ -1,3 +1,4 @@
+// src/api/sellerStoreService.js
 import { apiRequest } from "./apiRequest";
 
 /* ── Mağaza Bilgileri ─────────────────────────────────────────────── */
@@ -5,23 +6,51 @@ export const getMyStore = () =>
   apiRequest("/SellerStore/my-store", "GET", null, true);
 
 export const createStore = (form) => {
-  const formData = new FormData();
-  formData.append("StoreName", form.storeName);
-  formData.append("StoreDescription", form.storeDescription || "");
-  formData.append("LogoUrl", form.logoFile);
-  if (form.bannerFile) formData.append("BannerImageUrl", form.bannerFile);
-  (form.categoryIds || []).forEach((id) => formData.append("CategoryIds", id));
-  return apiRequest("/SellerStore/create-store", "POST", formData, true, true);
+  const fd = new FormData();
+
+  fd.append("StoreName", form.storeName?.trim() ?? "");
+  fd.append("StoreDescription", form.storeDescription?.trim() ?? "");
+
+  if (form.logoFile) {
+    fd.append("LogoUrl", form.logoFile, form.logoFile.name); // filename ile
+  }
+  if (form.bannerFile) {
+    fd.append("BannerImageUrl", form.bannerFile, form.bannerFile.name);
+  }
+
+  const ids = (form.categoryIds || [])
+    .map((x) => Number(x))
+    .filter((x) => Number.isInteger(x));
+
+  // 1) tekrarlı anahtar
+  ids.forEach((id) => fd.append("CategoryIds", String(id)));
+  // 2) index'li anahtar (bazı .NET binder'ları bunu bekler)
+  ids.forEach((id, i) => fd.append(`CategoryIds[${i}]`, String(id)));
+
+  return apiRequest("/SellerStore/create-store", "POST", fd, true);
 };
 
 export const updateStore = (form) => {
-  const formData = new FormData();
-  formData.append("StoreName", form.storeName);
-  formData.append("StoreDescription", form.storeDescription || "");
-  if (form.logoFile) formData.append("LogoUrl", form.logoFile);
-  if (form.bannerFile) formData.append("BannerImageUrl", form.bannerFile);
-  (form.categoryIds || []).forEach((id) => formData.append("CategoryIds", id));
-  return apiRequest("/SellerStore/update-store", "PUT", formData, true, true);
+  const fd = new FormData();
+
+  fd.append("StoreName", form.storeName?.trim() ?? "");
+  fd.append("StoreDescription", form.storeDescription?.trim() ?? "");
+
+  if (form.logoFile) {
+    fd.append("LogoUrl", form.logoFile, form.logoFile.name);
+  }
+  if (form.bannerFile) {
+    fd.append("BannerImageUrl", form.bannerFile, form.bannerFile.name);
+  }
+
+  const ids = (form.categoryIds || [])
+    .map((x) => Number(x))
+    .filter((x) => Number.isInteger(x));
+
+  ids.forEach((id) => fd.append("CategoryIds", String(id)));
+  ids.forEach((id, i) => fd.append(`CategoryIds[${i}]`, String(id)));
+
+  return apiRequest("/SellerStore/update-store", "PUT", fd, true);
 };
 
 /* ── Kategoriler ──────────────────────────────────────────────────── */
@@ -84,24 +113,20 @@ export const updateProductStock = (storeProductId, stock) =>
   );
 
 /* ── Görseller ───────────────────────────────────────────────────── */
-/** Tek dosya yükleme — dönüyorsa URL yakalıyoruz */
 export const uploadProductImage = async (storeProductId, file) => {
-  const formData = new FormData();
-  formData.append("file", file); // Swagger: field = 'file'
+  const fd = new FormData();
+  fd.append("file", file, file.name); // filename önemli
   const res = await apiRequest(
     `/SellerStoreProduct/upload-image?storeProductId=${storeProductId}`,
     "POST",
-    formData,
-    true,
+    fd,
     true
   );
-  // API'nin döndürebileceği muhtemel alanlar:
   const url = res?.url || res?.imageUrl || res?.path || res?.Location || null;
   const id = res?.id || res?.imageId || res?.guid || null;
   return { id, url, raw: res };
 };
 
-/** Çoklu yükleme: tek tek çağırır, dönen URL’leri toplar */
 export const uploadProductImages = async (storeProductId, filesOrArray) => {
   const list = Array.isArray(filesOrArray)
     ? filesOrArray
@@ -112,14 +137,13 @@ export const uploadProductImages = async (storeProductId, filesOrArray) => {
       const r = await uploadProductImage(storeProductId, f);
       results.push({ file: f.name, ok: true, ...r });
     } catch (e) {
-      console.error("Yükleme hatası:", f.name, e);
-      results.push({ file: f.name, ok: false, error: e });
+      console.error("Yükleme hatası:", f?.name, e);
+      results.push({ file: f?.name, ok: false, error: e });
     }
   }
   return results;
 };
 
-/** (Opsiyonel) sunucu imageId ile silmeyi destekliyorsa */
 export const deleteProductImage = (imageId) =>
   apiRequest(`/SellerStoreProduct/image/${imageId}`, "DELETE", null, true);
 
