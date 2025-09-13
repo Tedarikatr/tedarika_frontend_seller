@@ -2,10 +2,9 @@
 import { useEffect, useState } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import SellerLayout from "@/components/layout/SellerLayout";
-
 import { hasCompany } from "@/api/sellerCompanyService";
 
-// Bu sayfalar kontrol dışında kalsın (kendilerine gidilebilir)
+// Kontrolden muaf rotalar (doğrudan girilebilir)
 const passPaths = new Set([
   "/seller/company/create",
   "/seller/profile/extra-info",
@@ -13,9 +12,16 @@ const passPaths = new Set([
   "/seller/subscription",
 ]);
 
+// Layout KULLANMAYACAK rotalar
+const noLayoutPaths = new Set([
+  "/seller/company/create",
+  // gerekirse başkalarını ekleyebilirsin
+]);
+
 const SellerRouteWrapper = () => {
   const nav = useNavigate();
   const loc = useLocation();
+
   const [checking, setChecking] = useState(true);
   const [redirect, setRedirect] = useState("");
 
@@ -25,26 +31,23 @@ const SellerRouteWrapper = () => {
     (async () => {
       setChecking(true);
 
-      // Abonelik sayfasını kontrol etmiyoruz
-      if (loc.pathname === "/seller/subscription") {
+      // Bu path’ler için kontrol yapmayalım (serbest rotalar)
+      if (passPaths.has(loc.pathname)) {
         setChecking(false);
         return;
       }
 
       try {
-        // 1) Şirket kontrolü (devam eder)
+        // Şirket var mı?
         const companyExists = await hasCompany();
-        if (!companyExists) {
-          if (!passPaths.has(loc.pathname) && !cancelled) {
-            setRedirect("/seller/company/create");
-          }
+
+        if (!companyExists && !cancelled) {
+          // Şirket yoksa company/create’e at
+          setRedirect("/seller/company/create");
           return;
         }
 
-        // 2) ❌ Extra Info yönlendirmesi KALDIRILDI
-        // 3) ❌ Belgeler yönlendirmesi KALDIRILDI
-        //    (Eksikler profil sayfasında uyarı + butonlarla gösteriliyor)
-
+        // (Ek yönlendirmeler varsa burada yapılırdı – kaldırıldı)
       } finally {
         if (!cancelled) setChecking(false);
       }
@@ -53,7 +56,7 @@ const SellerRouteWrapper = () => {
     return () => {
       cancelled = true;
     };
-  }, [loc.pathname, nav]);
+  }, [loc.pathname]);
 
   useEffect(() => {
     if (redirect && loc.pathname !== redirect) {
@@ -62,8 +65,16 @@ const SellerRouteWrapper = () => {
     }
   }, [redirect, nav, loc.pathname]);
 
-  if (checking) return <div className="p-10 text-gray-600">Kontrol ediliyor…</div>;
+  if (checking) {
+    return <div className="p-10 text-gray-600">Kontrol ediliyor…</div>;
+  }
 
+  // Bu sayfalar layout’suz render edilir (özellikle /seller/company/create)
+  if (noLayoutPaths.has(loc.pathname)) {
+    return <Outlet />;
+  }
+
+  // Diğer tüm sayfalar SellerLayout içinde render edilir
   return (
     <SellerLayout>
       <Outlet />
