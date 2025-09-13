@@ -1,15 +1,15 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 
-// Açık seller sayfaları
+// Public seller pages
 import SellerLandingPage from "@/pages/seller/SellerLandingPage";
 import RegisterPage from "@/pages/seller/RegisterPage";
 import LoginPage from "@/pages/seller/LoginPage";
 import SellerApplicationPage from "@/pages/seller/SellerApplicationPage";
 
-// Abonelik
+// Subscription
 import SubscriptionPage from "@/pages/seller/subscription/SubscriptionPage";
 
-// Korumalı seller sayfaları
+// Protected seller pages
 import DashboardPage from "@/pages/seller/DashboardPage";
 import SellerProfilePage from "@/pages/seller/profile/SellerProfilePage";
 import { CompanyUpdate } from "@/pages/seller/company";
@@ -24,16 +24,12 @@ import SellerQuotationListPage from "@/pages/seller/quotations/QuotationListPage
 import QuotationDetailPage from "@/pages/seller/quotations/QuotationDetailPage";
 import StoreReviewsPage from "@/pages/seller/reviews/StoreReviewsPage";
 import ProductReviewsPage from "@/pages/seller/reviews/ProductReviewsPage";
-
-// Bu sprintte eklenen sayfalar
 import CompanyCreate from "@/pages/seller/company/CompanyCreate";
 import SellerExtraInfoPage from "@/pages/seller/profile/SellerExtraInfoPage";
 import SellerCompanyDocuments from "@/pages/seller/company/SellerCompanyDocuments";
-
-// 🔹 yeni eklediğimiz sayfa
 import ProductImagesPage from "@/pages/seller/products/ProductImagesPage";
 
-// Layout & Guard
+// Layout & Guards
 import SellerLayout from "@/components/layout/SellerLayout";
 import PrivateRoute from "@/routes/PrivateRoute";
 import SemiPrivateRoute from "@/routes/SemiPrivateRoute";
@@ -42,13 +38,17 @@ import SellerRouteWrapper from "@/components/SellerRouteWrapper";
 function App() {
   return (
     <Routes>
-      {/* ── Açık seller sayfaları ─────────────────────────────── */}
-      <Route path="/seller" element={<SellerLandingPage />} />
+      {/* ── Public seller routes ───────────────────────────── */}
+      {/* Landing'i /seller/landing'e aldık */}
+      <Route path="/seller/landing" element={<SellerLandingPage />} />
       <Route path="/seller/register" element={<RegisterPage />} />
       <Route path="/seller/login" element={<LoginPage />} />
       <Route path="/seller/apply" element={<SellerApplicationPage />} />
 
-      {/* Abonelik (login gerekli, aktif değilse erişir) */}
+      {/* /seller kökünü landing'e yönlendir (opsiyonel ama tavsiye) */}
+      <Route path="/seller" element={<Navigate to="/seller/landing" replace />} />
+
+      {/* ── Subscription (login gerekli; aktif değilse erişilir) ── */}
       <Route
         path="/seller/subscription"
         element={
@@ -58,9 +58,9 @@ function App() {
         }
       />
 
-      {/* ── Korumalı seller alanı ─────────────────────────────── */}
+      {/* ── Protected seller area: TEK kök /seller/* ─────────── */}
       <Route
-        path="/seller"
+        path="/seller/*"
         element={
           <PrivateRoute>
             <SellerRouteWrapper>
@@ -69,36 +69,38 @@ function App() {
           </PrivateRoute>
         }
       >
-        <Route path="company/create" element={<CompanyCreate />} />
-        <Route path="profile/extra-info" element={<SellerExtraInfoPage />} />
-        <Route path="company-documents" element={<SellerCompanyDocuments />} />
+        {/* index: /seller → dashboard (korumalı alanda) */}
+        <Route index element={<DashboardPage />} />
 
         <Route path="dashboard" element={<DashboardPage />} />
+        <Route path="company/create" element={<CompanyCreate />} />
         <Route path="company-profile" element={<CompanyUpdate />} />
+        <Route path="company-documents" element={<SellerCompanyDocuments />} />
+
+        <Route path="profile" element={<SellerProfilePage />} />
+        <Route path="profile/extra-info" element={<SellerExtraInfoPage />} />
+
         <Route path="store/create" element={<StoreCreate />} />
         <Route path="store/update" element={<StoreUpdate />} />
         <Route path="store/coverage" element={<StoreCoveragePage />} />
+
         <Route path="reviews" element={<StoreReviewsPage />} />
         <Route path="products/:productId/reviews" element={<ProductReviewsPage />} />
+
         <Route path="products/my-store" element={<MyStoreProductsPage />} />
         <Route path="products/database" element={<ProductDatabasePage />} />
         <Route path="products/requests" element={<ProductRequestListPage />} />
-
-        {/* 🔹 yeni ekledik */}
-        <Route
-          path="products/:storeProductId/images"
-          element={<ProductImagesPage />}
-        />
+        <Route path="products/:storeProductId/images" element={<ProductImagesPage />} />
 
         <Route path="quotations" element={<SellerQuotationListPage />} />
         <Route path="quotations/:id" element={<QuotationDetailPage />} />
+
         <Route path="orders" element={<OrderListPage />} />
         <Route path="orders/:orderId" element={<OrderDetailPage />} />
-        <Route path="profile" element={<SellerProfilePage />} />
       </Route>
 
       {/* 404 */}
-      <Route path="*" element={<Navigate to="/seller" replace />} />
+      <Route path="*" element={<Navigate to="/seller/landing" replace />} />
     </Routes>
   );
 }
