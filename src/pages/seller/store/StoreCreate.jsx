@@ -1,3 +1,4 @@
+// src/pages/seller/store/StoreCreate.jsx
 import { useState, useEffect } from "react";
 import { createStore, getAllCategories } from "@/api/sellerStoreService";
 import { useNavigate } from "react-router-dom";
@@ -12,44 +13,67 @@ const StoreCreate = () => {
   });
   const [categories, setCategories] = useState([]);
   const [message, setMessage] = useState("");
+  const [submitting, setSubmitting] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
-    getAllCategories().then(setCategories).catch(() => {
-      setMessage("❌ Kategoriler alınamadı.");
-    });
+    (async () => {
+      try {
+        const res = await getAllCategories();
+        const arr = Array.isArray(res) ? res : (res?.items || []);
+        const normalized = arr.map((c) => ({
+          id: Number(c.id ?? c.Id),
+          name: String(c.name ?? c.Name ?? ""),
+        }));
+        setCategories(normalized);
+      } catch {
+        setMessage("❌ Kategoriler alınamadı.");
+      }
+    })();
   }, []);
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleFileChange = (e, type) => {
-    const file = e.target.files[0];
-    if (file) setForm((prev) => ({ ...prev, [type]: file }));
+  const handleFileChange = (e, key) => {
+    const file = e.target.files?.[0] || null;
+    setForm((prev) => ({ ...prev, [key]: file }));
   };
 
   const handleCategoryChange = (e) => {
     const selected = Array.from(e.target.selectedOptions).map((opt) =>
-      parseInt(opt.value)
+      Number(opt.value)
     );
-    setForm({ ...form, categoryIds: selected });
+    setForm((prev) => ({ ...prev, categoryIds: selected }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (submitting) return;
 
-    if (!form.storeName.trim()) return setMessage("Mağaza adı zorunludur.");
-    if (!form.logoFile) return setMessage("Logo zorunludur.");
-    if (form.categoryIds.length === 0)
-      return setMessage("En az bir kategori seçilmelidir.");
+    // Basit validasyon
+    if (!form.storeName.trim()) return setMessage("❌ Mağaza adı zorunludur.");
+    if (!form.logoFile) return setMessage("❌ Logo zorunludur.");
+    if (!form.categoryIds.length) return setMessage("❌ En az bir kategori seçiniz.");
+    if (form.logoFile && !form.logoFile.type.startsWith("image/")) {
+      return setMessage("❌ Logo için geçerli bir görsel seçiniz.");
+    }
+    if (form.bannerFile && !form.bannerFile.type.startsWith("image/")) {
+      return setMessage("❌ Banner için geçerli bir görsel seçiniz.");
+    }
 
     try {
+      setSubmitting(true);
       setMessage("Mağaza oluşturuluyor...");
       await createStore(form);
-      navigate("/seller/store");
+
+      // Sende /seller/store route'u yok; /seller/store/update var.
+      navigate("/seller/store/update", { replace: true });
     } catch {
       setMessage("❌ Mağaza oluşturulamadı.");
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -94,20 +118,29 @@ const StoreCreate = () => {
 
         <div>
           <label className="text-sm font-semibold">Kategoriler</label>
-          <select multiple value={form.categoryIds} onChange={handleCategoryChange} className="w-full border p-2 rounded-md">
+          <select
+            multiple
+            value={form.categoryIds}
+            onChange={handleCategoryChange}
+            className="w-full border p-2 rounded-md"
+          >
             {categories.map((cat) => (
               <option key={cat.id} value={cat.id}>
                 {cat.name}
               </option>
             ))}
           </select>
+          <p className="text-xs text-gray-500 mt-1">
+            Birden fazla kategori seçmek için <kbd>Ctrl</kbd>/<kbd>Cmd</kbd> tuşunu kullanın.
+          </p>
         </div>
 
         <button
           type="submit"
-          className="bg-[#003636] hover:bg-[#004848] text-white font-semibold py-2 rounded-lg"
+          disabled={submitting}
+          className="bg-[#003636] hover:bg-[#004848] text-white font-semibold py-2 rounded-lg disabled:opacity-60"
         >
-          Mağazayı Oluştur
+          {submitting ? "İşleniyor..." : "Mağazayı Oluştur"}
         </button>
       </form>
     </div>
