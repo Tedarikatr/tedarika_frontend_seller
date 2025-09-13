@@ -1,20 +1,20 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import {
-  fetchOrderDetail,
-  updateOrderStatus,
-  cancelOrder,
-} from "@/api/sellerOrderService";
-import { statusLabels, statusOptions } from "@/constants/orderStatus";
-import { ArrowPathIcon, XCircleIcon } from "@heroicons/react/24/solid";
+import { fetchOrderDetail, fetchPaymentDetail } from "@/api/sellerOrderService";
+import { statusLabels } from "@/constants/orderStatus";
 
 const OrderDetailPage = () => {
   const { orderId } = useParams();
   const navigate = useNavigate();
+
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [updating, setUpdating] = useState(false);
-  const [selectedStatus, setSelectedStatus] = useState(null);
+
+  // ✅ ödeme detay state'i
+  const [payment, setPayment] = useState(null);
+  const [paymentOpen, setPaymentOpen] = useState(false);
+  const [paymentLoading, setPaymentLoading] = useState(false);
+  const [paymentError, setPaymentError] = useState("");
 
   useEffect(() => {
     const token = localStorage.getItem("sellerToken");
@@ -26,7 +26,6 @@ const OrderDetailPage = () => {
     try {
       const data = await fetchOrderDetail(Number(orderId));
       setOrder(data);
-      setSelectedStatus(data.status);
     } catch (err) {
       console.error("Detay yüklenemedi:", err);
     } finally {
@@ -36,31 +35,26 @@ const OrderDetailPage = () => {
 
   useEffect(() => {
     loadOrder();
+    // ödeme paneli her sipariş değişiminde sıfırlansın
+    setPayment(null);
+    setPaymentOpen(false);
+    setPaymentError("");
   }, [orderId]);
 
-  const handleStatusUpdate = async () => {
-    if (selectedStatus === order.status) return;
-    setUpdating(true);
+  // ✅ ödeme detayını getir
+  const handleFetchPayment = async () => {
+    setPaymentLoading(true);
+    setPaymentError("");
     try {
-      await updateOrderStatus(order.id, selectedStatus);
-      await loadOrder();
+      const data = await fetchPaymentDetail(Number(orderId));
+      setPayment(data);
+      setPaymentOpen(true);
     } catch (err) {
-      console.error("Durum güncellenemedi:", err);
+      console.error("Ödeme detayları alınamadı:", err);
+      setPaymentError("Ödeme detayları alınamadı.");
+      setPaymentOpen(true);
     } finally {
-      setUpdating(false);
-    }
-  };
-
-  const handleCancel = async () => {
-    if (!window.confirm("Siparişi iptal etmek istediğinize emin misiniz?")) return;
-    setUpdating(true);
-    try {
-      await cancelOrder(order.id);
-      await loadOrder();
-    } catch (err) {
-      console.error("İptal işlemi başarısız:", err);
-    } finally {
-      setUpdating(false);
+      setPaymentLoading(false);
     }
   };
 
@@ -75,8 +69,6 @@ const OrderDetailPage = () => {
     color: "bg-gray-100 text-gray-700",
   };
 
-  const isFinalStatus = order.status === "Delivered" || order.status === "Cancelled";
-
   return (
     <div className="max-w-7xl mx-auto px-6 py-12 space-y-10">
       <h1 className="text-3xl font-bold text-gray-900 border-b pb-4">Sipariş Detayı</h1>
@@ -89,10 +81,7 @@ const OrderDetailPage = () => {
           <Info label="Oluşturulma" value={new Date(order.createdAt).toLocaleString("tr-TR")} />
           <Info label="Kargo" value={order.carrierName || "Tanımsız"} />
           <Info label="Adres" value={order.shippingAddress} />
-          <Info
-            label="Toplam"
-            value={`₺${order.totalAmount.toFixed(2)} ${order.currency}`}
-          />
+          <Info label="Toplam" value={`₺${order.totalAmount.toFixed(2)} ${order.currency}`} />
           <div className="md:col-span-2">
             <span className="font-medium">Durum: </span>
             <span className={`inline-block px-3 py-1 text-xs font-semibold rounded-full ${status.color}`}>
@@ -100,58 +89,107 @@ const OrderDetailPage = () => {
             </span>
           </div>
         </div>
-
-        {isFinalStatus && (
-          <div className="bg-yellow-50 border border-yellow-300 text-yellow-800 p-3 rounded-md text-sm">
-            Bu sipariş <strong>{status.text}</strong> durumundadır ve değiştirilemez.
-          </div>
-        )}
-
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 border-t pt-4">
-          <select
-            className="border border-gray-300 rounded px-4 py-2 text-sm"
-            value={selectedStatus}
-            onChange={(e) => setSelectedStatus(e.target.value)}
-            disabled={updating || isFinalStatus}
-          >
-            {statusOptions.map((opt) => (
-              <option key={opt.value} value={opt.value} disabled={opt.value === order.status}>
-                {opt.label}
-              </option>
-            ))}
-          </select>
-
-          <button
-            onClick={handleStatusUpdate}
-            disabled={updating || selectedStatus === order.status || isFinalStatus}
-            className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-md text-sm font-medium flex items-center gap-2 disabled:opacity-50"
-          >
-            <ArrowPathIcon className="w-5 h-5" />
-            {updating ? "Güncelleniyor..." : "Durumu Güncelle"}
-          </button>
-
-          <button
-            onClick={handleCancel}
-            disabled={updating || isFinalStatus}
-            className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium flex items-center gap-2 disabled:opacity-50"
-          >
-            <XCircleIcon className="w-5 h-5" />
-            {updating ? "İptal Ediliyor..." : "Siparişi İptal Et"}
-          </button>
-        </div>
       </section>
 
-      {/* ÖDEME */}
+      {/* ÖDEME ÖZETİ + DETAY BUTONU */}
       <section className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
-        <h2 className="text-xl font-semibold mb-4 text-gray-900">Ödeme Bilgileri</h2>
-        <ul className="text-sm text-gray-700 space-y-1">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-semibold text-gray-900">Ödeme Bilgileri</h2>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={handleFetchPayment}
+              className="rounded-md bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-4 py-2 disabled:opacity-50"
+              disabled={paymentLoading}
+            >
+              {paymentLoading ? "Yükleniyor..." : "Ödeme Detaylarını Getir"}
+            </button>
+            {payment && (
+              <button
+                onClick={() => setPaymentOpen((s) => !s)}
+                className="rounded-md border border-gray-300 text-gray-700 text-sm font-medium px-3 py-2"
+              >
+                {paymentOpen ? "Detayı Gizle" : "Detayı Göster"}
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Ödeme özeti (order içinden mevcutsa) */}
+        <ul className="text-sm text-gray-700 space-y-1 mb-4">
           <Info label="Yöntem" value={order.payment?.name} />
           <Info label="Tutar" value={`₺${order.payment?.totalAmount?.toFixed(2)}`} />
-          <Info
-            label="Durum"
-            value={order.payment?.status === "Pending" ? "Ödenmedi" : "Ödendi"}
-          />
+          <Info label="Durum" value={order.payment?.status === "Pending" ? "Ödenmedi" : "Ödendi"} />
         </ul>
+
+        {/* ✅ Ödeme Detay Paneli */}
+        {paymentOpen && (
+          <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
+            {paymentError && (
+              <div className="mb-3 text-sm text-red-600 font-medium">{paymentError}</div>
+            )}
+
+            {!payment && !paymentError && (
+              <div className="text-sm text-gray-600">Detay bulunamadı.</div>
+            )}
+
+            {payment && (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                  <Info label="Payment ID" value={payment.paymentId} />
+                  <Info label="Conversation ID" value={payment.paymentConversationId || "-"} />
+                  <Info label="Taksit" value={payment.installment} />
+                  <Info label="Para Birimi" value={payment.currency} />
+                  <Info label="Toplam Ödenen" value={fmt(payment.totalPaidPrice)} />
+                  <Info label="İyzico Komisyonu" value={fmt(payment.totalIyziCommission)} />
+                  <Info label="Platform Ödemesi" value={fmt(payment.totalPlatformPayout)} />
+                  <Info label="Alt Mağaza Ödemesi" value={fmt(payment.totalSubMerchantPayout)} />
+                  <Info label="Bloke (Mağaza)" value={fmt(payment.totalBlockageMerchant)} />
+                  <Info label="Bloke (Alt Mağaza)" value={fmt(payment.totalBlockageSubMerchant)} />
+                  <Info
+                    label="Raporlama API'den"
+                    value={payment.fromReportingApi ? "Evet" : "Hayır"}
+                  />
+                </div>
+
+                <div className="mt-4">
+                  <h3 className="font-semibold text-gray-900 mb-2">Kalemler</h3>
+                  {Array.isArray(payment.items) && payment.items.length > 0 ? (
+                    <div className="overflow-x-auto">
+                      <table className="min-w-full text-sm">
+                        <thead>
+                          <tr className="text-left text-gray-600">
+                            <th className="px-3 py-2">#</th>
+                            <th className="px-3 py-2">Ödenen</th>
+                            <th className="px-3 py-2">Komisyon</th>
+                            <th className="px-3 py-2">Platform</th>
+                            <th className="px-3 py-2">Alt Mağaza</th>
+                            <th className="px-3 py-2">Bloke (Mağaza)</th>
+                            <th className="px-3 py-2">Bloke (Alt)</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {payment.items.map((it, idx) => (
+                            <tr key={idx} className="border-t">
+                              <td className="px-3 py-2">{idx + 1}</td>
+                              <td className="px-3 py-2">{fmt(it.paidPrice ?? it.totalPaidPrice)}</td>
+                              <td className="px-3 py-2">{fmt(it.iyziCommission ?? it.totalIyziCommission)}</td>
+                              <td className="px-3 py-2">{fmt(it.platformPayout ?? it.totalPlatformPayout)}</td>
+                              <td className="px-3 py-2">{fmt(it.subMerchantPayout ?? it.totalSubMerchantPayout)}</td>
+                              <td className="px-3 py-2">{fmt(it.blockageMerchant ?? it.totalBlockageMerchant)}</td>
+                              <td className="px-3 py-2">{fmt(it.blockageSubMerchant ?? it.totalBlockageSubMerchant)}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  ) : (
+                    <div className="text-sm text-gray-600">Kalem bilgisi bulunmuyor.</div>
+                  )}
+                </div>
+              </>
+            )}
+          </div>
+        )}
       </section>
 
       {/* ÜRÜNLER */}
@@ -183,8 +221,16 @@ const OrderDetailPage = () => {
 
 const Info = ({ label, value }) => (
   <li>
-    <strong>{label}:</strong> {value || "-"}
+    <strong>{label}:</strong> {value ?? "-"}
   </li>
 );
+
+// küçük yardımcı formatlayıcı
+function fmt(n) {
+  if (n === null || n === undefined) return "-";
+  const num = Number(n);
+  if (Number.isNaN(num)) return String(n);
+  return `₺${num.toFixed(2)}`;
+}
 
 export default OrderDetailPage;
