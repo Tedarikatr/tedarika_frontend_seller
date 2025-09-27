@@ -9,16 +9,16 @@ import { CheckCircle, AlertTriangle, Loader2, Copy, Check, Pencil, X } from "luc
 
 const EMPTY = { bankName: "", bankBranch: "", bankAccountHolderName: "", iban: "", swiftCode: "" };
 
+// ✅ Yeni enum değerlerine göre güncellendi
 const STATUS_LABELS = {
-  Created: "Oluşturuldu",
-  Pending: "Beklemede",
+  Uninitialized: "Başlatılmadı",
+  Draft: "Taslak",
   Submitted: "İnceleme Bekliyor",
-  Approved: "Onaylandı",
   Verified: "Doğrulandı",
   Rejected: "Reddedildi",
 };
 
-const isVerifiedStatus = (s) => ["Approved", "Verified"].includes((s || "").trim());
+const isVerifiedStatus = (s) => (s || "").trim() === "Verified";
 const isSubmittedStatus = (s) => (s || "").trim() === "Submitted";
 const isRejectedStatus = (s) => (s || "").trim() === "Rejected";
 
@@ -54,7 +54,7 @@ export default function SellerFinanceInfoCard() {
   const [form, setForm] = useState(EMPTY);
   const [mode, setMode] = useState("view"); // "view" | "edit"
 
-  const statusText = statusObj?.status || profile?.verificationStatus || "Created";
+  const statusText = statusObj?.status || profile?.verificationStatus || "Uninitialized";
   const statusError = statusObj?.success === false ? statusObj?.errorMessage : "";
   const verified = isVerifiedStatus(statusText);
 
@@ -151,13 +151,13 @@ export default function SellerFinanceInfoCard() {
           swiftCode: form.swiftCode.trim(),
         });
       }
-      await submitPayoutProfile(); // success:false -> throw
+      await submitPayoutProfile();
       await refresh();
       setMode("view");
       setMsg("✔️ Profil doğrulama için gönderildi.");
     } catch (err) {
       const apiErr = err?.response?.data ?? err;
-      setMode("edit"); // reddedildiyse edite bırak
+      setMode("edit");
       setMsg(`❌ Gönderim sırasında hata: ${stringify(apiErr)}`);
       if (apiErr?.status) {
         setStatusObj((prev) => ({
