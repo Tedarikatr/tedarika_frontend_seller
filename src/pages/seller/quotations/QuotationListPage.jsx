@@ -55,7 +55,7 @@ const QuotationListPage = () => {
           <table className="min-w-full divide-y divide-gray-200 text-sm">
             <thead className="bg-gray-50 text-gray-700 font-semibold text-xs uppercase">
               <tr>
-                <th className="px-5 py-4 text-left">Alıcı</th>
+                {/* ❌ Alıcı sütunu kaldırıldı */}
                 <th className="px-5 py-4 text-left">Ürün</th>
                 <th className="px-5 py-4 text-left">Tarih</th>
                 <th className="px-5 py-4 text-left">Fiyat</th>
@@ -72,7 +72,7 @@ const QuotationListPage = () => {
                 };
                 return (
                   <tr key={q.id} className="hover:bg-gray-50 transition">
-                    <td className="px-5 py-4">{q.buyerName || "Bilinmeyen Alıcı"}</td>
+                    {/* ❌ buyerName alanı kaldırıldı */}
                     <td className="px-5 py-4">{q.storeProductName}</td>
                     <td className="px-5 py-4">{formatDate(q.requestedAt)}</td>
                     <td className="px-5 py-4">{q.unitPrice} ₺</td>
