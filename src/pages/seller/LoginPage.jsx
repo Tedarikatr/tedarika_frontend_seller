@@ -1,22 +1,24 @@
-import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import { loginSeller } from "@/api/sellerAuthService";
 import { Mail, Lock, CheckCircle } from "lucide-react";
 
 const LoginPage = () => {
-  const [formData, setFormData] = useState({
-    emailOrPhone: "",
-    password: "",
-  });
+  const [formData, setFormData] = useState({ emailOrPhone: "", password: "" });
   const [message, setMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Oturum süresi dolduğunda uyarı mesajı
+  useEffect(() => {
+    if (location.state?.sessionExpired) {
+      setMessage("⚠️ Oturum süreniz doldu, lütfen tekrar giriş yapın.");
+    }
+  }, [location]);
 
   const handleChange = (e) => {
-    setFormData((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   const handleSubmit = async (e) => {
@@ -29,6 +31,7 @@ const LoginPage = () => {
         localStorage.setItem("sellerToken", result.token);
         localStorage.setItem("sellerEmail", result.email);
         localStorage.setItem("sellerRole", result.role);
+
         setMessage("✅ Giriş başarılı, yönlendiriliyorsunuz...");
         navigate("/seller/dashboard");
       } else {
