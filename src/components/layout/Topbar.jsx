@@ -55,7 +55,7 @@ const Topbar = ({ onMenuClick }) => {
 
           {/* Kullanıcı avatarı ve bilgileri */}
           {user && (
-            <>
+            <div className="flex items-center gap-3">
               <div
                 className="w-9 h-9 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold shadow-inner"
                 title={user?.email || ""}
@@ -70,7 +70,7 @@ const Topbar = ({ onMenuClick }) => {
                   {user?.email || "Yükleniyor..."}
                 </span>
               </div>
-            </>
+            </div>
           )}
         </div>
       </div>
