@@ -1,3 +1,4 @@
+// src/components/seller/CompanyInfoCard.jsx
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getMyCompany } from "@/api/sellerCompanyService";
@@ -25,9 +26,7 @@ const Badge = ({ children, color = "gray" }) => {
     blue: "bg-blue-100 text-blue-700",
     amber: "bg-amber-100 text-amber-700",
   };
-  return (
-    <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${map[color]}`}>{children}</span>
-  );
+  return <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${map[color]}`}>{children}</span>;
 };
 
 const Field = ({ label, value, children }) => (
@@ -40,15 +39,17 @@ const Field = ({ label, value, children }) => (
 const RowKV = ({ k, v }) => (
   <div className="flex items-center justify-between gap-4 text-sm">
     <span className="text-gray-500">{k}</span>
-    <span className="text-gray-800 font-medium truncate" title={v}>{v || "-"}</span>
+    <span className="text-gray-800 font-medium truncate" title={v}>
+      {v || "-"}
+    </span>
   </div>
 );
 
 const CompanyInfoCard = () => {
   const nav = useNavigate();
   const [company, setCompany] = useState(null);
-  const [extra, setExtra] = useState(null);         // SellerCompanyExtraInfo
-  const [docs, setDocs] = useState([]);             // SellerCompanyDocument[]
+  const [extra, setExtra] = useState(null);
+  const [docs, setDocs] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -71,22 +72,20 @@ const CompanyInfoCard = () => {
   }, []);
 
   const have = (t) => docs.some((x) => x.documentType === t);
-  const missingDocs = useMemo(
-    () => REQUIRED_DOC_TYPES.filter((t) => !have(t)),
-    [docs]
-  );
+  const missingDocs = useMemo(() => REQUIRED_DOC_TYPES.filter((t) => !have(t)), [docs]);
 
-  if (loading || !company) return (
-    <div className="bg-white shadow-sm border border-gray-200 rounded-2xl p-6 w-full animate-pulse">
-      <div className="h-6 w-48 bg-gray-200 rounded mb-2" />
-      <div className="h-4 w-72 bg-gray-100 rounded" />
-      <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {Array.from({ length: 8 }).map((_, i) => (
-          <div key={i} className="h-10 bg-gray-50 rounded" />
-        ))}
+  if (loading || !company)
+    return (
+      <div className="bg-white shadow-sm border border-gray-200 rounded-2xl p-6 w-full animate-pulse">
+        <div className="h-6 w-48 bg-gray-200 rounded mb-2" />
+        <div className="h-4 w-72 bg-gray-100 rounded" />
+        <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <div key={i} className="h-10 bg-gray-50 rounded" />
+          ))}
+        </div>
       </div>
-    </div>
-  );
+    );
 
   return (
     <div className="bg-white shadow-sm border border-gray-200 rounded-2xl p-6 w-full space-y-8">
@@ -98,9 +97,7 @@ const CompanyInfoCard = () => {
           </div>
           <div>
             <h2 className="text-2xl font-bold text-gray-800">Şirket Bilgileri</h2>
-            <p className="text-sm text-gray-500 mt-1">
-              Şirket profilinizde kayıtlı olan bilgiler ve ek doğrulama öğeleri.
-            </p>
+            <p className="text-sm text-gray-500 mt-1">Şirket profilinizde kayıtlı olan bilgiler ve ek doğrulama öğeleri.</p>
           </div>
         </div>
         <div className="flex gap-2">
@@ -123,16 +120,11 @@ const CompanyInfoCard = () => {
         <Field label="Adres" value={company.address} />
         <Field label="Şirket No" value={company.companyNumber} />
         <Field label="Şirket Türü" value={companyTypeOptions[company.type] || company.type} />
-
         <Field label="Doğrulama">
-          <Badge color={company.isVerified ? "blue" : "amber"}>
-            {company.isVerified ? "Doğrulandı" : "Bekliyor"}
-          </Badge>
+          <Badge color={company.isVerified ? "blue" : "amber"}>{company.isVerified ? "Doğrulandı" : "Bekliyor"}</Badge>
         </Field>
         <Field label="Durum">
-          <Badge color={company.isActive ? "green" : "red"}>
-            {company.isActive ? "Aktif" : "Pasif"}
-          </Badge>
+          <Badge color={company.isActive ? "green" : "red"}>{company.isActive ? "Aktif" : "Pasif"}</Badge>
         </Field>
       </div>
 
@@ -140,10 +132,7 @@ const CompanyInfoCard = () => {
       <section className="border-t pt-6">
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-lg font-semibold text-gray-800">Ekstra Bilgiler</h3>
-          <button
-            onClick={() => nav("/seller/profile/extra-info")}
-            className="text-sm flex items-center gap-1 text-[#006666] hover:underline"
-          >
+          <button onClick={() => nav("/seller/profile/extra-info")} className="text-sm flex items-center gap-1 text-[#006666] hover:underline">
             <Plus className="w-4 h-4" /> Görüntüle / Düzenle
           </button>
         </div>
@@ -152,8 +141,7 @@ const CompanyInfoCard = () => {
           <div className="flex items-start gap-2 p-3 rounded-xl border border-amber-200 bg-amber-50 text-amber-800">
             <AlertTriangle className="w-5 h-5 mt-0.5" />
             <div className="text-sm">
-              Henüz ekstra şirket bilgileri girilmemiş. KEP adresi, yetkili kişi ve yetkili telefon
-              bilgilerini eklemeniz önerilir.
+              Henüz ekstra şirket bilgileri girilmemiş. KEP adresi, yetkili kişi ve yetkili telefon bilgilerini eklemeniz önerilir.
             </div>
           </div>
         ) : (
@@ -177,10 +165,7 @@ const CompanyInfoCard = () => {
       <section className="border-t pt-6">
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-lg font-semibold text-gray-800">Belgeler</h3>
-          <button
-            onClick={() => nav("/seller/company-documents")}
-            className="text-sm flex items-center gap-1 text-[#006666] hover:underline"
-          >
+          <button onClick={() => nav("/seller/company-documents")} className="text-sm flex items-center gap-1 text-[#006666] hover:underline">
             <FolderOpen className="w-4 h-4" /> Tüm Belgeleri Yönet
           </button>
         </div>
@@ -191,9 +176,7 @@ const CompanyInfoCard = () => {
             <AlertTriangle className="w-5 h-5 mt-0.5" />
             <div className="text-sm">
               Eksik zorunlu belgeler:
-              <span className="ml-1 font-medium">
-                {missingDocs.map((t) => DOC_LABELS[t]).join(", ")}
-              </span>
+              <span className="ml-1 font-medium">{missingDocs.map((t) => DOC_LABELS[t]).join(", ")}</span>
             </div>
           </div>
         ) : (
@@ -220,14 +203,12 @@ const CompanyInfoCard = () => {
                   <a
                     href={d.fileUrl}
                     target="_blank"
-                    rel="noreferrer"
+                    rel="noopener noreferrer"
                     className="text-sm text-sky-700 underline break-all"
                   >
                     Belgeyi Aç
                   </a>
-                  {d.description && (
-                    <div className="text-xs text-gray-500 mt-0.5 break-words">{d.description}</div>
-                  )}
+                  {d.description && <div className="text-xs text-gray-500 mt-0.5 break-words">{d.description}</div>}
                 </div>
               </li>
             ))}
