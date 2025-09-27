@@ -1,8 +1,9 @@
+// src/pages/seller/company/SellerCompanyDocuments.jsx
 import { useEffect, useMemo, useRef, useState } from "react";
 import { getMyCompany } from "@/api/sellerCompanyService";
 import { getMyDocuments, addDocument, deleteDocument } from "@/api/sellerCompanyDocumentService";
 import { REQUIRED_DOC_TYPES, DOC_DEFS, DOC_LABELS, normalizeDocType } from "@/constants/companyDocuments";
-import { Upload, CheckCircle, AlertTriangle, Trash2, FileText, Shield, Loader2, X } from "lucide-react";
+import { Upload, CheckCircle, AlertTriangle, Trash2, Shield, Loader2, X } from "lucide-react";
 
 export default function SellerCompanyDocuments() {
   const [company, setCompany] = useState(null);
@@ -24,13 +25,9 @@ export default function SellerCompanyDocuments() {
     })();
   }, []);
 
-  const haveTypeCode = (code) =>
-    docs.some((x) => normalizeDocType(x.documentType) === code);
+  const haveTypeCode = (code) => docs.some((x) => normalizeDocType(x.documentType) === code);
 
-  const missingRequired = useMemo(
-    () => REQUIRED_DOC_TYPES.filter((code) => !haveTypeCode(code)),
-    [docs]
-  );
+  const missingRequired = useMemo(() => REQUIRED_DOC_TYPES.filter((code) => !haveTypeCode(code)), [docs]);
 
   const pickFile = (f) => {
     if (!f) return;
@@ -42,8 +39,15 @@ export default function SellerCompanyDocuments() {
   };
 
   const onFileChange = (e) => pickFile(e.target.files?.[0]);
-  const onDrop = (e) => { e.preventDefault(); e.stopPropagation(); pickFile(e.dataTransfer?.files?.[0]); };
-  const onDragOver = (e) => { e.preventDefault(); e.stopPropagation(); };
+  const onDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    pickFile(e.dataTransfer?.files?.[0]);
+  };
+  const onDragOver = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
 
   const refreshDocs = async () => {
     const d = await getMyDocuments();
@@ -58,14 +62,8 @@ export default function SellerCompanyDocuments() {
     setMsg("Kaydediliyor...");
     setSaving(true);
     try {
-      await addDocument({
-        documentType: docTypeName,
-        file,
-        description: desc?.trim(),
-      });
-
+      await addDocument({ documentType: docTypeName, file, description: desc?.trim() });
       await refreshDocs();
-
       setDocTypeName("");
       setDesc("");
       setFile(null);
@@ -132,15 +130,12 @@ export default function SellerCompanyDocuments() {
           <label className="text-sm font-medium text-gray-700">
             Belge Türü<span className="text-rose-600">*</span>
           </label>
-          <select
-            className="mt-1 input w-full"
-            value={docTypeName}
-            onChange={(e) => setDocTypeName(e.target.value)}
-            required
-          >
+          <select className="mt-1 input w-full" value={docTypeName} onChange={(e) => setDocTypeName(e.target.value)} required>
             <option value="">Seçin…</option>
             {DOC_DEFS.map((d) => (
-              <option key={d.name} value={d.name}>{d.label}</option>
+              <option key={d.name} value={d.name}>
+                {d.label}
+              </option>
             ))}
           </select>
         </div>
@@ -148,12 +143,7 @@ export default function SellerCompanyDocuments() {
         {/* Dropzone */}
         <div className="lg:col-span-2">
           <label className="text-sm font-medium text-gray-700">Dosya</label>
-          <div
-            ref={dropRef}
-            onDrop={onDrop}
-            onDragOver={onDragOver}
-            className="mt-1 rounded-xl border-2 border-dashed border-slate-300 bg-white p-4"
-          >
+          <div ref={dropRef} onDrop={onDrop} onDragOver={onDragOver} className="mt-1 rounded-xl border-2 border-dashed border-slate-300 bg-white p-4">
             <p className="text-sm text-slate-700">
               Dosyayı buraya sürükleyin veya
               <label className="mx-1 underline text-sky-700 cursor-pointer">
@@ -176,20 +166,20 @@ export default function SellerCompanyDocuments() {
         {/* Açıklama */}
         <div className="lg:col-span-1">
           <label className="text-sm font-medium text-gray-700">Açıklama (ops.)</label>
-          <input
-            className="mt-1 input w-full"
-            placeholder="Kısa açıklama"
-            value={desc}
-            onChange={(e) => setDesc(e.target.value)}
-          />
+          <input className="mt-1 input w-full" placeholder="Kısa açıklama" value={desc} onChange={(e) => setDesc(e.target.value)} />
         </div>
 
         <div className="lg:col-span-4">
-          <button
-            className="w-full bg-sky-700 hover:bg-sky-800 transition text-white py-3 rounded-xl flex items-center gap-2 justify-center"
-            disabled={saving}
-          >
-            {saving ? (<><Loader2 className="w-5 h-5 animate-spin" /> Kaydediliyor…</>) : (<><Upload className="w-5 h-5" /> Kaydet</>)}
+          <button className="w-full bg-sky-700 hover:bg-sky-800 transition text-white py-3 rounded-xl flex items-center gap-2 justify-center" disabled={saving}>
+            {saving ? (
+              <>
+                <Loader2 className="w-5 h-5 animate-spin" /> Kaydediliyor…
+              </>
+            ) : (
+              <>
+                <Upload className="w-5 h-5" /> Kaydet
+              </>
+            )}
           </button>
         </div>
       </form>
@@ -207,12 +197,10 @@ export default function SellerCompanyDocuments() {
                   <div className="font-semibold truncate" title={DOC_LABELS[code] || d.documentType}>
                     {DOC_LABELS[code] || d.documentType}
                   </div>
-                  <a className="text-sky-700 underline break-all" href={d.fileUrl} target="_blank" rel="noreferrer">
+                  <a className="text-sky-700 underline break-all" href={d.fileUrl} target="_blank" rel="noopener noreferrer">
                     Belgeyi Aç
                   </a>
-                  {d.description && (
-                    <div className="text-sm text-gray-600 mt-1 break-words">{d.description}</div>
-                  )}
+                  {d.description && <div className="text-sm text-gray-600 mt-1 break-words">{d.description}</div>}
                 </div>
                 <button onClick={() => remove(d.id)} className="text-red-600 hover:text-red-700 p-2" title="Sil">
                   <Trash2 className="w-5 h-5" />
