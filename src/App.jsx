@@ -28,6 +28,10 @@ import CompanyCreate from "@/pages/seller/company/CompanyCreate";
 import SellerExtraInfoPage from "@/pages/seller/profile/SellerExtraInfoPage";
 import SellerCompanyDocuments from "@/pages/seller/company/SellerCompanyDocuments";
 import ProductImagesPage from "@/pages/seller/products/ProductImagesPage";
+import CampaignListPage from "@/pages/seller/campaigns/CampaignListPage";
+import CampaignCreatePage from "@/pages/seller/campaigns/CampaignCreatePage";
+import CampaignDetailPage from "@/pages/seller/campaigns/CampaignDetailPage";
+
 
 // Layout & Guards
 import SellerLayout from "@/components/layout/SellerLayout";
@@ -97,6 +101,10 @@ function App() {
 
         <Route path="orders" element={<OrderListPage />} />
         <Route path="orders/:orderId" element={<OrderDetailPage />} />
+        <Route path="campaigns" element={<CampaignListPage />} />
+<Route path="campaigns/new" element={<CampaignCreatePage />} />
+<Route path="campaigns/:id" element={<CampaignDetailPage />} />
+
       </Route>
 
       {/* 404 */}
