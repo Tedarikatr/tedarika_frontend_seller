@@ -2,7 +2,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 import {
   Home, Package, ShoppingCart, Store, ClipboardList,
   LogOut, Settings, MessageSquare, ChevronRight,
-  X, MapPin, ChevronLeft
+  X, MapPin, ChevronLeft, Gift
 } from "lucide-react";
 import { useState } from "react";
 
@@ -30,7 +30,7 @@ const Sidebar = ({ isOpen, onClose }) => {
           </button>
         </div>
 
-        {/* Logo & Collapse Butonu */}
+        {/* Logo & Collapse */}
         <div className="hidden md:flex items-center justify-between px-4 py-4 border-b border-white/10">
           <div className="flex items-center gap-2">
             <Store size={22} />
@@ -73,6 +73,12 @@ const Sidebar = ({ isOpen, onClose }) => {
           <SidebarLink to="/seller/quotations" icon={<ClipboardList size={18} />} collapsed={collapsed} onClick={onClose}>
             Teklifler
           </SidebarLink>
+
+          {/* 💥 Yeni: Kampanyalarım */}
+          <SidebarLink to="/seller/campaigns" icon={<Gift size={18} />} collapsed={collapsed} onClick={onClose}>
+            Kampanyalarım
+          </SidebarLink>
+
           <SidebarLink to="/seller/reviews" icon={<MessageSquare size={18} />} collapsed={collapsed} onClick={onClose}>
             Yorumlar
           </SidebarLink>
@@ -83,7 +89,7 @@ const Sidebar = ({ isOpen, onClose }) => {
           </SidebarLink>
         </div>
 
-        {/* Çıkış Butonu */}
+        {/* Çıkış */}
         <div className="px-2 py-5 border-t border-white/10">
           <button
             onClick={handleLogout}
