@@ -31,6 +31,8 @@ import ProductImagesPage from "@/pages/seller/products/ProductImagesPage";
 import CampaignListPage from "@/pages/seller/campaigns/CampaignListPage";
 import CampaignCreatePage from "@/pages/seller/campaigns/CampaignCreatePage";
 import CampaignDetailPage from "@/pages/seller/campaigns/CampaignDetailPage";
+import ChatPage from "@/pages/seller/chat/ChatPage";
+
 
 
 // Layout & Guards
@@ -104,9 +106,10 @@ function App() {
         <Route path="campaigns" element={<CampaignListPage />} />
 <Route path="campaigns/new" element={<CampaignCreatePage />} />
 <Route path="campaigns/:id" element={<CampaignDetailPage />} />
+<Route path="chat" element={<ChatPage />} /> {/* ✅ eklendi */}
+
 
       </Route>
-
       {/* 404 */}
       <Route path="*" element={<Navigate to="/seller/landing" replace />} />
     </Routes>
