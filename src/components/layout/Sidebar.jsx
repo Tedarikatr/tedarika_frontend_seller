@@ -1,9 +1,20 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import {
-  Home, Package, ShoppingCart, Store, ClipboardList,
-  LogOut, Settings, MessageSquare, ChevronRight,
-  X, MapPin, ChevronLeft, Gift
-} from "lucide-react";
+  Home,
+  Package,
+  ShoppingCart,
+  Store,
+  ClipboardList,
+  LogOut,
+  Settings,
+  MessageSquare,
+  ChevronRight,
+  X,
+  MapPin,
+  ChevronLeft,
+  Gift,
+  MessageCircle
+} from "lucide-react"; // 💬 yeni ikon
 import { useState } from "react";
 
 const Sidebar = ({ isOpen, onClose }) => {
@@ -74,13 +85,17 @@ const Sidebar = ({ isOpen, onClose }) => {
             Teklifler
           </SidebarLink>
 
-          {/* 💥 Yeni: Kampanyalarım */}
           <SidebarLink to="/seller/campaigns" icon={<Gift size={18} />} collapsed={collapsed} onClick={onClose}>
             Kampanyalarım
           </SidebarLink>
 
           <SidebarLink to="/seller/reviews" icon={<MessageSquare size={18} />} collapsed={collapsed} onClick={onClose}>
             Yorumlar
+          </SidebarLink>
+
+          {/* 💬 Yeni: Chat (Mesajlar) */}
+          <SidebarLink to="/seller/chat" icon={<MessageCircle size={18} />} collapsed={collapsed} onClick={onClose}>
+            Mesajlar
           </SidebarLink>
 
           <SectionTitle title="Hesap" collapsed={collapsed} />
@@ -104,6 +119,7 @@ const Sidebar = ({ isOpen, onClose }) => {
   );
 };
 
+// 🔗 Link bileşeni
 const SidebarLink = ({ to, icon, children, onClick, collapsed }) => (
   <NavLink
     to={to}
@@ -121,6 +137,7 @@ const SidebarLink = ({ to, icon, children, onClick, collapsed }) => (
   </NavLink>
 );
 
+// 🔠 Başlık bileşeni
 const SectionTitle = ({ title, collapsed }) =>
   !collapsed ? (
     <div className="mt-4 mb-1 px-3 text-xs uppercase tracking-wide text-white/50 font-semibold">
