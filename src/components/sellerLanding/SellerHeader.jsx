@@ -23,10 +23,10 @@ const SellerHeader = () => {
             Giriş Yap
           </button>
           <button
-            onClick={() => navigate("/seller/apply")}
+            onClick={() => navigate("/seller/register")}
             className="border border-white text-white font-semibold text-sm px-4 py-2 rounded-full hover:bg-white hover:text-[#003032] transition"
           >
-            Hesap Aç
+            Kayıt Ol
           </button>
         </div>
 
@@ -53,12 +53,12 @@ const SellerHeader = () => {
           </button>
           <button
             onClick={() => {
-              navigate("/seller/apply");
+              navigate("/seller/register");
               setIsOpen(false);
             }}
             className="border border-white text-white font-semibold text-sm px-4 py-2 rounded-full hover:bg-white hover:text-[#003032] transition"
           >
-            Hesap Aç
+            Kayıt Ol
           </button>
         </div>
       )}
