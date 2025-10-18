@@ -26,7 +26,7 @@ const RegisterPage = () => {
     setMessage("");
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const phoneRegex = /^05\d{9}$/;
+    const phoneRegex = /^5\d{9}$/; // 5 ile başlayan 10 haneli format
 
     if (!emailRegex.test(formData.email)) {
       setMessage("❌ Geçerli bir e-posta adresi giriniz.");
@@ -34,17 +34,16 @@ const RegisterPage = () => {
     }
 
     if (!phoneRegex.test(formData.phone)) {
-      setMessage("❌ Telefon numarası 05 ile başlamalı ve 11 haneli olmalı.");
+      setMessage("❌ Telefon numarası 05XXXXXXXXX formatında olmalıdır.");
       return;
     }
 
-    const sanitizedPhone = formData.phone.startsWith("0")
-      ? formData.phone.slice(1)
-      : formData.phone;
+    // +90 kodu eklenmiş hal
+    const fullPhone = `+90${formData.phone}`;
 
     const payload = {
       ...formData,
-      phone: sanitizedPhone,
+      phone: fullPhone,
     };
 
     try {
@@ -91,7 +90,7 @@ const RegisterPage = () => {
             <FormInput name="name" value={formData.name} onChange={handleChange} placeholder="Ad" icon={<User size={18} />} />
             <FormInput name="lastName" value={formData.lastName} onChange={handleChange} placeholder="Soyad" icon={<User size={18} />} />
             <FormInput name="email" value={formData.email} onChange={handleChange} placeholder="E-posta" icon={<Mail size={18} />} type="email" />
-            <FormInput name="phone" value={formData.phone} onChange={handleChange} placeholder="Telefon (05XXXXXXXXX)" icon={<Phone size={18} />} />
+            <PhoneInput name="phone" value={formData.phone} onChange={handleChange} />
             <FormInput name="password" value={formData.password} onChange={handleChange} placeholder="Şifre" icon={<Lock size={18} />} type="password" />
           </div>
 
@@ -137,6 +136,27 @@ const FormInput = ({ name, value, onChange, placeholder, icon, type = "text" }) 
       onChange={onChange}
       required
       placeholder={placeholder}
+      className="w-full bg-transparent outline-none text-[#003636] placeholder-[#7aa5a2] text-sm"
+    />
+  </div>
+);
+
+// 🇹🇷 Telefon Girişi
+const PhoneInput = ({ name, value, onChange }) => (
+  <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#f0fdfa] border border-[#bde7e3] focus-within:ring-2 ring-[#00d18c] transition">
+    <span className="flex items-center gap-1">
+      <img src="https://flagcdn.com/w20/tr.png" alt="TR" className="w-5 h-3 rounded-sm" />
+      <span className="text-[#003636] font-semibold text-sm">+90</span>
+    </span>
+    <input
+      type="tel"
+      name={name}
+      value={value}
+      onChange={onChange}
+      maxLength={10}
+      pattern="[0-9]*"
+      placeholder="5XXXXXXXXX"
+      required
       className="w-full bg-transparent outline-none text-[#003636] placeholder-[#7aa5a2] text-sm"
     />
   </div>
