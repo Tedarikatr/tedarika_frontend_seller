@@ -114,10 +114,10 @@ const LoginPage = () => {
           <p className="mt-6 text-center text-sm text-gray-600">
             Hesabınız yok mu?{" "}
             <Link
-              to="/seller/apply"
+              to="/seller/register"
               className="text-emerald-600 font-semibold hover:underline"
             >
-              Başvuru Yap
+              Kayıt Ol
             </Link>
           </p>
         </form>
