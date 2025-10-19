@@ -6,21 +6,21 @@ import {
   getCurrentSubscription,
   getSubscriptionPackages,
 } from "@/api/sellerSubscriptionService";
-import { apiRequest } from "@/api/apiRequest";
 
 export default function SubscriptionPlans() {
   const [loadingId, setLoadingId] = useState(null);
   const [subscription, setSubscription] = useState(null);
   const [plans, setPlans] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedPeriod, setSelectedPeriod] = useState({}); // 👈 her plan için ayrı period sakla
 
-  // 🧩 Abonelik planlarını ve mevcut aboneliği birlikte çek
+  // 🎯 Planları ve mevcut aboneliği getir
   useEffect(() => {
     (async () => {
       try {
         const [packageList, currentSub] = await Promise.all([
           getSubscriptionPackages(),
-          getCurrentSubscription().catch(() => null), // hata olursa null dön
+          getCurrentSubscription().catch(() => null),
         ]);
         setPlans(packageList || []);
         setSubscription(currentSub || null);
@@ -33,21 +33,24 @@ export default function SubscriptionPlans() {
     })();
   }, []);
 
-  // 💳 Abone olma işlemi
-  const handleSubscribe = async (packageId, period = "Yearly") => {
+  // 💳 Abone ol
+  const handleSubscribe = async (packageId) => {
+    const period = selectedPeriod[packageId] || "SemiAnnual";
     setLoadingId(packageId);
+
     try {
       const selectedPlan = plans.find((p) => p.id === packageId);
 
-      // 🧩 Ücretsiz plan
+      // Ücretsiz plan
       if (selectedPlan?.isFree || selectedPlan?.price === 0) {
         await createSubscription(packageId, period);
-        toast.success("Ücretsiz abonelik başarıyla başlatıldı 🎉");
-        window.location.reload();
+        toast.success("Ücretsiz abonelik başlatıldı 🎉");
+        const current = await getCurrentSubscription();
+        setSubscription(current);
         return;
       }
 
-      // 💳 Ücretli plan
+      // Ücretli plan
       const created = await createSubscription(packageId, period);
       const subscriptionId = created?.subscriptionId || created?.id;
 
@@ -58,17 +61,17 @@ export default function SubscriptionPlans() {
 
       if (!paymentUrl) throw new Error("Ödeme bağlantısı alınamadı.");
 
-      toast.success("İyzico ödeme sayfasına yönlendiriliyorsunuz...");
+      toast.success("Ödeme sayfasına yönlendiriliyorsunuz...");
       window.location.href = paymentUrl;
     } catch (err) {
       console.error("Abonelik başlatılamadı:", err);
-      toast.error(err?.message || "İşlem sırasında beklenmedik bir hata oluştu.");
+      toast.error(err?.message || "İşlem sırasında hata oluştu.");
     } finally {
       setLoadingId(null);
     }
   };
 
-  // ⏳ Yükleme durumu
+  // ⏳ Yükleniyor ekranı
   if (loading) {
     return (
       <div className="flex justify-center items-center py-20">
@@ -77,12 +80,12 @@ export default function SubscriptionPlans() {
     );
   }
 
-  // ✅ Aktif abonelik varsa
+  // ✅ Aktif abonelik
   if (subscription?.isActive) {
     return (
       <div className="bg-white p-8 rounded-2xl shadow text-center">
         <h3 className="text-2xl font-bold text-emerald-700">
-          Aktif Aboneliğiniz Var 🎉
+          Aktif Aboneliğiniz 🎉
         </h3>
         <p className="text-gray-700 mt-2">
           Plan:{" "}
@@ -92,41 +95,18 @@ export default function SubscriptionPlans() {
         </p>
         <p className="text-sm text-gray-500 mt-1">
           Bitiş Tarihi:{" "}
-          {new Date(subscription.endDate).toLocaleDateString("tr-TR")}
+          {subscription.endDate
+            ? new Date(subscription.endDate).toLocaleDateString("tr-TR")
+            : "-"}
         </p>
         <p className="text-xs text-gray-400 mt-1">
-          {subscription.remainingDays} gün kaldı
+          {subscription.remainingDays ?? 0} gün kaldı
         </p>
       </div>
     );
   }
 
-  // 🔄 Abonelik var ama pasifse (süresi dolmuş)
-  if (subscription && !subscription.isActive) {
-    return (
-      <div className="bg-white p-8 rounded-2xl shadow text-center border border-red-200">
-        <h3 className="text-2xl font-bold text-red-600">
-          Aboneliğiniz Sona Erdi 💡
-        </h3>
-        <p className="text-gray-700 mt-2">
-          Plan:{" "}
-          <span className="font-semibold text-red-600">
-            {subscription.packageName || "Bilinmiyor"}
-          </span>
-        </p>
-        <button
-          onClick={() =>
-            handleSubscribe(subscription.subscriptionPackageId || 1, "Yearly")
-          }
-          className="mt-5 px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold rounded-lg transition"
-        >
-          Aboneliği Yenile
-        </button>
-      </div>
-    );
-  }
-
-  // 📦 Hiç abonelik yoksa → plan listesi
+  // ❌ Abone değilse plan listesi
   return (
     <div className="py-10 bg-gradient-to-b from-green-50 to-white text-gray-800 rounded-2xl shadow-sm">
       <h2 className="text-3xl font-extrabold text-center mb-2 text-[#003636]">
@@ -154,10 +134,28 @@ export default function SubscriptionPlans() {
               )}
 
               <h3 className="text-xl font-bold text-emerald-700">{plan.name}</h3>
-              <p className="text-3xl my-4 font-extrabold">
-                ₺{plan.price ?? 0}
-              </p>
+              <p className="text-3xl my-4 font-extrabold">₺{plan.price ?? 0}</p>
               <p className="mb-6 text-sm text-gray-600">{plan.description}</p>
+
+              {/* 🔽 Period seçimi */}
+              <div className="mb-4">
+                <label className="block text-sm font-semibold text-gray-700 mb-1">
+                  Abonelik Süresi
+                </label>
+                <select
+                  value={selectedPeriod[plan.id] || "SemiAnnual"}
+                  onChange={(e) =>
+                    setSelectedPeriod({
+                      ...selectedPeriod,
+                      [plan.id]: e.target.value,
+                    })
+                  }
+                  className="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-emerald-500 focus:border-emerald-500"
+                >
+                  <option value="SemiAnnual">6 Aylık</option>
+                  <option value="Yearly">Yıllık</option>
+                </select>
+              </div>
 
               <ul className="text-left text-sm space-y-2 text-gray-700">
                 {plan.features?.length > 0 ? (
@@ -175,7 +173,7 @@ export default function SubscriptionPlans() {
               </ul>
 
               <button
-                onClick={() => handleSubscribe(plan.id, "Yearly")}
+                onClick={() => handleSubscribe(plan.id)}
                 disabled={loadingId === plan.id}
                 className={`mt-6 w-full py-2.5 rounded-lg font-semibold text-white transition ${
                   loadingId === plan.id
@@ -189,7 +187,7 @@ export default function SubscriptionPlans() {
           ))
         ) : (
           <p className="text-center text-gray-500 col-span-3">
-            Şu anda sunulacak abonelik planı bulunamadı.
+            Şu anda plan bulunamadı.
           </p>
         )}
       </div>
