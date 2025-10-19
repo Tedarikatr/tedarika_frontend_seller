@@ -10,7 +10,6 @@ const LoginPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Oturum süresi dolduğunda uyarı mesajı
   useEffect(() => {
     if (location.state?.sessionExpired) {
       setMessage("⚠️ Oturum süreniz doldu, lütfen tekrar giriş yapın.");
@@ -25,12 +24,21 @@ const LoginPage = () => {
     e.preventDefault();
     setMessage("");
     setIsSubmitting(true);
+
     try {
       const result = await loginSeller(formData);
+
       if (typeof result?.token === "string") {
+        // 🔐 Temel bilgiler
         localStorage.setItem("sellerToken", result.token);
         localStorage.setItem("sellerEmail", result.email);
         localStorage.setItem("sellerRole", result.role);
+
+        // ✅ Backend token’a koymadığı için bunları ayrıca kaydediyoruz
+        if (result?.isthesystemactive !== undefined)
+          localStorage.setItem("sellerSystemActive", String(result.isthesystemactive));
+        if (result?.subscriptionActive !== undefined)
+          localStorage.setItem("sellerSubscriptionActive", String(result.subscriptionActive));
 
         setMessage("✅ Giriş başarılı, yönlendiriliyorsunuz...");
         navigate("/seller/dashboard");
@@ -46,7 +54,7 @@ const LoginPage = () => {
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row bg-[#002d2f] text-white">
-      {/* Sol Tanıtım Alanı */}
+      {/* Sol bilgi alanı */}
       <div className="w-full md:w-1/2 flex flex-col justify-center items-start px-10 py-20 space-y-8 bg-gradient-to-br from-[#003e3f] via-[#004b49] to-[#005c5a]">
         <h2 className="text-4xl font-extrabold leading-tight tracking-tight">
           Tedarika Satıcı Paneline Hoş Geldiniz
@@ -68,7 +76,7 @@ const LoginPage = () => {
         </ul>
       </div>
 
-      {/* Sağ Giriş Formu */}
+      {/* Sağ giriş formu */}
       <div className="w-full md:w-1/2 bg-white text-[#003636] flex items-center justify-center py-16 px-8">
         <form onSubmit={handleSubmit} className="w-full max-w-md">
           <h3 className="text-3xl font-bold text-center mb-10">Satıcı Giriş</h3>
@@ -113,10 +121,7 @@ const LoginPage = () => {
 
           <p className="mt-6 text-center text-sm text-gray-600">
             Hesabınız yok mu?{" "}
-            <Link
-              to="/seller/register"
-              className="text-emerald-600 font-semibold hover:underline"
-            >
+            <Link to="/seller/register" className="text-emerald-600 font-semibold hover:underline">
               Kayıt Ol
             </Link>
           </p>
@@ -126,15 +131,7 @@ const LoginPage = () => {
   );
 };
 
-const FormInput = ({
-  name,
-  value,
-  onChange,
-  placeholder,
-  icon,
-  type = "text",
-  autoComplete,
-}) => (
+const FormInput = ({ name, value, onChange, placeholder, icon, type = "text", autoComplete }) => (
   <div className="flex items-center gap-3 px-4 py-2 rounded-lg bg-[#f0fdfa] border border-[#bde7e3] focus-within:ring-2 ring-[#00d18c] transition">
     {icon}
     <input
