@@ -28,7 +28,7 @@ const SellerHeader = () => {
           >
             Kayıt Ol
           </button>
-        </div>
+        </div>  
 
         <div className="sm:hidden">
           <button
