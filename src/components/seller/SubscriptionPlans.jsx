@@ -4,61 +4,50 @@ import {
   createSubscription,
   checkoutSubscription,
   getCurrentSubscription,
+  getSubscriptionPackages,
 } from "@/api/sellerSubscriptionService";
-
-const plans = [
-  {
-    id: 1,
-    name: "Başlangıç",
-    price: "₺0",
-    description:
-      "Mağazanızı keşfetmeye başlayın, ürünlerinizi listeleyin ve Tedarika'yı deneyin.",
-    features: [
-      "Ücretsiz mağaza açılışı",
-      "Sınırsız ürün listeleme",
-      "Temel istatistik görünümü",
-    ],
-  },
-  {
-    id: 2,
-    name: "Standart",
-    price: "₺299",
-    highlight: true,
-    description:
-      "Markanızı yansıtın, satışlarınızı artırın ve işinizi büyütün.",
-    features: [
-      "Gelişmiş raporlar",
-      "Özel mağaza sayfası",
-      "Stok & fiyat yönetimi",
-    ],
-  },
-  {
-    id: 3,
-    name: "Premium",
-    price: "₺499",
-    description: "En yüksek verimlilik ve destekle tüm gücümüz yanınızda.",
-    features: ["Asistan hesapları", "Kampanya yönetimi", "Özel destek"],
-  },
-];
+import { apiRequest } from "@/api/apiRequest";
 
 export default function SubscriptionPlans() {
   const [loadingId, setLoadingId] = useState(null);
   const [subscription, setSubscription] = useState(null);
+  const [plans, setPlans] = useState([]);
+  const [loading, setLoading] = useState(true);
 
+  // 🧩 Abonelik planlarını ve mevcut aboneliği birlikte çek
   useEffect(() => {
     (async () => {
       try {
-        const sub = await getCurrentSubscription();
-        setSubscription(sub);
+        const [packageList, currentSub] = await Promise.all([
+          getSubscriptionPackages(),
+          getCurrentSubscription().catch(() => null), // hata olursa null dön
+        ]);
+        setPlans(packageList || []);
+        setSubscription(currentSub || null);
       } catch (error) {
-        console.error("Abonelik durumu alınamadı:", error);
+        console.error("Abonelik bilgileri alınamadı:", error);
+        toast.error("Abonelik planları yüklenemedi.");
+      } finally {
+        setLoading(false);
       }
     })();
   }, []);
 
+  // 💳 Abone olma işlemi
   const handleSubscribe = async (packageId, period = "Yearly") => {
     setLoadingId(packageId);
     try {
+      const selectedPlan = plans.find((p) => p.id === packageId);
+
+      // 🧩 Ücretsiz plan
+      if (selectedPlan?.isFree || selectedPlan?.price === 0) {
+        await createSubscription(packageId, period);
+        toast.success("Ücretsiz abonelik başarıyla başlatıldı 🎉");
+        window.location.reload();
+        return;
+      }
+
+      // 💳 Ücretli plan
       const created = await createSubscription(packageId, period);
       const subscriptionId = created?.subscriptionId || created?.id;
 
@@ -73,13 +62,20 @@ export default function SubscriptionPlans() {
       window.location.href = paymentUrl;
     } catch (err) {
       console.error("Abonelik başlatılamadı:", err);
-      toast.error(
-        err?.message || "İşlem sırasında beklenmedik bir hata oluştu."
-      );
+      toast.error(err?.message || "İşlem sırasında beklenmedik bir hata oluştu.");
     } finally {
       setLoadingId(null);
     }
   };
+
+  // ⏳ Yükleme durumu
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center py-20">
+        <p className="text-gray-600 animate-pulse">Planlar yükleniyor...</p>
+      </div>
+    );
+  }
 
   // ✅ Aktif abonelik varsa
   if (subscription?.isActive) {
@@ -105,7 +101,7 @@ export default function SubscriptionPlans() {
     );
   }
 
-  // 🔄 Süresi dolmuşsa
+  // 🔄 Abonelik var ama pasifse (süresi dolmuş)
   if (subscription && !subscription.isActive) {
     return (
       <div className="bg-white p-8 rounded-2xl shadow text-center border border-red-200">
@@ -130,7 +126,7 @@ export default function SubscriptionPlans() {
     );
   }
 
-  // 📦 Aboneliği olmayan kullanıcılar için plan listesi
+  // 📦 Hiç abonelik yoksa → plan listesi
   return (
     <div className="py-10 bg-gradient-to-b from-green-50 to-white text-gray-800 rounded-2xl shadow-sm">
       <h2 className="text-3xl font-extrabold text-center mb-2 text-[#003636]">
@@ -141,47 +137,61 @@ export default function SubscriptionPlans() {
       </p>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 px-6 md:px-10 max-w-6xl mx-auto">
-        {plans.map((plan) => (
-          <div
-            key={plan.id}
-            className={`relative p-6 rounded-2xl border transition duration-300 hover:shadow-xl ${
-              plan.highlight
-                ? "bg-white border-emerald-500 shadow-lg"
-                : "bg-gray-50 border-gray-200"
-            }`}
-          >
-            {plan.highlight && (
-              <span className="absolute top-0 right-0 mt-4 mr-4 bg-emerald-600 text-white text-xs px-3 py-1 rounded-full font-semibold shadow">
-                En Popüler
-              </span>
-            )}
-
-            <h3 className="text-xl font-bold text-emerald-700">{plan.name}</h3>
-            <p className="text-3xl my-4 font-extrabold">{plan.price}</p>
-            <p className="mb-6 text-sm text-gray-600">{plan.description}</p>
-
-            <ul className="text-left text-sm space-y-2 text-gray-700">
-              {plan.features.map((feature, i) => (
-                <li key={i} className="flex items-start">
-                  <span className="text-emerald-600 mr-2">✔</span>
-                  {feature}
-                </li>
-              ))}
-            </ul>
-
-            <button
-              onClick={() => handleSubscribe(plan.id, "SemiAnnual")}
-              disabled={loadingId === plan.id}
-              className={`mt-6 w-full py-2.5 rounded-lg font-semibold text-white transition ${
-                loadingId === plan.id
-                  ? "bg-emerald-400 cursor-wait"
-                  : "bg-emerald-600 hover:bg-emerald-700"
+        {plans.length > 0 ? (
+          plans.map((plan) => (
+            <div
+              key={plan.id}
+              className={`relative p-6 rounded-2xl border transition duration-300 hover:shadow-xl ${
+                plan.isFree
+                  ? "bg-gray-50 border-gray-200"
+                  : "bg-white border-emerald-500 shadow-lg"
               }`}
             >
-              {loadingId === plan.id ? "İşleniyor..." : "Abone Ol"}
-            </button>
-          </div>
-        ))}
+              {plan.isFree && (
+                <span className="absolute top-0 right-0 mt-4 mr-4 bg-emerald-600 text-white text-xs px-3 py-1 rounded-full font-semibold shadow">
+                  Ücretsiz
+                </span>
+              )}
+
+              <h3 className="text-xl font-bold text-emerald-700">{plan.name}</h3>
+              <p className="text-3xl my-4 font-extrabold">
+                ₺{plan.price ?? 0}
+              </p>
+              <p className="mb-6 text-sm text-gray-600">{plan.description}</p>
+
+              <ul className="text-left text-sm space-y-2 text-gray-700">
+                {plan.features?.length > 0 ? (
+                  plan.features.map((feature, i) => (
+                    <li key={i} className="flex items-start">
+                      <span className="text-emerald-600 mr-2">✔</span>
+                      {feature}
+                    </li>
+                  ))
+                ) : (
+                  <li className="text-gray-400 italic">
+                    Özellik bilgisi bulunmuyor.
+                  </li>
+                )}
+              </ul>
+
+              <button
+                onClick={() => handleSubscribe(plan.id, "Yearly")}
+                disabled={loadingId === plan.id}
+                className={`mt-6 w-full py-2.5 rounded-lg font-semibold text-white transition ${
+                  loadingId === plan.id
+                    ? "bg-emerald-400 cursor-wait"
+                    : "bg-emerald-600 hover:bg-emerald-700"
+                }`}
+              >
+                {loadingId === plan.id ? "İşleniyor..." : "Abone Ol"}
+              </button>
+            </div>
+          ))
+        ) : (
+          <p className="text-center text-gray-500 col-span-3">
+            Şu anda sunulacak abonelik planı bulunamadı.
+          </p>
+        )}
       </div>
     </div>
   );
