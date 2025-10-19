@@ -67,7 +67,7 @@ const CompanyCreate = () => {
       await createCompany(payload);
       const confirmed = await hasCompany();
       if (confirmed) {
-        navigate("/seller/subscription");
+        navigate("/seller/dashboard");
       } else {
         setMessage("Sistemsel hata: şirket oluşturuldu ancak görünmüyor.");
       }
