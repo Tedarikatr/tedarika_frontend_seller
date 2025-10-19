@@ -1,3 +1,4 @@
+// src/App.jsx
 import { Routes, Route, Navigate } from "react-router-dom";
 
 // Public seller pages
@@ -33,10 +34,7 @@ import CampaignCreatePage from "@/pages/seller/campaigns/CampaignCreatePage";
 import CampaignDetailPage from "@/pages/seller/campaigns/CampaignDetailPage";
 import ChatPage from "@/pages/seller/chat/ChatPage";
 
-
-
 // Layout & Guards
-import SellerLayout from "@/components/layout/SellerLayout";
 import PrivateRoute from "@/routes/PrivateRoute";
 import SemiPrivateRoute from "@/routes/SemiPrivateRoute";
 import SellerRouteWrapper from "@/components/SellerRouteWrapper";
@@ -45,13 +43,10 @@ function App() {
   return (
     <Routes>
       {/* ── Public seller routes ───────────────────────────── */}
-      {/* Landing'i /seller/landing'e aldık */}
       <Route path="/seller/landing" element={<SellerLandingPage />} />
       <Route path="/seller/register" element={<RegisterPage />} />
       <Route path="/seller/login" element={<LoginPage />} />
       <Route path="/seller/apply" element={<SellerApplicationPage />} />
-
-      {/* /seller kökünü landing'e yönlendir (opsiyonel ama tavsiye) */}
       <Route path="/seller" element={<Navigate to="/seller/landing" replace />} />
 
       {/* ── Subscription (login gerekli; aktif değilse erişilir) ── */}
@@ -64,53 +59,56 @@ function App() {
         }
       />
 
-      {/* ── Protected seller area: TEK kök /seller/* ─────────── */}
+      {/* ── Protected seller area ───────────────────────────── */}
       <Route
         path="/seller/*"
         element={
           <PrivateRoute>
-            <SellerRouteWrapper>
-              <SellerLayout />
-            </SellerRouteWrapper>
+            <SellerRouteWrapper />
           </PrivateRoute>
         }
       >
-        {/* index: /seller → dashboard (korumalı alanda) */}
         <Route index element={<DashboardPage />} />
-
         <Route path="dashboard" element={<DashboardPage />} />
+
+        {/* Firma */}
         <Route path="company/create" element={<CompanyCreate />} />
         <Route path="company-profile" element={<CompanyUpdate />} />
         <Route path="company-documents" element={<SellerCompanyDocuments />} />
 
+        {/* Profil */}
         <Route path="profile" element={<SellerProfilePage />} />
         <Route path="profile/extra-info" element={<SellerExtraInfoPage />} />
 
+        {/* Mağaza */}
         <Route path="store/create" element={<StoreCreate />} />
         <Route path="store/update" element={<StoreUpdate />} />
         <Route path="store/coverage" element={<StoreCoveragePage />} />
 
-        <Route path="reviews" element={<StoreReviewsPage />} />
-        <Route path="products/:productId/reviews" element={<ProductReviewsPage />} />
-
+        {/* Ürünler */}
         <Route path="products/my-store" element={<MyStoreProductsPage />} />
         <Route path="products/database" element={<ProductDatabasePage />} />
         <Route path="products/requests" element={<ProductRequestListPage />} />
         <Route path="products/:storeProductId/images" element={<ProductImagesPage />} />
+        <Route path="products/:productId/reviews" element={<ProductReviewsPage />} />
 
+        {/* Teklifler / Siparişler */}
         <Route path="quotations" element={<SellerQuotationListPage />} />
         <Route path="quotations/:id" element={<QuotationDetailPage />} />
-
         <Route path="orders" element={<OrderListPage />} />
         <Route path="orders/:orderId" element={<OrderDetailPage />} />
+
+        {/* Kampanyalar */}
         <Route path="campaigns" element={<CampaignListPage />} />
-<Route path="campaigns/new" element={<CampaignCreatePage />} />
-<Route path="campaigns/:id" element={<CampaignDetailPage />} />
-<Route path="chat" element={<ChatPage />} /> {/* ✅ eklendi */}
+        <Route path="campaigns/new" element={<CampaignCreatePage />} />
+        <Route path="campaigns/:id" element={<CampaignDetailPage />} />
 
-
+        {/* Diğer */}
+        <Route path="reviews" element={<StoreReviewsPage />} />
+        <Route path="chat" element={<ChatPage />} />
       </Route>
-      {/* 404 */}
+
+      {/* ── 404 redirect ───────────────────────────── */}
       <Route path="*" element={<Navigate to="/seller/landing" replace />} />
     </Routes>
   );
