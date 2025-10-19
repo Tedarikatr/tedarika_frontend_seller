@@ -1,6 +1,6 @@
 import { apiRequest } from "./apiRequest";
 
-// 1️⃣ Abonelik oluşturma (POST + query parametreleri)
+// 1️⃣ Abonelik oluşturma
 export const createSubscription = (packageId, period = "Yearly") =>
   apiRequest(
     `/SellerSubscription/create?packageId=${packageId}&period=${period}`,
@@ -9,7 +9,7 @@ export const createSubscription = (packageId, period = "Yearly") =>
     true
   );
 
-// 2️⃣ Ödeme sayfası (iyzico checkout linki alma)
+// 2️⃣ Ödeme sayfası (iyzico)
 export const checkoutSubscription = (subscriptionId) =>
   apiRequest(
     `/SellerSubscription/checkout?subscriptionId=${subscriptionId}`,
@@ -18,10 +18,14 @@ export const checkoutSubscription = (subscriptionId) =>
     true
   );
 
-// 3️⃣ Mevcut aktif abonelik kontrolü
+// 3️⃣ Aktif abonelik kontrolü
 export const getCurrentSubscription = () =>
   apiRequest("/SellerSubscription/current", "GET", null, true);
 
-// 4️⃣ Kullanıcının tüm geçmiş aboneliklerini getir
+// 4️⃣ Tüm geçmiş abonelikler
 export const getMySubscriptions = () =>
   apiRequest("/SellerSubscription/my-subscriptions", "GET", null, true);
+
+// 5️⃣ 📦 Abonelik paketleri (dinamik plans)
+export const getSubscriptionPackages = () =>
+  apiRequest("/SellerSubscription/packages", "GET", null, true);
