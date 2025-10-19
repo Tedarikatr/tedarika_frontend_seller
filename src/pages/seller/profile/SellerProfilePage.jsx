@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   AlertTriangle,
@@ -16,8 +16,8 @@ import { DOC_LABELS } from "@/constants/companyDocuments";
 import SellerInfoCard from "@/components/seller/SellerInfoCard";
 import StoreInfoCard from "@/components/seller/StoreInfoCard";
 import CompanyInfoCard from "@/components/seller/CompanyInfoCard";
-import SubscriptionInfoCard from "@/components/seller/SubscriptionInfoCard";
 import SellerFinanceInfoCard from "@/components/seller/SellerFinanceInfoCard";
+import SubscriptionPlans from "@/components/seller/SubscriptionPlans"; // 👈 SubscriptionPage’den çıkarılıp component olarak kaydedilecek
 
 const TABS = [
   { key: "seller", label: "Satıcı", icon: <UserCircle className="w-5 h-5" /> },
@@ -28,9 +28,14 @@ const TABS = [
 ];
 
 const SellerProfilePage = () => {
-  const [activeTab, setActiveTab] = useState("seller");
   const nav = useNavigate();
   const { loading, hasExtraInfo, missingDocs } = useSellerSetupStatus();
+  const isSubscribed =
+    localStorage.getItem("sellerSubscriptionActive") === "true";
+
+  const [activeTab, setActiveTab] = useState(
+    isSubscribed ? "seller" : "subscription"
+  );
 
   const renderActiveCard = () => {
     switch (activeTab) {
@@ -41,7 +46,7 @@ const SellerProfilePage = () => {
       case "store":
         return <StoreInfoCard />;
       case "subscription":
-        return <SubscriptionInfoCard />;
+        return <SubscriptionPlans />; // 👈 burada planlar gösteriliyor
       case "finance":
         return <SellerFinanceInfoCard />;
       default:
@@ -51,15 +56,16 @@ const SellerProfilePage = () => {
 
   return (
     <div className="min-h-screen bg-[#f9fafa] px-4 sm:px-6 lg:px-16 py-10">
-      {/* Üst uyarılar */}
+      {/* Uyarılar */}
       <div className="max-w-6xl mx-auto space-y-3 mb-8">
         {!loading && !hasExtraInfo && (
           <div className="flex items-start gap-3 p-4 rounded-xl border border-amber-200 bg-amber-50 text-amber-800">
             <AlertTriangle className="w-5 h-5 mt-0.5" />
             <div className="flex-1">
-              <div className="font-semibold">Ekstra şirket bilgileri eksik</div>
+              <div className="font-semibold">Ekstra bilgiler eksik</div>
               <p className="text-sm mt-0.5">
-                KEP adresi, yetkili kişi ve yetkili telefon bilgilerini eklemeniz gerekir.
+                KEP adresi, yetkili kişi ve yetkili telefon bilgilerini
+                eklemeniz gerekir.
               </p>
             </div>
             <button
@@ -90,7 +96,7 @@ const SellerProfilePage = () => {
         )}
       </div>
 
-      {/* Hero Başlık + Sekmeler */}
+      {/* Başlık + Sekmeler */}
       <header className="mb-12 relative bg-gradient-to-r from-[#e9f0ee] to-[#f3f8f7] rounded-2xl shadow px-6 py-12 sm:px-12 text-center">
         <h1 className="text-5xl font-extrabold text-[#003636] tracking-tight mb-3">
           Satıcı Profil Paneli
