@@ -6,6 +6,7 @@ import {
   getCurrentSubscription,
   getSubscriptionPackages,
 } from "@/api/sellerSubscriptionService";
+import { refreshToken } from "@/api/sellerAuthService"; // 🔥 eklendi
 
 export default function SubscriptionPlans() {
   const [loadingId, setLoadingId] = useState(null);
@@ -39,16 +40,20 @@ export default function SubscriptionPlans() {
     try {
       const selectedPlan = plans.find((p) => p.id === packageId);
 
-      // Ücretsiz plan
+      // 🆓 Ücretsiz plan
       if (selectedPlan?.isFree || selectedPlan?.price === 0) {
         await createSubscription(packageId);
         toast.success("Ücretsiz abonelik başlatıldı 🎉");
+
+        // 🔁 Token yenile
+        await handleTokenRefresh();
+
         const current = await getCurrentSubscription();
         setSubscription(current);
         return;
       }
 
-      // Ücretli plan
+      // 💰 Ücretli plan
       const created = await createSubscription(packageId);
       const subscriptionId = created?.subscriptionId || created?.id;
 
@@ -66,6 +71,41 @@ export default function SubscriptionPlans() {
       toast.error(err?.message || "İşlem sırasında hata oluştu.");
     } finally {
       setLoadingId(null);
+    }
+  };
+
+  // 🔁 Token yenileme
+  const handleTokenRefresh = async () => {
+    try {
+      const token = localStorage.getItem("sellerToken");
+      if (!token) throw new Error("Mevcut token bulunamadı.");
+
+      // API body formatı: { token: "string" }
+      const refreshed = await refreshToken({ token });
+
+      if (refreshed?.token) {
+        localStorage.setItem("sellerToken", refreshed.token);
+
+        // Ek alanlar varsa (backend’e göre)
+        if (refreshed?.subscriptionActive !== undefined)
+          localStorage.setItem(
+            "sellerSubscriptionActive",
+            String(refreshed.subscriptionActive)
+          );
+        if (refreshed?.isthesystemactive !== undefined)
+          localStorage.setItem(
+            "sellerSystemActive",
+            String(refreshed.isthesystemactive || refreshed.Status)
+          );
+
+        toast.success("Token yenilendi ✅");
+        setTimeout(() => window.location.reload(), 1200);
+      } else {
+        toast.error("Token yenilenemedi. Lütfen tekrar giriş yapın.");
+      }
+    } catch (err) {
+      console.error("Token yenileme hatası:", err);
+      toast.error("Token yenileme başarısız. Lütfen tekrar giriş yapın.");
     }
   };
 
