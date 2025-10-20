@@ -1,9 +1,9 @@
 import { apiRequest } from "./apiRequest";
 
-// 1️⃣ Abonelik oluşturma
-export const createSubscription = (packageId, period = "Yearly") =>
+// 1️⃣ Abonelik oluşturma (period kaldırıldı)
+export const createSubscription = (packageId) =>
   apiRequest(
-    `/SellerSubscription/create?packageId=${packageId}&period=${period}`,
+    `/SellerSubscription/create?packageId=${packageId}`,
     "POST",
     null,
     true
