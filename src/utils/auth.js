@@ -1,5 +1,4 @@
 // src/utils/auth.js
-
 export function getDecodedSellerPayload() {
   const raw =
     localStorage.getItem("sellerToken") || sessionStorage.getItem("sellerToken");
@@ -9,14 +8,19 @@ export function getDecodedSellerPayload() {
     const payload = JSON.parse(atob(raw.split(".")[1]));
     const now = Math.floor(Date.now() / 1000);
 
-    // Süresi dolmuşsa temizle
+    // ⏰ Süresi dolmuşsa temizle
     if (payload.exp && payload.exp < now) {
       localStorage.removeItem("sellerToken");
       sessionStorage.removeItem("sellerToken");
       return null;
     }
 
-    // ✅ Normalize alan isimleri (backend farklarını kapatır)
+    // 🧩 features içeriğini ana objeye merge et
+    if (payload.features && typeof payload.features === "object") {
+      Object.assign(payload, payload.features);
+    }
+
+    // 🔧 Normalize alan isimleri (bütün varyasyonları kapsa)
     payload.subscriptionActive =
       payload.subscriptionActive ??
       payload.SubscriptionActive ??
@@ -24,21 +28,22 @@ export function getDecodedSellerPayload() {
       false;
 
     payload.isSystemActive =
+      payload.isSystemActive ??
       payload.isTheSystemActive ??
       payload.IsTheSystemActive ??
       payload.isthesystemactive ??
       false;
+
+    // 🔁 Uyumluluk için eski isimleri de ata
+    payload.isthesystemactive = payload.isSystemActive;
+    payload.SubscriptionActive = payload.subscriptionActive;
+
+    // 🔍 Log (görmek için)
+    console.log("🧩 Decoded Seller Payload:", payload);
 
     return payload;
   } catch (err) {
     console.error("Token decode hatası:", err);
     return null;
   }
-}
-
-// Basit doğrulama (ekstra kontrol için)
-export function isSellerAuthenticated() {
-  const payload = getDecodedSellerPayload();
-  if (!payload) return false;
-  return true;
 }
