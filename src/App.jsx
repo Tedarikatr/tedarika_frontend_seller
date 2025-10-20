@@ -33,8 +33,8 @@ import CampaignListPage from "@/pages/seller/campaigns/CampaignListPage";
 import CampaignCreatePage from "@/pages/seller/campaigns/CampaignCreatePage";
 import CampaignDetailPage from "@/pages/seller/campaigns/CampaignDetailPage";
 import ChatPage from "@/pages/seller/chat/ChatPage";
-
-// Layout & Guards
+import ChatDebug from "@/pages/seller/chat/ChatDebug";
+import SellerLayout from "@/components/layout/SellerLayout";
 import PrivateRoute from "@/routes/PrivateRoute";
 import SemiPrivateRoute from "@/routes/SemiPrivateRoute";
 import SellerRouteWrapper from "@/components/SellerRouteWrapper";
@@ -97,7 +97,11 @@ function App() {
         <Route path="quotations/:id" element={<QuotationDetailPage />} />
         <Route path="orders" element={<OrderListPage />} />
         <Route path="orders/:orderId" element={<OrderDetailPage />} />
-
+        <Route path="campaigns" element={<CampaignListPage />} />
+        <Route path="campaigns/new" element={<CampaignCreatePage />} />
+        <Route path="campaigns/:id" element={<CampaignDetailPage />} />
+        <Route path="chat" element={<ChatPage />} />
+        <Route path="chat/debug" element={<ChatDebug />} />
         {/* Kampanyalar */}
         <Route path="campaigns" element={<CampaignListPage />} />
         <Route path="campaigns/new" element={<CampaignCreatePage />} />
