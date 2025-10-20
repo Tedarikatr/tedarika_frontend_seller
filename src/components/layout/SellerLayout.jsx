@@ -6,6 +6,7 @@ import { hasCompany } from "@/api/sellerCompanyService";
 import { getMyStore } from "@/api/sellerStoreService";
 import { AlertCircle, Lock } from "lucide-react";
 import { getDecodedSellerPayload } from "@/utils/auth";
+import { toast } from "react-hot-toast";
 
 const SellerLayout = () => {
   const [checking, setChecking] = useState(true);
@@ -21,6 +22,7 @@ const SellerLayout = () => {
     "/seller/logout",
   ];
 
+  // 🧩 Şirket ve mağaza kontrolü
   useEffect(() => {
     const verifySellerState = async () => {
       if (exemptPaths.includes(location.pathname)) {
@@ -40,11 +42,15 @@ const SellerLayout = () => {
           if (!store || !store.id) {
             setShowStoreNotification(true);
           }
-        } catch {
+        } catch (err) {
+          console.warn("Mağaza bilgisi alınamadı:", err);
           setShowStoreNotification(true);
+          if (err?.message?.includes("500"))
+            toast.error("Mağaza bilgisi geçici olarak alınamadı (500).");
         }
       } catch (err) {
         console.error("Yetkili durum kontrolünde hata:", err);
+        toast.error("Satıcı durumu kontrol edilirken hata oluştu.");
       } finally {
         setChecking(false);
       }
@@ -53,21 +59,36 @@ const SellerLayout = () => {
     verifySellerState();
   }, [location.pathname, navigate]);
 
-  // 🔒 Abonelik kontrolü
+  // 🔒 Abonelik ve sistem aktiflik kontrolü
   useEffect(() => {
     const payload = getDecodedSellerPayload();
+    console.log("🧩 Decoded Payload:", payload);
 
-    const isSubscribed =
+    const lsSubscription = localStorage.getItem("sellerSubscriptionActive");
+    const lsSystem = localStorage.getItem("sellerSystemActive");
+
+    const subscriptionActive =
+      payload?.features?.subscriptionActive === true ||
+      payload?.features?.subscriptionActive === "true" ||
       payload?.subscriptionActive === true ||
       payload?.subscriptionActive === "true" ||
-      localStorage.getItem("sellerSubscriptionActive") === "true";
+      payload?.SubscriptionActive === true ||
+      payload?.SubscriptionActive === "true" ||
+      lsSubscription === "true";
 
-    const isSystemActive =
-      payload?.isthesystemactive === true ||
-      payload?.isthesystemactive === "true" ||
-      localStorage.getItem("sellerSystemActive") === "true";
+    const systemActive =
+      payload?.features?.isthesystemactive === true ||
+      payload?.features?.isthesystemactive === "true" ||
+      payload?.isSystemActive === true ||
+      payload?.isSystemActive === "true" ||
+      payload?.Status === true ||
+      payload?.Status === "true" ||
+      lsSystem === "true";
 
-    setIsRestricted(!isSubscribed || !isSystemActive);
+    console.log("✅ subscriptionActive:", subscriptionActive);
+    console.log("✅ systemActive:", systemActive);
+
+    setIsRestricted(!subscriptionActive || !systemActive);
   }, []);
 
   const handleCreateStore = () => {
@@ -75,6 +96,7 @@ const SellerLayout = () => {
     navigate("/seller/store/create");
   };
 
+  // 🔄 Yükleniyor ekranı
   if (checking) {
     return (
       <div className="h-screen flex items-center justify-center bg-gradient-to-br from-indigo-100 via-purple-100 to-white text-[#003636] text-lg font-semibold animate-pulse">
@@ -83,7 +105,6 @@ const SellerLayout = () => {
     );
   }
 
-  // 🔹 Profil serbest, diğer sayfalar blur + uyarı
   const isProfilePage = location.pathname.startsWith("/seller/profile");
   const shouldShowOverlay = isRestricted && !isProfilePage;
 
@@ -96,7 +117,7 @@ const SellerLayout = () => {
         disabled={shouldShowOverlay}
       />
 
-      {/* Main Content */}
+      {/* Ana içerik */}
       <div className="flex flex-col flex-1 min-w-0 bg-gradient-to-br from-indigo-50 via-purple-50 to-white relative">
         <Topbar onMenuClick={() => setIsSidebarOpen(true)} />
 
@@ -109,7 +130,7 @@ const SellerLayout = () => {
         </main>
       </div>
 
-      {/* 🔒 Abonelik Uyarısı */}
+      {/* 🔒 Abonelik uyarısı */}
       {shouldShowOverlay && (
         <div className="absolute inset-0 flex items-center justify-center bg-white/70 backdrop-blur-sm z-[9999]">
           <div className="bg-white border border-gray-200 shadow-2xl rounded-2xl px-8 py-6 text-center max-w-md">
@@ -122,7 +143,8 @@ const SellerLayout = () => {
               Erişiminiz Sınırlı
             </h3>
             <p className="text-sm text-gray-600 mt-1">
-              Aboneliğiniz aktif değil. Profil sayfasından abonelik planınızı başlatabilirsiniz.
+              Aboneliğiniz veya sistem erişiminiz aktif değil. Profil
+              sayfasından abonelik planınızı başlatabilirsiniz.
             </p>
             <button
               onClick={() => navigate("/seller/profile")}
@@ -134,13 +156,14 @@ const SellerLayout = () => {
         </div>
       )}
 
-      {/* 🔔 Mağaza Uyarısı */}
+      {/* 🔔 Mağaza oluşturma uyarısı */}
       {showStoreNotification && !isRestricted && (
         <div className="fixed top-6 left-1/2 transform -translate-x-1/2 z-[9999] w-[90%] md:w-auto">
           <div className="bg-white border border-yellow-400 shadow-xl rounded-xl px-6 py-4 flex items-center gap-4 animate-fade-in-down backdrop-blur-lg bg-opacity-90">
             <AlertCircle className="w-6 h-6 text-yellow-500" />
             <div className="text-sm text-gray-800 font-medium">
-              Henüz bir mağazanız yok. Satışa başlayabilmek için bir mağaza oluşturmalısınız.
+              Henüz bir mağazanız yok. Satışa başlayabilmek için bir mağaza
+              oluşturmalısınız.
             </div>
             <button
               onClick={handleCreateStore}
