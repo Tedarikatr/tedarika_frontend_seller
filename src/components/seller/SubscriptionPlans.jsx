@@ -12,7 +12,6 @@ export default function SubscriptionPlans() {
   const [subscription, setSubscription] = useState(null);
   const [plans, setPlans] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedPeriod, setSelectedPeriod] = useState({}); // 👈 her plan için ayrı period sakla
 
   // 🎯 Planları ve mevcut aboneliği getir
   useEffect(() => {
@@ -35,7 +34,6 @@ export default function SubscriptionPlans() {
 
   // 💳 Abone ol
   const handleSubscribe = async (packageId) => {
-    const period = selectedPeriod[packageId] || "SemiAnnual";
     setLoadingId(packageId);
 
     try {
@@ -43,7 +41,7 @@ export default function SubscriptionPlans() {
 
       // Ücretsiz plan
       if (selectedPlan?.isFree || selectedPlan?.price === 0) {
-        await createSubscription(packageId, period);
+        await createSubscription(packageId);
         toast.success("Ücretsiz abonelik başlatıldı 🎉");
         const current = await getCurrentSubscription();
         setSubscription(current);
@@ -51,7 +49,7 @@ export default function SubscriptionPlans() {
       }
 
       // Ücretli plan
-      const created = await createSubscription(packageId, period);
+      const created = await createSubscription(packageId);
       const subscriptionId = created?.subscriptionId || created?.id;
 
       if (!subscriptionId) throw new Error("Abonelik oluşturulamadı.");
@@ -136,26 +134,6 @@ export default function SubscriptionPlans() {
               <h3 className="text-xl font-bold text-emerald-700">{plan.name}</h3>
               <p className="text-3xl my-4 font-extrabold">₺{plan.price ?? 0}</p>
               <p className="mb-6 text-sm text-gray-600">{plan.description}</p>
-
-              {/* 🔽 Period seçimi */}
-              <div className="mb-4">
-                <label className="block text-sm font-semibold text-gray-700 mb-1">
-                  Abonelik Süresi
-                </label>
-                <select
-                  value={selectedPeriod[plan.id] || "SemiAnnual"}
-                  onChange={(e) =>
-                    setSelectedPeriod({
-                      ...selectedPeriod,
-                      [plan.id]: e.target.value,
-                    })
-                  }
-                  className="w-full border border-gray-300 rounded-lg p-2 text-sm focus:ring-emerald-500 focus:border-emerald-500"
-                >
-                  <option value="SemiAnnual">6 Aylık</option>
-                  <option value="Yearly">Yıllık</option>
-                </select>
-              </div>
 
               <ul className="text-left text-sm space-y-2 text-gray-700">
                 {plan.features?.length > 0 ? (
