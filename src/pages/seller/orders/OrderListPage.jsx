@@ -3,16 +3,16 @@ import { fetchStoreOrders } from "@/api/sellerOrderService";
 import { Link, useNavigate } from "react-router-dom";
 import { statusLabels } from "@/constants/orderStatus";
 
-// Durum renklerini belirleyen yardımcı
+// 🎨 Durum rengi (nokta)
 const getStatusDotColor = (status) => {
   switch (status) {
     case "Created":
     case "Confirmed":
-      return "bg-green-500";
+      return "bg-gray-700";
     case "Delivered":
-      return "bg-orange-400";
+      return "bg-gray-500";
     case "Cancelled":
-      return "bg-red-500";
+      return "bg-gray-400";
     default:
       return "bg-gray-300";
   }
@@ -45,21 +45,24 @@ const OrderListPage = () => {
   }, [navigate]);
 
   return (
-    <div className="max-w-7xl mx-auto px-6 py-12 space-y-8">
-      <h1 className="text-3xl font-bold text-gray-900 border-b pb-4">Mağaza Siparişleri</h1>
+    <div className="max-w-7xl mx-auto px-6 py-10 space-y-8">
+      <h1 className="text-2xl font-bold text-gray-800 border-b border-gray-300 pb-3">
+        Mağaza Siparişleri
+      </h1>
 
       {loading ? (
-        <div className="bg-white p-6 rounded-xl shadow text-center text-gray-500 animate-pulse">
+        <div className="bg-white p-6 rounded-lg border border-gray-200 text-center text-gray-500 animate-pulse">
           Siparişler yükleniyor...
         </div>
       ) : orders.length === 0 ? (
-        <div className="bg-white p-8 rounded-xl shadow text-center text-gray-600">
+        <div className="bg-white p-8 rounded-lg border border-gray-200 text-center text-gray-600">
           Henüz sipariş bulunmamaktadır.
         </div>
       ) : (
-        <div className="overflow-x-auto rounded-2xl shadow border border-gray-200 bg-white">
-          <table className="min-w-full text-sm divide-y divide-gray-100">
-            <thead className="bg-gray-50 text-gray-700 uppercase text-xs tracking-wider">
+        <div className="overflow-x-auto rounded-lg border border-gray-400 bg-white shadow-sm">
+          <table className="min-w-full border-collapse text-sm text-gray-800">
+            {/* Başlık */}
+            <thead className="bg-gray-100 text-gray-700 text-xs uppercase tracking-wide">
               <tr>
                 <Th>#</Th>
                 <Th>Sipariş No</Th>
@@ -69,7 +72,9 @@ const OrderListPage = () => {
                 <Th className="text-center">İşlem</Th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100 text-gray-800">
+
+            {/* Satırlar */}
+            <tbody>
               {orders.map((order, index) => {
                 const status = statusLabels[order.status] || {
                   text: "Bilinmiyor",
@@ -77,10 +82,13 @@ const OrderListPage = () => {
                 };
 
                 return (
-                  <tr key={order.id} className="hover:bg-gray-50 transition">
+                  <tr
+                    key={order.id}
+                    className="hover:bg-gray-50 transition-colors border-t border-gray-300"
+                  >
                     <Td>{index + 1}</Td>
                     <Td>
-                      <span className="font-semibold text-indigo-700">
+                      <span className="font-semibold text-gray-900">
                         {order.orderNumber}
                       </span>
                     </Td>
@@ -88,7 +96,7 @@ const OrderListPage = () => {
                       {new Date(order.createdAt).toLocaleDateString("tr-TR")}
                     </Td>
                     <Td>
-                      <span className="font-bold text-green-700">
+                      <span className="font-semibold text-gray-800">
                         ₺{order.totalAmount.toFixed(2)}
                       </span>
                     </Td>
@@ -96,9 +104,10 @@ const OrderListPage = () => {
                       <div className="flex items-center gap-2">
                         <span
                           className={`w-2.5 h-2.5 rounded-full ${getStatusDotColor(order.status)}`}
-                          title={order.status}
                         />
-                        <span className={`text-xs font-medium px-3 py-1 rounded-full ${status.color}`}>
+                        <span
+                          className={`text-xs font-medium px-3 py-1 rounded-full ${status.color}`}
+                        >
                           {status.text}
                         </span>
                       </div>
@@ -106,7 +115,7 @@ const OrderListPage = () => {
                     <Td className="text-center">
                       <Link
                         to={`/seller/orders/${order.id}`}
-                        className="text-blue-600 hover:text-blue-800 font-medium text-sm transition"
+                        className="inline-flex items-center justify-center px-3 py-1.5 text-xs font-semibold text-gray-700 border border-gray-300 rounded-md hover:bg-gray-100 transition"
                       >
                         Detay
                       </Link>
@@ -122,14 +131,18 @@ const OrderListPage = () => {
   );
 };
 
-// Yardımcı Table Head bileşeni
+// 🧱 Table Head Hücresi
 const Th = ({ children, className = "" }) => (
-  <th className={`px-5 py-3 text-left ${className}`}>{children}</th>
+  <th
+    className={`px-5 py-3 text-left border border-gray-300 font-semibold ${className}`}
+  >
+    {children}
+  </th>
 );
 
-// Yardımcı Table Cell bileşeni
+// 🧱 Table Data Hücresi
 const Td = ({ children, className = "" }) => (
-  <td className={`px-5 py-4 align-middle ${className}`}>{children}</td>
+  <td className={`px-5 py-4 border border-gray-300 ${className}`}>{children}</td>
 );
 
 export default OrderListPage;
