@@ -11,9 +11,12 @@ const Topbar = ({ onMenuClick }) => {
     try {
       const payload = JSON.parse(atob(token.split(".")[1]));
       setUser({
-        email: payload["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"],
+        email:
+          payload[
+            "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"
+          ],
         sellerId: payload["SellerUserId"],
-        name: payload["UserType"], // İstersen backend'den gelen "name" alanına göre değiştirebilirsin
+        name: payload["UserType"],
       });
     } catch (err) {
       console.error("Token çözümleme hatası:", err);
@@ -26,48 +29,47 @@ const Topbar = ({ onMenuClick }) => {
     "?";
 
   return (
-    <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-md shadow-sm border-b border-gray-200 px-4 md:px-6 py-3">
-      <div className="flex items-center justify-between max-w-7xl mx-auto">
-        {/* Mobile Menu Button */}
-        <button
-          onClick={onMenuClick}
-          className="md:hidden text-gray-600 p-2 hover:bg-gray-100 rounded transition"
-        >
-          <Menu className="w-6 h-6" />
-        </button>
+    <header className="sticky top-0 z-50 w-full bg-white border-b border-gray-200 shadow-sm">
+      <div className="flex items-center justify-between w-full px-6 py-3">
+        {/* Sol Menü Butonu */}
+        <div className="flex items-center gap-3">
+          <button
+            onClick={onMenuClick}
+            className="md:hidden text-gray-600 p-2 hover:bg-gray-100 rounded-md transition"
+          >
+            <Menu className="w-6 h-6" />
+          </button>
 
-        {/* Başlık */}
-        <h1 className="text-lg md:text-xl font-semibold text-gray-800 tracking-tight">
-          Satıcı Paneli
-        </h1>
+          <h1 className="text-xl md:text-2xl font-semibold text-[#003636] tracking-tight select-none">
+            Satıcı Paneli
+          </h1>
+        </div>
 
-        {/* Kullanıcı Bilgisi ve Başvuru */}
-        <div className="flex items-center gap-3 text-sm text-gray-700">
-          {/* Başvuru yapmamış kullanıcılar için buton */}
+        {/* Sağ Taraf */}
+        <div className="flex items-center gap-4">
           {!user?.sellerId && (
             <a
               href="/seller/apply"
-              className="text-sm bg-yellow-400 text-black font-medium px-3 py-1 rounded hover:bg-yellow-500 transition"
+              className="text-sm bg-[#ffc107] text-black font-medium px-4 py-1.5 rounded-md hover:bg-[#ffca2c] transition shadow-sm"
             >
               Başvuru Yap
             </a>
           )}
 
-          {/* Kullanıcı avatarı ve bilgileri */}
           {user && (
             <div className="flex items-center gap-3">
               <div
-                className="w-9 h-9 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold shadow-inner"
+                className="w-10 h-10 flex items-center justify-center bg-[#003636] text-white rounded-full font-semibold shadow-inner"
                 title={user?.email || ""}
               >
                 {initials}
               </div>
               <div className="hidden sm:flex flex-col leading-tight">
                 <span className="font-medium text-gray-800">
-                  {user?.name || "..."}
+                  {user?.name || "Kullanıcı"}
                 </span>
                 <span className="text-xs text-gray-500">
-                  {user?.email || "Yükleniyor..."}
+                  {user?.email || ""}
                 </span>
               </div>
             </div>
