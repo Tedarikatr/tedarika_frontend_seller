@@ -14,7 +14,7 @@ import {
   ChevronLeft,
   Gift,
   MessageCircle
-} from "lucide-react"; // 💬 yeni ikon
+} from "lucide-react";
 import { useState } from "react";
 
 const Sidebar = ({ isOpen, onClose }) => {
@@ -28,13 +28,13 @@ const Sidebar = ({ isOpen, onClose }) => {
 
   return (
     <aside
-      className={`fixed md:static inset-y-0 left-0 z-50 bg-[#002c2c] text-white shadow-xl transform transition-all duration-300 ease-in-out
+      className={`fixed md:static inset-y-0 left-0 z-50 bg-gradient-to-b from-[#003131] to-[#001e1e] text-white shadow-2xl backdrop-blur-md transition-all duration-300 ease-in-out
         ${isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
         ${collapsed ? "w-20" : "w-64"}`}
     >
       <div className="flex flex-col h-full">
         {/* Mobil Başlık */}
-        <div className="flex items-center justify-between md:hidden px-4 py-3 border-b border-white/10 bg-[#002c2c]">
+        <div className="flex items-center justify-between md:hidden px-4 py-3 border-b border-white/10 bg-[#003131]">
           <span className="text-xl font-bold tracking-tight">Tedarika</span>
           <button onClick={onClose} className="hover:scale-110 transition">
             <X className="w-5 h-5 text-white" />
@@ -44,29 +44,37 @@ const Sidebar = ({ isOpen, onClose }) => {
         {/* Logo & Collapse */}
         <div className="hidden md:flex items-center justify-between px-4 py-4 border-b border-white/10">
           <div className="flex items-center gap-2">
-            <Store size={22} />
-            {!collapsed && <span className="text-xl font-extrabold">Tedarika</span>}
+            <Store size={22} className="text-emerald-400" />
+            {!collapsed && (
+              <span className="text-xl font-extrabold tracking-wide text-emerald-300">
+                Tedarika
+              </span>
+            )}
           </div>
           <button
             onClick={() => setCollapsed(!collapsed)}
             className="p-1 rounded-lg hover:bg-white/10 transition"
           >
-            {collapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
+            {collapsed ? (
+              <ChevronRight size={20} className="text-white/70" />
+            ) : (
+              <ChevronLeft size={20} className="text-white/70" />
+            )}
           </button>
         </div>
 
         {/* Menü */}
-        <div className="flex-1 overflow-y-auto px-2 py-6 text-sm custom-scrollbar">
+        <div className="flex-1 overflow-y-auto px-3 py-6 text-sm custom-scrollbar space-y-1">
           <SidebarLink to="/seller/dashboard" icon={<Home size={18} />} collapsed={collapsed} onClick={onClose}>
             Dashboard
           </SidebarLink>
 
-          <SectionTitle title="Mağaza Yönetimi" collapsed={collapsed} />
+          <SectionTitle title="MAĞAZA YÖNETİMİ" collapsed={collapsed} />
           <SidebarLink to="/seller/store/coverage" icon={<MapPin size={18} />} collapsed={collapsed} onClick={onClose}>
             Lokasyonlarım
           </SidebarLink>
 
-          <SectionTitle title="Ürünler" collapsed={collapsed} />
+          <SectionTitle title="ÜRÜNLER" collapsed={collapsed} />
           <SidebarLink to="/seller/products/my-store" icon={<Package size={18} />} collapsed={collapsed} onClick={onClose}>
             Ürünlerim
           </SidebarLink>
@@ -77,7 +85,7 @@ const Sidebar = ({ isOpen, onClose }) => {
             Başvurularım
           </SidebarLink>
 
-          <SectionTitle title="İşlemler" collapsed={collapsed} />
+          <SectionTitle title="İŞLEMLER" collapsed={collapsed} />
           <SidebarLink to="/seller/orders" icon={<ShoppingCart size={18} />} collapsed={collapsed} onClick={onClose}>
             Siparişler
           </SidebarLink>
@@ -93,22 +101,21 @@ const Sidebar = ({ isOpen, onClose }) => {
             Yorumlar
           </SidebarLink>
 
-          {/* 💬 Yeni: Chat (Mesajlar) */}
           <SidebarLink to="/seller/chat" icon={<MessageCircle size={18} />} collapsed={collapsed} onClick={onClose}>
             Mesajlar
           </SidebarLink>
 
-          <SectionTitle title="Hesap" collapsed={collapsed} />
+          <SectionTitle title="HESAP" collapsed={collapsed} />
           <SidebarLink to="/seller/profile" icon={<Settings size={18} />} collapsed={collapsed} onClick={onClose}>
             Profil
           </SidebarLink>
         </div>
 
         {/* Çıkış */}
-        <div className="px-2 py-5 border-t border-white/10">
+        <div className="px-3 py-5 border-t border-white/10">
           <button
             onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-red-300 hover:text-white hover:bg-white/10 text-sm transition-all"
+            className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-red-400 hover:text-white hover:bg-red-500/20 text-sm transition-all"
           >
             <LogOut size={18} />
             {!collapsed && <span>Çıkış</span>}
@@ -127,8 +134,8 @@ const SidebarLink = ({ to, icon, children, onClick, collapsed }) => (
     className={({ isActive }) =>
       `flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-all group ${
         isActive
-          ? "bg-white/20 text-white font-semibold shadow-inner"
-          : "text-white/80 hover:text-white hover:bg-white/10"
+          ? "bg-emerald-500/30 text-white shadow-inner"
+          : "text-white/80 hover:text-white hover:bg-emerald-500/10"
       }`
     }
   >
