@@ -5,7 +5,7 @@ const MyStoreProductTable = ({ products, onRefresh, onFeedback, hasCoverage }) =
   if (!products.length) {
     return (
       <div className="p-10 text-center">
-        <div className="inline-flex items-center gap-3 px-5 py-3 rounded-2xl bg-emerald-50 text-emerald-700 font-medium shadow-sm">
+        <div className="inline-flex items-center gap-3 px-5 py-3 rounded-2xl bg-gray-100 text-gray-700 font-medium shadow-sm">
           Mağazanıza ait ürün bulunmuyor.
         </div>
       </div>
@@ -13,29 +13,31 @@ const MyStoreProductTable = ({ products, onRefresh, onFeedback, hasCoverage }) =
   }
 
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-gray-200 shadow-[0_6px_30px_-12px_rgba(0,0,0,0.15)] bg-white">
+    <div className="relative overflow-hidden rounded-lg border border-gray-400 bg-white shadow-sm">
       <div className="overflow-x-auto">
-        <table className="min-w-full text-sm text-gray-800">
-          <thead className="sticky top-0 z-10 bg-gradient-to-b from-emerald-50 to-white/60 backdrop-blur supports-[backdrop-filter]:backdrop-blur border-b">
-            <tr className="text-[12px] uppercase tracking-wider text-emerald-800">
-              <th className="px-6 py-4 text-left">Ürün</th>
-              <th className="px-6 py-4 text-left">Kategori</th>
-              <th className="px-6 py-4 text-left">Fiyat</th>
-              <th className="px-6 py-4 text-left">Limit</th>
-              <th className="px-6 py-4 text-left">Görseller</th>
-              <th className="px-6 py-4 text-left">Durum</th>
-              <th className="px-6 py-4 text-left">Stok</th>
-              <th className="px-6 py-4 text-left">İşlemler</th>
+        <table className="min-w-full border-collapse text-sm text-gray-800">
+          {/* Başlık */}
+          <thead className="bg-gray-100 border-b border-gray-400">
+            <tr className="text-[13px] font-semibold text-gray-700 uppercase tracking-wide">
+              <th className="border border-gray-400 px-6 py-3 text-left">Ürün</th>
+              <th className="border border-gray-400 px-6 py-3 text-left">Kategori</th>
+              <th className="border border-gray-400 px-6 py-3 text-left">Fiyat</th>
+              <th className="border border-gray-400 px-6 py-3 text-left">Limit</th>
+              <th className="border border-gray-400 px-6 py-3 text-left">Görseller</th>
+              <th className="border border-gray-400 px-6 py-3 text-left">Durum</th>
+              <th className="border border-gray-400 px-6 py-3 text-left">Stok</th>
+              <th className="border border-gray-400 px-6 py-3 text-left">İşlemler</th>
             </tr>
           </thead>
 
+          {/* Satırlar */}
           <tbody>
             {products.map((product, index) => (
               <tr
                 key={product.id}
-                className={`group transition-colors ${
-                  index % 2 ? "bg-white" : "bg-gray-50/50"
-                } hover:bg-emerald-50/40`}
+                className={`transition-colors ${
+                  index % 2 === 0 ? "bg-white" : "bg-gray-50"
+                } hover:bg-gray-100`}
               >
                 <ProductRow
                   product={product}
