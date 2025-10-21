@@ -4,8 +4,11 @@ import {
 } from "recharts";
 import { useEffect, useState } from "react";
 import { getDashboardSummary, getWeeklyFinance } from "@/api/sellerFinanceService";
+import { getMyStore } from "@/api/sellerStoreService";
 import { motion } from "framer-motion";
 import { FaBoxOpen, FaLiraSign, FaTruck, FaBan, FaClipboardList, FaCheckCircle } from "react-icons/fa";
+import { AlertCircle } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const COLORS = ["#00A982", "#74D6BA", "#E2F0EA"];
 
@@ -21,39 +24,85 @@ const iconMap = {
 const DashboardPage = () => {
   const [summary, setSummary] = useState(null);
   const [weeklyChart, setWeeklyChart] = useState([]);
+  const [hasStore, setHasStore] = useState(true);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const dashboard = await getDashboardSummary();
-        setSummary(dashboard);
+        const store = await getMyStore();
+        if (!store || !store.id) {
+          setHasStore(false);
+          setLoading(false);
+          return;
+        }
 
-        const weekly = await getWeeklyFinance();
+        const dashboard = await getDashboardSummary().catch(() => null);
+        const weekly = await getWeeklyFinance().catch(() => ({}));
+
+        setSummary(dashboard || {});
         setWeeklyChart([
-          { name: "Bu Hafta", value: weekly.totalAmount || 0 },
-          { name: "Sipariş", value: weekly.totalOrders || 0 },
+          { name: "Bu Hafta", value: weekly?.totalAmount || 0 },
+          { name: "Sipariş", value: weekly?.totalOrders || 0 },
         ]);
       } catch (err) {
-        console.error("Finans verileri alınamadı:", err);
+        console.error("Dashboard verileri alınamadı:", err);
+        setHasStore(false); // hata alınırsa mağaza yok gibi davran
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchData();
   }, []);
 
-  if (!summary) {
+  if (loading) {
     return (
-      <div className="p-10 text-center text-gray-500 text-lg animate-pulse">Yükleniyor...</div>
+      <div className="p-10 text-center text-gray-500 text-lg animate-pulse">
+        Yükleniyor...
+      </div>
     );
   }
 
+  if (!hasStore) {
+    return (
+      <div className="min-h-[70vh] flex flex-col items-center justify-center text-center bg-gradient-to-br from-[#e6f4f1] via-[#f1f9f7] to-[#f9fdfc] px-6">
+        <div className="bg-white border border-yellow-400 shadow-xl rounded-2xl px-8 py-6 max-w-lg flex flex-col items-center gap-3">
+          <AlertCircle className="w-10 h-10 text-yellow-500" />
+          <h2 className="text-xl font-semibold text-gray-800">
+            Henüz bir mağazanız yok
+          </h2>
+          <p className="text-sm text-gray-600">
+            Satışa başlayabilmek için bir mağaza oluşturmalısınız.
+          </p>
+          <button
+            onClick={() => navigate("/seller/store/create")}
+            className="mt-3 bg-yellow-500 hover:bg-yellow-600 text-white text-sm font-semibold px-5 py-2 rounded-lg transition"
+          >
+            Mağaza Oluştur
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const safeSummary = {
+    totalOrders: summary?.totalOrders ?? 0,
+    activeProducts: summary?.activeProducts ?? 0,
+    totalRevenue: summary?.totalRevenue ?? 0,
+    pendingShipments: summary?.pendingShipments ?? 0,
+    cancelledOrders: summary?.cancelledOrders ?? 0,
+    pendingOffers: summary?.pendingOffers ?? 0,
+  };
+
   const stats = [
-    { title: "Toplam Sipariş", value: summary.totalOrders },
-    { title: "Aktif Ürün", value: summary.activeProducts },
-    { title: "Toplam Gelir", value: `₺${summary.totalRevenue}` },
-    { title: "Bekleyen Kargo", value: summary.pendingShipments },
-    { title: "İptal Edilen", value: summary.cancelledOrders },
-    { title: "Bekleyen Teklif", value: summary.pendingOffers },
+    { title: "Toplam Sipariş", value: safeSummary.totalOrders },
+    { title: "Aktif Ürün", value: safeSummary.activeProducts },
+    { title: "Toplam Gelir", value: `₺${safeSummary.totalRevenue}` },
+    { title: "Bekleyen Kargo", value: safeSummary.pendingShipments },
+    { title: "İptal Edilen", value: safeSummary.cancelledOrders },
+    { title: "Bekleyen Teklif", value: safeSummary.pendingOffers },
   ];
 
   return (
@@ -93,11 +142,7 @@ const DashboardPage = () => {
         animate="visible"
         variants={{
           hidden: {},
-          visible: {
-            transition: {
-              staggerChildren: 0.2,
-            },
-          },
+          visible: { transition: { staggerChildren: 0.2 } },
         }}
       >
         {/* Line Chart */}
@@ -147,12 +192,12 @@ const DashboardPage = () => {
                   {
                     name: "Tamamlanan",
                     value:
-                      summary.totalOrders -
-                      summary.pendingShipments -
-                      summary.cancelledOrders,
+                      safeSummary.totalOrders -
+                      safeSummary.pendingShipments -
+                      safeSummary.cancelledOrders,
                   },
-                  { name: "Bekleyen", value: summary.pendingShipments },
-                  { name: "İptal", value: summary.cancelledOrders },
+                  { name: "Bekleyen", value: safeSummary.pendingShipments },
+                  { name: "İptal", value: safeSummary.cancelledOrders },
                 ]}
                 cx="50%"
                 cy="50%"
