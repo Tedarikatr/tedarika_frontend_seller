@@ -20,14 +20,14 @@ const StoreCreate = () => {
     (async () => {
       try {
         const res = await getAllCategories();
-        const arr = Array.isArray(res) ? res : (res?.items || []);
+        const arr = Array.isArray(res) ? res : res?.items || [];
         const normalized = arr.map((c) => ({
           id: Number(c.id ?? c.Id),
           name: String(c.name ?? c.Name ?? ""),
         }));
         setCategories(normalized);
       } catch {
-        setMessage("❌ Kategoriler alınamadı.");
+        setMessage("Kategoriler alınamadı.");
       }
     })();
   }, []);
@@ -52,97 +52,120 @@ const StoreCreate = () => {
     e.preventDefault();
     if (submitting) return;
 
-    // Basit validasyon
-    if (!form.storeName.trim()) return setMessage("❌ Mağaza adı zorunludur.");
-    if (!form.logoFile) return setMessage("❌ Logo zorunludur.");
-    if (!form.categoryIds.length) return setMessage("❌ En az bir kategori seçiniz.");
-    if (form.logoFile && !form.logoFile.type.startsWith("image/")) {
-      return setMessage("❌ Logo için geçerli bir görsel seçiniz.");
-    }
-    if (form.bannerFile && !form.bannerFile.type.startsWith("image/")) {
-      return setMessage("❌ Banner için geçerli bir görsel seçiniz.");
-    }
+    if (!form.storeName.trim()) return setMessage("Mağaza adı zorunludur.");
+    if (!form.logoFile) return setMessage("Logo zorunludur.");
+    if (!form.categoryIds.length) return setMessage("En az bir kategori seçiniz.");
+    if (form.logoFile && !form.logoFile.type.startsWith("image/"))
+      return setMessage("Logo için geçerli bir görsel seçiniz.");
+    if (form.bannerFile && !form.bannerFile.type.startsWith("image/"))
+      return setMessage("Banner için geçerli bir görsel seçiniz.");
 
     try {
       setSubmitting(true);
       setMessage("Mağaza oluşturuluyor...");
       await createStore(form);
-
-      // Sende /seller/store route'u yok; /seller/store/update var.
       navigate("/seller/store/update", { replace: true });
     } catch {
-      setMessage("❌ Mağaza oluşturulamadı.");
+      setMessage("Mağaza oluşturulamadı.");
     } finally {
       setSubmitting(false);
     }
   };
 
   return (
-    <div className="max-w-2xl mx-auto p-6">
-      <h2 className="text-3xl font-bold text-center text-[#003636] mb-8">
-        Mağaza Oluştur
-      </h2>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#e8f5f5] to-[#ffffff] px-4 py-10">
+      <div className="w-full max-w-3xl bg-white shadow-xl rounded-2xl p-10 border border-gray-100">
+        <h2 className="text-4xl font-bold text-center text-[#003636] mb-10 tracking-tight">
+          Mağaza Oluştur
+        </h2>
 
-      {message && (
-        <div className="mb-6 text-sm px-4 py-3 border rounded-md bg-yellow-50 text-yellow-800 border-yellow-300 text-center">
-          {message}
-        </div>
-      )}
+        {message && (
+          <div className="mb-8 text-sm px-4 py-3 rounded-lg bg-gray-50 border border-gray-300 text-center text-gray-700">
+            {message}
+          </div>
+        )}
 
-      <form onSubmit={handleSubmit} className="grid gap-5 bg-white p-6 rounded-xl shadow-md">
-        <input
-          name="storeName"
-          value={form.storeName}
-          onChange={handleChange}
-          placeholder="Mağaza Adı *"
-          className="p-3 border rounded-md"
-        />
-
-        <textarea
-          name="storeDescription"
-          value={form.storeDescription}
-          onChange={handleChange}
-          placeholder="Mağaza Açıklaması"
-          className="p-3 border rounded-md"
-        />
-
-        <div>
-          <label className="text-sm font-semibold">Logo (zorunlu)</label>
-          <input type="file" accept="image/*" onChange={(e) => handleFileChange(e, "logoFile")} />
-        </div>
-
-        <div>
-          <label className="text-sm font-semibold">Banner (opsiyonel)</label>
-          <input type="file" accept="image/*" onChange={(e) => handleFileChange(e, "bannerFile")} />
-        </div>
-
-        <div>
-          <label className="text-sm font-semibold">Kategoriler</label>
-          <select
-            multiple
-            value={form.categoryIds}
-            onChange={handleCategoryChange}
-            className="w-full border p-2 rounded-md"
-          >
-            {categories.map((cat) => (
-              <option key={cat.id} value={cat.id}>
-                {cat.name}
-              </option>
-            ))}
-          </select>
-          <p className="text-xs text-gray-500 mt-1">
-            Birden fazla kategori seçmek için <kbd>Ctrl</kbd>/<kbd>Cmd</kbd> tuşunu kullanın.
-          </p>
-        </div>
-
-        <button
-          type="submit"
-          disabled={submitting}
-          className="bg-[#003636] hover:bg-[#004848] text-white font-semibold py-2 rounded-lg disabled:opacity-60"
+        <form
+          onSubmit={handleSubmit}
+          className="grid gap-6 text-gray-700"
         >
-          {submitting ? "İşleniyor..." : "Mağazayı Oluştur"}
-        </button>
-      </form>
+          <div>
+            <label className="block text-sm font-semibold mb-2">Mağaza Adı *</label>
+            <input
+              name="storeName"
+              value={form.storeName}
+              onChange={handleChange}
+              placeholder="Mağaza adınızı girin"
+              className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#003636]"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold mb-2">Mağaza Açıklaması</label>
+            <textarea
+              name="storeDescription"
+              value={form.storeDescription}
+              onChange={handleChange}
+              placeholder="Kısa bir açıklama ekleyin"
+              rows={4}
+              className="w-full p-3 border border-gray-300 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-[#003636]"
+            />
+          </div>
+
+          <div className="grid sm:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-sm font-semibold mb-2">
+                Logo (zorunlu)
+              </label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => handleFileChange(e, "logoFile")}
+                className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-[#003636]"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold mb-2">
+                Banner (isteğe bağlı)
+              </label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => handleFileChange(e, "bannerFile")}
+                className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-[#003636]"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold mb-2">Kategoriler *</label>
+            <select
+              multiple
+              value={form.categoryIds}
+              onChange={handleCategoryChange}
+              className="w-full border border-gray-300 p-3 rounded-md focus:outline-none focus:ring-2 focus:ring-[#003636]"
+            >
+              {categories.map((cat) => (
+                <option key={cat.id} value={cat.id}>
+                  {cat.name}
+                </option>
+              ))}
+            </select>
+            <p className="text-xs text-gray-500 mt-2">
+              Birden fazla kategori seçmek için <kbd>Ctrl</kbd> veya <kbd>Cmd</kbd> tuşunu basılı tutun.
+            </p>
+          </div>
+
+          <button
+            type="submit"
+            disabled={submitting}
+            className="mt-4 w-full bg-[#003636] hover:bg-[#004848] text-white font-semibold py-3 rounded-lg transition-all duration-200 disabled:opacity-60"
+          >
+            {submitting ? "İşleniyor..." : "Mağazayı Oluştur"}
+          </button>
+        </form>
+      </div>
     </div>
   );
 };
