@@ -6,7 +6,7 @@ import {
   getCurrentSubscription,
   getSubscriptionPackages,
 } from "@/api/sellerSubscriptionService";
-import { refreshToken } from "@/api/sellerAuthService"; // 🔥 eklendi
+import { refreshToken } from "@/api/sellerAuthService";
 
 export default function SubscriptionPlans() {
   const [loadingId, setLoadingId] = useState(null);
@@ -14,7 +14,7 @@ export default function SubscriptionPlans() {
   const [plans, setPlans] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // 🎯 Planları ve mevcut aboneliği getir
+  // Planları ve mevcut aboneliği getir
   useEffect(() => {
     (async () => {
       try {
@@ -33,35 +33,29 @@ export default function SubscriptionPlans() {
     })();
   }, []);
 
-  // 💳 Abone ol
+  // Abonelik başlat
   const handleSubscribe = async (packageId) => {
     setLoadingId(packageId);
-
     try {
       const selectedPlan = plans.find((p) => p.id === packageId);
 
-      // 🆓 Ücretsiz plan
+      // Ücretsiz plan
       if (selectedPlan?.isFree || selectedPlan?.price === 0) {
         await createSubscription(packageId);
-        toast.success("Ücretsiz abonelik başlatıldı 🎉");
-
-        // 🔁 Token yenile
+        toast.success("Ücretsiz abonelik başlatıldı.");
         await handleTokenRefresh();
-
         const current = await getCurrentSubscription();
         setSubscription(current);
         return;
       }
 
-      // 💰 Ücretli plan
+      // Ücretli plan
       const created = await createSubscription(packageId);
       const subscriptionId = created?.subscriptionId || created?.id;
-
       if (!subscriptionId) throw new Error("Abonelik oluşturulamadı.");
 
       const checkout = await checkoutSubscription(subscriptionId);
       const paymentUrl = checkout?.paymentPageUrl || checkout?.url;
-
       if (!paymentUrl) throw new Error("Ödeme bağlantısı alınamadı.");
 
       toast.success("Ödeme sayfasına yönlendiriliyorsunuz...");
@@ -74,19 +68,17 @@ export default function SubscriptionPlans() {
     }
   };
 
-  // 🔁 Token yenileme
+  // Token yenileme
   const handleTokenRefresh = async () => {
     try {
       const token = localStorage.getItem("sellerToken");
       if (!token) throw new Error("Mevcut token bulunamadı.");
 
-      // API body formatı: { token: "string" }
       const refreshed = await refreshToken({ token });
 
       if (refreshed?.token) {
         localStorage.setItem("sellerToken", refreshed.token);
 
-        // Ek alanlar varsa (backend’e göre)
         if (refreshed?.subscriptionActive !== undefined)
           localStorage.setItem(
             "sellerSubscriptionActive",
@@ -98,8 +90,8 @@ export default function SubscriptionPlans() {
             String(refreshed.isthesystemactive || refreshed.Status)
           );
 
-        toast.success("Token yenilendi ✅");
-        setTimeout(() => window.location.reload(), 1200);
+        toast.success("Token yenilendi.");
+        setTimeout(() => window.location.reload(), 1000);
       } else {
         toast.error("Token yenilenemedi. Lütfen tekrar giriş yapın.");
       }
@@ -109,23 +101,25 @@ export default function SubscriptionPlans() {
     }
   };
 
-  // ⏳ Yükleniyor ekranı
+  // Yükleniyor durumu
   if (loading) {
     return (
       <div className="flex justify-center items-center py-20">
-        <p className="text-gray-600 animate-pulse">Planlar yükleniyor...</p>
+        <p className="text-gray-600 animate-pulse text-lg">
+          Planlar yükleniyor...
+        </p>
       </div>
     );
   }
 
-  // ✅ Aktif abonelik
+  // Aktif abonelik
   if (subscription?.isActive) {
     return (
-      <div className="bg-white p-8 rounded-2xl shadow text-center">
-        <h3 className="text-2xl font-bold text-emerald-700">
-          Aktif Aboneliğiniz 🎉
+      <div className="bg-white p-10 rounded-2xl shadow-lg text-center max-w-md mx-auto">
+        <h3 className="text-2xl font-bold text-emerald-700 mb-3">
+          Aktif Aboneliğiniz
         </h3>
-        <p className="text-gray-700 mt-2">
+        <p className="text-gray-700">
           Plan:{" "}
           <span className="font-semibold text-emerald-600">
             {subscription.packageName || "Bilinmiyor"}
@@ -138,77 +132,88 @@ export default function SubscriptionPlans() {
             : "-"}
         </p>
         <p className="text-xs text-gray-400 mt-1">
-          {subscription.remainingDays ?? 0} gün kaldı
+          Kalan Süre: {subscription.remainingDays ?? 0} gün
         </p>
       </div>
     );
   }
 
-  // ❌ Abone değilse plan listesi
+  // Abonelik listesi
   return (
-    <div className="py-10 bg-gradient-to-b from-green-50 to-white text-gray-800 rounded-2xl shadow-sm">
-      <h2 className="text-3xl font-extrabold text-center mb-2 text-[#003636]">
-        Abonelik Planları
-      </h2>
-      <p className="text-center text-gray-500 mb-10">
-        Tedarika ile işinizi büyütmeye bugün başlayın.
-      </p>
+    <section className="py-16 bg-gradient-to-b from-emerald-50 to-white text-gray-800 rounded-2xl">
+      <div className="max-w-6xl mx-auto px-6 text-center">
+        <h2 className="text-4xl font-extrabold mb-4 text-[#003636]">
+          Abonelik Planları
+        </h2>
+        <p className="text-gray-500 mb-12">
+          İşinizi büyütmek için size en uygun planı seçin.
+        </p>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 px-6 md:px-10 max-w-6xl mx-auto">
-        {plans.length > 0 ? (
-          plans.map((plan) => (
-            <div
-              key={plan.id}
-              className={`relative p-6 rounded-2xl border transition duration-300 hover:shadow-xl ${
-                plan.isFree
-                  ? "bg-gray-50 border-gray-200"
-                  : "bg-white border-emerald-500 shadow-lg"
-              }`}
-            >
-              {plan.isFree && (
-                <span className="absolute top-0 right-0 mt-4 mr-4 bg-emerald-600 text-white text-xs px-3 py-1 rounded-full font-semibold shadow">
-                  Ücretsiz
-                </span>
-              )}
-
-              <h3 className="text-xl font-bold text-emerald-700">{plan.name}</h3>
-              <p className="text-3xl my-4 font-extrabold">₺{plan.price ?? 0}</p>
-              <p className="mb-6 text-sm text-gray-600">{plan.description}</p>
-
-              <ul className="text-left text-sm space-y-2 text-gray-700">
-                {plan.features?.length > 0 ? (
-                  plan.features.map((feature, i) => (
-                    <li key={i} className="flex items-start">
-                      <span className="text-emerald-600 mr-2">✔</span>
-                      {feature}
-                    </li>
-                  ))
-                ) : (
-                  <li className="text-gray-400 italic">
-                    Özellik bilgisi bulunmuyor.
-                  </li>
-                )}
-              </ul>
-
-              <button
-                onClick={() => handleSubscribe(plan.id)}
-                disabled={loadingId === plan.id}
-                className={`mt-6 w-full py-2.5 rounded-lg font-semibold text-white transition ${
-                  loadingId === plan.id
-                    ? "bg-emerald-400 cursor-wait"
-                    : "bg-emerald-600 hover:bg-emerald-700"
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {plans.length > 0 ? (
+            plans.map((plan) => (
+              <div
+                key={plan.id}
+                className={`relative p-8 rounded-2xl border transition duration-300 hover:shadow-2xl bg-white ${
+                  plan.isFree
+                    ? "border-gray-200 hover:border-emerald-300"
+                    : "border-emerald-500 hover:border-emerald-600"
                 }`}
               >
-                {loadingId === plan.id ? "İşleniyor..." : "Abone Ol"}
-              </button>
-            </div>
-          ))
-        ) : (
-          <p className="text-center text-gray-500 col-span-3">
-            Şu anda plan bulunamadı.
-          </p>
-        )}
+                {plan.isFree && (
+                  <div className="absolute top-4 right-4 bg-emerald-600 text-white text-xs px-3 py-1 rounded-full font-medium shadow">
+                    Ücretsiz
+                  </div>
+                )}
+
+                <h3 className="text-2xl font-bold text-emerald-700">
+                  {plan.name}
+                </h3>
+                <p className="text-4xl font-extrabold mt-3 text-gray-900">
+                  ₺{plan.price ?? 0}
+                  <span className="text-base font-medium text-gray-500">
+                    /ay
+                  </span>
+                </p>
+                <p className="text-sm text-gray-600 mt-4 mb-6">
+                  {plan.description || "Açıklama bulunmuyor."}
+                </p>
+
+                <ul className="text-left text-sm space-y-2 text-gray-700 border-t border-gray-100 pt-4 min-h-[130px]">
+                  {plan.features?.length > 0 ? (
+                    plan.features.map((feature, i) => (
+                      <li key={i} className="flex items-start">
+                        <span className="text-emerald-600 mr-2">✓</span>
+                        <span>{feature}</span>
+                      </li>
+                    ))
+                  ) : (
+                    <li className="text-gray-400 italic">
+                      Özellik bilgisi bulunmuyor.
+                    </li>
+                  )}
+                </ul>
+
+                <button
+                  onClick={() => handleSubscribe(plan.id)}
+                  disabled={loadingId === plan.id}
+                  className={`mt-8 w-full py-3 rounded-lg font-semibold text-white transition ${
+                    loadingId === plan.id
+                      ? "bg-emerald-400 cursor-wait"
+                      : "bg-emerald-600 hover:bg-emerald-700"
+                  }`}
+                >
+                  {loadingId === plan.id ? "İşleniyor..." : "Abone Ol"}
+                </button>
+              </div>
+            ))
+          ) : (
+            <p className="text-gray-500 col-span-3">
+              Şu anda görüntülenecek plan bulunmuyor.
+            </p>
+          )}
+        </div>
       </div>
-    </div>
+    </section>
   );
 }
