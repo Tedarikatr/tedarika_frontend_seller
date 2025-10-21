@@ -9,6 +9,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { ImagePlus, Images, ChevronRight } from "lucide-react";
 
+// 🧩 Yardımcı Fonksiyonlar
 const safeNumberInput = (v) =>
   v === null || v === undefined || v === "NaN" ? "" : v;
 
@@ -23,6 +24,47 @@ const withBuster = (url, buster) => {
   }
 };
 
+// 🧱 Mini UI bileşenleri
+const Input = ({ value, onChange, placeholder, className, ...props }) => (
+  <input
+    value={safeNumberInput(value)}
+    onChange={onChange}
+    placeholder={placeholder}
+    className={`px-3 py-2 text-sm border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-gray-400 transition ${className}`}
+    {...props}
+  />
+);
+
+const Button = ({ children, variant = "gray", className, ...props }) => {
+  const base =
+    "px-3 py-1.5 text-xs font-semibold rounded-md transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed";
+  const variants = {
+    gray: "bg-gray-700 hover:bg-gray-800 text-white",
+    ghost: "border border-gray-300 hover:bg-gray-100 text-gray-700",
+    soft: "bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-300",
+  };
+  return (
+    <button className={`${base} ${variants[variant]} ${className}`} {...props}>
+      {children}
+    </button>
+  );
+};
+
+const Tag = ({ children, color = "gray" }) => {
+  const colors = {
+    gray: "bg-gray-100 text-gray-700 border border-gray-300",
+    green: "bg-green-100 text-green-700 border border-green-300",
+  };
+  return (
+    <span
+      className={`px-2.5 py-0.5 rounded-full text-[11px] font-medium ${colors[color]}`}
+    >
+      {children}
+    </span>
+  );
+};
+
+// 🧾 Ürün Satırı
 const ProductRow = ({ product, onRefresh, onFeedback, hasCoverage }) => {
   const nav = useNavigate();
 
@@ -30,18 +72,20 @@ const ProductRow = ({ product, onRefresh, onFeedback, hasCoverage }) => {
   const [minQty, setMinQty] = useState(product.minOrderQuantity);
   const [maxQty, setMaxQty] = useState(product.maxOrderQuantity);
   const [stock, setStock] = useState(product.stockQuantity ?? 0);
-
-  // görseller: üründen gelen liste
-  const initialUrls =
-    product.storeProductImagesUrls?.length
+  const [images, setImages] = useState(
+    (product.storeProductImagesUrls?.length
       ? product.storeProductImagesUrls
-      : product.productImageUrls || [];
-  const [images, setImages] = useState(initialUrls.map((u) => ({ url: u })));
+      : product.productImageUrls || []
+    ).map((u) => ({ url: u }))
+  );
 
   const [selectedFiles, setSelectedFiles] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [buster, setBuster] = useState(Date.now());
   const tempBlobs = useRef([]);
+
+  const storeProductId = product.storeProductId ?? product.id;
+  const isOnSale = product.isOnSale ?? false;
 
   useEffect(() => {
     const urls =
@@ -51,9 +95,6 @@ const ProductRow = ({ product, onRefresh, onFeedback, hasCoverage }) => {
     setImages(urls.map((u) => ({ url: u })));
     setBuster(Date.now());
   }, [product.id]);
-
-  const storeProductId = product.storeProductId ?? product.id;
-  const isOnSale = product.isOnSale ?? false;
 
   const handleAction = async (fn, msg) => {
     try {
@@ -78,7 +119,7 @@ const ProductRow = ({ product, onRefresh, onFeedback, hasCoverage }) => {
   };
 
   const handleUpload = async () => {
-    if (!selectedFiles || !selectedFiles.length) return;
+    if (!selectedFiles?.length) return;
     optimisticAdd(selectedFiles);
     setUploading(true);
     try {
@@ -93,13 +134,6 @@ const ProductRow = ({ product, onRefresh, onFeedback, hasCoverage }) => {
     }
   };
 
-  const inputStyle =
-    "px-3 py-2 text-sm border border-gray-300 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/60 transition shadow-sm";
-  const pillBtn =
-    "px-3 py-1.5 text-xs font-semibold rounded-xl transition text-white shadow-sm";
-  const ghostBtn =
-    "px-3 py-1.5 text-xs font-semibold rounded-xl transition border shadow-sm";
-
   const cover =
     images?.[0]?.url ||
     product.storeProductImageUrl ||
@@ -109,21 +143,14 @@ const ProductRow = ({ product, onRefresh, onFeedback, hasCoverage }) => {
   return (
     <>
       {/* ÜRÜN */}
-      <td className="px-6 py-4 whitespace-nowrap">
+      <td className="px-6 py-4 border-t border-gray-300">
         <div className="flex items-center gap-3">
-          <div className="relative">
-            <img
-              src={withBuster(cover, buster)}
-              alt={product.name || "Ürün görseli"}
-              className="w-12 h-12 sm:w-14 sm:h-14 object-cover rounded-xl border shadow-sm bg-white"
-            />
-            {images.length > 1 && (
-              <span className="absolute -bottom-1 -right-1 text-[10px] px-1.5 py-0.5 rounded-full bg-emerald-600 text-white shadow">
-                {images.length}
-              </span>
-            )}
-          </div>
-          <div className="min-w-[180px]">
+          <img
+            src={withBuster(cover, buster)}
+            alt={product.name || "Ürün görseli"}
+            className="w-12 h-12 object-cover rounded-md border border-gray-300 bg-white"
+          />
+          <div>
             <div className="font-semibold text-gray-800">{product.name}</div>
             <div className="text-[11px] text-gray-500">#{storeProductId}</div>
           </div>
@@ -131,184 +158,153 @@ const ProductRow = ({ product, onRefresh, onFeedback, hasCoverage }) => {
       </td>
 
       {/* KATEGORİ */}
-      <td className="px-6 py-4">
-        <div className="inline-flex items-center gap-2">
-          <span className="px-2 py-0.5 rounded-full text-[11px] bg-gray-100 text-gray-700 border">
-            {product.categoryName}
-          </span>
-          <span className="px-2 py-0.5 rounded-full text-[11px] bg-gray-50 text-gray-500 border">
-            {product.categorySubName}
-          </span>
+      <td className="px-6 py-4 border-t border-gray-300">
+        <div className="inline-flex flex-wrap items-center gap-2">
+          <Tag>{product.categoryName}</Tag>
+          <Tag>{product.categorySubName}</Tag>
         </div>
       </td>
 
       {/* FİYAT */}
-      <td className="px-6 py-4">
+      <td className="px-6 py-4 border-t border-gray-300">
         <div className="flex items-center gap-2">
-          <div className="relative">
-            <span className="absolute -top-2 left-2 text-[10px] text-gray-400">₺</span>
-            <input
-              type="number"
-              value={safeNumberInput(price)}
-              onChange={(e) => setPrice(e.target.value)}
-              className={`${inputStyle} min-w-[110px] pl-5`}
-              placeholder="₺"
-            />
-          </div>
-          <button
-            onClick={() =>
-              handleAction(
-                () => updateProductPrice(storeProductId, price),
-                "Fiyat güncellendi."
-              )
-            }
-            className={`${pillBtn} bg-emerald-600 hover:bg-emerald-700`}
-          >
-            Kaydet
-          </button>
+          <Input
+            type="number"
+            value={price}
+            onChange={(e) => setPrice(e.target.value)}
+            className="w-24 text-center"
+          />
+          <Button onClick={() =>
+            handleAction(
+              () => updateProductPrice(storeProductId, price),
+              "Fiyat güncellendi."
+            )
+          }>Kaydet</Button>
         </div>
       </td>
 
       {/* LİMİT */}
-      <td className="px-6 py-4">
+      <td className="px-6 py-4 border-t border-gray-300">
         <div className="flex items-center gap-2">
-          <input
+          <Input
             type="number"
-            value={safeNumberInput(minQty)}
+            value={minQty}
             onChange={(e) => setMinQty(e.target.value)}
-            className={`${inputStyle} w-16 text-center`}
-            placeholder="Min"
+            className="w-16 text-center"
           />
-          <input
+          <Input
             type="number"
-            value={safeNumberInput(maxQty)}
+            value={maxQty}
             onChange={(e) => setMaxQty(e.target.value)}
-            className={`${inputStyle} w-16 text-center`}
-            placeholder="Max"
+            className="w-16 text-center"
           />
-          <button
+          <Button
+            variant="soft"
             onClick={() =>
               handleAction(
                 () => updateProductQuantityLimits(storeProductId, minQty, maxQty),
                 "Limit güncellendi."
               )
             }
-            className={`${ghostBtn} border-gray-300 hover:bg-gray-50`}
           >
             Kaydet
-          </button>
+          </Button>
         </div>
       </td>
 
       {/* GÖRSELLER */}
-      <td className="px-6 py-4">
-        {/* mini galeri */}
-        <div className="flex items-center gap-3">
-          <div className="hidden sm:flex -space-x-2">
+      <td className="px-6 py-4 border-t border-gray-300">
+        <div className="flex items-center gap-3 flex-wrap">
+          <div className="flex -space-x-2">
             {images.slice(0, 3).map((t, i) => (
               <img
                 key={t.key || t.url || i}
                 src={withBuster(t.url, buster)}
                 alt=""
-                className="w-8 h-8 rounded-lg ring-2 ring-white border object-cover bg-white shadow-sm"
+                className="w-8 h-8 rounded-md border border-gray-300 object-cover bg-white"
               />
             ))}
           </div>
 
-          {/* yönet butonu */}
-          <button
-            onClick={() => nav(`/seller/products/${storeProductId}/images`)}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-blue-600 hover:bg-blue-700 text-white shadow-sm"
-            title="Görselleri yönet"
-          >
-            <Images size={14} />
-            Yönet
-            <ChevronRight size={14} className="-mr-0.5" />
-          </button>
-        </div>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              onClick={() => nav(`/seller/products/${storeProductId}/images`)}
+            >
+              <div className="flex items-center gap-1.5 text-gray-700">
+                <Images size={14} />
+                Yönet
+                <ChevronRight size={14} className="-mr-0.5" />
+              </div>
+            </Button>
 
-        {/* hızlı yükleme */}
-        <div className="flex items-center gap-2 mt-2">
-          <label className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border border-dashed hover:border-emerald-500/80 text-gray-700 hover:text-emerald-700 bg-white cursor-pointer shadow-sm">
-            <ImagePlus size={14} />
-            Dosyaları Seç
-            <input
-              type="file"
-              accept="image/*"
-              multiple
-              className="hidden"
-              onChange={(e) => setSelectedFiles(e.target.files)}
-            />
-          </label>
-          <button
-            onClick={handleUpload}
-            disabled={uploading || !selectedFiles || selectedFiles.length === 0}
-            className={`px-3 py-1.5 text-xs font-semibold rounded-xl text-white shadow-sm ${
-              uploading || !selectedFiles
-                ? "bg-gray-300"
-                : "bg-emerald-600 hover:bg-emerald-700"
-            }`}
-          >
-            {uploading ? "Yükleniyor..." : "Yükle"}
-          </button>
+            <label className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium border border-dashed border-gray-400 text-gray-600 bg-white cursor-pointer hover:border-gray-600">
+              <ImagePlus size={14} />
+              Dosya Seç
+              <input
+                type="file"
+                accept="image/*"
+                multiple
+                className="hidden"
+                onChange={(e) => setSelectedFiles(e.target.files)}
+              />
+            </label>
+
+            <Button
+              variant="gray"
+              onClick={handleUpload}
+              disabled={uploading || !selectedFiles?.length}
+            >
+              {uploading ? "Yükleniyor..." : "Yükle"}
+            </Button>
+          </div>
         </div>
       </td>
 
       {/* DURUM */}
-      <td className="px-6 py-4">
-        <span
-          className={`px-2.5 py-1 rounded-full text-[11px] font-semibold shadow-sm ${
-            isOnSale
-              ? "bg-emerald-100 text-emerald-700 ring-1 ring-emerald-200"
-              : "bg-gray-100 text-gray-600 ring-1 ring-gray-200"
-          }`}
-        >
+      <td className="px-6 py-4 border-t border-gray-300">
+        <Tag color={isOnSale ? "green" : "gray"}>
           {isOnSale ? "Satışta" : "Pasif"}
-        </span>
+        </Tag>
       </td>
 
       {/* STOK */}
-      <td className="px-6 py-4">
+      <td className="px-6 py-4 border-t border-gray-300">
         <div className="flex items-center gap-2">
-          <input
+          <Input
             type="number"
-            value={safeNumberInput(stock)}
+            value={stock}
             onChange={(e) => setStock(e.target.value)}
-            className={`${inputStyle} w-24 text-center`}
+            className="w-20 text-center"
           />
-          <button
+          <Button
+            variant="soft"
             onClick={() =>
               handleAction(
                 () => updateProductStock(storeProductId, stock),
                 "Stok güncellendi."
               )
             }
-            className={`${ghostBtn} border-gray-300 hover:bg-gray-50`}
           >
             Kaydet
-          </button>
+          </Button>
         </div>
       </td>
 
       {/* İŞLEMLER */}
-      <td className="px-6 py-4">
-        <button
+      <td className="px-6 py-4 border-t border-gray-300">
+        <Button
+          variant="gray"
+          disabled={!hasCoverage}
           onClick={() =>
             handleAction(
               () => toggleProductOnSale(storeProductId, !isOnSale),
               isOnSale ? "Satış kapatıldı." : "Satışa açıldı."
             )
           }
-          disabled={!hasCoverage}
-          title={!hasCoverage ? "Satışa açmak için hizmet bölgesi tanımlayın." : ""}
-          className={`text-xs font-semibold px-3 py-1.5 rounded-xl shadow-sm ${
-            !hasCoverage
-              ? "bg-gray-200 text-gray-500 cursor-not-allowed"
-              : "bg-yellow-500 hover:bg-yellow-600 text-white"
-          }`}
         >
           {isOnSale ? "Satışı Kapat" : "Satışa Aç"}
-        </button>
+        </Button>
       </td>
     </>
   );
