@@ -57,7 +57,7 @@ const HeroSection = () => {
           transition={{ delay: 0.6, duration: 0.6 }}
         >
           <a
-            href="/seller/apply" // 🔁 Güncellenen link burada
+            href="/seller/register" // 🔁 Güncellenen link burada
             className="bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-3 rounded-full text-lg font-semibold transition shadow-lg"
           >
             Mağaza Aç
