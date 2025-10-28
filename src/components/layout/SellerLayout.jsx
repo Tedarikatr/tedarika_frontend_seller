@@ -62,7 +62,7 @@ const SellerLayout = () => {
   // 🔒 Abonelik ve sistem aktiflik kontrolü
   useEffect(() => {
     const payload = getDecodedSellerPayload();
-    console.log("🧩 Decoded Payload:", payload);
+  
 
     const lsSubscription = localStorage.getItem("sellerSubscriptionActive");
     const lsSystem = localStorage.getItem("sellerSystemActive");
@@ -85,8 +85,6 @@ const SellerLayout = () => {
       payload?.Status === "true" ||
       lsSystem === "true";
 
-    console.log("✅ subscriptionActive:", subscriptionActive);
-    console.log("✅ systemActive:", systemActive);
 
     setIsRestricted(!subscriptionActive || !systemActive);
   }, []);
