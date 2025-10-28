@@ -13,7 +13,8 @@ import {
   MapPin,
   ChevronLeft,
   Gift,
-  MessageCircle
+  MessageCircle,
+  Tags // 🆕 Markalar ikonu
 } from "lucide-react";
 import { useState } from "react";
 
@@ -72,6 +73,11 @@ const Sidebar = ({ isOpen, onClose }) => {
           <SectionTitle title="MAĞAZA YÖNETİMİ" collapsed={collapsed} />
           <SidebarLink to="/seller/store/coverage" icon={<MapPin size={18} />} collapsed={collapsed} onClick={onClose}>
             Lokasyonlarım
+          </SidebarLink>
+
+          {/* 🆕 Yeni eklenen Markalar linki */}
+          <SidebarLink to="/seller/brands" icon={<Tags size={18} />} collapsed={collapsed} onClick={onClose}>
+            Markalarım
           </SidebarLink>
 
           <SectionTitle title="ÜRÜNLER" collapsed={collapsed} />
