@@ -4,7 +4,7 @@ import {
   getBrandOwnership,
   getOwnedBrands,
   requestBrandOwnership,
-} from "@/api/sellerBrandService";
+} from "@/api/brandservice";
 import OwnedBrandsSection from "@/components/Brand/OwnedBrandsSection";
 import BrandList from "@/components/Brand/BrandList";
 import Pagination from "@/components/ui/Pagination";

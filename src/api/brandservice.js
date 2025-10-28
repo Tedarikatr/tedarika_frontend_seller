@@ -1,4 +1,3 @@
-// src/api/sellerBrandService.js
 import { apiRequest } from "./apiRequest";
 
 // ✅ Tüm markalar (tek seferde hepsini çekiyoruz)
