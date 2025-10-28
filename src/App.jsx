@@ -6,6 +6,7 @@ import SellerLandingPage from "@/pages/seller/SellerLandingPage";
 import RegisterPage from "@/pages/seller/RegisterPage";
 import LoginPage from "@/pages/seller/LoginPage";
 import SellerApplicationPage from "@/pages/seller/SellerApplicationPage";
+import SellerBrandListPage from "@/pages/seller/brands/SellerBrandListPage";
 
 // Subscription
 import SubscriptionPage from "@/pages/seller/subscription/SubscriptionPage";
@@ -110,6 +111,7 @@ function App() {
         {/* Diğer */}
         <Route path="reviews" element={<StoreReviewsPage />} />
         <Route path="chat" element={<ChatPage />} />
+        <Route path="brands" element={<SellerBrandListPage />} />
       </Route>
 
       {/* ── 404 redirect ───────────────────────────── */}
