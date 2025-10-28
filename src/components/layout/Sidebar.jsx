@@ -14,7 +14,7 @@ import {
   ChevronLeft,
   Gift,
   MessageCircle,
-  Tags // 🆕 Markalar ikonu
+  Tags
 } from "lucide-react";
 import { useState } from "react";
 
@@ -36,7 +36,9 @@ const Sidebar = ({ isOpen, onClose }) => {
       <div className="flex flex-col h-full">
         {/* Mobil Başlık */}
         <div className="flex items-center justify-between md:hidden px-4 py-3 border-b border-white/10 bg-[#003131]">
-          <span className="text-xl font-bold tracking-tight">Tedarika</span>
+          <span className="text-xl font-bold tracking-tight text-white">
+            Tedarika
+          </span>
           <button onClick={onClose} className="hover:scale-110 transition">
             <X className="w-5 h-5 text-white" />
           </button>
@@ -45,9 +47,9 @@ const Sidebar = ({ isOpen, onClose }) => {
         {/* Logo & Collapse */}
         <div className="hidden md:flex items-center justify-between px-4 py-4 border-b border-white/10">
           <div className="flex items-center gap-2">
-            <Store size={22} className="text-emerald-400" />
+            <Store size={22} className="text-white" />
             {!collapsed && (
-              <span className="text-xl font-extrabold tracking-wide text-emerald-300">
+              <span className="text-xl font-extrabold tracking-wide text-white">
                 Tedarika
               </span>
             )}
@@ -75,7 +77,6 @@ const Sidebar = ({ isOpen, onClose }) => {
             Lokasyonlarım
           </SidebarLink>
 
-          {/* 🆕 Yeni eklenen Markalar linki */}
           <SidebarLink to="/seller/brands" icon={<Tags size={18} />} collapsed={collapsed} onClick={onClose}>
             Markalarım
           </SidebarLink>
@@ -140,8 +141,8 @@ const SidebarLink = ({ to, icon, children, onClick, collapsed }) => (
     className={({ isActive }) =>
       `flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-all group ${
         isActive
-          ? "bg-emerald-500/30 text-white shadow-inner"
-          : "text-white/80 hover:text-white hover:bg-emerald-500/10"
+          ? "bg-white/20 text-white shadow-inner"
+          : "text-white/80 hover:text-white hover:bg-white/10"
       }`
     }
   >

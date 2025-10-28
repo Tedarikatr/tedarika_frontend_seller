@@ -40,7 +40,7 @@ const Topbar = ({ onMenuClick }) => {
             <Menu className="w-6 h-6" />
           </button>
 
-          <h1 className="text-xl md:text-2xl font-semibold text-emerald-300 tracking-tight select-none drop-shadow">
+          <h1 className="text-xl md:text-2xl font-semibold text-white tracking-tight select-none drop-shadow">
             Satıcı Paneli
           </h1>
         </div>
@@ -50,7 +50,7 @@ const Topbar = ({ onMenuClick }) => {
           {!user?.sellerId && (
             <a
               href="/seller/apply"
-              className="text-sm bg-emerald-400/90 text-[#003131] font-semibold px-4 py-1.5 rounded-md hover:bg-emerald-300 transition-all shadow-sm"
+              className="text-sm bg-white/90 text-[#003131] font-semibold px-4 py-1.5 rounded-md hover:bg-white transition-all shadow-sm"
             >
               Başvuru Yap
             </a>
@@ -59,7 +59,7 @@ const Topbar = ({ onMenuClick }) => {
           {user && (
             <div className="flex items-center gap-3">
               <div
-                className="w-10 h-10 flex items-center justify-center bg-emerald-500 text-white rounded-full font-semibold shadow-inner border border-emerald-300/40"
+                className="w-10 h-10 flex items-center justify-center bg-white text-[#003131] rounded-full font-semibold shadow-inner border border-white/40"
                 title={user?.email || ""}
               >
                 {initials}
@@ -68,7 +68,7 @@ const Topbar = ({ onMenuClick }) => {
                 <span className="font-medium text-white">
                   {user?.name || "Kullanıcı"}
                 </span>
-                <span className="text-xs text-emerald-200/70">
+                <span className="text-xs text-white/70">
                   {user?.email || ""}
                 </span>
               </div>
