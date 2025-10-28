@@ -22,9 +22,15 @@ import {
   FaBan,
   FaClipboardList,
   FaCheckCircle,
+  FaBox,
+  FaShoppingCart,
+  FaHandshake,
+  FaBullhorn,
+  FaComments,
+  FaStore,
 } from "react-icons/fa";
 import { AlertCircle } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 const COLORS = ["#00A982", "#EAEAEA", "#FF8A8A"];
 
@@ -146,6 +152,7 @@ const DashboardPage = () => {
 
   return (
     <div className="min-h-screen bg-white px-6 py-8 font-sans">
+      {/* Başlık */}
       <motion.h1
         className="text-3xl sm:text-4xl font-bold text-gray-800 mb-8"
         initial={{ opacity: 0, y: -20 }}
@@ -167,6 +174,37 @@ const DashboardPage = () => {
           />
         ))}
       </div>
+
+      {/* 🔗 Hızlı Kısayollar */}
+      <motion.div
+        className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-5 mb-10"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+      >
+        {[
+          { to: "/seller/products/my-store", icon: <FaBox />, label: "Ürünlerim" },
+          { to: "/seller/orders", icon: <FaShoppingCart />, label: "Siparişlerim" },
+          { to: "/seller/quotations", icon: <FaHandshake />, label: "Teklifler" },
+          { to: "/seller/campaigns", icon: <FaBullhorn />, label: "Kampanyalar" },
+          { to: "/seller/chat", icon: <FaComments />, label: "Mesajlar" },
+          { to: "/seller/store/update", icon: <FaStore />, label: "Mağazam" },
+        ].map((item, idx) => (
+          <motion.div
+            key={idx}
+            whileHover={{ scale: 1.05 }}
+            transition={{ duration: 0.2 }}
+          >
+            <Link
+              to={item.to}
+              className="bg-[#00A982]/10 hover:bg-[#00A982]/20 rounded-xl flex flex-col items-center justify-center p-5 transition shadow-sm hover:shadow-md"
+            >
+              <div className="text-[#00A982] text-2xl mb-2">{item.icon}</div>
+              <span className="font-semibold text-gray-700 text-sm">{item.label}</span>
+            </Link>
+          </motion.div>
+        ))}
+      </motion.div>
 
       {/* Grafikler */}
       <motion.div
@@ -240,7 +278,12 @@ const DashboardPage = () => {
                 ))}
               </Pie>
               <Tooltip />
-              <Legend verticalAlign="bottom" height={36} iconType="circle" wrapperStyle={{ fontSize: "13px" }} />
+              <Legend
+                verticalAlign="bottom"
+                height={36}
+                iconType="circle"
+                wrapperStyle={{ fontSize: "13px" }}
+              />
             </PieChart>
           </ResponsiveContainer>
           <p className="text-center text-sm text-gray-600 mt-3">
