@@ -15,28 +15,33 @@ const StoreCoverageForm = ({ onSuccess }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!selectedRegionId || selectedCountryIds.length === 0) {
-      setMessage({ type: "error", text: "Lütfen bölge ve en az bir ülke seçin." });
+      setMessage({
+        type: "error",
+        text: "Lütfen bölge ve en az bir ülke seçin.",
+      });
       return;
     }
 
     try {
       setLoading(true);
       setMessage(null);
-
       await addStoreCoverage({
         regionIds: [selectedRegionId],
         countryIds: selectedCountryIds,
       });
-
-      setMessage({ type: "success", text: "Kapsama alanı başarıyla eklendi." });
+      setMessage({
+        type: "success",
+        text: "Kapsama alanı başarıyla eklendi.",
+      });
       setSelectedRegionId(null);
       setSelectedCountryIds([]);
       onSuccess?.();
     } catch (err) {
-      console.error("Kapsama ekleme hatası:", err);
-      setMessage({ type: "error", text: "Kapsama alanı eklenirken hata oluştu." });
+      setMessage({
+        type: "error",
+        text: "Kapsama alanı eklenirken hata oluştu.",
+      });
     } finally {
       setLoading(false);
     }
@@ -45,11 +50,10 @@ const StoreCoverageForm = ({ onSuccess }) => {
   return (
     <form
       onSubmit={handleSubmit}
-      className="bg-white p-6 sm:p-8 rounded-2xl shadow-md border border-gray-200 max-w-3xl mx-auto space-y-6"
+      className="bg-white/70 backdrop-blur-sm p-8 rounded-3xl shadow-lg border border-gray-100 max-w-3xl mx-auto space-y-6 transition-all duration-300 hover:shadow-xl"
     >
-      {/* Başlık */}
       <div className="border-b pb-4">
-        <h2 className="text-xl sm:text-2xl font-bold text-gray-800">
+        <h2 className="text-2xl font-bold text-gray-800">
           Mağaza Kapsama Alanı Ekle
         </h2>
         <p className="text-sm text-gray-500 mt-1">
@@ -57,23 +61,20 @@ const StoreCoverageForm = ({ onSuccess }) => {
         </p>
       </div>
 
-      {/* Mesaj kutusu */}
       {message && (
         <div
-          className={`text-sm px-4 py-3 rounded-md font-medium ${
+          className={`text-sm px-4 py-3 rounded-xl font-medium shadow-sm border ${
             message.type === "success"
-              ? "bg-green-100 text-green-800 border border-green-200"
-              : "bg-red-100 text-red-800 border border-red-200"
+              ? "bg-green-50 text-green-700 border-green-200"
+              : "bg-red-50 text-red-700 border-red-200"
           }`}
         >
           {message.text}
         </div>
       )}
 
-      {/* Region & Country Selectors */}
       <div className="space-y-4">
         <RegionSelector value={selectedRegionId} onChange={setSelectedRegionId} />
-
         <CountrySelector
           regionId={selectedRegionId}
           selectedCountries={selectedCountryIds}
@@ -81,12 +82,11 @@ const StoreCoverageForm = ({ onSuccess }) => {
         />
       </div>
 
-      {/* Submit Button */}
       <div className="pt-4 border-t flex justify-end">
         <button
           type="submit"
           disabled={loading}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg text-sm font-semibold transition disabled:opacity-50"
+          className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-2.5 rounded-xl font-semibold shadow-md hover:shadow-lg transition-all duration-300 disabled:opacity-50"
         >
           {loading ? "Kaydediliyor..." : "Kapsama Alanı Ekle"}
         </button>
