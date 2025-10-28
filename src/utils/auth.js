@@ -39,7 +39,6 @@ export function getDecodedSellerPayload() {
     payload.SubscriptionActive = payload.subscriptionActive;
 
     // 🔍 Log (görmek için)
-    console.log("🧩 Decoded Seller Payload:", payload);
 
     return payload;
   } catch (err) {
