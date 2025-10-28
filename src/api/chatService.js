@@ -7,7 +7,6 @@ let streamClient = null;
 // 🔑 Stream Chat token al
 export const getChatToken = async () => {
   try {
-    console.log("🔑 Backend'den chat token alınıyor...");
     const tokenData = await apiRequest("Chat/token", "POST", null, true);
 
     return {
@@ -73,7 +72,6 @@ export const initializeStreamClient = async () => {
   if (streamClient.userID) await streamClient.disconnectUser();
   await streamClient.connectUser(user, token);
 
-  console.log("✅ Stream Chat client bağlı:", user.name);
   return streamClient;
 };
 

@@ -2,7 +2,7 @@ import React from "react";
 import ProductRow from "./ProductRow";
 
 const MyStoreProductTable = ({ products, onRefresh, onFeedback, hasCoverage }) => {
-  if (!products.length) {
+  if (!products?.length) {
     return (
       <div className="p-10 text-center">
         <div className="inline-flex items-center gap-3 px-5 py-3 rounded-2xl bg-gray-100 text-gray-700 font-medium shadow-sm">

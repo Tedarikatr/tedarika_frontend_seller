@@ -174,12 +174,16 @@ const ProductRow = ({ product, onRefresh, onFeedback, hasCoverage }) => {
             onChange={(e) => setPrice(e.target.value)}
             className="w-24 text-center"
           />
-          <Button onClick={() =>
-            handleAction(
-              () => updateProductPrice(storeProductId, price),
-              "Fiyat güncellendi."
-            )
-          }>Kaydet</Button>
+          <Button
+            onClick={() =>
+              handleAction(
+                () => updateProductPrice(storeProductId, price),
+                "Fiyat güncellendi."
+              )
+            }
+          >
+            Kaydet
+          </Button>
         </div>
       </td>
 
@@ -202,7 +206,8 @@ const ProductRow = ({ product, onRefresh, onFeedback, hasCoverage }) => {
             variant="soft"
             onClick={() =>
               handleAction(
-                () => updateProductQuantityLimits(storeProductId, minQty, maxQty),
+                () =>
+                  updateProductQuantityLimits(storeProductId, minQty, maxQty),
                 "Limit güncellendi."
               )
             }
