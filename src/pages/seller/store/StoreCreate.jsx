@@ -1,4 +1,6 @@
-// src/pages/seller/store/StoreCreate.jsx
+// =============================
+// src/pages/seller/store/StoreCreate.jsx (Final - Modern, Çoklu Seçim Etiketli)
+// =============================
 import { useState, useEffect } from "react";
 import { createStore, getAllCategories } from "@/api/sellerStoreService";
 import { useNavigate } from "react-router-dom";
@@ -16,6 +18,7 @@ const StoreCreate = () => {
   const [submitting, setSubmitting] = useState(false);
   const navigate = useNavigate();
 
+  // Kategorileri yükle
   useEffect(() => {
     (async () => {
       try {
@@ -32,6 +35,7 @@ const StoreCreate = () => {
     })();
   }, []);
 
+  // Input değişimi
   const handleChange = (e) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
@@ -41,13 +45,16 @@ const StoreCreate = () => {
     setForm((prev) => ({ ...prev, [key]: file }));
   };
 
-  const handleCategoryChange = (e) => {
-    const selected = Array.from(e.target.selectedOptions).map((opt) =>
-      Number(opt.value)
-    );
-    setForm((prev) => ({ ...prev, categoryIds: selected }));
+  const toggleCategory = (id) => {
+    setForm((prev) => {
+      const selected = prev.categoryIds.includes(id)
+        ? prev.categoryIds.filter((c) => c !== id)
+        : [...prev.categoryIds, id];
+      return { ...prev, categoryIds: selected };
+    });
   };
 
+  // Mağaza oluştur
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (submitting) return;
@@ -73,24 +80,32 @@ const StoreCreate = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#e8f5f5] to-[#ffffff] px-4 py-10">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#eef7f7] to-white px-4 py-10">
       <div className="w-full max-w-3xl bg-white shadow-xl rounded-2xl p-10 border border-gray-100">
         <h2 className="text-4xl font-bold text-center text-[#003636] mb-10 tracking-tight">
           Mağaza Oluştur
         </h2>
 
         {message && (
-          <div className="mb-8 text-sm px-4 py-3 rounded-lg bg-gray-50 border border-gray-300 text-center text-gray-700">
+          <div
+            className={`mb-8 text-sm px-4 py-3 rounded-lg border text-center ${
+              message.includes("oluşturuluyor")
+                ? "bg-emerald-50 border-emerald-200 text-emerald-700"
+                : message.includes("zorunlu") || message.includes("geçerli")
+                ? "bg-rose-50 border-rose-200 text-rose-700"
+                : "bg-gray-50 border-gray-300 text-gray-700"
+            }`}
+          >
             {message}
           </div>
         )}
 
-        <form
-          onSubmit={handleSubmit}
-          className="grid gap-6 text-gray-700"
-        >
+        <form onSubmit={handleSubmit} className="grid gap-6 text-gray-700">
+          {/* Mağaza Adı */}
           <div>
-            <label className="block text-sm font-semibold mb-2">Mağaza Adı *</label>
+            <label className="block text-sm font-semibold mb-2">
+              Mağaza Adı *
+            </label>
             <input
               name="storeName"
               value={form.storeName}
@@ -100,8 +115,11 @@ const StoreCreate = () => {
             />
           </div>
 
+          {/* Açıklama */}
           <div>
-            <label className="block text-sm font-semibold mb-2">Mağaza Açıklaması</label>
+            <label className="block text-sm font-semibold mb-2">
+              Mağaza Açıklaması
+            </label>
             <textarea
               name="storeDescription"
               value={form.storeDescription}
@@ -112,6 +130,7 @@ const StoreCreate = () => {
             />
           </div>
 
+          {/* Dosya yükleme alanları */}
           <div className="grid sm:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-semibold mb-2">
@@ -138,29 +157,60 @@ const StoreCreate = () => {
             </div>
           </div>
 
+          {/* Kategoriler */}
           <div>
-            <label className="block text-sm font-semibold mb-2">Kategoriler *</label>
-            <select
-              multiple
-              value={form.categoryIds}
-              onChange={handleCategoryChange}
-              className="w-full border border-gray-300 p-3 rounded-md focus:outline-none focus:ring-2 focus:ring-[#003636]"
-            >
-              {categories.map((cat) => (
-                <option key={cat.id} value={cat.id}>
-                  {cat.name}
-                </option>
-              ))}
-            </select>
-            <p className="text-xs text-gray-500 mt-2">
-              Birden fazla kategori seçmek için <kbd>Ctrl</kbd> veya <kbd>Cmd</kbd> tuşunu basılı tutun.
-            </p>
+            <label className="block text-sm font-semibold mb-3">
+              Kategoriler *
+            </label>
+
+            {categories.length > 0 ? (
+              <div className="flex flex-wrap gap-2">
+                {categories.map((cat) => {
+                  const active = form.categoryIds.includes(cat.id);
+                  return (
+                    <button
+                      type="button"
+                      key={cat.id}
+                      onClick={() => toggleCategory(cat.id)}
+                      className={`px-4 py-1.5 rounded-full text-sm font-medium border transition ${
+                        active
+                          ? "bg-[#003636] text-white border-[#003636]"
+                          : "bg-gray-50 border-gray-300 text-gray-700 hover:bg-gray-100"
+                      }`}
+                    >
+                      {cat.name}
+                    </button>
+                  );
+                })}
+              </div>
+            ) : (
+              <p className="text-sm text-gray-500 italic">
+                Kategoriler yükleniyor veya mevcut değil.
+              </p>
+            )}
+
+            {form.categoryIds.length > 0 && (
+              <div className="mt-3 flex flex-wrap gap-2">
+                {form.categoryIds.map((id) => {
+                  const cat = categories.find((c) => c.id === id);
+                  return (
+                    <span
+                      key={id}
+                      className="px-3 py-1 text-xs rounded-full bg-emerald-100 text-emerald-700 border border-emerald-200"
+                    >
+                      {cat?.name}
+                    </span>
+                  );
+                })}
+              </div>
+            )}
           </div>
 
+          {/* Kaydet butonu */}
           <button
             type="submit"
             disabled={submitting}
-            className="mt-4 w-full bg-[#003636] hover:bg-[#004848] text-white font-semibold py-3 rounded-lg transition-all duration-200 disabled:opacity-60"
+            className="mt-6 w-full bg-[#003636] hover:bg-[#004848] text-white font-semibold py-3 rounded-lg transition-all duration-200 disabled:opacity-60"
           >
             {submitting ? "İşleniyor..." : "Mağazayı Oluştur"}
           </button>
