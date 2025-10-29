@@ -1,5 +1,5 @@
 // =============================
-// SellerFinanceInfoCard.jsx (Final - Modern, Emojisiz, Kurumsal)
+// SellerFinanceInfoCard.jsx (Final - Gerçek IBAN Doğrulamalı)
 // =============================
 import React, { useEffect, useMemo, useState } from "react";
 import {
@@ -17,9 +17,28 @@ const EMPTY = {
   swiftCode: "",
 };
 
-// IBAN yardımcıları
-const formatIban = (val = "") => val.replace(/\s+/g, "").replace(/(.{4})/g, "$1 ").trim();
+// Yardımcı fonksiyonlar
+const formatIban = (val = "") =>
+  val.replace(/\s+/g, "").replace(/(.{4})/g, "$1 ").trim();
 const normalizeIban = (val = "") => val.replace(/\s+/g, "").toUpperCase();
+
+// ✅ Gerçek IBAN doğrulama (ISO 13616 standardı)
+const isValidIban = (iban) => {
+  const raw = normalizeIban(iban);
+  if (!/^TR\d{24}$/.test(raw)) return false; // TR ve 24 rakam
+  // Mod 97 algoritması
+  const rearranged = raw.slice(4) + raw.slice(0, 4);
+  const converted = rearranged
+    .split("")
+    .map((ch) => (ch >= "A" && ch <= "Z" ? ch.charCodeAt(0) - 55 : ch))
+    .join("");
+  let remainder = converted;
+  while (remainder.length > 9) {
+    remainder =
+      (parseInt(remainder.slice(0, 9), 10) % 97) + remainder.slice(9);
+  }
+  return parseInt(remainder, 10) % 97 === 1;
+};
 
 export default function SellerFinanceInfoCard() {
   const [loading, setLoading] = useState(true);
@@ -31,11 +50,8 @@ export default function SellerFinanceInfoCard() {
   const [form, setForm] = useState(EMPTY);
   const [mode, setMode] = useState("view"); // "view" | "edit"
 
-  // IBAN doğrulama
-  const ibanValid = useMemo(() => {
-    const raw = normalizeIban(form.iban);
-    return raw.startsWith("TR") && raw.length === 26;
-  }, [form.iban]);
+  // ✅ IBAN doğrulama (gerçek)
+  const ibanValid = useMemo(() => isValidIban(form.iban), [form.iban]);
 
   // API'den profil verisini al
   const refresh = async () => {
@@ -62,7 +78,6 @@ export default function SellerFinanceInfoCard() {
     refresh();
   }, []);
 
-  // Input değişim
   const onChange = (e) => {
     const { name, value } = e.target;
     if (name === "iban") {
@@ -73,7 +88,6 @@ export default function SellerFinanceInfoCard() {
     }
   };
 
-  // IBAN kopyalama
   const copyIban = async () => {
     try {
       await navigator.clipboard.writeText(normalizeIban(form.iban));
@@ -82,11 +96,15 @@ export default function SellerFinanceInfoCard() {
     } catch {}
   };
 
-  // Kayıt işlemi
   const onSave = async (e) => {
     e?.preventDefault?.();
     setBusy(true);
     setMsg("");
+    if (!ibanValid) {
+      setMsg("Geçerli bir TR IBAN giriniz.");
+      setBusy(false);
+      return;
+    }
     try {
       await savePayoutProfile({
         bankName: form.bankName.trim(),
@@ -118,9 +136,7 @@ export default function SellerFinanceInfoCard() {
     <div className="bg-white shadow-sm border border-gray-200 rounded-2xl p-6 w-full transition">
       {/* Başlık */}
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-semibold text-gray-900">
-          Ödeme Bilgileri
-        </h2>
+        <h2 className="text-xl font-semibold text-gray-900">Ödeme Bilgileri</h2>
         {msg && <span className="text-sm text-gray-600">{msg}</span>}
       </div>
 
@@ -130,7 +146,10 @@ export default function SellerFinanceInfoCard() {
           <div className="divide-y divide-gray-100">
             <InfoRow label="Banka Adı" value={profile?.bankName} />
             <InfoRow label="Şube" value={profile?.bankBranch} />
-            <InfoRow label="Hesap Sahibi" value={profile?.bankAccountHolderName} />
+            <InfoRow
+              label="Hesap Sahibi"
+              value={profile?.bankAccountHolderName}
+            />
             <InfoRow label="IBAN" value={formatIban(profile?.iban || "")}>
               <button
                 type="button"
@@ -138,7 +157,11 @@ export default function SellerFinanceInfoCard() {
                 className="ml-2 px-2 py-1 rounded border text-xs hover:bg-gray-50 transition"
                 title="Kopyala"
               >
-                {copied ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
+                {copied ? (
+                  <Check className="w-4 h-4 text-emerald-600" />
+                ) : (
+                  <Copy className="w-4 h-4" />
+                )}
               </button>
             </InfoRow>
             <InfoRow label="Swift Kodu" value={profile?.swiftCode} />
@@ -165,9 +188,23 @@ export default function SellerFinanceInfoCard() {
 
       {/* === EDIT MODE === */}
       {mode === "edit" && (
-        <form onSubmit={onSave} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Field label="Banka Adı" name="bankName" value={form.bankName} onChange={onChange} required />
-          <Field label="Şube" name="bankBranch" value={form.bankBranch} onChange={onChange} />
+        <form
+          onSubmit={onSave}
+          className="grid grid-cols-1 md:grid-cols-2 gap-4"
+        >
+          <Field
+            label="Banka Adı"
+            name="bankName"
+            value={form.bankName}
+            onChange={onChange}
+            required
+          />
+          <Field
+            label="Şube"
+            name="bankBranch"
+            value={form.bankBranch}
+            onChange={onChange}
+          />
           <Field
             label="Hesap Sahibi"
             name="bankAccountHolderName"
@@ -188,7 +225,9 @@ export default function SellerFinanceInfoCard() {
                 onChange={onChange}
                 placeholder="TR__ ____ ____ ____ ____ ____"
                 className={`flex-1 tracking-wider border rounded-md px-2 py-1 text-sm focus:ring-2 outline-none ${
-                  ibanValid ? "border-emerald-400 focus:ring-emerald-500" : "border-gray-300 focus:ring-rose-400"
+                  ibanValid
+                    ? "border-emerald-400 focus:ring-emerald-500"
+                    : "border-gray-300 focus:ring-rose-400"
                 }`}
                 required
               />
@@ -199,15 +238,27 @@ export default function SellerFinanceInfoCard() {
                 disabled={!form.iban}
                 title="Kopyala"
               >
-                {copied ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
+                {copied ? (
+                  <Check className="w-4 h-4 text-emerald-600" />
+                ) : (
+                  <Copy className="w-4 h-4" />
+                )}
               </button>
             </div>
             {!ibanValid && (
-              <p className="text-xs text-rose-600">Geçerli bir TR IBAN giriniz (26 karakter)</p>
+              <p className="text-xs text-rose-600">
+                Geçerli bir TR IBAN giriniz (örnek: TR12 3456 7890 1234 5678
+                9010 11)
+              </p>
             )}
           </div>
 
-          <Field label="Swift Kodu" name="swiftCode" value={form.swiftCode} onChange={onChange} />
+          <Field
+            label="Swift Kodu"
+            name="swiftCode"
+            value={form.swiftCode}
+            onChange={onChange}
+          />
 
           {/* Butonlar */}
           <div className="md:col-span-2 flex flex-wrap gap-3 mt-3">
