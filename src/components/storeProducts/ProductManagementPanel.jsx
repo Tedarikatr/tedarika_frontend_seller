@@ -1,5 +1,5 @@
 // =============================
-// ProductManagementPanel.jsx (Modern + Fiyat Merdivenleri Entegre)
+// ProductManagementPanel.jsx (Final + Unit Types + Fiyat Merdivenleri)
 // =============================
 import React, { useState } from "react";
 import {
@@ -8,10 +8,12 @@ import {
   updateProductQuantityLimits,
   uploadProductImages,
   updateProductStock,
+  updateProductUnitType,
 } from "@/api/sellerStoreService";
 import { X, ImagePlus, Images, ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import ProductPriceTiers from "@/components/storeProducts/ProductPriceTiers";
+import { UNIT_TYPE_OPTIONS } from "@/constants/unitTypes"; // ✅ Yeni import
 
 // Basit Input
 const Input = ({ value, onChange, placeholder, className = "", ...props }) => (
@@ -69,6 +71,7 @@ const ProductManagementPanel = ({
   const [minQty, setMinQty] = useState(product.minOrderQuantity);
   const [maxQty, setMaxQty] = useState(product.maxOrderQuantity);
   const [stock, setStock] = useState(product.stockQuantity ?? 0);
+  const [unitType, setUnitType] = useState(product.unitType || "");
   const [uploading, setUploading] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState(null);
   const [images, setImages] = useState(
@@ -106,7 +109,6 @@ const ProductManagementPanel = ({
 
   return (
     <div className="fixed inset-0 flex justify-end z-50 bg-black/30 backdrop-blur-sm transition-all">
-      {/* Sağ Panel */}
       <div className="w-full sm:w-[480px] bg-white h-full shadow-2xl overflow-y-auto p-6 relative animate-[slideIn_0.35s_ease-out] rounded-l-2xl">
         {/* Kapat Butonu */}
         <button
@@ -116,10 +118,7 @@ const ProductManagementPanel = ({
           <X size={22} />
         </button>
 
-        {/* Başlık */}
-        <h2 className="text-2xl font-bold mb-6 text-gray-900">
-          Ürün Yönetimi
-        </h2>
+        <h2 className="text-2xl font-bold mb-6 text-gray-900">Ürün Yönetimi</h2>
 
         {/* Ürün Bilgisi */}
         <div className="flex items-center gap-4 mb-8">
@@ -140,9 +139,8 @@ const ProductManagementPanel = ({
           </div>
         </div>
 
-        {/* Bölümler */}
         <div className="space-y-8">
-          {/* Fiyat Güncelle */}
+          {/* 💰 Fiyat Güncelle */}
           <section>
             <h3 className="text-sm font-semibold text-gray-700 mb-2">
               Fiyat Güncelle
@@ -167,7 +165,40 @@ const ProductManagementPanel = ({
             </div>
           </section>
 
-          {/* Limitler */}
+          {/* 📦 Birim Tipi Güncelle */}
+          <section>
+            <h3 className="text-sm font-semibold text-gray-700 mb-2">
+              Birim Tipi Güncelle
+            </h3>
+            <div className="flex gap-2">
+              <select
+                value={unitType}
+                onChange={(e) => setUnitType(e.target.value)}
+                className="border border-gray-300 rounded-md text-sm px-3 py-2 focus:ring-2 focus:ring-emerald-500 outline-none w-full"
+              >
+                <option value="">Birim Tipi Seçiniz</option>
+                {UNIT_TYPE_OPTIONS.map((opt) => (
+                  <option key={opt.id} value={opt.label}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+              <Button
+                variant="soft"
+                onClick={() =>
+                  handleAction(
+                    () => updateProductUnitType(storeProductId, unitType),
+                    "Birim tipi güncellendi."
+                  )
+                }
+                disabled={!unitType}
+              >
+                Kaydet
+              </Button>
+            </div>
+          </section>
+
+          {/* 🔢 Limitler */}
           <section>
             <h3 className="text-sm font-semibold text-gray-700 mb-2">
               Sipariş Limitleri
@@ -204,7 +235,7 @@ const ProductManagementPanel = ({
             </div>
           </section>
 
-          {/* Stok Güncelle */}
+          {/* 🏷️ Stok Güncelle */}
           <section>
             <h3 className="text-sm font-semibold text-gray-700 mb-2">
               Stok Güncelle
@@ -229,7 +260,7 @@ const ProductManagementPanel = ({
             </div>
           </section>
 
-          {/* Görseller */}
+          {/* 📸 Ürün Görselleri */}
           <section>
             <h3 className="text-sm font-semibold text-gray-700 mb-3">
               Ürün Görselleri
@@ -276,7 +307,7 @@ const ProductManagementPanel = ({
             </div>
           </section>
 
-          {/* Satış Durumu */}
+          {/* 🟢 Satış Durumu */}
           <section>
             <h3 className="text-sm font-semibold text-gray-700 mb-3">
               Satış Durumu
@@ -310,7 +341,6 @@ const ProductManagementPanel = ({
         </div>
       </div>
 
-      {/* Animasyon */}
       <style>{`
         @keyframes slideIn {
           from { transform: translateX(100%); opacity: 0.4; }
