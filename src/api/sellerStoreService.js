@@ -176,3 +176,11 @@ export const listProductImages = (storeProductId) =>
     null,
     true
   );
+
+  export const updateProductUnitType = (storeProductId, unitType) =>
+  apiRequest(
+    "/SellerStoreProduct/update-unit-type",
+    "PUT",
+    { storeProductId, unitType },
+    true
+  );
