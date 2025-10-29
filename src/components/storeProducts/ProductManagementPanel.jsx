@@ -1,5 +1,5 @@
 // =============================
-// ProductManagementPanel.jsx (Modern, Clean Tasarım)
+// ProductManagementPanel.jsx (Modern + Fiyat Merdivenleri Entegre)
 // =============================
 import React, { useState } from "react";
 import {
@@ -11,6 +11,7 @@ import {
 } from "@/api/sellerStoreService";
 import { X, ImagePlus, Images, ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import ProductPriceTiers from "@/components/storeProducts/ProductPriceTiers";
 
 // Basit Input
 const Input = ({ value, onChange, placeholder, className = "", ...props }) => (
@@ -297,6 +298,14 @@ const ProductManagementPanel = ({
                 {isOnSale ? "Satışı Kapat" : "Satışa Aç"}
               </Button>
             </div>
+          </section>
+
+          {/* 🧮 Fiyat Merdivenleri */}
+          <section>
+            <ProductPriceTiers
+              storeProductId={storeProductId}
+              onFeedback={onFeedback}
+            />
           </section>
         </div>
       </div>
