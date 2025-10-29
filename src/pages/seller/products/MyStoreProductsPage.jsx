@@ -1,9 +1,13 @@
+// =============================
+// MyStoreProductsPage.jsx (Final)
+// =============================
 import React, { useEffect, useState } from "react";
 import {
   fetchMyStoreProducts,
   getStoreCoverage,
 } from "@/api/sellerStoreService";
 import MyStoreProductTable from "@/components/storeProducts/MyStoreProductTable";
+import ProductManagementPanel from "@/components/storeProducts/ProductManagementPanel";
 import Pagination from "@/components/ui/Pagination";
 import { CheckCircle, XCircle } from "lucide-react";
 
@@ -15,6 +19,9 @@ const MyStoreProductsPage = () => {
   const [feedback, setFeedback] = useState(null);
   const [loading, setLoading] = useState(false);
   const [hasCoverage, setHasCoverage] = useState(true);
+
+  // Panel state
+  const [selectedProduct, setSelectedProduct] = useState(null);
 
   const loadProducts = async () => {
     setLoading(true);
@@ -56,10 +63,12 @@ const MyStoreProductsPage = () => {
   const currentItems = products.slice(start, start + ITEMS_PER_PAGE);
 
   return (
-    <div className="p-6 bg-[#f9f9f9] min-h-screen">
+    <div className="p-6 bg-[#f9f9f9] min-h-screen relative">
       {/* Başlık */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-2">
-        <h1 className="text-3xl font-extrabold text-gray-800">Mağaza Ürünlerim</h1>
+        <h1 className="text-3xl font-extrabold text-gray-800">
+          Mağaza Ürünlerim
+        </h1>
         {!loading && (
           <span className="text-sm text-gray-600">
             Toplam <strong>{products.length}</strong> ürün listeleniyor
@@ -98,9 +107,7 @@ const MyStoreProductsPage = () => {
         ) : (
           <MyStoreProductTable
             products={currentItems}
-            onRefresh={loadProducts}
-            onFeedback={showFeedback}
-            hasCoverage={hasCoverage}
+            onManage={setSelectedProduct} // ✅ paneli aç
           />
         )}
       </div>
@@ -115,6 +122,17 @@ const MyStoreProductsPage = () => {
             onPageChange={setCurrentPage}
           />
         </div>
+      )}
+
+      {/* Ürün Yönetimi Paneli */}
+      {selectedProduct && (
+        <ProductManagementPanel
+          product={selectedProduct}
+          onClose={() => setSelectedProduct(null)}
+          onFeedback={showFeedback}
+          onRefresh={loadProducts}
+          hasCoverage={hasCoverage}
+        />
       )}
     </div>
   );
