@@ -52,6 +52,11 @@ const LoginPage = () => {
     }
   };
 
+  // Handle back button click
+  const handleBack = () => {
+    navigate(-1); // Go back to the previous page
+  };
+
   return (
     <div className="min-h-screen flex flex-col md:flex-row bg-[#002d2f] text-white">
       {/* Sol bilgi alanı */}
@@ -125,6 +130,15 @@ const LoginPage = () => {
               Kayıt Ol
             </Link>
           </p>
+
+          {/* Back Button */}
+          <button
+            type="button"
+            onClick={handleBack}
+            className="mt-4 w-full text-center text-sm text-gray-600 underline"
+          >
+            Geri Dön
+          </button>
         </form>
       </div>
     </div>
