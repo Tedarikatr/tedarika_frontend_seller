@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 
 const HeroSection = () => {
   return (
-    <section className="relative bg-gradient-to-br from-emerald-100 via-white to-emerald-50 py-32 px-6 text-center overflow-hidden">
+    <section className="relative bg-white py-32 px-6 text-center overflow-hidden">
       {/* Dekoratif blur daireler */}
       <div className="absolute top-0 left-10 w-40 h-40 bg-emerald-300 opacity-20 rounded-full blur-3xl animate-pulse-slow z-0" />
       <div className="absolute bottom-0 right-10 w-40 h-40 bg-indigo-300 opacity-20 rounded-full blur-3xl animate-pulse-slow z-0" />
