@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 
 const HeroImpactSection = () => {
   return (
-    <section className="relative bg-gradient-to-r from-emerald-700 to-teal-500 py-40 px-6 text-center overflow-hidden">
+    <section className="relative bg-white py-40 px-6 text-center overflow-hidden">
       {/* Arka Plan Etkisi - Hareketli ve Parlak */}
       <div className="absolute top-0 left-0 w-80 h-80 bg-emerald-600 opacity-40 rounded-full blur-3xl animate-pulse-slow z-0" />
       <div className="absolute bottom-0 right-0 w-64 h-64 bg-teal-600 opacity-30 rounded-full blur-3xl animate-pulse-slow z-0" />
@@ -11,7 +11,7 @@ const HeroImpactSection = () => {
       <div className="max-w-7xl mx-auto relative z-10">
         {/* Başlık */}
         <motion.h1
-          className="text-6xl md:text-7xl font-extrabold text-white mb-8"
+          className="text-6xl md:text-7xl font-extrabold text-black mb-8"
           initial={{ opacity: 0, y: -30 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
@@ -23,7 +23,7 @@ const HeroImpactSection = () => {
 
         {/* Açıklama */}
         <motion.p
-          className="text-xl text-gray-100 max-w-2xl mx-auto mb-16"
+          className="text-xl text-gray-800 max-w-2xl mx-auto mb-16"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3, duration: 0.6 }}
@@ -93,9 +93,9 @@ const HeroImpactSection = () => {
         >
           <div className="flex justify-center items-center gap-4">
             <Rocket className="text-emerald-600 w-10 h-10" />
-            <h3 className="text-2xl font-semibold text-white">İhracat Başladı, Sen de Katıl!</h3>
+            <h3 className="text-2xl font-semibold text-black">İhracat Başladı, Sen de Katıl!</h3>
           </div>
-          <p className="text-sm text-gray-100 mt-4">Sana sadece global pazarda yerini almak kaldı!</p>
+          <p className="text-sm text-gray-800 mt-4">Sana sadece global pazarda yerini almak kaldı!</p>
           <a
             href="/seller/register"
             className="inline-block bg-emerald-800 hover:bg-emerald-900 text-white px-12 py-4 rounded-full text-lg font-semibold transition shadow-lg hover:shadow-emerald-400/40 mt-6"
