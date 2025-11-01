@@ -42,7 +42,7 @@ export default function PricingSection() {
   }
 
   return (
-    <section className="py-24 bg-gradient-to-br from-emerald-800 via-emerald-700 to-teal-600 text-white">
+    <section className="py-24 bg-white text-gray-800">
       <div className="max-w-5xl mx-auto px-6 text-center">
         <motion.h2
           initial={{ opacity: 0, y: 20 }}
@@ -59,11 +59,11 @@ export default function PricingSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
-          className="text-lg md:text-xl text-gray-200 mb-16 max-w-2xl mx-auto"
+          className="text-lg md:text-xl text-gray-600 mb-16 max-w-2xl mx-auto"
         >
           Hiçbir ücret ödemeden mağazanı oluştur, ürünlerini listele ve satışa
           başla.{" "}
-          <span className="font-semibold text-white">
+          <span className="font-semibold text-gray-800">
             {plan.name || "6 Aylık Ücretsiz Deneme Paketi"}
           </span>{" "}
           ile Tedarika dünyasını keşfet!
