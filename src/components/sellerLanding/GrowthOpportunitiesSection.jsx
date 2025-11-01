@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 
 const GrowthOpportunitiesSection = () => {
   return (
-    <section className="relative bg-gradient-to-r from-emerald-400 to-emerald-600 py-32 px-6 text-center overflow-hidden">
+    <section className="relative bg-white py-32 px-6 text-center overflow-hidden">
       {/* Dekoratif blur daireler */}
       <div className="absolute top-0 left-10 w-40 h-40 bg-emerald-300 opacity-30 rounded-full blur-3xl animate-pulse-slow z-0" />
       <div className="absolute bottom-0 right-10 w-56 h-56 bg-indigo-300 opacity-20 rounded-full blur-3xl animate-pulse-slow z-0" />
@@ -11,7 +11,7 @@ const GrowthOpportunitiesSection = () => {
       <div className="max-w-6xl mx-auto relative z-10">
         {/* Başlık */}
         <motion.h2
-          className="text-5xl md:text-6xl font-extrabold text-white mb-8"
+          className="text-5xl md:text-6xl font-extrabold text-black mb-8"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
@@ -21,7 +21,7 @@ const GrowthOpportunitiesSection = () => {
 
         {/* Açıklama */}
         <motion.p
-          className="text-lg text-gray-100 mb-12 max-w-2xl mx-auto"
+          className="text-lg text-gray-800 mb-12 max-w-2xl mx-auto"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2, duration: 0.6 }}
@@ -108,9 +108,9 @@ const GrowthOpportunitiesSection = () => {
         >
           <div className="flex justify-center items-center gap-4">
             <ArrowRight className="text-emerald-600 w-8 h-8" />
-            <h3 className="text-2xl font-semibold text-white">Büyümeye Başla, Satışa Geç!</h3>
+            <h3 className="text-2xl font-semibold text-black">Büyümeye Başla, Satışa Geç!</h3>
           </div>
-          <p className="text-sm text-gray-100 mt-4">Fırsatları kaçırmayın, hemen global pazara adım atın.</p>
+          <p className="text-sm text-gray-800 mt-4">Fırsatları kaçırmayın, hemen global pazara adım atın.</p>
           <a
             href="/seller/register"
             className="inline-block bg-emerald-700 hover:bg-emerald-800 text-white px-10 py-4 rounded-full text-lg font-semibold transition shadow-lg hover:shadow-emerald-400/40 mt-6"
