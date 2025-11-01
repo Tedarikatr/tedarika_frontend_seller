@@ -3,9 +3,9 @@ import { motion } from "framer-motion";
 
 const ExportMadeEasySection = () => {
   return (
-    <section className="relative bg-gradient-to-br from-emerald-100 to-emerald-200 py-24 px-6 text-center overflow-hidden">
-      {/* Dekoratif blur daireler */}
-      <div className="absolute top-10 left-10 w-40 h-40 bg-emerald-300 opacity-20 rounded-full blur-3xl animate-pulse-slow z-0" />
+    <section className="relative bg-white py-24 px-6 text-center overflow-hidden">
+      {/* 🌟 Arka plan parıltı efektleri */}
+      <div className="absolute top-10 left-10 w-40 h-40 bg-emerald-300 opacity-30 rounded-full blur-3xl animate-pulse-slow z-0" />
       <div className="absolute bottom-10 right-10 w-56 h-56 bg-indigo-300 opacity-20 rounded-full blur-3xl animate-pulse-slow z-0" />
 
       <div className="max-w-6xl mx-auto relative z-10">
@@ -47,6 +47,13 @@ const ExportMadeEasySection = () => {
             <p className="text-sm text-gray-600">
               Tedarika ile hangi ülkeye satış yapmak istediğini kolayca belirle.
             </p>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="mt-4 px-6 py-2 bg-gradient-to-r from-emerald-600 to-teal-500 text-white rounded-full"
+            >
+              Hedef Pazar Seç
+            </motion.button>
           </motion.div>
 
           {/* Adım 2 */}
@@ -63,6 +70,13 @@ const ExportMadeEasySection = () => {
             <p className="text-sm text-gray-600">
               Ürününüzü yükleyin, açıklamalarını girin ve satışa sunmaya başlayın.
             </p>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="mt-4 px-6 py-2 bg-gradient-to-r from-yellow-500 to-orange-600 text-white rounded-full"
+            >
+              Ürün Yükle
+            </motion.button>
           </motion.div>
 
           {/* Adım 3 */}
@@ -79,6 +93,13 @@ const ExportMadeEasySection = () => {
             <p className="text-sm text-gray-600">
               Kargo entegrasyonu ve güvenli ödeme sistemi ile işlem tamamlanır.
             </p>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="mt-4 px-6 py-2 bg-gradient-to-r from-purple-500 to-indigo-600 text-white rounded-full"
+            >
+              Kargo ve Ödeme
+            </motion.button>
           </motion.div>
 
           {/* Adım 4 */}
@@ -95,6 +116,13 @@ const ExportMadeEasySection = () => {
             <p className="text-sm text-gray-600">
               Sipariş tamamlandığında, ödemeni güvenle al ve kazancını artır.
             </p>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="mt-4 px-6 py-2 bg-gradient-to-r from-green-500 to-teal-600 text-white rounded-full"
+            >
+              Ödeme Al
+            </motion.button>
           </motion.div>
         </div>
       </div>
