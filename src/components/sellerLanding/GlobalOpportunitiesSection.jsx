@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 
 const GlobalOpportunitiesSection = () => {
   return (
-    <section className="relative bg-gradient-to-br from-teal-600 to-emerald-400 py-32 px-6 text-center overflow-hidden">
+    <section className="relative bg-white py-32 px-6 text-center overflow-hidden">
       {/* Arka Plan Efektleri */}
       <div className="absolute top-0 left-10 w-40 h-40 bg-teal-500 opacity-30 rounded-full blur-3xl animate-pulse-slow z-0" />
       <div className="absolute bottom-0 right-10 w-56 h-56 bg-emerald-500 opacity-20 rounded-full blur-3xl animate-pulse-slow z-0" />
@@ -11,19 +11,19 @@ const GlobalOpportunitiesSection = () => {
       <div className="max-w-6xl mx-auto relative z-10">
         {/* Başlık */}
         <motion.h2
-          className="text-6xl font-extrabold text-white mb-8"
+          className="text-6xl font-extrabold text-black mb-8"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
         >
-          <span className="text-emerald-100">İhracat</span> ile Yeni Bir Dünya Keşfedin  
+          <span className="text-emerald-800">İhracat</span> ile Yeni Bir Dünya Keşfedin  
           <br />
           Küresel Fırsatlar Bir Adım Uzağınızda
         </motion.h2>
 
         {/* Açıklama */}
         <motion.p
-          className="text-lg text-gray-100 mb-16 max-w-2xl mx-auto"
+          className="text-lg text-gray-800 mb-16 max-w-2xl mx-auto"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2, duration: 0.6 }}
@@ -49,6 +49,13 @@ const GlobalOpportunitiesSection = () => {
             <p className="text-sm text-gray-600">
               Küresel pazarda ilk adımı atın. Hedef pazarınızı seçin ve ürünlerinizi dünyaya sunmaya başlayın.
             </p>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="mt-4 px-6 py-2 bg-gradient-to-r from-emerald-600 to-teal-500 text-white rounded-full"
+            >
+              Hedef Pazara Adım At
+            </motion.button>
           </motion.div>
 
           {/* Adım 2 */}
@@ -61,10 +68,17 @@ const GlobalOpportunitiesSection = () => {
             <div className="w-16 h-16 bg-gradient-to-br from-yellow-500 to-orange-600 text-white rounded-xl flex items-center justify-center mb-6">
               <Package className="w-8 h-8" />
             </div>
-            <h3 className="font-semibold text-xl text-[#002222] mb-2">Ürün Yükle ve Satışa Başla</h3>
+            <h3 className="font-semibold text-xl text-[#002222] mb-2">Ürünlerini Yükle</h3>
             <p className="text-sm text-gray-600">
               Ürünlerini platforma yükle, açıklamalarını gir ve satışa başlamak için hazır ol!
             </p>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="mt-4 px-6 py-2 bg-gradient-to-r from-yellow-500 to-orange-600 text-white rounded-full"
+            >
+              Ürün Yükle
+            </motion.button>
           </motion.div>
 
           {/* Adım 3 */}
@@ -81,6 +95,13 @@ const GlobalOpportunitiesSection = () => {
             <p className="text-sm text-gray-600">
               Global alıcılarla güvenli ödeme ve hızlı teslimat süreci ile satışınızı hemen tamamlayın.
             </p>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="mt-4 px-6 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-full"
+            >
+              Ödeme ve Teslimat
+            </motion.button>
           </motion.div>
         </div>
 
@@ -93,9 +114,9 @@ const GlobalOpportunitiesSection = () => {
         >
           <div className="flex justify-center items-center gap-4">
             <Star className="text-emerald-600 w-8 h-8" />
-            <h3 className="text-2xl font-semibold text-white">Hedefine Ulaş ve Büyümeye Başla</h3>
+            <h3 className="text-2xl font-semibold text-black">Hedefine Ulaş ve Büyümeye Başla</h3>
           </div>
-          <p className="text-sm text-gray-100 mt-4">İhracat fırsatlarını keşfet, büyümeye başla!</p>
+          <p className="text-sm text-gray-800 mt-4">İhracat fırsatlarını keşfet, büyümeye başla!</p>
           <a
             href="/seller/register"
             className="inline-block bg-emerald-700 hover:bg-emerald-800 text-white px-10 py-4 rounded-full text-lg font-semibold transition shadow-lg hover:shadow-emerald-400/40 mt-6"
