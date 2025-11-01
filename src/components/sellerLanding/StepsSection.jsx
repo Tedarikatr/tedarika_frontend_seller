@@ -26,7 +26,7 @@ const steps = [
 ];
 
 const StepsSection = () => (
-  <section className="bg-gradient-to-r from-emerald-100 via-white to-emerald-50 py-24 px-6 relative">
+  <section className="bg-white py-24 px-6 relative">
     <div className="max-w-6xl mx-auto">
       {/* Başlık */}
       <motion.h2
