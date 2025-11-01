@@ -24,7 +24,7 @@ const features = [
 
 const FeaturesSection = () => {
   return (
-    <section className="relative bg-gradient-to-b from-white via-emerald-50 to-emerald-100 py-28 px-6 overflow-hidden">
+    <section className="relative bg-white py-28 px-6 overflow-hidden">
       {/* Dekoratif arka plan efektleri */}
       <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-[0.02]" />
       <div className="absolute top-10 left-10 w-40 h-40 bg-emerald-300 opacity-20 rounded-full blur-3xl animate-pulse-slow" />
@@ -58,7 +58,7 @@ const FeaturesSection = () => {
         </motion.p>
 
         {/* Özellik Kartları */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10">
           {features.map(({ icon: Icon, title, desc, bg }, index) => (
             <motion.div
               key={index}
@@ -90,7 +90,7 @@ const FeaturesSection = () => {
           transition={{ delay: 0.8, duration: 0.6 }}
         >
           <h3 className="text-2xl md:text-3xl font-bold text-[#003333] mb-6">
-            Sen de Tedarika’da mağazanı aç, dünyaya satış yapmaya başla 🚀
+            Sen de Tedarika’da mağazanı aç, dünyaya satış yapmaya başla
           </h3>
           <a
             href="/seller/register"
