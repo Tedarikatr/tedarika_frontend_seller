@@ -3,10 +3,10 @@ import { motion } from "framer-motion";
 
 const ExportVurgulayanSection = () => {
   return (
-    <section className="relative bg-gradient-to-br from-emerald-100 to-emerald-50 py-32 px-6 text-center overflow-hidden">
+    <section className="relative bg-white py-32 px-6 text-center overflow-hidden">
       {/* Arka Plan Efektleri */}
-      <div className="absolute top-10 left-10 w-40 h-40 bg-emerald-300 opacity-20 rounded-full blur-3xl animate-pulse-slow z-0" />
-      <div className="absolute bottom-10 right-10 w-56 h-56 bg-indigo-300 opacity-20 rounded-full blur-3xl animate-pulse-slow z-0" />
+      <div className="absolute top-10 left-10 w-40 h-40 bg-emerald-400 opacity-30 rounded-full blur-3xl animate-pulse-slow z-0" />
+      <div className="absolute bottom-10 right-10 w-56 h-56 bg-indigo-400 opacity-20 rounded-full blur-3xl animate-pulse-slow z-0" />
 
       <div className="max-w-6xl mx-auto relative z-10">
         {/* Başlık */}
@@ -25,7 +25,7 @@ const ExportVurgulayanSection = () => {
 
         {/* Açıklama */}
         <motion.p
-          className="text-lg text-gray-600 max-w-2xl mx-auto mb-12"
+          className="text-lg text-gray-800 max-w-2xl mx-auto mb-12"
           initial={{ opacity: 0, y: 10 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2, duration: 0.6 }}
@@ -36,10 +36,10 @@ const ExportVurgulayanSection = () => {
         </motion.p>
 
         {/* 3 Adımda İhracat */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-12">
           {/* Adım 1 */}
           <motion.div
-            className="bg-white rounded-2xl p-8 shadow-md hover:shadow-xl transition-transform duration-300 hover:-translate-y-1"
+            className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-transform duration-300 hover:-translate-y-1"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.6 }}
@@ -48,12 +48,21 @@ const ExportVurgulayanSection = () => {
               <Globe className="w-8 h-8" />
             </div>
             <h3 className="font-semibold text-xl text-[#002222] mb-2">Global Pazara Adım At</h3>
-            <p className="text-sm text-gray-600">Dünya çapındaki alıcılara, kolayca erişin ve satışa başlamak için gerekli tüm adımları atın.</p>
+            <p className="text-sm text-gray-600">
+              Dünya çapındaki alıcılara, kolayca erişin ve satışa başlamak için gerekli tüm adımları atın.
+            </p>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="mt-4 px-6 py-2 bg-gradient-to-r from-emerald-600 to-teal-500 text-white rounded-full"
+            >
+              Hedef Pazara Adım At
+            </motion.button>
           </motion.div>
 
           {/* Adım 2 */}
           <motion.div
-            className="bg-white rounded-2xl p-8 shadow-md hover:shadow-xl transition-transform duration-300 hover:-translate-y-1"
+            className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-transform duration-300 hover:-translate-y-1"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6, duration: 0.6 }}
@@ -61,13 +70,22 @@ const ExportVurgulayanSection = () => {
             <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-yellow-500 to-orange-600 text-white flex items-center justify-center mb-6">
               <Package className="w-8 h-8" />
             </div>
-            <h3 className="font-semibold text-xl text-[#002222] mb-2">Ürünlerinizi Yükleyin</h3>
-            <p className="text-sm text-gray-600">Ürünlerinizi platforma yükleyin, dünyanın dört bir yanındaki alıcılara sunun.</p>
+            <h3 className="font-semibold text-xl text-[#002222] mb-2">Ürünlerini Yükle</h3>
+            <p className="text-sm text-gray-600">
+              Ürünlerini platforma yükleyin, dünyanın dört bir yanındaki alıcılara sunun.
+            </p>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="mt-4 px-6 py-2 bg-gradient-to-r from-yellow-500 to-orange-600 text-white rounded-full"
+            >
+              Ürün Yükle
+            </motion.button>
           </motion.div>
 
           {/* Adım 3 */}
           <motion.div
-            className="bg-white rounded-2xl p-8 shadow-md hover:shadow-xl transition-transform duration-300 hover:-translate-y-1"
+            className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-transform duration-300 hover:-translate-y-1"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.9, duration: 0.6 }}
@@ -76,7 +94,16 @@ const ExportVurgulayanSection = () => {
               <Truck className="w-8 h-8" />
             </div>
             <h3 className="font-semibold text-xl text-[#002222] mb-2">Güvenli Ödeme ve Teslimat</h3>
-            <p className="text-sm text-gray-600">Her işlemde güvenli ödeme, güvenilir teslimat garantisi ile satışı tamamlayın.</p>
+            <p className="text-sm text-gray-600">
+              Her işlemde güvenli ödeme, güvenilir teslimat garantisi ile satışı tamamlayın.
+            </p>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="mt-4 px-6 py-2 bg-gradient-to-r from-purple-600 to-indigo-700 text-white rounded-full"
+            >
+              Ödeme ve Teslimat
+            </motion.button>
           </motion.div>
         </div>
 
@@ -92,7 +119,7 @@ const ExportVurgulayanSection = () => {
           </h3>
           <a
             href="/seller/register"
-            className="inline-block bg-emerald-600 hover:bg-emerald-700 text-white px-10 py-4 rounded-full text-lg font-semibold transition shadow-lg hover:shadow-emerald-400/40"
+            className="inline-block bg-gradient-to-r from-emerald-600 to-teal-600 hover:bg-emerald-700 text-white px-10 py-4 rounded-full text-lg font-semibold transition shadow-lg hover:shadow-emerald-400/40"
           >
             Mağazanı Ücretsiz Aç
           </a>
