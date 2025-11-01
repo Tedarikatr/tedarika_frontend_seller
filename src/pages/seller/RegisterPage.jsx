@@ -13,6 +13,7 @@ const RegisterPage = () => {
     password: "",
   });
   const [message, setMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false); // Track submission status
 
   const handleChange = (e) => {
     setFormData((prev) => ({
@@ -24,22 +25,31 @@ const RegisterPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage("");
+    setIsSubmitting(true); // Disable submit during submission
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const phoneRegex = /^5\d{9}$/; // 5 ile başlayan 10 haneli format
+    const phoneRegex = /^5\d{9}$/;
 
     if (!emailRegex.test(formData.email)) {
       setMessage("❌ Geçerli bir e-posta adresi giriniz.");
+      setIsSubmitting(false);
       return;
     }
 
     if (!phoneRegex.test(formData.phone)) {
       setMessage("❌ Telefon numarası 05XXXXXXXXX formatında olmalıdır.");
+      setIsSubmitting(false);
       return;
     }
 
-    // +90 kodu eklenmiş hal
     const fullPhone = `+90${formData.phone}`;
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/; // Add password validation
+
+    if (!passwordRegex.test(formData.password)) {
+      setMessage("❌ Şifre en az 8 karakter, harf ve rakam içermelidir.");
+      setIsSubmitting(false);
+      return;
+    }
 
     const payload = {
       ...formData,
@@ -53,13 +63,20 @@ const RegisterPage = () => {
         navigate("/seller/login");
       }, 1500);
     } catch (err) {
-      setMessage("❌ " + (err.message || "Kayıt sırasında bir hata oluştu."));
+      const errorMessage = err?.response?.data?.message || err.message || "Kayıt sırasında bir hata oluştu.";
+      setMessage(`❌ ${errorMessage}`);
+    } finally {
+      setIsSubmitting(false); // Re-enable the submit button after submission
     }
+  };
+
+  // Handle back button click
+  const handleBack = () => {
+    navigate(-1); // Go back to the previous page
   };
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row bg-[#002d2f] text-white">
-      {/* Sol Tanıtım Alanı */}
       <div className="w-full md:w-1/2 flex flex-col justify-center items-start px-10 py-20 space-y-8 bg-gradient-to-br from-[#003e3f] via-[#004b49] to-[#005c5a]">
         <h2 className="text-4xl font-extrabold leading-tight tracking-tight">
           Tedarika ile Dakikalar İçinde Satışa Başlayın
@@ -81,11 +98,9 @@ const RegisterPage = () => {
         </ul>
       </div>
 
-      {/* Sağ Form Alanı */}
       <div className="w-full md:w-1/2 bg-white text-[#003636] flex items-center justify-center py-16 px-8">
         <form onSubmit={handleSubmit} className="w-full max-w-md">
           <h3 className="text-3xl font-bold text-center mb-10">Satıcı Kaydı</h3>
-
           <div className="space-y-5">
             <FormInput name="name" value={formData.name} onChange={handleChange} placeholder="Ad" icon={<User size={18} />} />
             <FormInput name="lastName" value={formData.lastName} onChange={handleChange} placeholder="Soyad" icon={<User size={18} />} />
@@ -96,9 +111,10 @@ const RegisterPage = () => {
 
           <button
             type="submit"
+            disabled={isSubmitting} // Disable button during submission
             className="mt-8 w-full bg-gradient-to-r from-[#00d18c] to-[#00a980] hover:opacity-90 text-white font-semibold py-3 rounded-xl transition"
           >
-            Hesap Oluştur
+            {isSubmitting ? "Kayıt Yapılıyor..." : "Hesap Oluştur"}
           </button>
 
           {message && (
@@ -120,6 +136,15 @@ const RegisterPage = () => {
               Giriş Yap
             </Link>
           </p>
+
+          {/* Back Button */}
+          <button
+            type="button"
+            onClick={handleBack}
+            className="mt-4 w-full text-center text-sm text-gray-600 underline"
+          >
+            Geri Dön
+          </button>
         </form>
       </div>
     </div>
@@ -141,7 +166,6 @@ const FormInput = ({ name, value, onChange, placeholder, icon, type = "text" }) 
   </div>
 );
 
-// 🇹🇷 Telefon Girişi
 const PhoneInput = ({ name, value, onChange }) => (
   <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#f0fdfa] border border-[#bde7e3] focus-within:ring-2 ring-[#00d18c] transition">
     <span className="flex items-center gap-1">
