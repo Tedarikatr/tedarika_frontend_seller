@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import Logo from "@/assets/images/logo.svg"; // Adjust path if needed
 
 const SellerHeader = () => {
   const navigate = useNavigate();
@@ -9,10 +10,8 @@ const SellerHeader = () => {
     <header className="bg-[#003032] shadow-md px-4 sm:px-6 py-3 w-full">
       <div className="w-full flex items-center justify-between">
         <div className="flex items-center">
-          <span className="text-white text-xl sm:text-2xl font-bold">
-            Tedarika
-            <span className="text-emerald-400 font-semibold ml-1">Seller</span>
-          </span>
+          {/* Adjusted logo size */}
+          <img src={Logo} alt="Tedarika Logo" className="h-12 sm:h-16" /> {/* Moderate size */}
         </div>
 
         <div className="hidden sm:flex items-center gap-3">
