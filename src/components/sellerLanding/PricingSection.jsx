@@ -42,23 +42,23 @@ export default function PricingSection() {
   }
 
   return (
-    <section className="py-24 bg-gradient-to-br from-green-900 via-emerald-800 to-green-900 text-white">
+    <section className="py-24 bg-gradient-to-br from-emerald-800 via-emerald-700 to-teal-600 text-white">
       <div className="max-w-5xl mx-auto px-6 text-center">
         <motion.h2
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 0.6 }}
           className="text-4xl md:text-5xl font-extrabold mb-6 drop-shadow"
         >
-          Şimdi Mağazanı Ücretsiz Aç 
+          Şimdi Mağazanı Ücretsiz Aç
         </motion.h2>
 
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
+          transition={{ duration: 0.8 }}
           className="text-lg md:text-xl text-gray-200 mb-16 max-w-2xl mx-auto"
         >
           Hiçbir ücret ödemeden mağazanı oluştur, ürünlerini listele ve satışa
@@ -93,7 +93,7 @@ export default function PricingSection() {
 
           <button
             onClick={() => navigate("/seller/register")}
-            className="mt-6 w-full py-3 rounded-lg font-semibold text-white bg-emerald-600 hover:bg-emerald-700 transition"
+            className="mt-6 w-full py-3 rounded-lg font-semibold text-white bg-emerald-600 hover:bg-emerald-700 transition transform hover:scale-105"
           >
             Hemen Başla
           </button>
