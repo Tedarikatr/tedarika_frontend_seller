@@ -1,6 +1,16 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { SendHorizonal, Mail, Phone, User, MapPin, Building2, CheckCircle2, XCircle } from "lucide-react";
+import {
+  SendHorizonal,
+  Mail,
+  Phone,
+  User,
+  MapPin,
+  Building2,
+  CheckCircle2,
+  XCircle,
+  FileText,
+} from "lucide-react";
 import { sendSellerNonSupport } from "../../api/sellerNonSupportService";
 
 const SupportFormSection = () => {
@@ -34,7 +44,7 @@ const SupportFormSection = () => {
     try {
       await sendSellerNonSupport(form);
       setIsSuccess(true);
-      setResponseMsg("Talebiniz başarıyla gönderildi!");
+      setResponseMsg("✅ Talebiniz başarıyla gönderildi!");
       setForm({
         FirstName: "",
         LastName: "",
@@ -50,7 +60,7 @@ const SupportFormSection = () => {
       setResponseMsg("❌ Bir hata oluştu: " + err.message);
     } finally {
       setLoading(false);
-      setTimeout(() => setIsSuccess(null), 4000); // 4 sn sonra kapanır
+      setTimeout(() => setIsSuccess(null), 4000); // toast 4 sn sonra kaybolur
     }
   };
 
@@ -73,7 +83,7 @@ const SupportFormSection = () => {
           Yardıma mı ihtiyacınız var? Formu doldurun, ekibimiz en kısa sürede sizinle iletişime geçsin.
         </p>
 
-        {/* Bildirim */}
+        {/* Toast Bildirimi */}
         <AnimatePresence>
           {isSuccess !== null && (
             <motion.div
@@ -107,9 +117,7 @@ const SupportFormSection = () => {
         >
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Ad
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Ad</label>
               <div className="flex items-center gap-2 border rounded-lg px-3 py-2">
                 <User className="text-emerald-600 w-4 h-4" />
                 <input
@@ -124,9 +132,7 @@ const SupportFormSection = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Soyad
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Soyad</label>
               <input
                 name="LastName"
                 value={form.LastName}
@@ -139,9 +145,7 @@ const SupportFormSection = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Telefon
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Telefon</label>
             <div className="flex items-center gap-2 border rounded-lg px-3 py-2">
               <Phone className="text-emerald-600 w-4 h-4" />
               <input
@@ -155,9 +159,7 @@ const SupportFormSection = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              E-Posta
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">E-Posta</label>
             <div className="flex items-center gap-2 border rounded-lg px-3 py-2">
               <Mail className="text-emerald-600 w-4 h-4" />
               <input
@@ -173,9 +175,7 @@ const SupportFormSection = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Mesajınız
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Mesajınız</label>
             <textarea
               name="Message"
               value={form.Message}
@@ -231,9 +231,11 @@ const SupportFormSection = () => {
             <div className="flex items-center gap-3">
               <Building2 className="text-emerald-700 w-6 h-6" />
               <p className="text-sm sm:text-base font-medium">
-                <strong>Tedarika A.Ş.</strong>
+                <strong>Coşkunlar Dış Ticaret Limited Şirketi</strong>
                 <br />
-                Vergi No: 1234567890
+                Mersis No: <strong>0211135358300001</strong>
+                <br />
+                İlan Sıra No: <strong>5978</strong>
               </p>
             </div>
             <div className="flex items-center gap-3">
