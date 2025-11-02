@@ -11,6 +11,7 @@ import GrowthOpportunitiesSection from "@/components/sellerLanding/GrowthOpportu
 import GlobalOpportunitiesSection from "@/components/sellerLanding/GlobalOpportunitiesSection";
 import HeroImpactSection from "@/components/sellerLanding/HeroImpactSection";
 import Footer from "@/components/sellerLanding/Footer";
+import SupportFormSection from "@/components/sellerLanding/SupportFormSection";
 
 
 
@@ -29,6 +30,7 @@ const SellerLandingPage = () => {
       <PricingSection /> {/* <-- BURAYA EKLENDİ */}
       {/* <TestimonialsSection /> */}
       <CTASection />
+      <SupportFormSection />
        <Footer />
     </div>
   );
