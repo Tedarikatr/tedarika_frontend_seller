@@ -11,15 +11,18 @@ const HeroImpactSection = () => {
       <div className="max-w-6xl mx-auto relative z-10">
         {/* Başlık */}
         <motion.h1
-          className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-black mb-6 sm:mb-8 leading-tight"
+          className="text-3xl sm:text-5xl md:text-6xl font-extrabold text-black mb-6 sm:mb-8 leading-snug sm:leading-tight px-2"
           initial={{ opacity: 0, y: -30 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
         >
-          Hayalinizdeki Global Pazara Adım Atın
-          <br className="hidden sm:block" />
-          Tedarika ile{" "}
-          <span className="text-emerald-400">E-İhracat</span> Çok Kolay!
+          Hayalinizdeki <br className="sm:hidden" />
+          Global Pazara <br />
+          Adım Atın <br className="hidden sm:block" />
+          <span className="block sm:inline">
+            Tedarika ile{" "}
+            <span className="text-emerald-400">E-İhracat</span> Çok Kolay!
+          </span>
         </motion.h1>
 
         {/* Açıklama */}
@@ -29,13 +32,13 @@ const HeroImpactSection = () => {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3, duration: 0.6 }}
         >
-          Birkaç adımda kendi mağazanızı açın, ürünlerinizi dünyaya tanıtın.  
+          Birkaç adımda kendi mağazanızı açın, ürünlerinizi dünyaya tanıtın.{" "}
           <strong>Düşük maliyet</strong>, <strong>güvenli ödeme</strong> ve{" "}
           <strong>kolay teslimat</strong> ile satışa başlayın.  
           İhracat bir tık uzağınızda!
         </motion.p>
 
-        {/* Adımlar */}
+        {/* 3 Ana Adım */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 sm:gap-12 text-center">
           {/* Adım 1 */}
           <motion.div
