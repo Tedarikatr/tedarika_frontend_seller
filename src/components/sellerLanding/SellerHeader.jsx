@@ -1,6 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import Logo from "@/assets/images/logo.svg";
+import Logo from "../../assets/images/logo.svg";
+
+
 
 const SellerHeader = () => {
   const navigate = useNavigate();
