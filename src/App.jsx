@@ -39,6 +39,8 @@ import SellerLayout from "@/components/layout/SellerLayout";
 import PrivateRoute from "@/routes/PrivateRoute";
 import SemiPrivateRoute from "@/routes/SemiPrivateRoute";
 import SellerRouteWrapper from "@/components/SellerRouteWrapper";
+import SellerAppointment from "@/pages/seller/SellerAppointment";
+
 
 function App() {
   return (
@@ -49,7 +51,7 @@ function App() {
       <Route path="/seller/login" element={<LoginPage />} />
       <Route path="/seller/apply" element={<SellerApplicationPage />} />
       <Route path="/seller" element={<Navigate to="/seller/landing" replace />} />
-
+      <Route path="/seller/appointment" element={<SellerAppointment />} />
       {/* ── Subscription (login gerekli; aktif değilse erişilir) ── */}
       <Route
         path="/seller/subscription"
