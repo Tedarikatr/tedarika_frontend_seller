@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import Logo from "@/assets/images/logo.svg"; // Adjust path if needed
+import Logo from "@/assets/images/logo.svg";
 
 const SellerHeader = () => {
   const navigate = useNavigate();
@@ -10,10 +10,10 @@ const SellerHeader = () => {
     <header className="bg-[#003032] shadow-md px-4 sm:px-6 py-3 w-full">
       <div className="w-full flex items-center justify-between">
         <div className="flex items-center">
-          {/* Adjusted logo size */}
-          <img src={Logo} alt="Tedarika Logo" className="h-12 sm:h-16" /> {/* Moderate size */}
+          <img src={Logo} alt="Tedarika Logo" className="h-12 sm:h-16" />
         </div>
 
+        {/* Desktop buttons */}
         <div className="hidden sm:flex items-center gap-3">
           <button
             onClick={() => navigate("/seller/login")}
@@ -27,8 +27,15 @@ const SellerHeader = () => {
           >
             Kayıt Ol
           </button>
-        </div>  
+          <button
+            onClick={() => navigate("/seller/appointment")}
+            className="bg-emerald-500 text-white font-semibold text-sm px-4 py-2 rounded-full hover:bg-emerald-400 transition"
+          >
+            Randevu Oluştur
+          </button>
+        </div>
 
+        {/* Mobile menu button */}
         <div className="sm:hidden">
           <button
             onClick={() => setIsOpen(!isOpen)}
@@ -39,6 +46,7 @@ const SellerHeader = () => {
         </div>
       </div>
 
+      {/* Mobile dropdown */}
       {isOpen && (
         <div className="sm:hidden mt-3 px-2 flex flex-col gap-2 animate-fade-in-down">
           <button
@@ -58,6 +66,15 @@ const SellerHeader = () => {
             className="border border-white text-white font-semibold text-sm px-4 py-2 rounded-full hover:bg-white hover:text-[#003032] transition"
           >
             Kayıt Ol
+          </button>
+          <button
+            onClick={() => {
+              navigate("/seller/appointment");
+              setIsOpen(false);
+            }}
+            className="bg-emerald-500 text-white font-semibold text-sm px-4 py-2 rounded-full hover:bg-emerald-400 transition"
+          >
+            Randevu Oluştur
           </button>
         </div>
       )}
