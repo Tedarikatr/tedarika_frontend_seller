@@ -98,13 +98,6 @@ const ProductDatabasePage = () => {
             <span className="text-sm text-gray-600 whitespace-nowrap">
               {filteredProducts.length} ürün bulundu
             </span>
-            <button
-              onClick={() => setShowForm(true)}
-              className="bg-emerald-600 text-white px-3 py-2 rounded text-sm hover:bg-emerald-700 flex items-center gap-1"
-            >
-              <PlusCircle size={16} />
-              <span className="hidden sm:inline">Yeni Başvuru</span>
-            </button>
           </div>
         </div>
       </div>
