@@ -88,9 +88,7 @@ const Sidebar = ({ isOpen, onClose }) => {
           <SidebarLink to="/seller/products/database" icon={<ChevronRight size={14} />} collapsed={collapsed} onClick={onClose}>
             Veritabanı
           </SidebarLink>
-          <SidebarLink to="/seller/products/requests" icon={<ChevronRight size={14} />} collapsed={collapsed} onClick={onClose}>
-            Başvurularım
-          </SidebarLink>
+         
 
           <SectionTitle title="İŞLEMLER" collapsed={collapsed} />
           <SidebarLink to="/seller/orders" icon={<ShoppingCart size={18} />} collapsed={collapsed} onClick={onClose}>
