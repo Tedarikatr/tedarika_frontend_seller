@@ -9,6 +9,14 @@ import OwnedBrandsSection from "@/components/Brand/OwnedBrandsSection";
 import BrandList from "@/components/Brand/BrandList";
 import Pagination from "@/components/ui/Pagination";
 import Toast from "@/components/ui/Toast";
+import { 
+  Award, 
+  Sparkles, 
+  Search, 
+  CheckCircle, 
+  Package, 
+  TrendingUp 
+} from "lucide-react";
 
 export default function SellerBrandPage() {
   const [brands, setBrands] = useState([]);
@@ -78,72 +86,157 @@ export default function SellerBrandPage() {
     }
   };
 
+  // Stats
+  const stats = useMemo(() => {
+    const owned = ownedBrands.length;
+    const pending = ownerships.filter(o => o.status === 0 || o.status === "Pending").length;
+    const total = brands.length;
+    
+    return { owned, pending, total };
+  }, [ownedBrands.length, ownerships, brands.length]);
+
   return (
-    <div className="p-6 space-y-6">
-      <h2 className="text-3xl font-bold text-gray-800">Markalar Yönetimi</h2>
-
-      {/* Sekmeler */}
-      <div className="flex gap-6 border-b pb-2">
-        {["owned", "all"].map((tab) => (
-          <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className={`px-4 py-2 font-medium border-b-2 transition ${
-              activeTab === tab
-                ? "border-blue-600 text-blue-600"
-                : "border-transparent text-gray-500 hover:text-gray-700"
-            }`}
-          >
-            {tab === "owned" ? "Sahip Olduklarım" : "Tüm Markalar"}
-          </button>
-        ))}
-      </div>
-
-      {loading ? (
-        <p className="text-gray-600">Yükleniyor...</p>
-      ) : activeTab === "owned" ? (
-        <OwnedBrandsSection ownedBrands={ownedBrands} />
-      ) : (
-        <>
-          {/* Arama */}
-          <div className="flex gap-3 mb-5">
-            <input
-              type="text"
-              value={search}
-              onChange={(e) => {
-                setSearch(e.target.value);
-                setPage(1);
-              }}
-              placeholder="Marka ara..."
-              className="border rounded-md px-3 py-2 w-1/2 focus:ring-2 focus:ring-blue-500"
-            />
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-purple-50/30 px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto">
+        {/* Hero Header */}
+        <header className="mb-8 relative bg-gradient-to-r from-purple-600 via-pink-600 to-red-600 rounded-3xl shadow-2xl px-8 py-12 text-center overflow-hidden">
+          {/* Dekoratif Arka Plan */}
+          <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent pointer-events-none"></div>
+          <div className="absolute top-10 right-10 w-32 h-32 bg-white/10 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-10 left-10 w-40 h-40 bg-purple-400/20 rounded-full blur-3xl"></div>
+          
+          <div className="relative z-10">
+            <div className="flex items-center justify-center gap-3 mb-4">
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center shadow-xl animate-pulse">
+                <Award className="w-8 h-8 text-white" />
+              </div>
+              <h1 className="text-5xl font-extrabold text-white tracking-tight">
+                Markalar Yönetimi
+              </h1>
+              <Sparkles className="w-8 h-8 text-yellow-300 animate-pulse" />
+            </div>
+            <p className="text-purple-100 text-lg font-medium">
+              Marka sahipliği başvurularınızı yönetin ve markalarınızı görüntüleyin
+            </p>
           </div>
+        </header>
 
-          {/* Marka Listesi */}
-          <BrandList
-            brands={visibleBrands}
-            ownerships={ownerships}
-            sending={sending}
-            onOwnershipRequest={handleOwnershipRequest}
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
+          <StatCard
+            icon={CheckCircle}
+            label="Sahip Olduklarım"
+            value={stats.owned}
+            gradient="from-green-500 to-emerald-500"
+            bgGradient="from-green-50 to-emerald-50"
           />
-
-          {/* Sayfalama */}
-          <Pagination
-            total={totalCount}
-            current={page}
-            perPage={pageSize}
-            onPageChange={setPage}
+          <StatCard
+            icon={TrendingUp}
+            label="Bekleyen Başvuru"
+            value={stats.pending}
+            gradient="from-amber-500 to-orange-500"
+            bgGradient="from-amber-50 to-orange-50"
           />
-        </>
-      )}
+          <StatCard
+            icon={Package}
+            label="Toplam Marka"
+            value={stats.total}
+            gradient="from-purple-500 to-pink-500"
+            bgGradient="from-purple-50 to-pink-50"
+          />
+        </div>
 
-      {toast.show && (
-        <Toast
-          message={toast.message}
-          type={toast.type}
-          onClose={() => setToast({ ...toast, show: false })}
-        />
-      )}
+        {/* Tabs */}
+        <div className="flex gap-4 mb-6 bg-white rounded-2xl p-2 shadow-lg border-2 border-gray-200">
+          {["owned", "all"].map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`flex-1 px-6 py-3 rounded-xl font-bold text-sm transition-all duration-300 ${
+                activeTab === tab
+                  ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg scale-105"
+                  : "text-gray-600 hover:bg-gray-100"
+              }`}
+            >
+              {tab === "owned" ? "Sahip Olduklarım" : "Tüm Markalar"}
+            </button>
+          ))}
+        </div>
+
+        {/* Content */}
+        {loading ? (
+          <div className="flex flex-col items-center justify-center py-20 bg-white rounded-3xl shadow-lg">
+            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center shadow-xl animate-pulse mb-4">
+              <Award className="w-8 h-8 text-white" />
+            </div>
+            <p className="text-gray-500 text-lg font-medium">Yükleniyor...</p>
+          </div>
+        ) : activeTab === "owned" ? (
+          <OwnedBrandsSection ownedBrands={ownedBrands} />
+        ) : (
+          <>
+            {/* Search Bar */}
+            <div className="mb-6 bg-white rounded-2xl shadow-lg p-4 border-2 border-gray-200">
+              <div className="relative">
+                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <input
+                  type="text"
+                  value={search}
+                  onChange={(e) => {
+                    setSearch(e.target.value);
+                    setPage(1);
+                  }}
+                  placeholder="Marka ara..."
+                  className="w-full pl-12 pr-4 py-3 rounded-xl border-2 border-gray-200 focus:border-purple-500 focus:ring-4 focus:ring-purple-100 transition-all duration-300 text-gray-800"
+                />
+              </div>
+            </div>
+
+            {/* Brand List */}
+            <BrandList
+              brands={visibleBrands}
+              ownerships={ownerships}
+              sending={sending}
+              onOwnershipRequest={handleOwnershipRequest}
+            />
+
+            {/* Pagination */}
+            {totalCount > pageSize && (
+              <div className="mt-6">
+                <Pagination
+                  total={totalCount}
+                  current={page}
+                  perPage={pageSize}
+                  onPageChange={setPage}
+                />
+              </div>
+            )}
+          </>
+        )}
+
+        {toast.show && (
+          <Toast
+            message={toast.message}
+            type={toast.type}
+            onClose={() => setToast({ ...toast, show: false })}
+          />
+        )}
+      </div>
     </div>
   );
 }
+
+// Stat Card Component
+const StatCard = ({ icon: Icon, label, value, gradient, bgGradient }) => (
+  <div className={`bg-gradient-to-br ${bgGradient} rounded-2xl p-6 border-2 border-gray-200 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105`}>
+    <div className="flex items-center justify-between">
+      <div>
+        <p className="text-gray-600 text-sm font-semibold mb-2">{label}</p>
+        <p className="text-4xl font-extrabold text-gray-900">{value}</p>
+      </div>
+      <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${gradient} flex items-center justify-center shadow-lg`}>
+        <Icon className="w-7 h-7 text-white" />
+      </div>
+    </div>
+  </div>
+);
