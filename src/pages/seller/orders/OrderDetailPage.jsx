@@ -1,7 +1,95 @@
+// =============================
+// OrderDetailPage.jsx - Ultra Modern & Beautiful 🎨
+// =============================
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { fetchOrderDetail, fetchPaymentDetail } from "@/api/sellerOrderService";
 import { statusLabels } from "@/constants/orderStatus";
+import {
+  ArrowLeft,
+  Package,
+  CreditCard,
+  ShoppingBag,
+  MapPin,
+  Calendar,
+  DollarSign,
+  Info as InfoIcon,
+  CheckCircle,
+  XCircle,
+  Clock,
+  Eye,
+  EyeOff,
+  Truck,
+  Store,
+  FileText,
+  Sparkles
+} from "lucide-react";
+
+// Modern Status Badge
+const StatusBadge = ({ status }) => {
+  const statusConfig = {
+    Created: { 
+      bg: "from-blue-50 to-cyan-50", 
+      text: "text-blue-700", 
+      border: "border-blue-200",
+      icon: <Clock size={16} />,
+      label: "Oluşturuldu"
+    },
+    Confirmed: { 
+      bg: "from-emerald-50 to-green-50", 
+      text: "text-emerald-700", 
+      border: "border-emerald-200",
+      icon: <CheckCircle size={16} />,
+      label: "Onaylandı"
+    },
+    Delivered: { 
+      bg: "from-purple-50 to-pink-50", 
+      text: "text-purple-700", 
+      border: "border-purple-200",
+      icon: <Package size={16} />,
+      label: "Teslim Edildi"
+    },
+    Cancelled: { 
+      bg: "from-red-50 to-rose-50", 
+      text: "text-red-700", 
+      border: "border-red-200",
+      icon: <XCircle size={16} />,
+      label: "İptal Edildi"
+    },
+    default: { 
+      bg: "from-gray-50 to-gray-100", 
+      text: "text-gray-700", 
+      border: "border-gray-200",
+      icon: <Clock size={16} />,
+      label: "Bilinmiyor"
+    }
+  };
+
+  const config = statusConfig[status] || statusConfig.default;
+  const statusLabel = statusLabels[status] || { text: config.label };
+
+  return (
+    <span className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold bg-gradient-to-r ${config.bg} ${config.text} border-2 ${config.border}`}>
+      {config.icon}
+      {statusLabel.text}
+    </span>
+  );
+};
+
+// Info Card Component
+const InfoCard = ({ icon: Icon, label, value, colorClass = "text-gray-700" }) => (
+  <div className="bg-gradient-to-br from-white to-gray-50 rounded-xl p-4 border border-gray-200 hover:shadow-md transition-all">
+    <div className="flex items-center gap-3">
+      <div className={`w-10 h-10 rounded-lg bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center text-white shadow-lg`}>
+        <Icon size={20} />
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-xs text-gray-500 mb-0.5">{label}</p>
+        <p className={`font-semibold truncate ${colorClass}`}>{value}</p>
+      </div>
+    </div>
+  </div>
+);
 
 const OrderDetailPage = () => {
   const { orderId } = useParams();
@@ -54,262 +142,297 @@ const OrderDetailPage = () => {
     }
   };
 
-  if (loading)
+  if (loading) {
     return (
-      <div className="p-6 text-center text-gray-500 animate-pulse">
-        Yükleniyor...
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 mb-4 animate-pulse shadow-xl">
+            <Package size={40} className="text-white" />
+          </div>
+          <p className="text-gray-600 font-medium text-lg">Yükleniyor...</p>
+        </div>
       </div>
     );
+  }
 
-  if (!order)
+  if (!order) {
     return (
-      <div className="p-6 text-center text-red-600 font-semibold">
-        Sipariş bulunamadı.
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-gradient-to-br from-red-100 to-red-200 mb-4 shadow-lg">
+            <XCircle size={48} className="text-red-600" />
+          </div>
+          <h3 className="text-xl font-bold text-gray-700 mb-2">Sipariş Bulunamadı</h3>
+          <button
+            onClick={() => navigate("/seller/orders")}
+            className="mt-4 px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all"
+          >
+            Siparişlere Dön
+          </button>
+        </div>
       </div>
     );
-
-  const status = statusLabels[order.status] || {
-    text: "Bilinmiyor",
-    color: "bg-gray-100 text-gray-700 border border-gray-300",
-  };
+  }
 
   return (
-    <div className="max-w-7xl mx-auto px-6 py-10 space-y-10">
-      <h1 className="text-2xl font-bold text-gray-800 border-b border-gray-300 pb-3">
-        Sipariş Detayı
-      </h1>
-
-      {/* 🧱 GENEL BİLGİLER */}
-      <section className="bg-white border border-gray-300 rounded-lg shadow-sm p-6 space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-y-2 text-sm text-gray-800">
-          <Info label="Sipariş No" value={order.orderNumber} />
-          <Info label="Mağaza" value={order.storeName} />
-          <Info
-            label="Oluşturulma"
-            value={new Date(order.createdAt).toLocaleString("tr-TR")}
-          />
-          <Info label="Kargo" value={order.carrierName || "Tanımsız"} />
-          <Info label="Adres" value={order.shippingAddress} />
-          <Info
-            label="Toplam"
-            value={`₺${order.totalAmount.toFixed(2)} ${order.currency}`}
-          />
-          <div className="md:col-span-2">
-            <strong>Durum: </strong>
-            <span
-              className={`inline-block px-3 py-1 text-xs font-medium rounded-full ${status.color}`}
-            >
-              {status.text}
-            </span>
-          </div>
-        </div>
-      </section>
-
-      {/* 💳 ÖDEME BİLGİLERİ */}
-      <section className="bg-white border border-gray-300 rounded-lg shadow-sm p-6 space-y-4">
-        <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-gray-800">
-            Ödeme Bilgileri
-          </h2>
-          <div className="flex items-center gap-3">
-            <button
-              onClick={handleFetchPayment}
-              disabled={paymentLoading}
-              className="border border-gray-400 text-gray-700 px-4 py-1.5 rounded-md text-sm hover:bg-gray-100 transition disabled:opacity-50"
-            >
-              {paymentLoading ? "Yükleniyor..." : "Ödeme Detaylarını Getir"}
-            </button>
-            {payment && (
-              <button
-                onClick={() => setPaymentOpen((s) => !s)}
-                className="border border-gray-300 text-gray-700 px-3 py-1.5 rounded-md text-sm hover:bg-gray-100 transition"
-              >
-                {paymentOpen ? "Detayı Gizle" : "Detayı Göster"}
-              </button>
-            )}
-          </div>
-        </div>
-
-        {/* Kısa Özet */}
-        <ul className="text-sm text-gray-700 space-y-1">
-          <Info label="Yöntem" value={order.payment?.name} />
-          <Info
-            label="Tutar"
-            value={`₺${order.payment?.totalAmount?.toFixed(2) || "-"}`}
-          />
-          <Info
-            label="Durum"
-            value={
-              order.payment?.status === "Pending" ? "Ödenmedi" : "Ödendi"
-            }
-          />
-        </ul>
-
-        {/* ✅ ÖDEME DETAY PANELİ */}
-        {paymentOpen && (
-          <div className="border border-gray-300 bg-gray-50 rounded-md p-4 space-y-3">
-            {paymentError && (
-              <div className="text-sm text-red-600">{paymentError}</div>
-            )}
-            {payment && (
-              <>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-gray-700">
-                  <Info label="Payment ID" value={payment.paymentId} />
-                  <Info
-                    label="Conversation ID"
-                    value={payment.paymentConversationId || "-"}
-                  />
-                  <Info label="Taksit" value={payment.installment} />
-                  <Info label="Para Birimi" value={payment.currency} />
-                  <Info
-                    label="Toplam Ödenen"
-                    value={fmt(payment.totalPaidPrice)}
-                  />
-                  <Info
-                    label="İyzico Komisyonu"
-                    value={fmt(payment.totalIyziCommission)}
-                  />
-                  <Info
-                    label="Platform Ödemesi"
-                    value={fmt(payment.totalPlatformPayout)}
-                  />
-                  <Info
-                    label="Alt Mağaza Ödemesi"
-                    value={fmt(payment.totalSubMerchantPayout)}
-                  />
-                </div>
-
-                {/* Kalemler */}
-                <div className="mt-4">
-                  <h3 className="font-medium text-gray-800 mb-2">Kalemler</h3>
-                  {Array.isArray(payment.items) && payment.items.length > 0 ? (
-                    <div className="overflow-x-auto border border-gray-300 rounded-md">
-                      <table className="min-w-full text-sm border-collapse">
-                        <thead className="bg-gray-100 text-gray-700">
-                          <tr>
-                            <th className="px-3 py-2 border border-gray-300">
-                              #
-                            </th>
-                            <th className="px-3 py-2 border border-gray-300">
-                              Ödenen
-                            </th>
-                            <th className="px-3 py-2 border border-gray-300">
-                              Komisyon
-                            </th>
-                            <th className="px-3 py-2 border border-gray-300">
-                              Platform
-                            </th>
-                            <th className="px-3 py-2 border border-gray-300">
-                              Alt Mağaza
-                            </th>
-                            <th className="px-3 py-2 border border-gray-300">
-                              Bloke (Mağaza)
-                            </th>
-                            <th className="px-3 py-2 border border-gray-300">
-                              Bloke (Alt)
-                            </th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {payment.items.map((it, idx) => (
-                            <tr
-                              key={idx}
-                              className="border-t border-gray-300 hover:bg-gray-50"
-                            >
-                              <td className="px-3 py-2 border border-gray-300">
-                                {idx + 1}
-                              </td>
-                              <td className="px-3 py-2 border border-gray-300">
-                                {fmt(it.paidPrice ?? it.totalPaidPrice)}
-                              </td>
-                              <td className="px-3 py-2 border border-gray-300">
-                                {fmt(
-                                  it.iyziCommission ?? it.totalIyziCommission
-                                )}
-                              </td>
-                              <td className="px-3 py-2 border border-gray-300">
-                                {fmt(it.platformPayout ?? it.totalPlatformPayout)}
-                              </td>
-                              <td className="px-3 py-2 border border-gray-300">
-                                {fmt(
-                                  it.subMerchantPayout ??
-                                    it.totalSubMerchantPayout
-                                )}
-                              </td>
-                              <td className="px-3 py-2 border border-gray-300">
-                                {fmt(
-                                  it.blockageMerchant ??
-                                    it.totalBlockageMerchant
-                                )}
-                              </td>
-                              <td className="px-3 py-2 border border-gray-300">
-                                {fmt(
-                                  it.blockageSubMerchant ??
-                                    it.totalBlockageSubMerchant
-                                )}
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  ) : (
-                    <div className="text-sm text-gray-600">
-                      Kalem bilgisi bulunmuyor.
-                    </div>
-                  )}
-                </div>
-              </>
-            )}
-          </div>
-        )}
-      </section>
-
-      {/* 📦 ÜRÜNLER */}
-      <section className="bg-white border border-gray-300 rounded-lg shadow-sm p-6">
-        <h2 className="text-lg font-semibold text-gray-800 mb-4">Ürünler</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {order.items.map((item, i) => (
-            <div
-              key={i}
-              className="border border-gray-300 rounded-md p-4 space-y-3 hover:shadow-sm transition"
-            >
-              <div className="flex justify-center">
-                <img
-                  src={
-                    item.storeProductImageUrl ||
-                    "/tedarika/assets/images/product-placeholder.svg"
-                  }
-                  alt={item.productName}
-                  className="w-24 h-24 object-cover rounded-md border border-gray-300"
-                />
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
+      {/* Hero Header */}
+      <div className="bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-700 text-white shadow-xl">
+        <div className="max-w-7xl mx-auto px-6 py-8">
+          <button
+            onClick={() => navigate("/seller/orders")}
+            className="mb-4 inline-flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl transition-all backdrop-blur-sm"
+          >
+            <ArrowLeft size={20} />
+            Geri Dön
+          </button>
+          
+          <div className="flex items-center justify-between flex-wrap gap-4">
+            <div className="flex items-center gap-4">
+              <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center shadow-lg">
+                <FileText size={32} />
               </div>
-              <div className="text-sm text-gray-700 space-y-1">
-                <p className="font-medium text-gray-800">{item.productName}</p>
-                <p>
-                  Adet: <strong>{item.quantity}</strong>
-                </p>
-                <p>Birim: ₺{item.unitPrice.toFixed(2)}</p>
-                <p className="font-semibold text-gray-900">
-                  Toplam: ₺{item.totalPrice.toFixed(2)}
+              <div>
+                <h1 className="text-3xl font-bold mb-1 flex items-center gap-2">
+                  Sipariş Detayı
+                  <Sparkles size={24} className="text-yellow-300" />
+                </h1>
+                <p className="text-blue-100 text-sm">
+                  Sipariş No: <span className="font-bold">{order.orderNumber}</span>
                 </p>
               </div>
             </div>
-          ))}
+            
+            <StatusBadge status={order.status} />
+          </div>
         </div>
-      </section>
+      </div>
+
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-6 py-8 space-y-6">
+        
+        {/* Genel Bilgiler Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <InfoCard 
+            icon={Store} 
+            label="Mağaza" 
+            value={order.storeName}
+          />
+          <InfoCard 
+            icon={Calendar} 
+            label="Oluşturulma" 
+            value={new Date(order.createdAt).toLocaleString("tr-TR")}
+          />
+          <InfoCard 
+            icon={Truck} 
+            label="Kargo" 
+            value={order.carrierName || "Tanımsız"}
+          />
+          <InfoCard 
+            icon={MapPin} 
+            label="Teslimat Adresi" 
+            value={order.shippingAddress}
+          />
+          <InfoCard 
+            icon={DollarSign} 
+            label="Toplam Tutar" 
+            value={`₺${order.totalAmount.toFixed(2)} ${order.currency}`}
+            colorClass="text-emerald-700 text-lg"
+          />
+        </div>
+
+        {/* Ödeme Bilgileri */}
+        <div className="bg-white rounded-3xl shadow-2xl border border-gray-200 overflow-hidden">
+          <div className="bg-gradient-to-r from-purple-50 to-pink-50 px-6 py-4 border-b border-purple-100 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center text-white shadow-lg">
+                <CreditCard size={20} />
+              </div>
+              <h2 className="text-lg font-bold text-gray-800">Ödeme Bilgileri</h2>
+            </div>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={handleFetchPayment}
+                disabled={paymentLoading}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white text-sm font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all disabled:opacity-50"
+              >
+                {paymentLoading ? (
+                  <>Yükleniyor...</>
+                ) : (
+                  <>
+                    <Eye size={16} />
+                    Detayları Getir
+                  </>
+                )}
+              </button>
+              {payment && (
+                <button
+                  onClick={() => setPaymentOpen((s) => !s)}
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-white hover:bg-gray-50 text-gray-700 text-sm font-semibold rounded-xl border-2 border-gray-200 shadow-lg hover:shadow-xl transition-all"
+                >
+                  {paymentOpen ? <EyeOff size={16} /> : <Eye size={16} />}
+                  {paymentOpen ? "Gizle" : "Göster"}
+                </button>
+              )}
+            </div>
+          </div>
+
+          <div className="p-6 space-y-4">
+            {/* Kısa Özet */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl p-4 border border-blue-200">
+                <p className="text-xs text-blue-600 mb-1">Ödeme Yöntemi</p>
+                <p className="font-bold text-gray-800">{order.payment?.name || "-"}</p>
+              </div>
+              <div className="bg-gradient-to-br from-emerald-50 to-green-50 rounded-xl p-4 border border-emerald-200">
+                <p className="text-xs text-emerald-600 mb-1">Tutar</p>
+                <p className="font-bold text-gray-800">₺{order.payment?.totalAmount?.toFixed(2) || "-"}</p>
+              </div>
+              <div className="bg-gradient-to-br from-amber-50 to-yellow-50 rounded-xl p-4 border border-amber-200">
+                <p className="text-xs text-amber-600 mb-1">Durum</p>
+                <p className="font-bold text-gray-800">
+                  {order.payment?.status === "Pending" ? "Ödenmedi" : "Ödendi"}
+                </p>
+              </div>
+            </div>
+
+            {/* Detaylı Ödeme Paneli */}
+            {paymentOpen && (
+              <div className="mt-6 bg-gradient-to-br from-gray-50 to-white border border-gray-200 rounded-2xl p-6 space-y-6">
+                {paymentError && (
+                  <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-center gap-2 text-red-700">
+                    <XCircle size={20} />
+                    {paymentError}
+                  </div>
+                )}
+                {payment && (
+                  <>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {[
+                        { label: "Payment ID", value: payment.paymentId },
+                        { label: "Conversation ID", value: payment.paymentConversationId || "-" },
+                        { label: "Taksit", value: payment.installment },
+                        { label: "Para Birimi", value: payment.currency },
+                        { label: "Toplam Ödenen", value: fmt(payment.totalPaidPrice) },
+                        { label: "İyzico Komisyonu", value: fmt(payment.totalIyziCommission) },
+                        { label: "Platform Ödemesi", value: fmt(payment.totalPlatformPayout) },
+                        { label: "Alt Mağaza Ödemesi", value: fmt(payment.totalSubMerchantPayout) },
+                      ].map((item, i) => (
+                        <div key={i} className="bg-white rounded-xl p-3 border border-gray-200">
+                          <p className="text-xs text-gray-500 mb-1">{item.label}</p>
+                          <p className="font-semibold text-gray-800">{item.value}</p>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Kalemler Tablosu */}
+                    {Array.isArray(payment.items) && payment.items.length > 0 && (
+                      <div className="mt-6">
+                        <h3 className="font-bold text-gray-800 mb-3 flex items-center gap-2">
+                          <FileText size={18} />
+                          Ödeme Kalemleri
+                        </h3>
+                        <div className="overflow-x-auto rounded-xl border border-gray-200">
+                          <table className="min-w-full text-sm">
+                            <thead className="bg-gradient-to-r from-gray-100 to-gray-50">
+                              <tr>
+                                <th className="px-4 py-3 text-left font-bold text-gray-700">#</th>
+                                <th className="px-4 py-3 text-left font-bold text-gray-700">Ödenen</th>
+                                <th className="px-4 py-3 text-left font-bold text-gray-700">Komisyon</th>
+                                <th className="px-4 py-3 text-left font-bold text-gray-700">Platform</th>
+                                <th className="px-4 py-3 text-left font-bold text-gray-700">Alt Mağaza</th>
+                                <th className="px-4 py-3 text-left font-bold text-gray-700">Bloke (Mağaza)</th>
+                                <th className="px-4 py-3 text-left font-bold text-gray-700">Bloke (Alt)</th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-200">
+                              {payment.items.map((it, idx) => (
+                                <tr key={idx} className="hover:bg-blue-50 transition-colors">
+                                  <td className="px-4 py-3 font-medium">{idx + 1}</td>
+                                  <td className="px-4 py-3">{fmt(it.paidPrice ?? it.totalPaidPrice)}</td>
+                                  <td className="px-4 py-3">{fmt(it.iyziCommission ?? it.totalIyziCommission)}</td>
+                                  <td className="px-4 py-3">{fmt(it.platformPayout ?? it.totalPlatformPayout)}</td>
+                                  <td className="px-4 py-3">{fmt(it.subMerchantPayout ?? it.totalSubMerchantPayout)}</td>
+                                  <td className="px-4 py-3">{fmt(it.blockageMerchant ?? it.totalBlockageMerchant)}</td>
+                                  <td className="px-4 py-3">{fmt(it.blockageSubMerchant ?? it.totalBlockageSubMerchant)}</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Ürünler */}
+        <div className="bg-white rounded-3xl shadow-2xl border border-gray-200 overflow-hidden">
+          <div className="bg-gradient-to-r from-emerald-50 to-green-50 px-6 py-4 border-b border-emerald-100 flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center text-white shadow-lg">
+              <ShoppingBag size={20} />
+            </div>
+            <h2 className="text-lg font-bold text-gray-800">Sipariş Ürünleri</h2>
+            <span className="ml-auto px-3 py-1 bg-emerald-200 text-emerald-800 rounded-full text-xs font-bold">
+              {order.items.length} Ürün
+            </span>
+          </div>
+
+          <div className="p-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              {order.items.map((item, i) => (
+                <div
+                  key={i}
+                  className="bg-gradient-to-br from-white to-gray-50 border-2 border-gray-200 rounded-2xl p-5 hover:shadow-xl transition-all duration-200 hover:scale-105"
+                >
+                  <div className="flex justify-center mb-4">
+                    <div className="relative">
+                      <img
+                        src={
+                          item.storeProductImageUrl ||
+                          "/tedarika/assets/images/product-placeholder.svg"
+                        }
+                        alt={item.productName}
+                        className="w-32 h-32 object-cover rounded-xl border-2 border-gray-200 shadow-lg"
+                      />
+                      <div className="absolute -top-2 -right-2 w-8 h-8 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-full flex items-center justify-center text-white font-bold text-xs shadow-lg">
+                        {i + 1}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <h3 className="font-bold text-gray-800 text-center mb-3">
+                      {item.productName}
+                    </h3>
+                    <div className="space-y-1 text-sm">
+                      <div className="flex justify-between items-center p-2 bg-blue-50 rounded-lg">
+                        <span className="text-blue-700">Adet:</span>
+                        <span className="font-bold text-gray-800">{item.quantity}</span>
+                      </div>
+                      <div className="flex justify-between items-center p-2 bg-purple-50 rounded-lg">
+                        <span className="text-purple-700">Birim:</span>
+                        <span className="font-bold text-gray-800">₺{item.unitPrice.toFixed(2)}</span>
+                      </div>
+                      <div className="flex justify-between items-center p-2 bg-gradient-to-r from-emerald-50 to-green-50 rounded-lg border border-emerald-200">
+                        <span className="text-emerald-700 font-semibold">Toplam:</span>
+                        <span className="font-bold text-emerald-800">₺{item.totalPrice.toFixed(2)}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
 
-// 🧩 Bilgi satırı bileşeni
-const Info = ({ label, value }) => (
-  <li className="text-sm text-gray-700">
-    <strong>{label}:</strong> {value ?? "-"}
-  </li>
-);
-
-// 💰 Basit formatlayıcı
+// Formatlayıcı
 function fmt(n) {
   if (n === null || n === undefined) return "-";
   const num = Number(n);
