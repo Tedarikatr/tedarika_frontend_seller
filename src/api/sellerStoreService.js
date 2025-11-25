@@ -80,14 +80,6 @@ export const fetchProductDatabase = () =>
 export const addProductToStore = (productId) =>
   apiRequest(`/SellerStoreProduct/${productId}/add`, "POST", null, true);
 
-export const updateProductPrice = (storeProductId, price) =>
-  apiRequest(
-    "/SellerStoreProduct/update-price",
-    "PUT",
-    { storeProductId, price },
-    true
-  );
-
 export const toggleProductOnSale = (storeProductId, isOnSale) =>
   apiRequest(
     "/SellerStoreProduct/set-on-sale",
