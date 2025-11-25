@@ -82,6 +82,9 @@ export default function CompanyUpdate() {
 
   const requiredOk = useMemo(() => {
     if (!form) return false;
+    // Vergi numarası 10 haneli olmalı
+    const taxNum = form.taxNumber?.trim();
+    if (!taxNum || taxNum.length !== 10 || !/^\d{10}$/.test(taxNum)) return false;
     return (
       form.name?.trim() &&
       form.taxNumber?.trim() &&
@@ -100,6 +103,14 @@ export default function CompanyUpdate() {
 
     if (!requiredOk) {
       setMessage("❌ Lütfen zorunlu alanları doldurun.");
+      setLoading(false);
+      return;
+    }
+
+    // Ekstra vergi numarası kontrolü
+    const taxNum = form.taxNumber.trim();
+    if (taxNum.length !== 10 || !/^\d{10}$/.test(taxNum)) {
+      setMessage("⚠️ Vergi numarası 10 haneli rakamlardan oluşmalıdır!");
       setLoading(false);
       return;
     }
@@ -175,7 +186,7 @@ export default function CompanyUpdate() {
           onSubmit={handleSubmit}
           className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white p-6 rounded-2xl shadow-sm border"
         >
-          {fields.map((f) => (
+          {textFields.map((f) => (
             <Field key={f.name} label={f.label} required={f.required}>
               <input
                 name={f.name}
@@ -184,6 +195,11 @@ export default function CompanyUpdate() {
                 placeholder={f.label}
                 required={f.required}
                 className="input"
+                {...(f.name === "taxNumber" && {
+                  maxLength: 10,
+                  pattern: "\\d{10}",
+                  title: "Vergi numarası 10 haneli rakamlardan oluşmalıdır"
+                })}
               />
             </Field>
           ))}

@@ -46,6 +46,14 @@ const CompanyCreate = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Vergi numarası validasyonu
+    const taxNum = form.taxNumber.trim();
+    if (taxNum.length !== 10 || !/^\d{10}$/.test(taxNum)) {
+      setMessage("⚠️ Vergi numarası 10 haneli rakamlardan oluşmalıdır!");
+      return;
+    }
+    
     setMessage("Kaydediliyor...");
 
     // API string enum kabul ediyor ise numeric → string çeviriyoruz
@@ -109,7 +117,17 @@ const CompanyCreate = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <input name="name" value={form.name} onChange={handleChange} placeholder="Şirket Adı" required className="input" />
-            <input name="taxNumber" value={form.taxNumber} onChange={handleChange} placeholder="Vergi Numarası" required className="input" />
+            <input 
+              name="taxNumber" 
+              value={form.taxNumber} 
+              onChange={handleChange} 
+              placeholder="Vergi Numarası (10 hane)" 
+              required 
+              className="input"
+              maxLength={10}
+              pattern="\d{10}"
+              title="Vergi numarası 10 haneli rakamlardan oluşmalıdır"
+            />
 
             {/* 🔽 Vergi Dairesi Select */}
             <TaxOfficeSelect value={form.taxOffice} onChange={handleChange} required />
