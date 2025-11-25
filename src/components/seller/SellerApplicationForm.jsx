@@ -54,6 +54,9 @@ const SellerApplicationForm = () => {
   const isValid = useMemo(() => {
     if (!formData.companyName?.trim()) return false;
     if (!formData.taxNumber?.trim()) return false;
+    // Vergi numarası 10 haneli olmalı
+    if (formData.taxNumber?.trim().length !== 10) return false;
+    if (!/^\d{10}$/.test(formData.taxNumber?.trim())) return false;
     if (!formData.taxOffice?.trim()) return false;
     if (!formData.contactName?.trim()) return false;
     if (!formData.phoneNumber?.trim()) return false;
@@ -67,6 +70,13 @@ const SellerApplicationForm = () => {
     e.preventDefault();
     if (!isValid) {
       toast.error("Lütfen zorunlu alanları doldurun ve onay kutularını işaretleyin.");
+      return;
+    }
+
+    // Ekstra validasyon kontrolü
+    const taxNum = formData.taxNumber.trim();
+    if (taxNum.length !== 10 || !/^\d{10}$/.test(taxNum)) {
+      toast.error("⚠️ Vergi numarası 10 haneli rakamlardan oluşmalıdır!");
       return;
     }
 
@@ -126,7 +136,16 @@ const SellerApplicationForm = () => {
 
           {/* Şirket Bilgileri */}
           <Input name="companyName" value={formData.companyName} onChange={handleChange} placeholder="Şirket Adı *" required />
-          <Input name="taxNumber" value={formData.taxNumber} onChange={handleChange} placeholder="Vergi Numarası *" required />
+          <Input 
+            name="taxNumber" 
+            value={formData.taxNumber} 
+            onChange={handleChange} 
+            placeholder="Vergi Numarası (10 hane) *" 
+            required 
+            maxLength={10}
+            pattern="\d{10}"
+            title="Vergi numarası 10 haneli rakamlardan oluşmalıdır"
+          />
 
           {/* Vergi Dairesi — JSON'dan select */}
           <TaxOfficeSelect value={formData.taxOffice} onChange={handleChange} required />
