@@ -99,7 +99,7 @@ export default function SellerBrandPage() {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-purple-50/30 px-4 sm:px-6 lg:px-8 py-8">
       <div className="max-w-7xl mx-auto">
         {/* Hero Header */}
-        <header className="mb-8 relative bg-gradient-to-r from-purple-600 via-pink-600 to-red-600 rounded-3xl shadow-2xl px-8 py-12 text-center overflow-hidden">
+        <header className="mb-8 relative bg-gradient-to-r from-emerald-600 via-teal-600 to-green-600 rounded-3xl shadow-2xl px-8 py-12 text-center overflow-hidden">
           {/* Dekoratif Arka Plan */}
           <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent pointer-events-none"></div>
           <div className="absolute top-10 right-10 w-32 h-32 bg-white/10 rounded-full blur-3xl"></div>
@@ -115,7 +115,7 @@ export default function SellerBrandPage() {
               </h1>
               <Sparkles className="w-8 h-8 text-yellow-300 animate-pulse" />
             </div>
-            <p className="text-purple-100 text-lg font-medium">
+            <p className="text-emerald-100 text-lg font-medium">
               Marka sahipliği başvurularınızı yönetin ve markalarınızı görüntüleyin
             </p>
           </div>
@@ -154,7 +154,7 @@ export default function SellerBrandPage() {
               onClick={() => setActiveTab(tab)}
               className={`flex-1 px-6 py-3 rounded-xl font-bold text-sm transition-all duration-300 ${
                 activeTab === tab
-                  ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg scale-105"
+                  ? "bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-lg scale-105"
                   : "text-gray-600 hover:bg-gray-100"
               }`}
             >

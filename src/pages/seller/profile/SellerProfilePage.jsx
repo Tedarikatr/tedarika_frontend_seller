@@ -104,7 +104,7 @@ const SellerProfilePage = () => {
       </div>
 
       {/* Hero Başlık */}
-      <header className="mb-8 relative bg-gradient-to-r from-purple-600 via-purple-700 to-indigo-700 rounded-3xl shadow-2xl px-8 py-12 sm:px-12 text-center overflow-hidden">
+      <header className="mb-8 relative bg-gradient-to-r from-emerald-600 via-teal-600 to-green-600 rounded-3xl shadow-2xl px-8 py-12 sm:px-12 text-center overflow-hidden">
         {/* Dekoratif Arka Plan */}
         <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent pointer-events-none"></div>
         <div className="absolute top-10 right-10 w-32 h-32 bg-white/10 rounded-full blur-3xl"></div>
@@ -119,12 +119,10 @@ const SellerProfilePage = () => {
               Satıcı Profil Paneli
             </h1>
             <Sparkles className="w-8 h-8 text-yellow-300 animate-pulse" />
-          </div>
-          <p className="text-purple-100 text-lg max-w-2xl mx-auto font-medium">
-            Tedarika satıcı hesabınıza ait tüm bilgileri modern ve sezgisel bir arayüzle görüntüleyin.
-          </p>
-
-          {/* Modern Tab Navigation */}
+            </div>
+            <p className="text-emerald-100 text-lg max-w-2xl mx-auto font-medium">
+              Tedarika satıcı hesabınıza ait tüm bilgileri modern ve sezgisel bir arayüzle görüntüleyin.
+            </p>          {/* Modern Tab Navigation */}
           <nav className="mt-10 flex justify-center flex-wrap gap-3">
             {TABS.map((tab) => (
               <button
@@ -133,7 +131,7 @@ const SellerProfilePage = () => {
                 className={`group flex items-center gap-2 px-6 py-3 rounded-2xl text-sm font-bold transition-all duration-300 transform
                   ${
                     activeTab === tab.key
-                      ? "bg-white text-purple-700 shadow-xl scale-105"
+                      ? "bg-white text-emerald-700 shadow-xl scale-105"
                       : "bg-white/20 backdrop-blur-sm text-white hover:bg-white/30 hover:scale-105 hover:shadow-lg"
                   }`}
               >

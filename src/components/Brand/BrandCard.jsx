@@ -5,7 +5,7 @@ export default function BrandCard({ brand, ownership, sending, onRequest }) {
     <div className="bg-gradient-to-br from-white to-gray-50 rounded-2xl border-2 border-gray-200 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
       <div className="flex items-center justify-between p-6">
         <div className="flex items-start gap-4 flex-1">
-          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center shadow-lg flex-shrink-0">
+          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-lg flex-shrink-0">
             <Award className="w-6 h-6 text-white" />
           </div>
           <div className="flex-1">
@@ -38,7 +38,7 @@ export default function BrandCard({ brand, ownership, sending, onRequest }) {
           className={`flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold transition-all duration-300 ${
             ownership
               ? "bg-gradient-to-r from-gray-300 to-gray-400 text-gray-600 cursor-not-allowed"
-              : "bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:shadow-xl hover:scale-105"
+              : "bg-gradient-to-r from-emerald-600 to-teal-600 text-white hover:shadow-xl hover:scale-105"
           }`}
         >
           {ownership ? (

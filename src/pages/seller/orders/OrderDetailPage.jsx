@@ -177,7 +177,7 @@ const OrderDetailPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
       {/* Hero Header */}
-      <div className="bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-700 text-white shadow-xl">
+      <div className="bg-gradient-to-r from-emerald-600 via-teal-600 to-green-600 text-white shadow-xl">
         <div className="max-w-7xl mx-auto px-6 py-8">
           <button
             onClick={() => navigate("/seller/orders")}
@@ -197,7 +197,7 @@ const OrderDetailPage = () => {
                   Sipariş Detayı
                   <Sparkles size={24} className="text-yellow-300" />
                 </h1>
-                <p className="text-blue-100 text-sm">
+                <p className="text-emerald-100 text-sm">
                   Sipariş No: <span className="font-bold">{order.orderNumber}</span>
                 </p>
               </div>

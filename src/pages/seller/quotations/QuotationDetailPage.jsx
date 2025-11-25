@@ -171,7 +171,7 @@ const QuotationDetailPage = () => {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50/30 px-4 sm:px-6 lg:px-8 py-8">
       <div className="max-w-5xl mx-auto">
         {/* Hero Header */}
-        <header className="mb-8 relative bg-gradient-to-r from-cyan-600 via-blue-600 to-indigo-600 rounded-3xl shadow-2xl px-8 py-10 overflow-hidden">
+        <header className="mb-8 relative bg-gradient-to-r from-emerald-600 via-teal-600 to-green-600 rounded-3xl shadow-2xl px-8 py-10 overflow-hidden">
           {/* Dekoratif Arka Plan */}
           <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent pointer-events-none"></div>
           <div className="absolute top-10 right-10 w-32 h-32 bg-white/10 rounded-full blur-3xl"></div>
@@ -193,7 +193,7 @@ const QuotationDetailPage = () => {
                 <h1 className="text-4xl font-extrabold text-white tracking-tight">
                   Teklif Detayı
                 </h1>
-                <p className="text-cyan-100 text-sm font-medium">
+                <p className="text-emerald-100 text-sm font-medium">
                   Teklif ID: #{id}
                 </p>
               </div>
