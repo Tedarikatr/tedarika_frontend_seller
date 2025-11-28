@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { MessageCircle } from "lucide-react";
 import Logo from "../../assets/images/logo.svg";
 
 
@@ -17,6 +18,17 @@ const SellerHeader = () => {
 
         {/* Desktop buttons */}
         <div className="hidden sm:flex items-center gap-3">
+          {/* WhatsApp Contact Button - Clear & Visible */}
+          <a
+            href="https://wa.me/905382362605"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 bg-gradient-to-r from-green-500 to-emerald-500 text-white font-semibold text-sm px-4 py-2 rounded-full hover:from-green-600 hover:to-emerald-600 transition-all shadow-lg hover:shadow-green-500/50 hover:scale-105"
+          >
+            <MessageCircle className="w-5 h-5" />
+            <span>WhatsApp Destek</span>
+          </a>
+          
           <button
             onClick={() => navigate("/seller/login")}
             className="bg-white text-[#003032] font-semibold text-sm px-4 py-2 rounded-full hover:bg-emerald-100 transition"
@@ -51,6 +63,17 @@ const SellerHeader = () => {
       {/* Mobile dropdown */}
       {isOpen && (
         <div className="sm:hidden mt-3 px-2 flex flex-col gap-2 animate-fade-in-down">
+          {/* WhatsApp Contact Button - Mobile */}
+          <a
+            href="https://wa.me/905382362605"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-center gap-2 bg-gradient-to-r from-green-500 to-emerald-500 text-white font-bold text-sm px-4 py-2.5 rounded-full hover:from-green-600 hover:to-emerald-600 transition-all shadow-lg"
+          >
+            <MessageCircle className="w-5 h-5" />
+            <span>WhatsApp Destek</span>
+          </a>
+          
           <button
             onClick={() => {
               navigate("/seller/login");
