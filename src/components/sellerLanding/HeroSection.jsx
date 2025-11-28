@@ -1,4 +1,4 @@
-import { Store, Globe2, ShieldCheck, Truck, Rocket } from "lucide-react";
+import { Store, Globe2, ShieldCheck, Truck, Rocket, MessageCircle, Phone } from "lucide-react";
 import { motion } from "framer-motion";
 
 const HeroSection = () => {
@@ -72,6 +72,28 @@ const HeroSection = () => {
             className="bg-white border border-emerald-600 text-emerald-700 hover:bg-emerald-50 px-8 py-3 rounded-full text-lg font-semibold transition"
           >
             Zaten Üyeyim
+          </a>
+        </motion.div>
+
+        {/* WhatsApp İletişim - Net ve Anlaşılır */}
+        <motion.div
+          className="mt-8 flex justify-center"
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.8, duration: 0.6 }}
+        >
+          <a
+            href="https://wa.me/905382362605"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group relative inline-flex items-center gap-3 bg-gradient-to-r from-green-500 via-emerald-500 to-teal-500 text-white px-8 py-4 rounded-full text-lg font-bold shadow-2xl hover:shadow-green-500/50 transition-all hover:scale-105"
+          >
+            <div className="absolute -inset-1 bg-gradient-to-r from-green-400 to-emerald-400 rounded-full blur opacity-40 group-hover:opacity-70 transition"></div>
+            <MessageCircle className="w-7 h-7 relative z-10" />
+            <div className="relative z-10">
+              <div className="text-base font-semibold">WhatsApp Destek</div>
+              <div className="text-sm font-normal opacity-90">Hemen Bize Ulaşın</div>
+            </div>
           </a>
         </motion.div>
 
