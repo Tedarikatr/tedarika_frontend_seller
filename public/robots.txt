@@ -1,0 +1,22 @@
+# Tedarika Seller Panel - Robots.txt
+User-agent: *
+Allow: /
+Allow: /seller/register
+Allow: /seller/login
+Allow: /seller/appointment
+
+# Disallow private pages
+Disallow: /seller/dashboard
+Disallow: /seller/profile
+Disallow: /seller/orders
+Disallow: /seller/products
+Disallow: /seller/store
+Disallow: /seller/finance
+Disallow: /seller/brands
+Disallow: /seller/reviews
+Disallow: /seller/quotations
+Disallow: /seller/campaigns
+Disallow: /seller/location
+
+# Sitemap
+Sitemap: https://seller.tedarika.com/sitemap.xml

@@ -1,6 +1,7 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
+import { HelmetProvider } from "react-helmet-async";
 import App from "./App";
 import "./index.css";
 
@@ -10,12 +11,14 @@ import { SpeedInsights } from "@vercel/speed-insights/react";
 
 createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <BrowserRouter>
-      <App />
-      {/* 🌐 Ziyaretçi analitiği */}
-      <Analytics />
-      {/* ⚡ Performans ölçümü */}
-      <SpeedInsights />
-    </BrowserRouter>
+    <HelmetProvider>
+      <BrowserRouter>
+        <App />
+        {/* 🌐 Ziyaretçi analitiği */}
+        <Analytics />
+        {/* ⚡ Performans ölçümü */}
+        <SpeedInsights />
+      </BrowserRouter>
+    </HelmetProvider>
   </React.StrictMode>
 );
