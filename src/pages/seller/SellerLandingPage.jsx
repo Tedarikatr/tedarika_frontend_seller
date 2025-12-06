@@ -11,7 +11,7 @@ import ExportVurgulayanSection from "@/components/sellerLanding/ExportVurgulayan
 import GrowthOpportunitiesSection from "@/components/sellerLanding/GrowthOpportunitiesSection";
 import GlobalOpportunitiesSection from "@/components/sellerLanding/GlobalOpportunitiesSection";
 import HeroImpactSection from "@/components/sellerLanding/HeroImpactSection";
-import Footer from "@/components/sellerLanding/Footer";
+import Footer from "@/components/corporate/Footer";
 import SupportFormSection from "@/components/sellerLanding/SupportFormSection";
 
 

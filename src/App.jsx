@@ -8,6 +8,13 @@ import LoginPage from "@/pages/seller/LoginPage";
 import SellerApplicationPage from "@/pages/seller/SellerApplicationPage";
 import SellerBrandListPage from "@/pages/seller/brands/SellerBrandListPage";
 
+// Corporate pages
+import AboutPage from "@/pages/corporate/AboutPage";
+import ContactPage from "@/pages/corporate/ContactPage";
+import KvkkPage from "@/pages/corporate/KvkkPage";
+import SssPage from "@/pages/corporate/SssPage";
+import ContractsPage from "@/pages/corporate/ContractsPage";
+
 // Subscription
 import SubscriptionPage from "@/pages/seller/subscription/SubscriptionPage";
 
@@ -40,11 +47,14 @@ import PrivateRoute from "@/routes/PrivateRoute";
 import SemiPrivateRoute from "@/routes/SemiPrivateRoute";
 import SellerRouteWrapper from "@/components/SellerRouteWrapper";
 import SellerAppointment from "@/pages/seller/SellerAppointment";
+import ScrollToTop from "@/components/ScrollToTop";
 
 
 function App() {
   return (
-    <Routes>
+    <>
+      <ScrollToTop />
+      <Routes>
       {/* ── Public seller routes ───────────────────────────── */}
       <Route path="/seller/landing" element={<SellerLandingPage />} />
       <Route path="/seller/register" element={<RegisterPage />} />
@@ -52,6 +62,14 @@ function App() {
       <Route path="/seller/apply" element={<SellerApplicationPage />} />
       <Route path="/seller" element={<Navigate to="/seller/landing" replace />} />
       <Route path="/seller/appointment" element={<SellerAppointment />} />
+      
+      {/* ── Corporate pages (Public) ─────────────────────────── */}
+      <Route path="/corporate/about" element={<AboutPage />} />
+      <Route path="/corporate/contact" element={<ContactPage />} />
+      <Route path="/corporate/kvkk" element={<KvkkPage />} />
+      <Route path="/corporate/sss" element={<SssPage />} />
+      <Route path="/corporate/contracts" element={<ContractsPage />} />
+      
       {/* ── Subscription (login gerekli; aktif değilse erişilir) ── */}
       <Route
         path="/seller/subscription"
@@ -105,20 +123,16 @@ function App() {
         <Route path="campaigns/:id" element={<CampaignDetailPage />} />
         <Route path="chat" element={<ChatPage />} />
         <Route path="chat/debug" element={<ChatDebug />} />
-        {/* Kampanyalar */}
-        <Route path="campaigns" element={<CampaignListPage />} />
-        <Route path="campaigns/new" element={<CampaignCreatePage />} />
-        <Route path="campaigns/:id" element={<CampaignDetailPage />} />
 
         {/* Diğer */}
         <Route path="reviews" element={<StoreReviewsPage />} />
-        <Route path="chat" element={<ChatPage />} />
         <Route path="brands" element={<SellerBrandListPage />} />
       </Route>
 
       {/* ── 404 redirect ───────────────────────────── */}
       <Route path="*" element={<Navigate to="/seller/landing" replace />} />
     </Routes>
+    </>
   );
 }
 
