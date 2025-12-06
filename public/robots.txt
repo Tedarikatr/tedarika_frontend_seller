@@ -4,6 +4,11 @@ Allow: /
 Allow: /seller/register
 Allow: /seller/login
 Allow: /seller/appointment
+Allow: /corporate/about
+Allow: /corporate/contact
+Allow: /corporate/kvkk
+Allow: /corporate/sss
+Allow: /corporate/contracts
 
 # Disallow private pages
 Disallow: /seller/dashboard
