@@ -1,4 +1,4 @@
-import { BarChart, TrendingUp, Users, ArrowRight } from "lucide-react";
+import { BarChart, TrendingUp, Users, ArrowRight, Globe } from "lucide-react";
 import { motion } from "framer-motion";
 
 const GrowthOpportunitiesSection = () => {
@@ -10,14 +10,19 @@ const GrowthOpportunitiesSection = () => {
 
       <div className="max-w-6xl mx-auto relative z-10">
         {/* Başlık */}
-        <motion.h2
-          className="text-5xl md:text-6xl font-extrabold text-black mb-8"
+        <motion.div
+          className="flex items-center justify-center gap-4 mb-8"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          Global Pazara Açılın ve Büyümeye Başlayın 🌍
-        </motion.h2>
+          <div className="hidden md:block w-16 h-16 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-2xl flex items-center justify-center shadow-2xl">
+            <Globe className="w-8 h-8 text-white" strokeWidth={2.5} />
+          </div>
+          <h2 className="text-5xl md:text-6xl font-extrabold text-black">
+            Global Pazara Açılın ve Büyümeye Başlayın
+          </h2>
+        </motion.div>
 
         {/* Açıklama */}
         <motion.p
@@ -26,7 +31,7 @@ const GrowthOpportunitiesSection = () => {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2, duration: 0.6 }}
         >
-          Tedarika ile sınırları kaldırın ve **ihracat** ile **global büyüme fırsatlarını** yakalayın.  
+          Tedarika ile sınırları kaldırın ve <strong>ihracat</strong> ile <strong>global büyüme fırsatlarını</strong> yakalayın.  
           Kolay başlama, düşük maliyetli süreçler ve hızlı büyüme fırsatları burada sizleri bekliyor.
         </motion.p>
 

@@ -44,7 +44,7 @@ const SupportFormSection = () => {
     try {
       await sendSellerNonSupport(form);
       setIsSuccess(true);
-      setResponseMsg("✅ Talebiniz başarıyla gönderildi!");
+      setResponseMsg("Talebiniz başarıyla gönderildi!");
       setForm({
         FirstName: "",
         LastName: "",
@@ -57,7 +57,7 @@ const SupportFormSection = () => {
       });
     } catch (err) {
       setIsSuccess(false);
-      setResponseMsg("❌ Bir hata oluştu: " + err.message);
+      setResponseMsg("Bir hata oluştu: " + err.message);
     } finally {
       setLoading(false);
       setTimeout(() => setIsSuccess(null), 4000); // toast 4 sn sonra kaybolur
