@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Helmet } from "react-helmet-async";
-import { ChevronDown, ChevronUp, HelpCircle } from "lucide-react";
+import { ChevronDown, ChevronUp, HelpCircle, MessageCircle, Mail } from "lucide-react";
 import SellerHeader from "@/components/sellerLanding/SellerHeader";
 import Footer from "@/components/corporate/Footer";
 
@@ -117,10 +117,12 @@ const SssPage = () => {
         </div>
 
         <div className="mt-8 bg-gradient-to-r from-emerald-50 via-teal-50 to-green-50 border-2 border-emerald-200 rounded-3xl p-8 shadow-xl">
-          <h3 className="text-2xl font-bold text-emerald-900 mb-4 flex items-center gap-3">
-            <HelpCircle className="w-7 h-7" />
-            Sorunuz mu var?
-          </h3>
+          <div className="flex items-center gap-3 mb-4">
+            <div className="bg-gradient-to-br from-emerald-600 to-teal-600 p-3 rounded-2xl shadow-lg">
+              <HelpCircle className="w-7 h-7 text-white" />
+            </div>
+            <h3 className="text-2xl font-bold text-emerald-900">Sorunuz mu var?</h3>
+          </div>
           <p className="text-gray-700 mb-5 text-lg">
             Burada bulamadığınız sorular için destek ekibimizle iletişime geçebilirsiniz.
           </p>
@@ -129,15 +131,17 @@ const SssPage = () => {
               href="https://wa.me/905382362605"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 bg-gradient-to-r from-green-500 via-emerald-500 to-teal-500 text-white px-6 py-3 rounded-xl font-bold hover:shadow-xl transition-all hover:scale-105"
+              className="inline-flex items-center gap-3 bg-gradient-to-r from-green-500 via-emerald-500 to-teal-500 text-white px-6 py-3 rounded-xl font-bold hover:shadow-xl transition-all hover:scale-105"
             >
-              📱 WhatsApp ile İletişim
+              <MessageCircle className="w-5 h-5" />
+              WhatsApp ile İletişim
             </a>
             <a
               href="mailto:info@tedarika.app"
-              className="inline-flex items-center gap-2 bg-white text-emerald-700 border-2 border-emerald-500 px-6 py-3 rounded-xl font-bold hover:bg-emerald-50 transition-all hover:scale-105"
+              className="inline-flex items-center gap-3 bg-white text-emerald-700 border-2 border-emerald-500 px-6 py-3 rounded-xl font-bold hover:bg-emerald-50 transition-all hover:scale-105"
             >
-              ✉️ E-posta Gönder
+              <Mail className="w-5 h-5" />
+              E-posta Gönder
             </a>
           </div>
         </div>

@@ -1,6 +1,6 @@
 import React from "react";
 import { Helmet } from "react-helmet-async";
-import { FileText, Download, Scale } from "lucide-react";
+import { FileText, Download, Scale, AlertTriangle } from "lucide-react";
 import SellerHeader from "@/components/sellerLanding/SellerHeader";
 import Footer from "@/components/corporate/Footer";
 
@@ -99,10 +99,12 @@ const ContractsPage = () => {
         </div>
 
         <div className="mt-8 bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-200 rounded-3xl p-8 shadow-xl">
-          <h3 className="text-2xl font-bold text-amber-900 mb-4 flex items-center gap-3">
-            <span className="text-3xl">⚠️</span>
-            Önemli Bilgilendirme
-          </h3>
+          <div className="flex items-center gap-3 mb-4">
+            <div className="bg-gradient-to-br from-amber-500 to-orange-500 p-3 rounded-2xl shadow-lg animate-pulse">
+              <AlertTriangle className="w-7 h-7 text-white" />
+            </div>
+            <h3 className="text-2xl font-bold text-amber-900">Önemli Bilgilendirme</h3>
+          </div>
           <p className="text-gray-700 text-lg leading-relaxed">
             Tedarika platformunu kullanarak yukarıdaki sözleşme ve politikaları kabul etmiş sayılırsınız. 
             Lütfen satıcı olarak haklarınızı ve yükümlülüklerinizi öğrenmek için bu belgeleri dikkatlice okuyunuz.

@@ -87,20 +87,38 @@ const KvkkPage = () => {
         </div>
 
         <div className="mt-8 bg-gradient-to-r from-emerald-50 to-teal-50 border-2 border-emerald-200 rounded-3xl p-8 shadow-xl">
-          <h3 className="text-2xl font-bold text-emerald-900 mb-4 flex items-center gap-3">
-            <Shield className="w-7 h-7" />
-            İletişim
-          </h3>
-          <p className="text-gray-700 mb-3 text-lg">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="bg-gradient-to-br from-emerald-600 to-teal-600 p-3 rounded-2xl shadow-lg">
+              <Shield className="w-7 h-7 text-white" />
+            </div>
+            <h3 className="text-2xl font-bold text-emerald-900">İletişim</h3>
+          </div>
+          <p className="text-gray-700 mb-4 text-lg">
             KVKK kapsamındaki talepleriniz için bizimle iletişime geçebilirsiniz:
           </p>
-          <div className="space-y-2">
-            <p className="text-emerald-700 font-semibold text-lg flex items-center gap-2">
-              <span className="text-2xl">✉️</span> E-posta: info@tedarika.app
-            </p>
-            <p className="text-emerald-700 font-semibold text-lg flex items-center gap-2">
-              <span className="text-2xl">📞</span> Telefon: +90 (538) 236 26 05
-            </p>
+          <div className="space-y-3">
+            <div className="flex items-center gap-3 bg-white p-4 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
+              <div className="bg-gradient-to-br from-teal-500 to-emerald-500 p-2 rounded-xl">
+                <Bell className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <p className="text-sm text-gray-500 font-medium">E-posta</p>
+                <a href="mailto:info@tedarika.app" className="text-emerald-700 font-bold text-lg hover:text-emerald-800">
+                  info@tedarika.app
+                </a>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 bg-white p-4 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
+              <div className="bg-gradient-to-br from-green-500 to-teal-500 p-2 rounded-xl">
+                <Lock className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <p className="text-sm text-gray-500 font-medium">Telefon</p>
+                <a href="tel:+905382362605" className="text-emerald-700 font-bold text-lg hover:text-emerald-800">
+                  +90 (538) 236 26 05
+                </a>
+              </div>
+            </div>
           </div>
         </div>
         </div>
