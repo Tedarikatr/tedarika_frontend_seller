@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Mail, Phone } from "lucide-react";
+import Logo from "@/assets/images/logo.svg";
 
 // BASE_URL'i kullanarak public içindeki dosyaların doğru yolu
 const publicUrl = (path) => {
@@ -29,10 +30,10 @@ const FooterMain = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-12 mb-12">
           {/* Sol: Logo ve İletişim Bilgileri */}
           <div className="lg:col-span-2">
-            <a href="/" className="inline-block mb-6 group">
+            <a href="/seller/landing" className="inline-block mb-6 group">
               <div className="flex items-center gap-4">
                 <img
-                  src={publicUrl("logo.svg")}
+                  src={Logo}
                   alt="Tedarika Logo"
                   className="w-24 group-hover:scale-110 transition-transform duration-300"
                 />
