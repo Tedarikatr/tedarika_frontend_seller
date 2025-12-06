@@ -175,7 +175,7 @@ const MyStoreProductsPage = () => {
         )}
 
         {/* Tablo Container */}
-        <div className="bg-white rounded-3xl shadow-2xl border border-gray-200 overflow-hidden">
+        <div className="bg-white rounded-3xl shadow-2xl border-2 border-gray-200 overflow-hidden">
           {loading ? (
             <div className="text-center py-20">
               <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 mb-4 animate-pulse shadow-xl">
