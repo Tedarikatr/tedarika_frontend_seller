@@ -11,6 +11,7 @@ import {
   Sparkles,
   Award,
   CheckCircle,
+  Bell,
 } from "lucide-react";
 
 import useSellerSetupStatus from "@/hooks/useSellerSetupStatus";
@@ -20,7 +21,8 @@ import SellerInfoCard from "@/components/seller/SellerInfoCard";
 import StoreInfoCard from "@/components/seller/StoreInfoCard";
 import CompanyInfoCard from "@/components/seller/CompanyInfoCard";
 import SellerFinanceInfoCard from "@/components/seller/SellerFinanceInfoCard";
-import SubscriptionPlans from "@/components/seller/SubscriptionPlans"; // 👈 SubscriptionPage’den çıkarılıp component olarak kaydedilecek
+import BulletinPreferencesCard from "@/components/seller/BulletinPreferencesCard";
+import SubscriptionPlans from "@/components/seller/SubscriptionPlans"; // 👈 SubscriptionPage'den çıkarılıp component olarak kaydedilecek
 
 const TABS = [
   { key: "seller", label: "Satıcı", icon: <UserCircle className="w-5 h-5" /> },
@@ -28,6 +30,7 @@ const TABS = [
   { key: "store", label: "Mağaza", icon: <Store className="w-5 h-5" /> },
   { key: "subscription", label: "Abonelik", icon: <ShieldCheck className="w-5 h-5" /> },
   { key: "finance", label: "Ödeme", icon: <CreditCard className="w-5 h-5" /> },
+  { key: "notifications", label: "Bildirimler", icon: <Bell className="w-5 h-5" /> },
 ];
 
 const SellerProfilePage = () => {
@@ -52,6 +55,8 @@ const SellerProfilePage = () => {
         return <SubscriptionPlans />; // 👈 burada planlar gösteriliyor
       case "finance":
         return <SellerFinanceInfoCard />;
+      case "notifications":
+        return <BulletinPreferencesCard />;
       default:
         return null;
     }
