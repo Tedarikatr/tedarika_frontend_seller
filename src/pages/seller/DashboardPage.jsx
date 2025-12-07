@@ -32,30 +32,51 @@ import {
 import { AlertCircle } from "lucide-react";
 import { useNavigate, Link } from "react-router-dom";
 
-const COLORS = ["#00A982", "#EAEAEA", "#FF8A8A"];
+const COLORS = ["#10B981", "#F59E0B", "#EF4444"];
 
 const iconMap = {
-  "Toplam Sipariş": <FaClipboardList className="text-[#00A982]" size={22} />,
-  "Aktif Ürün": <FaBoxOpen className="text-[#00A982]" size={22} />,
-  "Toplam Gelir": <FaLiraSign className="text-[#00A982]" size={22} />,
-  "Bekleyen Kargo": <FaTruck className="text-[#00A982]" size={22} />,
-  "İptal Edilen": <FaBan className="text-[#00A982]" size={22} />,
-  "Bekleyen Teklif": <FaCheckCircle className="text-[#00A982]" size={22} />,
+  "Toplam Sipariş": <FaClipboardList className="text-emerald-600" size={24} />,
+  "Aktif Ürün": <FaBoxOpen className="text-blue-600" size={24} />,
+  "Toplam Gelir": <FaLiraSign className="text-green-600" size={24} />,
+  "Bekleyen Kargo": <FaTruck className="text-orange-600" size={24} />,
+  "İptal Edilen": <FaBan className="text-red-600" size={24} />,
+  "Bekleyen Teklif": <FaCheckCircle className="text-purple-600" size={24} />,
+};
+
+const colorMap = {
+  "Toplam Sipariş": "from-emerald-500 to-teal-600",
+  "Aktif Ürün": "from-blue-500 to-indigo-600",
+  "Toplam Gelir": "from-green-500 to-emerald-600",
+  "Bekleyen Kargo": "from-orange-500 to-amber-600",
+  "İptal Edilen": "from-red-500 to-rose-600",
+  "Bekleyen Teklif": "from-purple-500 to-violet-600",
 };
 
 const StatCard = ({ title, value, icon, delay }) => (
   <motion.div
-    className="bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 p-5 flex flex-col gap-2"
-    whileHover={{ scale: 1.02 }}
+    className="relative bg-gradient-to-br from-white to-gray-50 border-2 border-gray-200 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 p-6 overflow-hidden group"
+    whileHover={{ scale: 1.03, y: -4 }}
     initial={{ opacity: 0, y: 20 }}
     animate={{ opacity: 1, y: 0 }}
     transition={{ delay, duration: 0.4 }}
   >
-    <div className="flex justify-between items-center">
-      <p className="text-sm text-gray-500 font-medium">{title}</p>
-      {icon}
+    {/* Background Gradient on Hover */}
+    <div className={`absolute inset-0 bg-gradient-to-br ${colorMap[title]} opacity-0 group-hover:opacity-5 transition-opacity duration-300`} />
+    
+    <div className="relative z-10 flex flex-col gap-3">
+      <div className="flex justify-between items-start">
+        <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide">{title}</p>
+        <div className="p-2 bg-gray-100 rounded-xl group-hover:scale-110 transition-transform duration-300">
+          {icon}
+        </div>
+      </div>
+      <p className="text-3xl font-bold text-gray-900 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-emerald-600 group-hover:to-teal-600 transition-all duration-300">
+        {value}
+      </p>
     </div>
-    <p className="text-2xl font-semibold text-gray-800">{value}</p>
+    
+    {/* Bottom accent line */}
+    <div className={`absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r ${colorMap[title]} transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left`} />
   </motion.div>
 );
 
@@ -151,19 +172,22 @@ const DashboardPage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-white px-6 py-8 font-sans">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50 px-6 py-8 font-sans">
       {/* Başlık */}
-      <motion.h1
-        className="text-3xl sm:text-4xl font-bold text-gray-800 mb-8"
+      <motion.div
+        className="mb-10"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        Satıcı Paneli
-      </motion.h1>
+        <h1 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-emerald-600 via-teal-600 to-green-600 bg-clip-text text-transparent mb-2">
+          Satıcı Paneli
+        </h1>
+        <p className="text-gray-600 text-lg">Mağazanızın genel durumunu buradan takip edebilirsiniz</p>
+      </motion.div>
 
       {/* Özet Kartlar */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-5 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
         {stats.map((stat, idx) => (
           <StatCard
             key={stat.title}
@@ -177,33 +201,49 @@ const DashboardPage = () => {
 
       {/* 🔗 Hızlı Kısayollar */}
       <motion.div
-        className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-5 mb-10"
+        className="mb-10"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
       >
-        {[
-          { to: "/seller/products/my-store", icon: <FaBox />, label: "Ürünlerim" },
-          { to: "/seller/orders", icon: <FaShoppingCart />, label: "Siparişlerim" },
-          { to: "/seller/quotations", icon: <FaHandshake />, label: "Teklifler" },
-          { to: "/seller/campaigns", icon: <FaBullhorn />, label: "Kampanyalar" },
-          { to: "/seller/chat", icon: <FaComments />, label: "Mesajlar" },
-          { to: "/seller/store/update", icon: <FaStore />, label: "Mağazam" },
-        ].map((item, idx) => (
-          <motion.div
-            key={idx}
-            whileHover={{ scale: 1.05 }}
-            transition={{ duration: 0.2 }}
-          >
-            <Link
-              to={item.to}
-              className="bg-[#00A982]/10 hover:bg-[#00A982]/20 rounded-xl flex flex-col items-center justify-center p-5 transition shadow-sm hover:shadow-md"
+        <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+          <span className="w-1 h-8 bg-gradient-to-b from-emerald-600 to-teal-600 rounded-full"></span>
+          Hızlı Erişim
+        </h2>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-5">
+          {[
+            { to: "/seller/products/my-store", icon: <FaBox />, label: "Ürünlerim", color: "from-blue-500 to-indigo-600" },
+            { to: "/seller/orders", icon: <FaShoppingCart />, label: "Siparişlerim", color: "from-emerald-500 to-teal-600" },
+            { to: "/seller/quotations", icon: <FaHandshake />, label: "Teklifler", color: "from-purple-500 to-violet-600" },
+            { to: "/seller/campaigns", icon: <FaBullhorn />, label: "Kampanyalar", color: "from-orange-500 to-amber-600" },
+            { to: "/seller/chat", icon: <FaComments />, label: "Mesajlar", color: "from-pink-500 to-rose-600" },
+            { to: "/seller/store/update", icon: <FaStore />, label: "Mağazam", color: "from-cyan-500 to-blue-600" },
+          ].map((item, idx) => (
+            <motion.div
+              key={idx}
+              whileHover={{ scale: 1.08, y: -4 }}
+              whileTap={{ scale: 0.95 }}
+              transition={{ duration: 0.2 }}
             >
-              <div className="text-[#00A982] text-2xl mb-2">{item.icon}</div>
-              <span className="font-semibold text-gray-700 text-sm">{item.label}</span>
-            </Link>
-          </motion.div>
-        ))}
+              <Link
+                to={item.to}
+                className="group relative bg-white hover:bg-gradient-to-br hover:from-white hover:to-gray-50 border-2 border-gray-200 hover:border-gray-300 rounded-2xl flex flex-col items-center justify-center p-6 transition-all shadow-md hover:shadow-xl overflow-hidden"
+              >
+                {/* Gradient overlay on hover */}
+                <div className={`absolute inset-0 bg-gradient-to-br ${item.color} opacity-0 group-hover:opacity-10 transition-opacity duration-300`} />
+                
+                <div className="relative z-10 flex flex-col items-center gap-3">
+                  <div className={`p-4 bg-gradient-to-br ${item.color} rounded-xl text-white text-2xl shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+                    {item.icon}
+                  </div>
+                  <span className="text-sm font-semibold text-gray-700 group-hover:text-gray-900 transition-colors">
+                    {item.label}
+                  </span>
+                </div>
+              </Link>
+            </motion.div>
+          ))}
+        </div>
       </motion.div>
 
       {/* Grafikler */}
@@ -218,40 +258,60 @@ const DashboardPage = () => {
       >
         {/* Line Chart */}
         <motion.div
-          className="col-span-2 bg-white border border-gray-200 rounded-xl p-6 shadow-sm"
+          className="col-span-2 bg-gradient-to-br from-white to-gray-50 border-2 border-gray-200 rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-shadow duration-300"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
         >
-          <h3 className="text-lg font-semibold text-gray-700 mb-4">Haftalık Finans</h3>
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-1 h-8 bg-gradient-to-b from-emerald-600 to-teal-600 rounded-full"></div>
+            <h3 className="text-xl font-bold text-gray-800">Haftalık Satış Grafiği</h3>
+          </div>
           <ResponsiveContainer width="100%" height={260}>
             <LineChart data={weeklyChart}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#F3F3F3" />
-              <XAxis dataKey="name" stroke="#888" />
-              <YAxis stroke="#888" />
-              <Tooltip />
+              <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
+              <XAxis dataKey="name" stroke="#6B7280" style={{ fontSize: '14px', fontWeight: '500' }} />
+              <YAxis stroke="#6B7280" style={{ fontSize: '14px', fontWeight: '500' }} />
+              <Tooltip 
+                contentStyle={{ 
+                  backgroundColor: 'white', 
+                  border: '2px solid #10B981', 
+                  borderRadius: '12px',
+                  boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                }} 
+              />
               <Line
                 type="monotone"
                 dataKey="value"
-                stroke="#00A982"
-                strokeWidth={3}
+                stroke="url(#colorGradient)"
+                strokeWidth={4}
                 dot={{
-                  r: 5,
-                  stroke: "#00A982",
-                  strokeWidth: 2,
+                  r: 6,
+                  stroke: "#10B981",
+                  strokeWidth: 3,
                   fill: "white",
                 }}
+                activeDot={{ r: 8 }}
               />
+              <defs>
+                <linearGradient id="colorGradient" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stopColor="#10B981" />
+                  <stop offset="100%" stopColor="#14B8A6" />
+                </linearGradient>
+              </defs>
             </LineChart>
           </ResponsiveContainer>
         </motion.div>
 
         {/* Pie Chart */}
         <motion.div
-          className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm"
+          className="bg-gradient-to-br from-white to-gray-50 border-2 border-gray-200 rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-shadow duration-300"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
         >
-          <h3 className="text-lg font-semibold text-gray-700 mb-4">Sipariş Dağılımı</h3>
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-1 h-8 bg-gradient-to-b from-blue-600 to-indigo-600 rounded-full"></div>
+            <h3 className="text-xl font-bold text-gray-800">Sipariş Durumu</h3>
+          </div>
           <ResponsiveContainer width="100%" height={260}>
             <PieChart>
               <Pie
@@ -268,16 +328,29 @@ const DashboardPage = () => {
                 ]}
                 cx="50%"
                 cy="50%"
-                innerRadius={55}
-                outerRadius={85}
-                paddingAngle={2}
+                innerRadius={60}
+                outerRadius={90}
+                paddingAngle={3}
                 dataKey="value"
               >
                 {COLORS.map((color, index) => (
-                  <Cell key={index} fill={color} />
+                  <Cell key={index} fill={color} stroke="white" strokeWidth={2} />
                 ))}
               </Pie>
-              <Tooltip />
+              <Tooltip 
+                contentStyle={{ 
+                  backgroundColor: 'white', 
+                  border: '2px solid #3B82F6', 
+                  borderRadius: '12px',
+                  boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                }} 
+              />
+              <Legend 
+                verticalAlign="bottom" 
+                height={36}
+                iconType="circle"
+                wrapperStyle={{ fontSize: '14px', fontWeight: '600' }}
+              />
               <Legend
                 verticalAlign="bottom"
                 height={36}
