@@ -12,7 +12,7 @@ import {
   Legend,
 } from "recharts";
 import { useEffect, useState } from "react";
-import { getDashboardSummary, getWeeklyFinance } from "@/api/sellerFinanceService";
+import { getDashboardSnapshot, getWeeklySnapshot } from "@/api/sellerSalesSnapshotService";
 import { getMyStore } from "@/api/sellerStoreService";
 import { motion } from "framer-motion";
 import {
@@ -77,8 +77,8 @@ const DashboardPage = () => {
         }
 
         const [dashboard, weekly] = await Promise.all([
-          getDashboardSummary().catch(() => null),
-          getWeeklyFinance().catch(() => ({})),
+          getDashboardSnapshot().catch(() => null),
+          getWeeklySnapshot().catch(() => ({})),
         ]);
 
         setSummary(dashboard || {});
