@@ -14,7 +14,9 @@ import {
   ChevronLeft,
   Gift,
   MessageCircle,
-  Tags
+  Tags,
+  FileText,
+  Upload
 } from "lucide-react";
 import { useState } from "react";
 
@@ -88,7 +90,9 @@ const Sidebar = ({ isOpen, onClose }) => {
           <SidebarLink to="/seller/products/database" icon={<ChevronRight size={14} />} collapsed={collapsed} onClick={onClose}>
             Veritabanı
           </SidebarLink>
-         
+          <SidebarLink to="/seller/products/drafts" icon={<FileText size={18} />} collapsed={collapsed} onClick={onClose}>
+            Toplu Yükleme
+          </SidebarLink>
 
           <SectionTitle title="İŞLEMLER" collapsed={collapsed} />
           <SidebarLink to="/seller/orders" icon={<ShoppingCart size={18} />} collapsed={collapsed} onClick={onClose}>
