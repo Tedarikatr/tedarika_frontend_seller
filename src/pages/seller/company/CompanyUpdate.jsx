@@ -29,7 +29,7 @@ const companyTypeOptions = [
 const Field = ({ label, required, children, hint }) => (
   <div className="flex flex-col gap-2">
     <label className="text-sm font-bold text-gray-700 flex items-center gap-2">
-      <FileText className="w-4 h-4 text-indigo-600" />
+      <FileText className="w-4 h-4 text-emerald-600" />
       {label} {required && <span className="text-rose-600">*</span>}
     </label>
     {children}
@@ -169,10 +169,10 @@ export default function CompanyUpdate() {
   const textFields = fields; // textFields değişkeni tanımla
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-indigo-50">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-emerald-50">
       {/* Hero Header */}
       <motion.header 
-        className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 relative overflow-hidden"
+        className="bg-gradient-to-r from-emerald-600 via-teal-600 to-green-600 relative overflow-hidden"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.6 }}
@@ -196,7 +196,7 @@ export default function CompanyUpdate() {
                 Şirket Bilgileriniz
                 <Sparkles className="w-8 h-8 text-yellow-300 animate-pulse" />
               </h1>
-              <p className="text-indigo-100 text-lg">Zorunlu alanları doldurun ve bilgilerinizi güncel tutun</p>
+              <p className="text-emerald-100 text-lg">Zorunlu alanları doldurun ve bilgilerinizi güncel tutun</p>
             </div>
           </motion.div>
         </div>
@@ -220,7 +220,7 @@ export default function CompanyUpdate() {
                   onChange={handleChange}
                   placeholder={f.label}
                   required={f.required}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all"
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 transition-all"
                   {...(f.name === "taxNumber" && {
                     maxLength: 10,
                     pattern: "\\d{10}",
@@ -241,7 +241,7 @@ export default function CompanyUpdate() {
                 placeholder="Detaylı adres bilginizi girin"
                 required
                 rows={4}
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all resize-none"
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 transition-all resize-none"
               />
             </Field>
           </div>
@@ -263,7 +263,7 @@ export default function CompanyUpdate() {
                 value={form.type}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all bg-white"
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 transition-all bg-white"
               >
                 <option value="">Seçiniz</option>
                 {companyTypeOptions.map((o) => (
@@ -280,7 +280,7 @@ export default function CompanyUpdate() {
             <motion.button
               type="submit"
               disabled={loading || !requiredOk}
-              className="w-full bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-700 hover:via-purple-700 hover:to-pink-700 text-white font-bold py-4 rounded-xl shadow-xl hover:shadow-2xl transition-all disabled:opacity-50 disabled:hover:scale-100 text-lg"
+              className="w-full bg-gradient-to-r from-emerald-600 via-teal-600 to-green-600 hover:from-emerald-700 hover:via-teal-700 hover:to-green-700 text-white font-bold py-4 rounded-xl shadow-xl hover:shadow-2xl transition-all disabled:opacity-50 disabled:hover:scale-100 text-lg"
               whileHover={{ scale: loading || !requiredOk ? 1 : 1.02 }}
               whileTap={{ scale: loading || !requiredOk ? 1 : 0.98 }}
             >

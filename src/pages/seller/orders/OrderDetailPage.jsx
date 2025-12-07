@@ -3,8 +3,16 @@
 // =============================
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { fetchOrderDetail, fetchPaymentDetail } from "@/api/sellerOrderService";
+import { 
+  fetchOrderDetail, 
+  fetchPaymentDetail,
+  updateOrderStatus,
+  updateCarrierInfo,
+  cancelOrder
+} from "@/api/sellerOrderService";
 import { statusLabels } from "@/constants/orderStatus";
+import { CARRIER_OPTIONS } from "@/constants/carrierCompanies";
+import { toast } from "react-hot-toast";
 import {
   ArrowLeft,
   Package,
@@ -22,7 +30,11 @@ import {
   Truck,
   Store,
   FileText,
-  Sparkles
+  Sparkles,
+  Edit,
+  Ban,
+  Loader2,
+  Send
 } from "lucide-react";
 
 // Modern Status Badge
@@ -102,6 +114,16 @@ const OrderDetailPage = () => {
   const [paymentLoading, setPaymentLoading] = useState(false);
   const [paymentError, setPaymentError] = useState("");
 
+  // Kargo Modal State
+  const [showCarrierModal, setShowCarrierModal] = useState(false);
+  const [carrierCompany, setCarrierCompany] = useState("");
+  const [trackingNumber, setTrackingNumber] = useState("");
+  const [carrierLoading, setCarrierLoading] = useState(false);
+
+  // İşlem Loading States
+  const [statusLoading, setStatusLoading] = useState(false);
+  const [cancelLoading, setCancelLoading] = useState(false);
+
   useEffect(() => {
     const token = localStorage.getItem("sellerToken");
     if (!token) navigate("/seller/login");
@@ -139,6 +161,67 @@ const OrderDetailPage = () => {
       setPaymentOpen(true);
     } finally {
       setPaymentLoading(false);
+    }
+  };
+
+  // Sipariş durumunu güncelle (Created -> Confirmed)
+  const handleUpdateStatus = async () => {
+    if (!window.confirm("Siparişi onaylamak istediğinize emin misiniz?")) return;
+    
+    setStatusLoading(true);
+    try {
+      console.log("Sipariş onaylanıyor:", orderId, "Status: Confirmed");
+      await updateOrderStatus(Number(orderId), "Confirmed");
+      toast.success("Sipariş onaylandı!");
+      await loadOrder();
+    } catch (err) {
+      console.error("Durum güncellenemedi:", err);
+      toast.error(`Sipariş durumu güncellenemedi: ${err.message}`);
+    } finally {
+      setStatusLoading(false);
+    }
+  };
+
+  // Kargo bilgisi güncelle
+  const handleUpdateCarrier = async () => {
+    if (!carrierCompany || !trackingNumber) {
+      toast.error("Lütfen tüm alanları doldurun");
+      return;
+    }
+
+    setCarrierLoading(true);
+    try {
+      await updateCarrierInfo(Number(orderId), {
+        carrierCompany,
+        trackingNumber
+      });
+      toast.success("Kargo bilgisi başarıyla güncellendi!");
+      setShowCarrierModal(false);
+      setCarrierCompany("");
+      setTrackingNumber("");
+      await loadOrder();
+    } catch (err) {
+      console.error("Kargo bilgisi güncellenemedi:", err);
+      toast.error("Kargo bilgisi güncellenemedi.");
+    } finally {
+      setCarrierLoading(false);
+    }
+  };
+
+  // Siparişi iptal et
+  const handleCancelOrder = async () => {
+    if (!window.confirm("Siparişi iptal etmek istediğinize emin misiniz? Bu işlem geri alınamaz!")) return;
+    
+    setCancelLoading(true);
+    try {
+      await cancelOrder(Number(orderId));
+      toast.success("Sipariş iptal edildi!");
+      await loadOrder();
+    } catch (err) {
+      console.error("Sipariş iptal edilemedi:", err);
+      toast.error("Sipariş iptal edilemedi.");
+    } finally {
+      setCancelLoading(false);
     }
   };
 
@@ -203,7 +286,52 @@ const OrderDetailPage = () => {
               </div>
             </div>
             
-            <StatusBadge status={order.status} />
+            <div className="flex flex-wrap items-center gap-3">
+              <StatusBadge status={order.status} />
+              
+              {/* Sipariş İşlemleri */}
+              <div className="flex flex-wrap gap-2">
+                {order.status === "Created" && (
+                  <button
+                    onClick={handleUpdateStatus}
+                    disabled={statusLoading}
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white rounded-xl font-semibold transition-all disabled:opacity-50 border border-white/30"
+                  >
+                    {statusLoading ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <CheckCircle className="w-4 h-4" />
+                    )}
+                    Onayla
+                  </button>
+                )}
+                
+                {(order.status === "Created" || order.status === "Confirmed") && (
+                  <>
+                    <button
+                      onClick={() => setShowCarrierModal(true)}
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white rounded-xl font-semibold transition-all border border-white/30"
+                    >
+                      <Truck className="w-4 h-4" />
+                      Kargo Bilgisi
+                    </button>
+                    
+                    <button
+                      onClick={handleCancelOrder}
+                      disabled={cancelLoading}
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-red-500/20 hover:bg-red-500/30 backdrop-blur-sm text-white rounded-xl font-semibold transition-all disabled:opacity-50 border border-red-300/30"
+                    >
+                      {cancelLoading ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <Ban className="w-4 h-4" />
+                      )}
+                      İptal Et
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -224,20 +352,27 @@ const OrderDetailPage = () => {
             value={new Date(order.createdAt).toLocaleString("tr-TR")}
           />
           <InfoCard 
+            icon={DollarSign} 
+            label="Toplam Tutar" 
+            value={`₺${order.totalAmount.toFixed(2)} ${order.currency}`}
+            colorClass="text-emerald-700 text-lg"
+          />
+          <InfoCard 
             icon={Truck} 
-            label="Kargo" 
-            value={order.carrierName || "Tanımsız"}
+            label="Kargo Şirketi" 
+            value={order.carrierCompany || "Henüz Eklenmedi"}
+            colorClass={order.carrierCompany ? "text-gray-900" : "text-gray-400"}
+          />
+          <InfoCard 
+            icon={Package} 
+            label="Takip Numarası" 
+            value={order.trackingNumber || "Henüz Eklenmedi"}
+            colorClass={order.trackingNumber ? "text-gray-900" : "text-gray-400"}
           />
           <InfoCard 
             icon={MapPin} 
             label="Teslimat Adresi" 
             value={order.shippingAddress}
-          />
-          <InfoCard 
-            icon={DollarSign} 
-            label="Toplam Tutar" 
-            value={`₺${order.totalAmount.toFixed(2)} ${order.currency}`}
-            colorClass="text-emerald-700 text-lg"
           />
         </div>
 
@@ -428,6 +563,115 @@ const OrderDetailPage = () => {
           </div>
         </div>
       </div>
+
+      {/* Kargo Bilgisi Modal */}
+      {showCarrierModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full overflow-hidden animate-[slideUp_0.3s_ease-out]">
+            {/* Modal Header */}
+            <div className="bg-gradient-to-r from-emerald-600 to-teal-600 px-6 py-5 text-white">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                  <Truck size={24} />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold">Kargo Bilgisi Ekle</h3>
+                  <p className="text-emerald-100 text-sm">Sipariş No: {order.orderNumber}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-6 space-y-4">
+              {/* Kargo Şirketi */}
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-2">
+                  Kargo Şirketi *
+                </label>
+                <select
+                  value={carrierCompany}
+                  onChange={(e) => setCarrierCompany(e.target.value)}
+                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 transition-all"
+                >
+                  <option value="">Seçiniz...</option>
+                  {CARRIER_OPTIONS.map((opt) => (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Takip Numarası */}
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-2">
+                  Takip Numarası *
+                </label>
+                <input
+                  type="text"
+                  value={trackingNumber}
+                  onChange={(e) => setTrackingNumber(e.target.value)}
+                  placeholder="Kargo takip numarasını girin"
+                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 transition-all"
+                />
+              </div>
+
+              {/* Info Box */}
+              <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-4 flex items-start gap-3">
+                <InfoIcon className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                <p className="text-sm text-blue-800">
+                  Kargo bilgisi eklendikten sonra müşteri kargo takip numarasını görebilecektir.
+                </p>
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end gap-3">
+              <button
+                onClick={() => {
+                  setShowCarrierModal(false);
+                  setCarrierCompany("");
+                  setTrackingNumber("");
+                }}
+                disabled={carrierLoading}
+                className="px-5 py-2.5 rounded-xl border-2 border-gray-300 text-gray-700 font-semibold hover:bg-gray-100 transition-all disabled:opacity-50"
+              >
+                İptal
+              </button>
+              <button
+                onClick={handleUpdateCarrier}
+                disabled={carrierLoading || !carrierCompany || !trackingNumber}
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-semibold hover:shadow-lg hover:scale-105 transition-all disabled:opacity-50 disabled:hover:scale-100"
+              >
+                {carrierLoading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Kaydediliyor...
+                  </>
+                ) : (
+                  <>
+                    <Send className="w-4 h-4" />
+                    Kaydet
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <style>{`
+        @keyframes slideUp {
+          from { 
+            transform: translateY(20px); 
+            opacity: 0; 
+          }
+          to { 
+            transform: translateY(0); 
+            opacity: 1; 
+          }
+        }
+      `}</style>
     </div>
   );
 };

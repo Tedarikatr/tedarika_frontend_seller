@@ -12,10 +12,40 @@ export const fetchPagedOrders = (page = 1, size = 10) =>
 export const fetchOrderDetail = (orderId) =>
   apiRequest(`/SellerOrder/detail/${orderId}`, "GET", null, true);
 
-// (KALDIRILDI: durum güncelle/iptal kullanılmıyor)
-// export const updateOrderStatus = ...
-// export const cancelOrder = ...
-
 // ✅ Ödeme detayını getir
 export const fetchPaymentDetail = (orderId) =>
   apiRequest(`/SellerOrder/payment-detail/${orderId}`, "GET", null, true);
+
+// ✅ Sipariş durumunu güncelle
+export const updateOrderStatus = async (orderId, status) => {
+  const token = localStorage.getItem("sellerToken");
+  const BASE_URL = import.meta.env.VITE_API_URL;
+  
+  const response = await fetch(`${BASE_URL}/SellerOrder/update-status/${orderId}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`,
+      "Accept": "*/*"
+    },
+    body: `"${status}"` // Send as JSON-encoded string: "Created", "Confirmed", etc.
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text().catch(() => "");
+    console.error("Status update error:", response.status, errorText);
+    throw new Error(errorText || "Status güncellenemedi");
+  }
+
+  return response.ok;
+};
+
+// ✅ Kargo bilgisi güncelle
+export const updateCarrierInfo = async (orderId, carrierData) => {
+  console.log("Kargo güncelleniyor:", orderId, carrierData);
+  return await apiRequest(`/SellerOrder/update-carrier/${orderId}`, "PUT", carrierData, true);
+};
+
+// ✅ Siparişi iptal et
+export const cancelOrder = (orderId) =>
+  apiRequest(`/SellerOrder/cancel/${orderId}`, "PUT", null, true);
