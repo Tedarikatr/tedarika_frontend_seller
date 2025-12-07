@@ -2,7 +2,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { getMyCompany, updateCompany } from "@/api/sellerCompanyService";
 import TaxOfficeSelect from "@/components/seller/TaxOfficeSelect";
-import { Building2, Loader2, CheckCircle, AlertTriangle } from "lucide-react";
+import { Building2, Loader2, CheckCircle, AlertTriangle, Sparkles, FileText } from "lucide-react";
+import { motion } from "framer-motion";
 
 // UI (numeric) → API (string enum) map
 const COMPANY_TYPE_NUM2STR = {
@@ -26,12 +27,13 @@ const companyTypeOptions = [
 ];
 
 const Field = ({ label, required, children, hint }) => (
-  <div className="flex flex-col gap-1">
-    <label className="text-sm font-medium text-gray-700">
+  <div className="flex flex-col gap-2">
+    <label className="text-sm font-bold text-gray-700 flex items-center gap-2">
+      <FileText className="w-4 h-4 text-indigo-600" />
       {label} {required && <span className="text-rose-600">*</span>}
     </label>
     {children}
-    {hint && <p className="text-xs text-gray-500">{hint}</p>}
+    {hint && <p className="text-xs text-gray-500 italic">{hint}</p>}
   </div>
 );
 
@@ -164,63 +166,88 @@ export default function CompanyUpdate() {
     { name: "province", label: "Şehir", required: true },
   ];
 
+  const textFields = fields; // textFields değişkeni tanımla
+
   return (
-    <div className="min-h-screen bg-[#f9fafa]">
-      {/* Hero başlık - tam genişlik */}
-      <header className="bg-gradient-to-r from-[#e9f0ee] to-[#f3f8f7]">
-        <div className="max-w-6xl mx-auto px-6 py-10">
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-xl bg-[#003636]/10 text-[#003636]">
-              <Building2 className="w-5 h-5" />
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-indigo-50">
+      {/* Hero Header */}
+      <motion.header 
+        className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 relative overflow-hidden"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.6 }}
+      >
+        {/* Decorative elements */}
+        <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 left-0 w-64 h-64 bg-white/10 rounded-full blur-3xl" />
+        
+        <div className="max-w-6xl mx-auto px-6 py-12 relative z-10">
+          <motion.div 
+            className="flex items-center gap-4"
+            initial={{ y: -20 }}
+            animate={{ y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
+            <div className="p-4 rounded-2xl bg-white/20 backdrop-blur-sm text-white shadow-lg">
+              <Building2 className="w-8 h-8" />
             </div>
             <div>
-              <h2 className="text-3xl font-bold text-[#003636]">Şirket Bilgilerini Güncelle</h2>
-              <p className="text-sm text-gray-600 mt-1">Zorunlu alanları doldurun ve değişiklikleri kaydedin.</p>
+              <h1 className="text-4xl sm:text-5xl font-bold text-white mb-2 flex items-center gap-3">
+                Şirket Bilgileriniz
+                <Sparkles className="w-8 h-8 text-yellow-300 animate-pulse" />
+              </h1>
+              <p className="text-indigo-100 text-lg">Zorunlu alanları doldurun ve bilgilerinizi güncel tutun</p>
             </div>
-          </div>
+          </motion.div>
         </div>
-      </header>
+      </motion.header>
 
-      <main className="max-w-6xl mx-auto px-6 py-8">
-        <form
+      <main className="max-w-6xl mx-auto px-6 py-10">
+        <motion.form
           onSubmit={handleSubmit}
-          className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white p-6 rounded-2xl shadow-sm border"
+          className="bg-white rounded-3xl shadow-2xl border-2 border-gray-200 p-10"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.3 }}
         >
-          {textFields.map((f) => (
-            <Field key={f.name} label={f.label} required={f.required}>
-              <input
-                name={f.name}
-                value={form[f.name]}
-                onChange={handleChange}
-                placeholder={f.label}
-                required={f.required}
-                className="input"
-                {...(f.name === "taxNumber" && {
-                  maxLength: 10,
-                  pattern: "\\d{10}",
-                  title: "Vergi numarası 10 haneli rakamlardan oluşmalıdır"
-                })}
-              />
-            </Field>
-          ))}
+          {/* Text Fields */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {textFields.map((f) => (
+              <Field key={f.name} label={f.label} required={f.required}>
+                <input
+                  name={f.name}
+                  value={form[f.name]}
+                  onChange={handleChange}
+                  placeholder={f.label}
+                  required={f.required}
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all"
+                  {...(f.name === "taxNumber" && {
+                    maxLength: 10,
+                    pattern: "\\d{10}",
+                    title: "Vergi numarası 10 haneli rakamlardan oluşmalıdır"
+                  })}
+                />
+              </Field>
+            ))}
+          </div>
 
           {/* Adres */}
-          <div className="md:col-span-2">
+          <div>
             <Field label="Adres" required>
               <textarea
                 name="address"
                 value={form.address}
                 onChange={handleChange}
-                placeholder="Adres"
+                placeholder="Detaylı adres bilginizi girin"
                 required
-                rows={3}
-                className="input min-h-[100px]"
+                rows={4}
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all resize-none"
               />
             </Field>
           </div>
 
-          {/* Vergi Dairesi - JSON select */}
-          <div className="md:col-span-1">
+          {/* Vergi Dairesi & Şirket Türü */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <Field label="Vergi Dairesi" required>
               <TaxOfficeSelect
                 name="taxOffice"
@@ -229,17 +256,14 @@ export default function CompanyUpdate() {
                 required
               />
             </Field>
-          </div>
 
-          {/* Şirket Türü */}
-          <div className="md:col-span-1">
             <Field label="Şirket Türü" required>
               <select
                 name="type"
                 value={form.type}
                 onChange={handleChange}
                 required
-                className="input bg-white"
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all bg-white"
               >
                 <option value="">Seçiniz</option>
                 {companyTypeOptions.map((o) => (
@@ -251,32 +275,52 @@ export default function CompanyUpdate() {
             </Field>
           </div>
 
-          {/* Aksiyonlar */}
-          <div className="md:col-span-2 flex flex-col gap-3">
-            <button
+          {/* Actions */}
+          <div className="space-y-4">
+            <motion.button
               type="submit"
               disabled={loading || !requiredOk}
-              className="w-full bg-[#003636] hover:bg-[#004848] text-white font-semibold py-3 rounded-xl transition disabled:opacity-50 inline-flex items-center justify-center gap-2"
+              className="w-full bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-700 hover:via-purple-700 hover:to-pink-700 text-white font-bold py-4 rounded-xl shadow-xl hover:shadow-2xl transition-all disabled:opacity-50 disabled:hover:scale-100 text-lg"
+              whileHover={{ scale: loading || !requiredOk ? 1 : 1.02 }}
+              whileTap={{ scale: loading || !requiredOk ? 1 : 0.98 }}
             >
-              {loading ? (<><Loader2 className="w-5 h-5 animate-spin" /> Güncelleniyor...</>) : "Güncelle"}
-            </button>
+              {loading ? (
+                <span className="flex items-center justify-center gap-2">
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  Güncelleniyor...
+                </span>
+              ) : (
+                <span className="flex items-center justify-center gap-2">
+                  <CheckCircle className="w-5 h-5" />
+                  Bilgileri Güncelle
+                </span>
+              )}
+            </motion.button>
+
             {message && (
-              <div
-                className={`text-center text-sm font-medium ${
-                  message.startsWith("✅") ? "text-emerald-700 bg-emerald-50 border border-emerald-200" : "text-rose-700 bg-rose-50 border border-rose-200"
-                } py-2 rounded-lg`}
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className={`text-center text-sm font-bold p-4 rounded-xl ${
+                  message.startsWith("✅") ? "text-emerald-800 bg-emerald-100 border-2 border-emerald-300" : "text-rose-800 bg-rose-100 border-2 border-rose-300"
+                }`}
               >
                 {message}
-              </div>
+              </motion.div>
             )}
+
             {!requiredOk && (
-              <div className="flex items-start gap-2 text-amber-700 bg-amber-50 p-3 rounded-xl">
-                <AlertTriangle className="w-5 h-5 mt-0.5" />
-                <p className="text-sm">Lütfen tüm zorunlu alanları doldurun.</p>
-              </div>
+              <motion.div 
+                className="flex items-start gap-3 text-amber-800 bg-amber-50 p-4 rounded-xl border-2 border-amber-200"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+              >
+                <AlertTriangle className="w-5 h-5 mt-0.5 flex-shrink-0" />
+                <p className="text-sm font-semibold">Lütfen tüm zorunlu alanları doldurun ve vergi numarasının 10 haneli olduğundan emin olun.</p>
+              </motion.div>
             )}
           </div>
-        </form>
+        </motion.form>
       </main>
     </div>
   );
