@@ -26,24 +26,51 @@ const handleSubmit = async (e) => {
   e.preventDefault();
   setMessage("");
 
+  // Eğer zaten submit ediliyor ise çık
+  if (isSubmitting) {
+    return;
+  }
+
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const phoneRegex = /^5\d{9}$/;
 
-  if (!emailRegex.test(formData.email)) {
+  // Email validation
+  if (!formData.email || !emailRegex.test(formData.email)) {
     setMessage("❌ Geçerli bir e-posta adresi giriniz.");
     return;
   }
 
-  if (!phoneRegex.test(formData.phone)) {
-    setMessage("❌ Telefon numarası 05XXXXXXXXX formatında olmalıdır.");
+  // Phone validation
+  if (!formData.phone || !phoneRegex.test(formData.phone)) {
+    setMessage("❌ Telefon numarası 10 haneli olmalı ve 5 ile başlamalıdır (örn: 5551234567)");
+    return;
+  }
+
+  // Password validation
+  if (!formData.password || formData.password.length < 8) {
+    setMessage("❌ Şifre en az 8 karakter olmalıdır.");
+    return;
+  }
+
+  // Name validation
+  if (!formData.name || !formData.name.trim()) {
+    setMessage("❌ Ad alanı zorunludur.");
+    return;
+  }
+
+  if (!formData.lastName || !formData.lastName.trim()) {
+    setMessage("❌ Soyad alanı zorunludur.");
     return;
   }
   
   const fullPhone = `+90${formData.phone}`;
 
   const payload = {
-    ...formData,
+    name: formData.name.trim(),
+    lastName: formData.lastName.trim(),
+    email: formData.email.trim(),
     phone: fullPhone,
+    password: formData.password,
   };
 
   setIsSubmitting(true); // Tüm validasyonlar geçildikten sonra kilitle
@@ -60,8 +87,7 @@ const handleSubmit = async (e) => {
       err.message ||
       "Kayıt sırasında bir hata oluştu.";
     setMessage(`❌ ${errorMessage}`);
-  } finally {
-    setIsSubmitting(false);
+    setIsSubmitting(false); // Hata durumunda butonu tekrar aktif et
   }
 };
 
@@ -106,8 +132,10 @@ const handleSubmit = async (e) => {
 
           <button
             type="submit"
-            disabled={isSubmitting} // Disable button during submission
-            className="mt-8 w-full bg-gradient-to-r from-[#00d18c] to-[#00a980] hover:opacity-90 text-white font-semibold py-3 rounded-xl transition"
+            disabled={isSubmitting}
+            className={`mt-8 w-full bg-gradient-to-r from-[#00d18c] to-[#00a980] hover:opacity-90 text-white font-semibold py-3 rounded-xl transition ${
+              isSubmitting ? "opacity-50 cursor-not-allowed" : ""
+            }`}
           >
             {isSubmitting ? "Kayıt Yapılıyor..." : "Hesap Oluştur"}
           </button>
