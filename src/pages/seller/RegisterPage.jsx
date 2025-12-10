@@ -50,7 +50,7 @@ const RegisterPage = () => {
       setIsSubmitting(false);
       return;
     }
-
+    
     const payload = {
       ...formData,
       phone: fullPhone,
