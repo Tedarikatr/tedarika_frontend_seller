@@ -22,53 +22,48 @@ const RegisterPage = () => {
     }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setMessage("");
-    setIsSubmitting(true); // Disable submit during submission
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setMessage("");
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const phoneRegex = /^5\d{9}$/;
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const phoneRegex = /^5\d{9}$/;
 
-    if (!emailRegex.test(formData.email)) {
-      setMessage("❌ Geçerli bir e-posta adresi giriniz.");
-      setIsSubmitting(false);
-      return;
-    }
+  if (!emailRegex.test(formData.email)) {
+    setMessage("❌ Geçerli bir e-posta adresi giriniz.");
+    return;
+  }
 
-    if (!phoneRegex.test(formData.phone)) {
-      setMessage("❌ Telefon numarası 05XXXXXXXXX formatında olmalıdır.");
-      setIsSubmitting(false);
-      return;
-    }
+  if (!phoneRegex.test(formData.phone)) {
+    setMessage("❌ Telefon numarası 05XXXXXXXXX formatında olmalıdır.");
+    return;
+  }
+  
+  const fullPhone = `+90${formData.phone}`;
 
-    const fullPhone = `+90${formData.phone}`;
-    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/; // Add password validation
-
-    if (!passwordRegex.test(formData.password)) {
-      setMessage("❌ Şifre en az 8 karakter, harf ve rakam içermelidir.");
-      setIsSubmitting(false);
-      return;
-    }
-    
-    const payload = {
-      ...formData,
-      phone: fullPhone,
-    };
-
-    try {
-      await registerSeller(payload);
-      setMessage("✅ Kayıt başarılı! Giriş sayfasına yönlendiriliyorsunuz...");
-      setTimeout(() => {
-        navigate("/seller/login");
-      }, 1500);
-    } catch (err) {
-      const errorMessage = err?.response?.data?.message || err.message || "Kayıt sırasında bir hata oluştu.";
-      setMessage(`❌ ${errorMessage}`);
-    } finally {
-      setIsSubmitting(false); // Re-enable the submit button after submission
-    }
+  const payload = {
+    ...formData,
+    phone: fullPhone,
   };
+
+  setIsSubmitting(true); // Tüm validasyonlar geçildikten sonra kilitle
+
+  try {
+    await registerSeller(payload);
+    setMessage("✅ Kayıt başarılı! Giriş sayfasına yönlendiriliyorsunuz...");
+    setTimeout(() => {
+      navigate("/seller/login");
+    }, 1500);
+  } catch (err) {
+    const errorMessage =
+      err?.response?.data?.message ||
+      err.message ||
+      "Kayıt sırasında bir hata oluştu.";
+    setMessage(`❌ ${errorMessage}`);
+  } finally {
+    setIsSubmitting(false);
+  }
+};
 
   // Handle back button click
   const handleBack = () => {
