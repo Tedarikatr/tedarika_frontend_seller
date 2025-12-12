@@ -50,11 +50,11 @@ const FeaturesSection = () => {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2, duration: 0.6 }}
         >
-          Tedarika, sadece bir pazaryeri değil —{" "}
+          Sadece bir satış platformu değil, işinizi büyütmenize yardımcı olan eksiksiz bir B2B çözümü.
+          <br />
           <span className="text-emerald-700 font-semibold">
-            KOBİ’leri dünyaya bağlayan dijital ihracat ekosistemi
+            Teknoloji, güven ve profesyonel destek tek çatı altında.
           </span>
-          . Teknoloji, güven ve hız tek çatı altında.
         </motion.p>
 
         {/* Özellik Kartları */}
@@ -90,19 +90,14 @@ const FeaturesSection = () => {
           transition={{ delay: 0.8, duration: 0.6 }}
         >
           <h3 className="text-2xl md:text-3xl font-bold text-[#003333] mb-6">
-            Sen de Tedarika’da mağazanı aç, dünyaya satış yapmaya başla
+            Bugün başlayın, yarın ilk siparişinizi alın
           </h3>
           <a
             href="/seller/register"
             className="inline-block bg-emerald-600 hover:bg-emerald-700 text-white px-10 py-4 rounded-full text-lg font-semibold transition shadow-lg hover:shadow-emerald-400/40"
           >
-            Ücretsiz Mağaza Aç
+            Ücretsiz Kaydol
           </a>
-          <p className="text-sm text-gray-600 mt-3">
-            <span className="text-emerald-700 font-medium">
-            </span>{" "}
-            · 5 dakikada kaydol · 7/24 destek
-          </p>
         </motion.div>
       </div>
     </section>

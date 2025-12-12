@@ -1,25 +1,25 @@
 import { motion } from "framer-motion";
-import { Globe, Store, Package, CheckCircle } from "lucide-react";
+import { UserPlus, Building2, Package } from "lucide-react";
 
 const steps = [
   {
     number: 1,
-    title: "Hızlı Kayıt",
-    desc: "Dakikalar içinde formu doldurarak Tedarika sistemine giriş yapın.",
-    icon: Globe,
+    title: "Kayıt Olun",
+    desc: "Basit kayıt formunu doldurun, e-posta adresinizi onaylayın. İşlem 2 dakikadan kısa sürer.",
+    icon: UserPlus,
     bg: "from-teal-500 to-teal-700",
   },
   {
     number: 2,
-    title: "Şirket & Mağaza Bilgileri",
-    desc: "Yasal bilgilerinizi ve mağaza detaylarını girerek başvurunuzu tamamlayın.",
-    icon: Store,
+    title: "Şirket Bilgilerinizi Tamamlayın",
+    desc: "Firma bilgilerinizi, vergi numaranızı ve banka hesap bilgilerinizi sisteme girin.",
+    icon: Building2,
     bg: "from-yellow-500 to-orange-600",
   },
   {
     number: 3,
-    title: "Ürünleri Ekleyin",
-    desc: "Ürünlerinizi yükleyin, satışa başlayın ve kurumsal alıcılarla buluşun.",
+    title: "Ürünlerinizi Ekleyin",
+    desc: "Kataloğunuzu yükleyin veya tek tek ürün ekleyin. Satışa hazırsınız, ilk siparişinizi bekleyin.",
     icon: Package,
     bg: "from-purple-600 to-indigo-700",
   },
@@ -35,7 +35,7 @@ const StepsSection = () => (
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
       >
-        3 Adımda Satıcı Olun
+        3 Basit Adımda Satıcı Olun
       </motion.h2>
       <motion.p
         className="text-center text-gray-600 mb-16 max-w-2xl mx-auto text-lg"
@@ -43,7 +43,7 @@ const StepsSection = () => (
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2, duration: 0.6 }}
       >
-        Tedarika’ya katılmak sadece birkaç dakika sürer. Aşağıdaki adımları izleyerek mağazanızı kolayca açabilirsiniz.
+        Karmaşık süreçler yok. Sadece birkaç dakikada hesabınızı oluşturun, ürünlerinizi ekleyin ve satmaya başlayın.
       </motion.p>
 
       {/* Adımlar */}

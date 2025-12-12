@@ -29,28 +29,24 @@ const HeroSection = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2, duration: 0.8 }}
         >
-          Türkiye’nin En Hızlı Büyüyen{" "}
+          Türkiye'den Dünyaya{" "}
           <br className="hidden md:inline" />
-          B2B Pazaryerinde{" "}
           <span className="text-emerald-600 bg-gradient-to-br from-emerald-400 to-green-700 bg-clip-text text-transparent">
-            Yerini Al
+            Profesyonel İhracat Platformu
           </span>
         </motion.h1>
 
-        {/* Alt slogan (dinamik duygusal mesaj) */}
+        {/* Alt slogan */}
         <motion.p
-          className="text-lg text-gray-800 mb-10 max-w-2xl mx-auto"
+          className="text-lg text-gray-800 mb-10 max-w-2xl mx-auto leading-relaxed"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3, duration: 0.8 }}
         >
-          <strong className="text-emerald-700 font-semibold">
-            Üreticiler, KOBİ’ler ve İhracatçılar
-          </strong>{" "}
-          için dijital ticaretin yeni adresi.  
-          Belgelerden ödemeye, kargodan müşteri bulmaya kadar{" "}
+          Binlerce global alıcıya ulaşın, güvenli ödeme alın, siparişlerinizi kolayca yönetin.
+          <br />
           <span className="font-semibold text-emerald-800">
-            her şeyi tek panelden yönetin.
+            İhracatınızı büyütmek için ihtiyacınız olan her şey tek platformda.
           </span>
         </motion.p>
 
@@ -65,13 +61,13 @@ const HeroSection = () => {
             href="/seller/register"
             className="bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-3 rounded-full text-lg font-semibold transition shadow-lg hover:shadow-emerald-400/40"
           >
-            Mağazanı Ücretsiz Aç
+            Ücretsiz Başlayın
           </a>
           <a
             href="/seller/login"
             className="bg-white border border-emerald-600 text-emerald-700 hover:bg-emerald-50 px-8 py-3 rounded-full text-lg font-semibold transition"
           >
-            Zaten Üyeyim
+            Giriş Yapın
           </a>
         </motion.div>
 
@@ -91,8 +87,8 @@ const HeroSection = () => {
             <div className="absolute -inset-1 bg-gradient-to-r from-green-400 to-emerald-400 rounded-full blur opacity-40 group-hover:opacity-70 transition"></div>
             <MessageCircle className="w-7 h-7 relative z-10" />
             <div className="relative z-10">
-              <div className="text-base font-semibold">WhatsApp Destek</div>
-              <div className="text-sm font-normal opacity-90">Hemen Bize Ulaşın</div>
+              <div className="text-base font-semibold">Canlı Destek</div>
+              <div className="text-sm font-normal opacity-90">WhatsApp ile Bize Ulaşın</div>
             </div>
           </a>
         </motion.div>
@@ -104,7 +100,7 @@ const HeroSection = () => {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.9, duration: 0.6 }}
         >
-          Ücretsiz kayıt · Türkçe destek
+          Kredi kartı gerekmez · Kurulum ücreti yok · 7/24 Türkçe destek
         </motion.p>
       </div>
 
@@ -117,19 +113,19 @@ const HeroSection = () => {
       >
         <div className="flex items-center gap-3">
           <Globe2 className="w-7 h-7 text-emerald-600" />
-          <span><strong>Global alıcılar</strong> seni bekliyor</span>
+          <span className="font-medium">150+ Ülkeden Alıcı</span>
         </div>
         <div className="flex items-center gap-3">
           <ShieldCheck className="w-7 h-7 text-emerald-600" />
-          <span><strong>Güvenli ödeme</strong> sistemiyle koruma</span>
+          <span className="font-medium">Güvenli Ödeme Garantisi</span>
         </div>
         <div className="flex items-center gap-3">
           <Truck className="w-7 h-7 text-emerald-600" />
-          <span><strong>Kargo entegrasyonu</strong> hazır</span>
+          <span className="font-medium">Otomatik Kargo Entegrasyonu</span>
         </div>
         <div className="flex items-center gap-3">
           <Rocket className="w-7 h-7 text-emerald-600" />
-          <span><strong>5 dakikada</strong> mağazan aktif!</span>
+          <span className="font-medium">5 Dakikada Aktif</span>
         </div>
       </motion.div>
     </section>
