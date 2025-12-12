@@ -12,7 +12,7 @@ const LoginPage = () => {
 
   useEffect(() => {
     if (location.state?.sessionExpired) {
-      setMessage("⚠️ Oturum süreniz doldu, lütfen tekrar giriş yapın.");
+      setMessage("Oturum süreniz doldu, lütfen tekrar giriş yapın.");
     }
   }, [location]);
 
@@ -29,24 +29,24 @@ const LoginPage = () => {
       const result = await loginSeller(formData);
 
       if (typeof result?.token === "string") {
-        // 🔐 Temel bilgiler
+        // Temel bilgiler
         localStorage.setItem("sellerToken", result.token);
         localStorage.setItem("sellerEmail", result.email);
         localStorage.setItem("sellerRole", result.role);
 
-        // ✅ Backend token’a koymadığı için bunları ayrıca kaydediyoruz
+        // Backend token'a koymadığı için bunları ayrıca kaydediyoruz
         if (result?.isthesystemactive !== undefined)
           localStorage.setItem("sellerSystemActive", String(result.isthesystemactive));
         if (result?.subscriptionActive !== undefined)
           localStorage.setItem("sellerSubscriptionActive", String(result.subscriptionActive));
 
-        setMessage("✅ Giriş başarılı, yönlendiriliyorsunuz...");
+        setMessage("Giriş başarılı, yönlendiriliyorsunuz...");
         navigate("/seller/dashboard");
       } else {
-        setMessage("❌ Beklenen token verisi alınamadı.");
+        setMessage("Beklenen token verisi alınamadı.");
       }
     } catch (err) {
-      setMessage("❌ " + (err?.response?.data?.message || "Giriş sırasında hata oluştu."));
+      setMessage((err?.response?.data?.message || "Giriş sırasında hata oluştu."));
     } finally {
       setIsSubmitting(false);
     }
@@ -62,16 +62,16 @@ const LoginPage = () => {
       {/* Sol bilgi alanı */}
       <div className="w-full md:w-1/2 flex flex-col justify-center items-start px-10 py-20 space-y-8 bg-gradient-to-br from-[#003e3f] via-[#004b49] to-[#005c5a]">
         <h2 className="text-4xl font-extrabold leading-tight tracking-tight">
-          Tedarika Satıcı Paneline Hoş Geldiniz
+          Profesyonel B2B İhracat Platformu
         </h2>
         <p className="text-[#b8dedb] max-w-md text-sm leading-relaxed">
-          Satıcı hesabınıza giriş yaparak mağazanızı yönetin, ürünleri yönetin ve alım gücünüzü artırın.
+          Satıcı hesabınızla mağazanızı yönetin, ürünlerinizi global alıcılara sunun ve ihracatınızı büyütün.
         </p>
         <ul className="space-y-3 text-sm">
           {[
-            "Güvenli oturum altyapısı",
-            "Kolay kullanım ve sade tasarım",
-            "Mobil uyumlu deneyim",
+            "150+ ülkeye güvenli ihracat",
+            "Kurumsal alıcı ağına erişim",
+            "Profesyonel satıcı paneli",
           ].map((item, i) => (
             <li key={i} className="flex items-center gap-2">
               <CheckCircle size={18} className="text-emerald-400" />
@@ -117,7 +117,7 @@ const LoginPage = () => {
           {message && (
             <p
               className={`mt-4 text-sm text-center font-medium ${
-                message.startsWith("✅") ? "text-green-600" : "text-red-500"
+                message.includes("başarılı") ? "text-green-600" : "text-red-500"
               }`}
             >
               {message}

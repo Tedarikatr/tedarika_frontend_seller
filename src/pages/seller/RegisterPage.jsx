@@ -36,30 +36,30 @@ const handleSubmit = async (e) => {
 
   // Email validation
   if (!formData.email || !emailRegex.test(formData.email)) {
-    setMessage("❌ Geçerli bir e-posta adresi giriniz.");
+    setMessage("Geçerli bir e-posta adresi giriniz.");
     return;
   }
 
   // Phone validation
   if (!formData.phone || !phoneRegex.test(formData.phone)) {
-    setMessage("❌ Telefon numarası 10 haneli olmalı ve 5 ile başlamalıdır (örn: 5551234567)");
+    setMessage("Telefon numarası 10 haneli olmalı ve 5 ile başlamalıdır (örn: 5551234567)");
     return;
   }
 
   // Password validation
   if (!formData.password || formData.password.length < 8) {
-    setMessage("❌ Şifre en az 8 karakter olmalıdır.");
+    setMessage("Şifre en az 8 karakter olmalıdır.");
     return;
   }
 
   // Name validation
   if (!formData.name || !formData.name.trim()) {
-    setMessage("❌ Ad alanı zorunludur.");
+    setMessage("Ad alanı zorunludur.");
     return;
   }
 
   if (!formData.lastName || !formData.lastName.trim()) {
-    setMessage("❌ Soyad alanı zorunludur.");
+    setMessage("Soyad alanı zorunludur.");
     return;
   }
   
@@ -77,7 +77,7 @@ const handleSubmit = async (e) => {
 
   try {
     await registerSeller(payload);
-    setMessage("✅ Kayıt başarılı! Giriş sayfasına yönlendiriliyorsunuz...");
+    setMessage("Kayıt başarılı! Giriş sayfasına yönlendiriliyorsunuz...");
     setTimeout(() => {
       navigate("/seller/login");
     }, 1500);
@@ -86,7 +86,7 @@ const handleSubmit = async (e) => {
       err?.response?.data?.message ||
       err.message ||
       "Kayıt sırasında bir hata oluştu.";
-    setMessage(`❌ ${errorMessage}`);
+    setMessage(`${errorMessage}`);
     setIsSubmitting(false); // Hata durumunda butonu tekrar aktif et
   }
 };
@@ -100,16 +100,16 @@ const handleSubmit = async (e) => {
     <div className="min-h-screen flex flex-col md:flex-row bg-[#002d2f] text-white">
       <div className="w-full md:w-1/2 flex flex-col justify-center items-start px-10 py-20 space-y-8 bg-gradient-to-br from-[#003e3f] via-[#004b49] to-[#005c5a]">
         <h2 className="text-4xl font-extrabold leading-tight tracking-tight">
-          Tedarika ile Dakikalar İçinde Satışa Başlayın
+          Global Pazarlara Profesyonel Erişim
         </h2>
         <p className="text-[#b8dedb] max-w-md text-sm leading-relaxed">
-          Şirketini oluştur, mağazanı aç ve on binlerce işletmeye ulaş.
+          Satıcı hesabı oluşturun, mağazanızı açın ve 150+ ülkedeki B2B alıcılara ulaşın.
         </p>
         <ul className="space-y-3 text-sm">
           {[
-            "Kolay ve hızlı kayıt süreci",
-            "Geniş müşteri kitlesi",
-            "Ücretsiz ve güvenli altyapı",
+            "5 dakikada hızlı kayıt",
+            "Binlerce kurumsal alıcı",
+            "Güvenli ödeme garantisi",
           ].map((item, i) => (
             <li key={i} className="flex items-center gap-2">
               <CheckCircle size={18} className="text-emerald-400" />
@@ -143,7 +143,7 @@ const handleSubmit = async (e) => {
           {message && (
             <p
               className={`mt-4 text-sm text-center font-medium ${
-                message.startsWith("✅") ? "text-green-600" : "text-red-500"
+                message.includes("başarılı") ? "text-green-600" : "text-red-500"
               }`}
             >
               {message}
