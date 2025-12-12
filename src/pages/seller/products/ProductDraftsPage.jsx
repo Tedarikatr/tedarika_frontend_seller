@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { fetchProductDrafts } from "@/api/sellerProductDraftService";
 import { DRAFT_STATUS_LABELS, SOURCE_TYPE_LABELS } from "@/constants/productDraftStatus";
-import { toast } from "react-hot-toast";
+import { useToast } from "@/contexts/ToastContext";
 import {
   FileText,
   Clock,
@@ -22,6 +22,7 @@ import {
 
 const ProductDraftsPage = () => {
   const navigate = useNavigate();
+  const toast = useToast();
   const [drafts, setDrafts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all"); // all, pending, approved, rejected
@@ -47,7 +48,9 @@ const ProductDraftsPage = () => {
     const statusKey = typeof status === "number" ? status : status;
     const config = DRAFT_STATUS_LABELS[statusKey];
     
-    switch (config?.icon) {
+    if (!config) return <AlertCircle className="w-5 h-5" />;
+    
+    switch (config.icon) {
       case "Clock":
         return <Clock className="w-5 h-5" />;
       case "CheckCircle":
@@ -62,6 +65,8 @@ const ProductDraftsPage = () => {
   const getSourceIcon = (sourceType) => {
     const config = SOURCE_TYPE_LABELS[sourceType] || SOURCE_TYPE_LABELS.Json;
     
+    if (!config) return <FileText className="w-5 h-5" />;
+    
     switch (config.icon) {
       case "FileSpreadsheet":
         return <FileSpreadsheet className="w-5 h-5" />;
@@ -69,6 +74,38 @@ const ProductDraftsPage = () => {
         return <FileCode className="w-5 h-5" />;
       default:
         return <FileText className="w-5 h-5" />;
+    }
+  };
+
+  const getStatusBadgeClass = (statusKey) => {
+    const config = DRAFT_STATUS_LABELS[statusKey];
+    if (!config) return "bg-gray-100 text-gray-800 border-gray-200";
+    
+    switch (config.color) {
+      case "amber":
+        return "bg-amber-100 text-amber-800 border-amber-200";
+      case "green":
+        return "bg-green-100 text-green-800 border-green-200";
+      case "red":
+        return "bg-red-100 text-red-800 border-red-200";
+      default:
+        return "bg-gray-100 text-gray-800 border-gray-200";
+    }
+  };
+
+  const getSourceBadgeClass = (sourceType) => {
+    const config = SOURCE_TYPE_LABELS[sourceType] || SOURCE_TYPE_LABELS.Json;
+    if (!config) return "bg-gray-100 text-gray-800";
+    
+    switch (config.color) {
+      case "green":
+        return "bg-green-100 text-green-800";
+      case "blue":
+        return "bg-blue-100 text-blue-800";
+      case "purple":
+        return "bg-purple-100 text-purple-800";
+      default:
+        return "bg-gray-100 text-gray-800";
     }
   };
 
@@ -214,7 +251,7 @@ const ProductDraftsPage = () => {
                 <tbody className="bg-white divide-y divide-gray-100">
                   {filteredDrafts.map((draft) => {
                     const statusKey = typeof draft.status === "number" ? draft.status : draft.status;
-                    const statusConfig = DRAFT_STATUS_LABELS[statusKey];
+                    const statusConfig = DRAFT_STATUS_LABELS[statusKey] || { text: "Bilinmiyor", color: "gray", icon: "AlertCircle" };
                     const sourceConfig = SOURCE_TYPE_LABELS[draft.sourceType] || SOURCE_TYPE_LABELS.Json;
 
                     return (
@@ -249,7 +286,7 @@ const ProductDraftsPage = () => {
 
                         {/* Kaynak */}
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-${sourceConfig.color}-100 text-${sourceConfig.color}-800 text-xs font-bold`}>
+                          <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-lg ${getSourceBadgeClass(draft.sourceType)} text-xs font-bold`}>
                             {getSourceIcon(draft.sourceType)}
                             {sourceConfig.text}
                           </div>
@@ -265,7 +302,7 @@ const ProductDraftsPage = () => {
 
                         {/* Durum */}
                         <td className="px-6 py-4 whitespace-nowrap text-center">
-                          <span className={`inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-${statusConfig.color}-100 text-${statusConfig.color}-800 text-xs font-bold border border-${statusConfig.color}-200`}>
+                          <span className={`inline-flex items-center gap-2 px-3 py-1 rounded-lg ${getStatusBadgeClass(statusKey)} text-xs font-bold border`}>
                             {getStatusIcon(draft.status)}
                             {statusConfig.text}
                           </span>

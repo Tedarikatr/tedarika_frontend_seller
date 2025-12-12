@@ -1,11 +1,12 @@
 import React, { useRef, useState } from "react";
-import { toast } from "react-hot-toast";
+import { useToast } from "@/contexts/ToastContext";
 import { Helmet } from "react-helmet-async";
 import { Mail, MessageSquare, Phone } from "lucide-react";
 import SellerHeader from "@/components/sellerLanding/SellerHeader";
 import Footer from "@/components/corporate/Footer";
 
 const ContactPage = () => {
+  const toast = useToast();
   const subjectRef = useRef();
   const messageRef = useRef();
   const fileRef = useRef();

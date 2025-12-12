@@ -6,7 +6,7 @@ import {
   addProductXml, 
   addProductXmlFromUrl 
 } from "@/api/sellerProductDraftService";
-import { toast } from "react-hot-toast";
+import { useToast } from "@/contexts/ToastContext";
 import {
   ArrowLeft,
   FileSpreadsheet,
@@ -24,6 +24,7 @@ import {
 
 const ProductDraftUploadPage = () => {
   const navigate = useNavigate();
+  const toast = useToast();
   const [activeTab, setActiveTab] = useState("excel"); // excel, json, xml, xml-url
   const [loading, setLoading] = useState(false);
   const [showTemplatePreview, setShowTemplatePreview] = useState(false);

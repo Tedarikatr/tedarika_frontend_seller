@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { toast } from "react-hot-toast";
+import { useToast } from "@/contexts/ToastContext";
 import { Check } from "lucide-react";
 import { getSubscriptionPackages } from "@/api/sellerSubscriptionService";
 
 export default function PricingSection() {
   const navigate = useNavigate();
+  const toast = useToast();
   const [plan, setPlan] = useState(null);
   const [loading, setLoading] = useState(true);
 

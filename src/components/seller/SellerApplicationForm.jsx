@@ -1,10 +1,10 @@
 import React, { useMemo, useState } from "react";
 import { applySeller } from "@/api/sellerService";
-import { toast } from "react-hot-toast";
+import { useToast } from "@/contexts/ToastContext";
 import { CheckCircle } from "lucide-react";
 import TaxOfficeSelect from "@/components/seller/TaxOfficeSelect";
 
-// API string enum’ları (Swagger ile uyumlu)
+// API string enum'ları (Swagger ile uyumlu)
 const COMPANY_TYPES = [
   { value: "SoleProprietorship", label: "Şahıs" },
   { value: "Limited", label: "Limited Şirket" },
@@ -40,6 +40,7 @@ const initial = {
 };
 
 const SellerApplicationForm = () => {
+  const toast = useToast();
   const [formData, setFormData] = useState(initial);
   const [isSubmitting, setIsSubmitting] = useState(false);
 

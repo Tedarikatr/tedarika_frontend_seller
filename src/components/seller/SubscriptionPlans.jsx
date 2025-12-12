@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { toast } from "react-hot-toast";
+import { useToast } from "@/contexts/ToastContext";
 import {
   createSubscription,
   checkoutSubscription,
@@ -9,6 +9,7 @@ import {
 import { refreshToken } from "@/api/sellerAuthService";
 
 export default function SubscriptionPlans() {
+  const toast = useToast();
   const [loadingId, setLoadingId] = useState(null);
   const [subscription, setSubscription] = useState(null);
   const [plans, setPlans] = useState([]);

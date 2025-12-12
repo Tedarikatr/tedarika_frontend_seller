@@ -2,9 +2,11 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { registerSeller } from "@/api/sellerAuthService";
 import { Mail, Lock, User, Phone, CheckCircle } from "lucide-react";
+import { useToast } from "@/contexts/ToastContext";
 
 const RegisterPage = () => {
   const navigate = useNavigate();
+  const toast = useToast();
   const [formData, setFormData] = useState({
     name: "",
     lastName: "",
@@ -12,7 +14,6 @@ const RegisterPage = () => {
     phone: "",
     password: "",
   });
-  const [message, setMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false); // Track submission status
 
   const handleChange = (e) => {
@@ -24,7 +25,6 @@ const RegisterPage = () => {
 
 const handleSubmit = async (e) => {
   e.preventDefault();
-  setMessage("");
 
   // Eğer zaten submit ediliyor ise çık
   if (isSubmitting) {
@@ -36,30 +36,30 @@ const handleSubmit = async (e) => {
 
   // Email validation
   if (!formData.email || !emailRegex.test(formData.email)) {
-    setMessage("Geçerli bir e-posta adresi giriniz.");
+    toast.error("Geçerli bir e-posta adresi giriniz.");
     return;
   }
 
   // Phone validation
   if (!formData.phone || !phoneRegex.test(formData.phone)) {
-    setMessage("Telefon numarası 10 haneli olmalı ve 5 ile başlamalıdır (örn: 5551234567)");
+    toast.error("Telefon numarası 10 haneli olmalı ve 5 ile başlamalıdır (örn: 5551234567)");
     return;
   }
 
   // Password validation
   if (!formData.password || formData.password.length < 8) {
-    setMessage("Şifre en az 8 karakter olmalıdır.");
+    toast.error("Şifre en az 8 karakter olmalıdır.");
     return;
   }
 
   // Name validation
   if (!formData.name || !formData.name.trim()) {
-    setMessage("Ad alanı zorunludur.");
+    toast.error("Ad alanı zorunludur.");
     return;
   }
 
   if (!formData.lastName || !formData.lastName.trim()) {
-    setMessage("Soyad alanı zorunludur.");
+    toast.error("Soyad alanı zorunludur.");
     return;
   }
   
@@ -77,7 +77,7 @@ const handleSubmit = async (e) => {
 
   try {
     await registerSeller(payload);
-    setMessage("Kayıt başarılı! Giriş sayfasına yönlendiriliyorsunuz...");
+    toast.success("Kayıt başarılı! Giriş sayfasına yönlendiriliyorsunuz...");
     setTimeout(() => {
       navigate("/seller/login");
     }, 1500);
@@ -86,7 +86,7 @@ const handleSubmit = async (e) => {
       err?.response?.data?.message ||
       err.message ||
       "Kayıt sırasında bir hata oluştu.";
-    setMessage(`${errorMessage}`);
+    toast.error(errorMessage);
     setIsSubmitting(false); // Hata durumunda butonu tekrar aktif et
   }
 };
@@ -139,16 +139,6 @@ const handleSubmit = async (e) => {
           >
             {isSubmitting ? "Kayıt Yapılıyor..." : "Hesap Oluştur"}
           </button>
-
-          {message && (
-            <p
-              className={`mt-4 text-sm text-center font-medium ${
-                message.includes("başarılı") ? "text-green-600" : "text-red-500"
-              }`}
-            >
-              {message}
-            </p>
-          )}
 
           <p className="mt-6 text-center text-sm text-gray-600">
             Hesabın var mı?{" "}

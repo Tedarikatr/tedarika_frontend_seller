@@ -2,19 +2,20 @@ import { useState, useEffect } from "react";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import { loginSeller } from "@/api/sellerAuthService";
 import { Mail, Lock, CheckCircle } from "lucide-react";
+import { useToast } from "@/contexts/ToastContext";
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({ emailOrPhone: "", password: "" });
-  const [message, setMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const toast = useToast();
 
   useEffect(() => {
     if (location.state?.sessionExpired) {
-      setMessage("Oturum süreniz doldu, lütfen tekrar giriş yapın.");
+      toast.warning("Oturum süreniz doldu, lütfen tekrar giriş yapın.");
     }
-  }, [location]);
+  }, [location, toast]);
 
   const handleChange = (e) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -22,7 +23,6 @@ const LoginPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setMessage("");
     setIsSubmitting(true);
 
     try {
@@ -40,13 +40,13 @@ const LoginPage = () => {
         if (result?.subscriptionActive !== undefined)
           localStorage.setItem("sellerSubscriptionActive", String(result.subscriptionActive));
 
-        setMessage("Giriş başarılı, yönlendiriliyorsunuz...");
+        toast.success("Giriş başarılı, yönlendiriliyorsunuz...");
         navigate("/seller/dashboard");
       } else {
-        setMessage("Beklenen token verisi alınamadı.");
+        toast.error("Beklenen token verisi alınamadı.");
       }
     } catch (err) {
-      setMessage((err?.response?.data?.message || "Giriş sırasında hata oluştu."));
+      toast.error(err?.response?.data?.message || "Giriş sırasında hata oluştu.");
     } finally {
       setIsSubmitting(false);
     }
@@ -113,16 +113,6 @@ const LoginPage = () => {
           >
             {isSubmitting ? "Giriş Yapılıyor..." : "Giriş Yap"}
           </button>
-
-          {message && (
-            <p
-              className={`mt-4 text-sm text-center font-medium ${
-                message.includes("başarılı") ? "text-green-600" : "text-red-500"
-              }`}
-            >
-              {message}
-            </p>
-          )}
 
           <p className="mt-6 text-center text-sm text-gray-600">
             Hesabınız yok mu?{" "}
