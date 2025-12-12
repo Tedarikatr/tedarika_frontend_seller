@@ -16,7 +16,7 @@ const ExportMadeEasySection = () => {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          İhracatın Kolay Haliyle Tanışın
+          4 Adımda Profesyonel İhracat Süreciniz Başlasın
         </motion.h2>
 
         {/* Açıklama */}
@@ -26,9 +26,7 @@ const ExportMadeEasySection = () => {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2, duration: 0.6 }}
         >
-          Tedarika ile ihracat süreci, karmaşık belgeler ve lojistik işlemlerden
-          çok daha kolay. Birkaç adımda ürününüzü dünya çapında alıcılarla
-          buluşturun.
+          Tedarika ile ihracat süreci basit ve güvenli. Belgeler, lojistik ve ödemeler için profesyonel destek alın.
         </motion.p>
 
         {/* Adım Adım İhracat */}
@@ -43,16 +41,16 @@ const ExportMadeEasySection = () => {
             <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-emerald-600 to-green-700 text-white flex items-center justify-center mb-6">
               <Globe className="w-8 h-8" />
             </div>
-            <h3 className="font-semibold text-xl text-[#002222] mb-2">Hedef Pazarı Seç</h3>
+            <h3 className="font-semibold text-xl text-[#002222] mb-2">Hedef Pazar Belirleyin</h3>
             <p className="text-sm text-gray-600">
-              Tedarika ile hangi ülkeye satış yapmak istediğini kolayca belirle.
+              150+ ülke arasından hedef pazarınızı seçin ve B2B alıcılara ulaşın.
             </p>
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               className="mt-4 px-6 py-2 bg-gradient-to-r from-emerald-600 to-teal-500 text-white rounded-full"
             >
-              Hedef Pazar Seç
+              Pazar Seç
             </motion.button>
           </motion.div>
 
@@ -66,16 +64,16 @@ const ExportMadeEasySection = () => {
             <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-yellow-400 to-orange-500 text-white flex items-center justify-center mb-6">
               <Package className="w-8 h-8" />
             </div>
-            <h3 className="font-semibold text-xl text-[#002222] mb-2">Ürün Yükle</h3>
+            <h3 className="font-semibold text-xl text-[#002222] mb-2">Ürün Ekleyin</h3>
             <p className="text-sm text-gray-600">
-              Ürününüzü yükleyin, açıklamalarını girin ve satışa sunmaya başlayın.
+              Ürünlerinizi platforma yükleyin ve global alıcılara görünür olun.
             </p>
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               className="mt-4 px-6 py-2 bg-gradient-to-r from-yellow-500 to-orange-600 text-white rounded-full"
             >
-              Ürün Yükle
+              Ürün Ekle
             </motion.button>
           </motion.div>
 
@@ -89,16 +87,16 @@ const ExportMadeEasySection = () => {
             <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-purple-500 to-indigo-600 text-white flex items-center justify-center mb-6">
               <Truck className="w-8 h-8" />
             </div>
-            <h3 className="font-semibold text-xl text-[#002222] mb-2">Kargo ve Ödeme</h3>
+            <h3 className="font-semibold text-xl text-[#002222] mb-2">Lojistik ve Ödeme</h3>
             <p className="text-sm text-gray-600">
-              Kargo entegrasyonu ve güvenli ödeme sistemi ile işlem tamamlanır.
+              Profesyonel kargo entegrasyonu ve güvenli ödeme sistemi ile satış tamamlanır.
             </p>
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               className="mt-4 px-6 py-2 bg-gradient-to-r from-purple-500 to-indigo-600 text-white rounded-full"
             >
-              Kargo ve Ödeme
+              Lojistik
             </motion.button>
           </motion.div>
 
@@ -112,16 +110,16 @@ const ExportMadeEasySection = () => {
             <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-green-400 to-teal-600 text-white flex items-center justify-center mb-6">
               <DollarSign className="w-8 h-8" />
             </div>
-            <h3 className="font-semibold text-xl text-[#002222] mb-2">Ödeme Al</h3>
+            <h3 className="font-semibold text-xl text-[#002222] mb-2">Güvenli Ödeme Alın</h3>
             <p className="text-sm text-gray-600">
-              Sipariş tamamlandığında, ödemeni güvenle al ve kazancını artır.
+              Siparişler tamamlandığında ödemeleriniz garanti altında hesabınıza yatırılır.
             </p>
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               className="mt-4 px-6 py-2 bg-gradient-to-r from-green-500 to-teal-600 text-white rounded-full"
             >
-              Ödeme Al
+              Ödeme Sistemi
             </motion.button>
           </motion.div>
         </div>

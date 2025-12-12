@@ -20,7 +20,7 @@ const GrowthOpportunitiesSection = () => {
             <Globe className="w-8 h-8 text-white" strokeWidth={2.5} />
           </div>
           <h2 className="text-5xl md:text-6xl font-extrabold text-black">
-            Global Pazara Açılın ve Büyümeye Başlayın
+            İhracatla Satışlarınızı Katlamak İçin Fırsatlar
           </h2>
         </motion.div>
 
@@ -31,8 +31,7 @@ const GrowthOpportunitiesSection = () => {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2, duration: 0.6 }}
         >
-          Tedarika ile sınırları kaldırın ve <strong>ihracat</strong> ile <strong>global büyüme fırsatlarını</strong> yakalayın.  
-          Kolay başlama, düşük maliyetli süreçler ve hızlı büyüme fırsatları burada sizleri bekliyor.
+          Tedarika ile global pazarlara ulaşın ve profesyonel B2B alıcılarla büyümeye başlayın. Düşük maliyet, hızlı başlangıç ve sürekli büyüme fırsatları.
         </motion.p>
 
         {/* Büyüme Fırsatları Kartları */}
@@ -49,8 +48,7 @@ const GrowthOpportunitiesSection = () => {
             </div>
             <h3 className="font-semibold text-xl text-[#002222] mb-2">Satış Artışı</h3>
             <p className="text-sm text-gray-600">
-              Global pazara açılarak satışlarınızı önemli ölçüde artırın.  
-              Yüksek talep ve geniş müşteri kitlesi ile büyüme fırsatları sizi bekliyor.
+              150+ ülkeden B2B alıcılara ulaşarak cirolarınızı önemli ölçüde artırın. Binlerce aktif kurumsal alıcı.
             </p>
           </motion.div>
 
@@ -66,8 +64,7 @@ const GrowthOpportunitiesSection = () => {
             </div>
             <h3 className="font-semibold text-xl text-[#002222] mb-2">Hızlı Büyüme</h3>
             <p className="text-sm text-gray-600">
-              Tedarika’nın sunduğu düşük maliyetli süreçlerle ihracatın hızla büyümesine yardımcı olun.  
-              5 dakikada mağaza açın, hemen satışa başlayın.
+              5 dakikada mağaza açın, anında satışa başlayın. Düşük komisyonlar, yüksek kar marjları.
             </p>
           </motion.div>
 
@@ -83,7 +80,7 @@ const GrowthOpportunitiesSection = () => {
             </div>
             <h3 className="font-semibold text-xl text-[#002222] mb-2">Geniş Alıcı Ağı</h3>
             <p className="text-sm text-gray-600">
-              Binlerce kurumsal alıcıya kolay erişim sağlayarak satışlarınızı hızla artırın.
+              Doğrulanmış kurumsal alıcılarla güvenli ticaret yapın. B2B odaklı profesyonel alıcı ağı.
             </p>
           </motion.div>
 
@@ -97,9 +94,9 @@ const GrowthOpportunitiesSection = () => {
             <div className="w-16 h-16 bg-gradient-to-br from-teal-600 to-emerald-500 text-white rounded-xl flex items-center justify-center mb-6">
               <ArrowRight className="w-8 h-8" />
             </div>
-            <h3 className="font-semibold text-xl text-[#002222] mb-2">Kolay Geçiş</h3>
+            <h3 className="font-semibold text-xl text-[#002222] mb-2">Kolay Entegrasyon</h3>
             <p className="text-sm text-gray-600">
-              Hızlı kayıt ve entegre araçlarla ihracata geçiş sürecini kolaylaştırın.
+              Hızlı kayıt ve kullanıma hazır araçlarla dakikalar içinde satmaya başlayın.
             </p>
           </motion.div>
         </div>
@@ -113,14 +110,14 @@ const GrowthOpportunitiesSection = () => {
         >
           <div className="flex justify-center items-center gap-4">
             <ArrowRight className="text-emerald-600 w-8 h-8" />
-            <h3 className="text-2xl font-semibold text-black">Büyümeye Başla, Satışa Geç!</h3>
+            <h3 className="text-2xl font-semibold text-black">Büyümeye Bugün Başlayın</h3>
           </div>
-          <p className="text-sm text-gray-800 mt-4">Fırsatları kaçırmayın, hemen global pazara adım atın.</p>
+          <p className="text-sm text-gray-800 mt-4">İlk siparişiniz için kaydolun, global pazarlarda yerinizi alın.</p>
           <a
             href="/seller/register"
             className="inline-block bg-emerald-700 hover:bg-emerald-800 text-white px-10 py-4 rounded-full text-lg font-semibold transition shadow-lg hover:shadow-emerald-400/40 mt-6"
           >
-            Hemen Satışa Başla
+            Ücretsiz Başlayın
           </a>
         </motion.div>
       </div>

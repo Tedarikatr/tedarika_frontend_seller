@@ -16,11 +16,11 @@ const ExportVurgulayanSection = () => {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          Türk Üreticiler İçin{" "}
+          Profesyonel İhracat Çözümü{" "}
           <span className="text-emerald-600 bg-gradient-to-br from-emerald-400 to-green-700 bg-clip-text text-transparent">
-            İhracat Kolaylığı
+            Türk Üreticiler
           </span>{" "}
-          Burada Başlıyor
+          İçin
         </motion.h2>
 
         {/* Açıklama */}
@@ -30,9 +30,7 @@ const ExportVurgulayanSection = () => {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2, duration: 0.6 }}
         >
-          <span className="text-emerald-700 font-semibold">Tedarika</span> ile, ürünlerinizi sadece Türkiye’de değil, dünyada da alıcılarla buluşturun. Her adımda yanınızdayız —{" "}
-          <span className="font-semibold text-emerald-800">belgelerden lojistiğe</span>,{" "}
-          <span className="font-semibold text-emerald-800">ödemeden güvenli alışverişe</span>.
+          <span className="text-emerald-700 font-semibold">Tedarika</span> ile ürünlerinizi global B2B alıcılarla buluşturun. Belgeler, lojistik, ödeme ve güvenli ticaret için tam destek sunuyoruz.
         </motion.p>
 
         {/* 3 Adımda İhracat */}
@@ -47,16 +45,16 @@ const ExportVurgulayanSection = () => {
             <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-emerald-500 to-green-600 text-white flex items-center justify-center mb-6">
               <Globe className="w-8 h-8" />
             </div>
-            <h3 className="font-semibold text-xl text-[#002222] mb-2">Global Pazara Adım At</h3>
+            <h3 className="font-semibold text-xl text-[#002222] mb-2">150+ Ülkeye Erişim</h3>
             <p className="text-sm text-gray-600">
-              Dünya çapındaki alıcılara, kolayca erişin ve satışa başlamak için gerekli tüm adımları atın.
+              Global B2B pazarlara anında erişin. Binlerce kurumsal alıcı ürünlerinizi bekliyor.
             </p>
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               className="mt-4 px-6 py-2 bg-gradient-to-r from-emerald-600 to-teal-500 text-white rounded-full"
             >
-              Hedef Pazara Adım At
+              Pazarlara Ulaşın
             </motion.button>
           </motion.div>
 
@@ -70,16 +68,16 @@ const ExportVurgulayanSection = () => {
             <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-yellow-500 to-orange-600 text-white flex items-center justify-center mb-6">
               <Package className="w-8 h-8" />
             </div>
-            <h3 className="font-semibold text-xl text-[#002222] mb-2">Ürünlerini Yükle</h3>
+            <h3 className="font-semibold text-xl text-[#002222] mb-2">Ürünlerinizi Ekleyin</h3>
             <p className="text-sm text-gray-600">
-              Ürünlerini platforma yükleyin, dünyanın dört bir yanındaki alıcılara sunun.
+              Ürünlerinizi hızlıca yükleyin ve global alıcılara sunun. Sınırsız ürün listeleme.
             </p>
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               className="mt-4 px-6 py-2 bg-gradient-to-r from-yellow-500 to-orange-600 text-white rounded-full"
             >
-              Ürün Yükle
+              Ürün Ekle
             </motion.button>
           </motion.div>
 
@@ -93,16 +91,16 @@ const ExportVurgulayanSection = () => {
             <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-purple-600 to-indigo-700 text-white flex items-center justify-center mb-6">
               <Truck className="w-8 h-8" />
             </div>
-            <h3 className="font-semibold text-xl text-[#002222] mb-2">Güvenli Ödeme ve Teslimat</h3>
+            <h3 className="font-semibold text-xl text-[#002222] mb-2">Güvenli Ödeme Garantisi</h3>
             <p className="text-sm text-gray-600">
-              Her işlemde güvenli ödeme, güvenilir teslimat garantisi ile satışı tamamlayın.
+              Tüm ödemeler garanti altında. Lojistik desteği ve güvenli teslimat ile satış tamamlanır.
             </p>
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               className="mt-4 px-6 py-2 bg-gradient-to-r from-purple-600 to-indigo-700 text-white rounded-full"
             >
-              Ödeme ve Teslimat
+              Güvenli Ödeme
             </motion.button>
           </motion.div>
         </div>
@@ -115,13 +113,13 @@ const ExportVurgulayanSection = () => {
           transition={{ delay: 1.2, duration: 0.6 }}
         >
           <h3 className="text-2xl md:text-3xl font-bold text-[#003333] mb-6">
-            Hemen İhracata Başla, Türk Üreticilerinin Dünyaya Açılmasını Sağla
+            Bugün Kayıt Olun, Yarın İlk İhracat Siparişinizi Alın
           </h3>
           <a
             href="/seller/register"
             className="inline-block bg-gradient-to-r from-emerald-600 to-teal-600 hover:bg-emerald-700 text-white px-10 py-4 rounded-full text-lg font-semibold transition shadow-lg hover:shadow-emerald-400/40"
           >
-            Mağazanı Ücretsiz Aç
+            Ücretsiz Mağaza Açın
           </a>
         </motion.div>
       </div>

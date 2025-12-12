@@ -16,9 +16,9 @@ const GlobalOpportunitiesSection = () => {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
         >
-          <span className="text-emerald-800">İhracat</span> ile Yeni Bir Dünya Keşfedin  
+          <span className="text-emerald-800">Global Pazarlara</span> Profesyonel Erişim 
           <br />
-          Küresel Fırsatlar Bir Adım Uzağınızda
+          B2B İhracat Fırsatları Sizi Bekliyor
         </motion.h2>
 
         {/* Açıklama */}
@@ -28,9 +28,7 @@ const GlobalOpportunitiesSection = () => {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2, duration: 0.6 }}
         >
-          **Dünyanın her yerine satış yapmaya başlamak** şimdi çok kolay.  
-          Tedarika ile ürünlerinizi küresel pazarda en hızlı şekilde satışa sunun.  
-          Hedef pazara, güvenli ödemelere ve hızlı kargoya sadece birkaç tıkla ulaşabilirsiniz.
+          150+ ülkeye ihracat yapmak artık çok kolay. Tedarika ile ürünlerinizi kurumsal alıcılara sunun, güvenli ödeme alın ve profesyonel lojistik desteği ile teslimat yapın.
         </motion.p>
 
         {/* 3 Adımda İhracat – Görsellerle Hedefe Ulaşın */}
@@ -45,16 +43,16 @@ const GlobalOpportunitiesSection = () => {
             <div className="w-16 h-16 bg-gradient-to-br from-teal-600 to-emerald-500 text-white rounded-xl flex items-center justify-center mb-6">
               <Globe className="w-8 h-8" />
             </div>
-            <h3 className="font-semibold text-xl text-[#002222] mb-2">İhracat Yolculuğuna Başla</h3>
+            <h3 className="font-semibold text-xl text-[#002222] mb-2">Hedef Pazarınızı Seçin</h3>
             <p className="text-sm text-gray-600">
-              Küresel pazarda ilk adımı atın. Hedef pazarınızı seçin ve ürünlerinizi dünyaya sunmaya başlayın.
+              150+ ülke arasından hedef pazarınızı belirleyin ve kurumsal alıcılara ulaşmaya başlayın.
             </p>
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               className="mt-4 px-6 py-2 bg-gradient-to-r from-emerald-600 to-teal-500 text-white rounded-full"
             >
-              Hedef Pazara Adım At
+              Pazarlara Ulaşın
             </motion.button>
           </motion.div>
 
@@ -68,16 +66,16 @@ const GlobalOpportunitiesSection = () => {
             <div className="w-16 h-16 bg-gradient-to-br from-yellow-500 to-orange-600 text-white rounded-xl flex items-center justify-center mb-6">
               <Package className="w-8 h-8" />
             </div>
-            <h3 className="font-semibold text-xl text-[#002222] mb-2">Ürünlerini Yükle</h3>
+            <h3 className="font-semibold text-xl text-[#002222] mb-2">Ürünlerinizi Listeleyin</h3>
             <p className="text-sm text-gray-600">
-              Ürünlerini platforma yükle, açıklamalarını gir ve satışa başlamak için hazır ol!
+              Ürünlerinizi platforma ekleyin ve global B2B alıcılara anında görünür olun.
             </p>
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               className="mt-4 px-6 py-2 bg-gradient-to-r from-yellow-500 to-orange-600 text-white rounded-full"
             >
-              Ürün Yükle
+              Ürün Ekle
             </motion.button>
           </motion.div>
 
@@ -91,16 +89,16 @@ const GlobalOpportunitiesSection = () => {
             <div className="w-16 h-16 bg-gradient-to-br from-indigo-600 to-purple-600 text-white rounded-xl flex items-center justify-center mb-6">
               <CheckCircle className="w-8 h-8" />
             </div>
-            <h3 className="font-semibold text-xl text-[#002222] mb-2">Satışı Tamamla</h3>
+            <h3 className="font-semibold text-xl text-[#002222] mb-2">Güvenli Ödeme Alın</h3>
             <p className="text-sm text-gray-600">
-              Global alıcılarla güvenli ödeme ve hızlı teslimat süreci ile satışınızı hemen tamamlayın.
+              Tüm ödemeleriniz garanti altında. Profesyonel lojistik desteği ile teslimatı tamamlayın.
             </p>
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               className="mt-4 px-6 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-full"
             >
-              Ödeme ve Teslimat
+              Ödeme Sistemi
             </motion.button>
           </motion.div>
         </div>
@@ -114,14 +112,14 @@ const GlobalOpportunitiesSection = () => {
         >
           <div className="flex justify-center items-center gap-4">
             <Star className="text-emerald-600 w-8 h-8" />
-            <h3 className="text-2xl font-semibold text-black">Hedefine Ulaş ve Büyümeye Başla</h3>
+            <h3 className="text-2xl font-semibold text-black">İlk İhracat Siparişinizi Alın</h3>
           </div>
-          <p className="text-sm text-gray-800 mt-4">İhracat fırsatlarını keşfet, büyümeye başla!</p>
+          <p className="text-sm text-gray-800 mt-4">Binlerce satıcı Tedarika ile global pazarlarda büyüyor, siz de katılın.</p>
           <a
             href="/seller/register"
             className="inline-block bg-emerald-700 hover:bg-emerald-800 text-white px-10 py-4 rounded-full text-lg font-semibold transition shadow-lg hover:shadow-emerald-400/40 mt-6"
           >
-            Hemen Başla
+            Ücretsiz Kayıt Olun
           </a>
         </motion.div>
       </div>

@@ -16,12 +16,10 @@ const HeroImpactSection = () => {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
         >
-          Hayalinizdeki <br className="sm:hidden" />
-          Global Pazara <br />
-          Adım Atın <br className="hidden sm:block" />
+          Ürünlerinizi <br className="sm:hidden" />
+          Dünyaya Satın <br />
           <span className="block sm:inline">
-            Tedarika ile{" "}
-            <span className="text-emerald-400">E-İhracat</span> Çok Kolay!
+            <span className="text-emerald-600">Profesyonel B2B Platformu</span> ile İhracat Yapın
           </span>
         </motion.h1>
 
@@ -32,10 +30,9 @@ const HeroImpactSection = () => {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3, duration: 0.6 }}
         >
-          Birkaç adımda kendi mağazanızı açın, ürünlerinizi dünyaya tanıtın.{" "}
-          <strong>Düşük maliyet</strong>, <strong>güvenli ödeme</strong> ve{" "}
-          <strong>kolay teslimat</strong> ile satışa başlayın.  
-          İhracat bir tık uzağınızda!
+          Dakikalar içinde mağazanızı açın, ürünlerinizi global alıcılara ulaştırın.{" "}
+          <strong>Güvenli ödeme</strong>, <strong>kolay teslimat</strong> ve{" "}
+          <strong>7/24 destek</strong> ile satışlarınızı büyütün.
         </motion.p>
 
         {/* 3 Ana Adım */}
@@ -51,10 +48,10 @@ const HeroImpactSection = () => {
               <Globe className="w-8 h-8 sm:w-10 sm:h-10" />
             </div>
             <h3 className="font-semibold text-lg sm:text-xl text-[#003636] mb-2">
-              Hedef Pazarı Seç
+              Global Pazarlara Erişim
             </h3>
             <p className="text-sm sm:text-base text-gray-600">
-              Dünyanın her yerine satış yapma fırsatını keşfedin. Hedef pazarınızı kolayca belirleyin.
+              150+ ülkeden alıcıya ulaşın. Hedef pazarınızı belirleyin ve satışa başlayın.
             </p>
           </motion.div>
 
@@ -69,10 +66,10 @@ const HeroImpactSection = () => {
               <TrendingUp className="w-8 h-8 sm:w-10 sm:h-10" />
             </div>
             <h3 className="font-semibold text-lg sm:text-xl text-[#003636] mb-2">
-              Satışınızı Yükseltin
+              Satışlarınızı Artırın
             </h3>
             <p className="text-sm sm:text-base text-gray-600">
-              Global alıcılar ile hızlıca satışa başlayın ve ticaretinizi hızla büyütün.
+              Kaliteli B2B alıcılarla doğrudan bağlantı kurun ve siparişlerinizi katlayın.
             </p>
           </motion.div>
 
@@ -87,10 +84,10 @@ const HeroImpactSection = () => {
               <DollarSign className="w-8 h-8 sm:w-10 sm:h-10" />
             </div>
             <h3 className="font-semibold text-lg sm:text-xl text-[#003636] mb-2">
-              Kazancınızı Hızla Artırın
+              Güvenli Ödeme Alın
             </h3>
             <p className="text-sm sm:text-base text-gray-600">
-              Güvenli ödeme entegrasyonu ile kazancınızı hızlı ve güvenli şekilde alın.
+              Ödemeleriniz garanti altında. Hızlı ve güvenli ödeme entegrasyonu ile kazancınızı alın.
             </p>
           </motion.div>
         </div>
@@ -105,17 +102,17 @@ const HeroImpactSection = () => {
           <div className="flex flex-col sm:flex-row justify-center items-center gap-3 sm:gap-4">
             <Rocket className="text-emerald-600 w-8 h-8 sm:w-10 sm:h-10" />
             <h3 className="text-xl sm:text-2xl font-semibold text-black">
-              İhracat Başladı, Sen de Katıl!
+              Bugün Başlayın, Yarın İhracat Yapın
             </h3>
           </div>
           <p className="text-xs sm:text-sm text-gray-700 mt-3 sm:mt-4">
-            Sana sadece global pazarda yerini almak kaldı!
+            Binlerce satıcı Tedarika ile global pazarlarda büyüyor
           </p>
           <a
             href="/seller/register"
             className="inline-block bg-emerald-700 hover:bg-emerald-800 text-white px-8 sm:px-12 py-3 sm:py-4 rounded-full text-base sm:text-lg font-semibold transition shadow-lg hover:shadow-emerald-400/40 mt-5"
           >
-            Hemen Satışa Başla
+            Ücretsiz Başlayın
           </a>
         </motion.div>
       </div>

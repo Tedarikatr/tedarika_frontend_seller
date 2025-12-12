@@ -77,10 +77,10 @@ const SupportFormSection = () => {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          Satıcı Destek Talebi
+          İhracat İçin Profesyonel Destek Alın
         </motion.h2>
         <p className="text-gray-600 text-base sm:text-lg mb-10 max-w-2xl mx-auto">
-          Yardıma mı ihtiyacınız var? Formu doldurun, ekibimiz en kısa sürede sizinle iletişime geçsin.
+          Sorularınız mı var? Formu doldurun, uzman ekibimiz size yardımcı olmak için en kısa sürede iletişime geçsin.
         </p>
 
         {/* Toast Bildirimi */}
