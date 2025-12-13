@@ -29,6 +29,8 @@ import MyStoreProductsPage from "@/pages/seller/products/MyStoreProductsPage";
 import ProductDatabasePage from "@/pages/seller/products/ProductDatabasePage";
 import ProductRequestListPage from "@/pages/seller/products/ProductRequestListPage";
 import ProductDraftsPage from "@/pages/seller/products/ProductDraftsPage";
+import ProductDraftListPage from "@/pages/seller/products/ProductDraftListPage";
+import ProductDraftDetailPage from "@/pages/seller/products/ProductDraftDetailPage";
 import ProductDraftUploadPage from "@/pages/seller/products/ProductDraftUploadPage";
 import OrderListPage from "@/pages/seller/orders/OrderListPage";
 import OrderDetailPage from "@/pages/seller/orders/OrderDetailPage";
@@ -113,7 +115,8 @@ function App() {
         <Route path="products/my-store" element={<MyStoreProductsPage />} />
         <Route path="products/database" element={<ProductDatabasePage />} />
         <Route path="products/requests" element={<ProductRequestListPage />} />
-        <Route path="products/drafts" element={<ProductDraftsPage />} />
+        <Route path="products/drafts" element={<ProductDraftListPage />} />
+        <Route path="products/drafts/:draftId" element={<ProductDraftDetailPage />} />
         <Route path="products/draft/upload" element={<ProductDraftUploadPage />} />
         <Route path="products/:storeProductId/images" element={<ProductImagesPage />} />
         <Route path="products/:productId/reviews" element={<ProductReviewsPage />} />
