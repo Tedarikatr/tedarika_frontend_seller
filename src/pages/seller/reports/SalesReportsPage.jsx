@@ -25,6 +25,7 @@ import {
   Loader2,
   Mail,
   RefreshCw,
+  CheckCircle,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -235,79 +236,116 @@ const SalesReportsPage = () => {
               <h2 className="text-xl font-bold text-gray-900">Rapor İndir</h2>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-6">
               {/* Rapor Türü */}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label className="block text-sm font-semibold text-gray-700 mb-3">
                   Rapor Türü
                 </label>
-                <select
-                  value={reportType}
-                  onChange={(e) => setReportType(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                >
-                  <option value="DailySales">Günlük Satışlar</option>
-                  <option value="MonthlySales">Aylık Satışlar</option>
-                  <option value="ProductSales">Ürün Bazlı Satışlar</option>
-                  <option value="CategorySales">Kategori Bazlı Satışlar</option>
-                  <option value="CustomerSales">Müşteri Bazlı Satışlar</option>
-                </select>
+                <div className="grid grid-cols-1 gap-2">
+                  {[
+                    { value: "DailySales", label: "Günlük Satışlar", icon: <Calendar className="w-5 h-5" /> },
+                    { value: "MonthlySales", label: "Aylık Satışlar", icon: <BarChart3 className="w-5 h-5" /> },
+                    { value: "ProductSales", label: "Ürün Bazlı", icon: <Package className="w-5 h-5" /> },
+                    { value: "CategorySales", label: "Kategori Bazlı", icon: <TrendingUp className="w-5 h-5" /> },
+                    { value: "CustomerSales", label: "Müşteri Bazlı", icon: <Users className="w-5 h-5" /> },
+                  ].map((type) => (
+                    <button
+                      key={type.value}
+                      onClick={() => setReportType(type.value)}
+                      className={`flex items-center gap-3 px-4 py-3 rounded-xl border-2 transition-all ${
+                        reportType === type.value
+                          ? "border-emerald-600 bg-gradient-to-r from-emerald-50 to-teal-50 text-emerald-700 shadow-md"
+                          : "border-gray-200 bg-white text-gray-700 hover:border-emerald-300 hover:shadow"
+                      }`}
+                    >
+                      <div className={`p-2 rounded-lg ${
+                        reportType === type.value ? "bg-emerald-100" : "bg-gray-100"
+                      }`}>
+                        {type.icon}
+                      </div>
+                      <span className="font-semibold">{type.label}</span>
+                      {reportType === type.value && (
+                        <CheckCircle className="w-5 h-5 ml-auto text-emerald-600" />
+                      )}
+                    </button>
+                  ))}
+                </div>
               </div>
 
               {/* Format */}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label className="block text-sm font-semibold text-gray-700 mb-3">
                   Dosya Formatı
                 </label>
                 <div className="grid grid-cols-2 gap-3">
                   <button
                     onClick={() => setFormat("Pdf")}
-                    className={`flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 transition ${
+                    className={`flex flex-col items-center justify-center gap-2 px-4 py-4 rounded-xl border-2 transition-all ${
                       format === "Pdf"
-                        ? "border-emerald-600 bg-emerald-50 text-emerald-700"
-                        : "border-gray-300 bg-white text-gray-700 hover:border-emerald-300"
+                        ? "border-emerald-600 bg-gradient-to-br from-emerald-50 to-teal-50 text-emerald-700 shadow-md"
+                        : "border-gray-200 bg-white text-gray-700 hover:border-emerald-300 hover:shadow"
                     }`}
                   >
-                    <FileText className="w-5 h-5" />
-                    PDF
+                    <div className={`p-3 rounded-xl ${
+                      format === "Pdf" ? "bg-emerald-100" : "bg-gray-100"
+                    }`}>
+                      <FileText className="w-6 h-6" />
+                    </div>
+                    <span className="font-bold">PDF</span>
+                    {format === "Pdf" && (
+                      <CheckCircle className="w-4 h-4 text-emerald-600" />
+                    )}
                   </button>
                   <button
                     onClick={() => setFormat("Xlsx")}
-                    className={`flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 transition ${
+                    className={`flex flex-col items-center justify-center gap-2 px-4 py-4 rounded-xl border-2 transition-all ${
                       format === "Xlsx"
-                        ? "border-emerald-600 bg-emerald-50 text-emerald-700"
-                        : "border-gray-300 bg-white text-gray-700 hover:border-emerald-300"
+                        ? "border-emerald-600 bg-gradient-to-br from-emerald-50 to-teal-50 text-emerald-700 shadow-md"
+                        : "border-gray-200 bg-white text-gray-700 hover:border-emerald-300 hover:shadow"
                     }`}
                   >
-                    <FileSpreadsheet className="w-5 h-5" />
-                    Excel
+                    <div className={`p-3 rounded-xl ${
+                      format === "Xlsx" ? "bg-emerald-100" : "bg-gray-100"
+                    }`}>
+                      <FileSpreadsheet className="w-6 h-6" />
+                    </div>
+                    <span className="font-bold">Excel</span>
+                    {format === "Xlsx" && (
+                      <CheckCircle className="w-4 h-4 text-emerald-600" />
+                    )}
                   </button>
                 </div>
               </div>
 
               {/* Tarih Aralığı */}
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Başlangıç
-                  </label>
-                  <input
-                    type="date"
-                    value={startDate}
-                    onChange={(e) => setStartDate(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Bitiş
-                  </label>
-                  <input
-                    type="date"
-                    value={endDate}
-                    onChange={(e) => setEndDate(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500"
-                  />
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-3">
+                  Tarih Aralığı
+                </label>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="relative">
+                    <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                      <Calendar className="w-5 h-5" />
+                    </div>
+                    <input
+                      type="date"
+                      value={startDate}
+                      onChange={(e) => setStartDate(e.target.value)}
+                      className="w-full pl-11 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition"
+                    />
+                  </div>
+                  <div className="relative">
+                    <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                      <Calendar className="w-5 h-5" />
+                    </div>
+                    <input
+                      type="date"
+                      value={endDate}
+                      onChange={(e) => setEndDate(e.target.value)}
+                      className="w-full pl-11 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition"
+                    />
+                  </div>
                 </div>
               </div>
 
@@ -487,69 +525,118 @@ const SalesReportsPage = () => {
               onClick={(e) => e.stopPropagation()}
               className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6"
             >
-              <h3 className="text-xl font-bold text-gray-900 mb-4">
+              <h3 className="text-xl font-bold text-gray-900 mb-6">
                 Zamanlanmış Rapor Oluştur
               </h3>
 
-              <div className="space-y-4">
+              <div className="space-y-5">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label className="block text-sm font-semibold text-gray-700 mb-3">
                     Rapor Türü
                   </label>
-                  <select
-                    value={scheduleReportType}
-                    onChange={(e) => setScheduleReportType(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500"
-                  >
-                    <option value="DailySales">Günlük Satışlar</option>
-                    <option value="MonthlySales">Aylık Satışlar</option>
-                    <option value="ProductSales">Ürün Bazlı</option>
-                    <option value="CategorySales">Kategori Bazlı</option>
-                    <option value="CustomerSales">Müşteri Bazlı</option>
-                  </select>
+                  <div className="grid grid-cols-1 gap-2 max-h-64 overflow-y-auto">
+                    {[
+                      { value: "DailySales", label: "Günlük Satışlar", icon: <Calendar className="w-4 h-4" /> },
+                      { value: "MonthlySales", label: "Aylık Satışlar", icon: <BarChart3 className="w-4 h-4" /> },
+                      { value: "ProductSales", label: "Ürün Bazlı", icon: <Package className="w-4 h-4" /> },
+                      { value: "CategorySales", label: "Kategori Bazlı", icon: <TrendingUp className="w-4 h-4" /> },
+                      { value: "CustomerSales", label: "Müşteri Bazlı", icon: <Users className="w-4 h-4" /> },
+                    ].map((type) => (
+                      <button
+                        key={type.value}
+                        onClick={() => setScheduleReportType(type.value)}
+                        className={`flex items-center gap-3 px-3 py-2.5 rounded-lg border transition-all text-sm ${
+                          scheduleReportType === type.value
+                            ? "border-emerald-600 bg-emerald-50 text-emerald-700"
+                            : "border-gray-200 bg-white text-gray-700 hover:border-emerald-300"
+                        }`}
+                      >
+                        {type.icon}
+                        <span className="font-medium">{type.label}</span>
+                        {scheduleReportType === type.value && (
+                          <CheckCircle className="w-4 h-4 ml-auto text-emerald-600" />
+                        )}
+                      </button>
+                    ))}
+                  </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label className="block text-sm font-semibold text-gray-700 mb-3">
                     Format
                   </label>
-                  <select
-                    value={scheduleFormat}
-                    onChange={(e) => setScheduleFormat(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500"
-                  >
-                    <option value="Pdf">PDF</option>
-                    <option value="Xlsx">Excel</option>
-                  </select>
+                  <div className="grid grid-cols-2 gap-3">
+                    <button
+                      onClick={() => setScheduleFormat("Pdf")}
+                      className={`flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 transition-all ${
+                        scheduleFormat === "Pdf"
+                          ? "border-emerald-600 bg-emerald-50 text-emerald-700"
+                          : "border-gray-200 bg-white text-gray-700 hover:border-emerald-300"
+                      }`}
+                    >
+                      <FileText className="w-5 h-5" />
+                      <span className="font-semibold">PDF</span>
+                    </button>
+                    <button
+                      onClick={() => setScheduleFormat("Xlsx")}
+                      className={`flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 transition-all ${
+                        scheduleFormat === "Xlsx"
+                          ? "border-emerald-600 bg-emerald-50 text-emerald-700"
+                          : "border-gray-200 bg-white text-gray-700 hover:border-emerald-300"
+                      }`}
+                    >
+                      <FileSpreadsheet className="w-5 h-5" />
+                      <span className="font-semibold">Excel</span>
+                    </button>
+                  </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label className="block text-sm font-semibold text-gray-700 mb-3">
                     E-posta Adresi
                   </label>
-                  <input
-                    type="email"
-                    value={scheduleEmail}
-                    onChange={(e) => setScheduleEmail(e.target.value)}
-                    placeholder="ornek@email.com"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500"
-                  />
+                  <div className="relative">
+                    <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                      <Mail className="w-5 h-5" />
+                    </div>
+                    <input
+                      type="email"
+                      value={scheduleEmail}
+                      onChange={(e) => setScheduleEmail(e.target.value)}
+                      placeholder="ornek@email.com"
+                      className="w-full pl-11 pr-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition"
+                    />
+                  </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label className="block text-sm font-semibold text-gray-700 mb-3">
                     Zamanlama
                   </label>
-                  <select
-                    value={scheduleCron}
-                    onChange={(e) => setScheduleCron(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500"
-                  >
-                    <option value="0 9 * * 1">Her Pazartesi 09:00</option>
-                    <option value="0 9 * * *">Her Gün 09:00</option>
-                    <option value="0 9 1 * *">Her Ayın 1'i 09:00</option>
-                    <option value="0 0 * * 0">Her Pazar 00:00</option>
-                  </select>
+                  <div className="grid grid-cols-1 gap-2">
+                    {[
+                      { value: "0 9 * * 1", label: "Her Pazartesi 09:00" },
+                      { value: "0 9 * * *", label: "Her Gün 09:00" },
+                      { value: "0 9 1 * *", label: "Her Ayın 1'i 09:00" },
+                      { value: "0 0 * * 0", label: "Her Pazar 00:00" },
+                    ].map((cron) => (
+                      <button
+                        key={cron.value}
+                        onClick={() => setScheduleCron(cron.value)}
+                        className={`flex items-center gap-3 px-3 py-2.5 rounded-lg border transition-all text-sm ${
+                          scheduleCron === cron.value
+                            ? "border-emerald-600 bg-emerald-50 text-emerald-700"
+                            : "border-gray-200 bg-white text-gray-700 hover:border-emerald-300"
+                        }`}
+                      >
+                        <RefreshCw className="w-4 h-4" />
+                        <span className="font-medium">{cron.label}</span>
+                        {scheduleCron === cron.value && (
+                          <CheckCircle className="w-4 h-4 ml-auto text-emerald-600" />
+                        )}
+                      </button>
+                    ))}
+                  </div>
                 </div>
 
                 <div className="flex gap-3 pt-4">
