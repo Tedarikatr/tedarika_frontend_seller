@@ -16,7 +16,8 @@ import {
   MessageCircle,
   Tags,
   FileText,
-  Upload
+  Upload,
+  BarChart3,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -112,6 +113,11 @@ const Sidebar = ({ isOpen, onClose }) => {
 
           <SidebarLink to="/seller/chat" icon={<MessageCircle size={18} />} collapsed={collapsed} onClick={onClose}>
             Mesajlar
+          </SidebarLink>
+
+          <SectionTitle title="RAPORLAR" collapsed={collapsed} />
+          <SidebarLink to="/seller/reports/sales" icon={<BarChart3 size={18} />} collapsed={collapsed} onClick={onClose}>
+            Satış Raporları
           </SidebarLink>
 
           <SectionTitle title="HESAP" collapsed={collapsed} />
