@@ -11,7 +11,7 @@ export const fetchProductDrafts = async () => {
 /**
  * Belirli bir draft'ın ürünlerini getir
  * @param {string} draftId - Draft UUID
- * Returns: [{ id, draftId, storeId, name, brandName, categoryId, status, ... }]
+ * Returns: [{ id, draftId, storeId, name, brandName, sku, ean, status, createdAt }]
  */
 export const fetchDraftProducts = async (draftId) => {
   return await apiRequest(`/SellerProductDraft/draft/${draftId}/products`, "GET", null, true);
@@ -20,7 +20,7 @@ export const fetchDraftProducts = async (draftId) => {
 /**
  * Tek bir draft product detayını getir
  * @param {string} productDraftId - Product Draft UUID
- * Returns: { id, name, brandId, brandName, description, unitPrice, imageUrls, ... }
+ * Returns: { id, draftId, storeId, name, sku, ean, brandName, gtip, description, stores, imageUrls, status, rejectReason, createdAt }
  */
 export const fetchDraftProductDetail = async (productDraftId) => {
   return await apiRequest(`/SellerProductDraft/draft-product/${productDraftId}`, "GET", null, true);
@@ -38,7 +38,7 @@ export const addProductJson = async (jsonString) => {
 
 /**
  * Excel dosyası ile ürün ekle
- * @param {FormData} formData - ExcelFile, RowsJson, BatchId, UploadName, ParsedRows
+ * @param {FormData} formData - ExcelFile, UploadName (opsiyonel)
  */
 export const addProductExcel = async (formData) => {
   return await apiRequest("/SellerProductDraft/add-product-excel", "POST", formData, true);

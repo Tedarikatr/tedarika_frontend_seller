@@ -31,6 +31,7 @@ const ProductDraftUploadPage = () => {
 
   // Excel State
   const [excelFile, setExcelFile] = useState(null);
+  const [excelUploadName, setExcelUploadName] = useState("");
 
   // JSON State
   const [jsonText, setJsonText] = useState("");
@@ -55,6 +56,7 @@ const ProductDraftUploadPage = () => {
     try {
       const formData = new FormData();
       formData.append("ExcelFile", excelFile);
+      if (excelUploadName) formData.append("UploadName", excelUploadName);
 
       await addProductExcel(formData);
       toast.success("Excel dosyası başarıyla yüklendi!");
@@ -276,6 +278,19 @@ const ProductDraftUploadPage = () => {
                     {excelFile.name}
                   </p>
                 )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-2">
+                  Yükleme Adı (Opsiyonel)
+                </label>
+                <input
+                  type="text"
+                  value={excelUploadName}
+                  onChange={(e) => setExcelUploadName(e.target.value)}
+                  placeholder="Örn: Ocak 2025 Ürünleri"
+                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-green-500 focus:ring-4 focus:ring-green-100 transition-all"
+                />
               </div>
 
               <button

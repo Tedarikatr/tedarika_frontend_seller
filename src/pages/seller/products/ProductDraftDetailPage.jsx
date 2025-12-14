@@ -1,16 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { fetchDraftProducts, fetchDraftProductDetail } from "@/api/sellerProductDraftService";
-import { DRAFT_STATUS_LABELS, SOURCE_TYPE_LABELS } from "@/constants/productDraftStatus";
+import { DRAFT_STATUS_LABELS } from "@/constants/productDraftStatus";
 import { useToast } from "@/contexts/ToastContext";
 import {
   ArrowLeft,
-  FileText,
   Clock,
   CheckCircle,
   XCircle,
-  FileSpreadsheet,
-  FileCode,
   Package,
   AlertCircle,
   Calendar,
@@ -71,18 +68,6 @@ const ProductDraftDetailPage = () => {
     }
   };
 
-  const getSourceIcon = (sourceType) => {
-    const config = SOURCE_TYPE_LABELS[sourceType] || SOURCE_TYPE_LABELS.Json;
-    switch (config.icon) {
-      case "FileSpreadsheet":
-        return <FileSpreadsheet className="w-5 h-5" />;
-      case "FileCode":
-        return <FileCode className="w-5 h-5" />;
-      default:
-        return <FileText className="w-5 h-5" />;
-    }
-  };
-
   const getStatusBadgeClass = (status) => {
     const config = DRAFT_STATUS_LABELS[status];
     if (!config) return "bg-gray-100 text-gray-800 border-gray-200";
@@ -96,20 +81,6 @@ const ProductDraftDetailPage = () => {
         return "bg-red-100 text-red-800 border-red-200";
       default:
         return "bg-gray-100 text-gray-800 border-gray-200";
-    }
-  };
-
-  const getSourceBadgeClass = (sourceType) => {
-    const config = SOURCE_TYPE_LABELS[sourceType] || SOURCE_TYPE_LABELS.Json;
-    switch (config?.color) {
-      case "green":
-        return "bg-green-100 text-green-800";
-      case "blue":
-        return "bg-blue-100 text-blue-800";
-      case "purple":
-        return "bg-purple-100 text-purple-800";
-      default:
-        return "bg-gray-100 text-gray-800";
     }
   };
 
@@ -201,9 +172,6 @@ const ProductDraftDetailPage = () => {
                     Marka
                   </th>
                   <th className="px-6 py-4 text-left text-xs font-bold text-emerald-800 uppercase tracking-wider">
-                    Kaynak
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-bold text-emerald-800 uppercase tracking-wider">
                     Tarih
                   </th>
                   <th className="px-6 py-4 text-center text-xs font-bold text-emerald-800 uppercase tracking-wider">
@@ -217,7 +185,6 @@ const ProductDraftDetailPage = () => {
               <tbody className="bg-white divide-y divide-gray-100">
                 {filteredProducts.map((product) => {
                   const statusConfig = DRAFT_STATUS_LABELS[product.status] || DRAFT_STATUS_LABELS.Pending;
-                  const sourceConfig = SOURCE_TYPE_LABELS[product.sourceType] || SOURCE_TYPE_LABELS.Json;
 
                   return (
                     <tr
@@ -226,8 +193,11 @@ const ProductDraftDetailPage = () => {
                     >
                       <td className="px-6 py-4">
                         <div className="font-bold text-gray-900">{product.name}</div>
-                        {product.gtin && (
-                          <div className="text-xs text-gray-500 mt-1">GTIN: {product.gtin}</div>
+                        {product.sku && (
+                          <div className="text-xs text-gray-500 mt-1">SKU: {product.sku}</div>
+                        )}
+                        {product.ean && (
+                          <div className="text-xs text-gray-500">EAN: {product.ean}</div>
                         )}
                       </td>
 
@@ -237,13 +207,6 @@ const ProductDraftDetailPage = () => {
                           <span className="text-sm text-gray-700 font-medium">
                             {product.brandName || "—"}
                           </span>
-                        </div>
-                      </td>
-
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-lg ${getSourceBadgeClass(product.sourceType)} text-xs font-bold`}>
-                          {getSourceIcon(product.sourceType)}
-                          {sourceConfig.text}
                         </div>
                       </td>
 
@@ -298,7 +261,9 @@ const ProductDraftDetailPage = () => {
             >
               <div className="sticky top-0 bg-gradient-to-r from-emerald-600 to-teal-600 text-white p-6 rounded-t-2xl">
                 <h2 className="text-2xl font-bold">{selectedProduct.name}</h2>
-                <p className="text-emerald-100 text-sm mt-1">{selectedProduct.brandName}</p>
+                <p className="text-emerald-100 text-sm mt-1">
+                  {selectedProduct.brandName || "Marka belirtilmemiş"}
+                </p>
               </div>
 
               <div className="p-6 space-y-6">
@@ -319,48 +284,77 @@ const ProductDraftDetailPage = () => {
                   </div>
                 )}
 
-                {/* Info Grid */}
+                {/* Basic Info Grid */}
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <p className="text-sm text-gray-500">Fiyat</p>
-                    <p className="font-bold text-gray-900">
-                      {selectedProduct.unitPrice} {selectedProduct.currencyCode}
-                    </p>
+                    <p className="text-sm text-gray-500">SKU</p>
+                    <p className="font-bold text-gray-900">{selectedProduct.sku || "—"}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-500">Stok</p>
-                    <p className="font-bold text-gray-900">{selectedProduct.stockQuantity}</p>
+                    <p className="text-sm text-gray-500">EAN</p>
+                    <p className="font-bold text-gray-900">{selectedProduct.ean || "—"}</p>
                   </div>
+                  {selectedProduct.gtip && (
+                    <div>
+                      <p className="text-sm text-gray-500">GTIP</p>
+                      <p className="font-bold text-gray-900">{selectedProduct.gtip}</p>
+                    </div>
+                  )}
                   <div>
-                    <p className="text-sm text-gray-500">Min. Sipariş</p>
-                    <p className="font-bold text-gray-900">{selectedProduct.minOrderQuantity}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-500">Max. Sipariş</p>
-                    <p className="font-bold text-gray-900">{selectedProduct.maxOrderQuantity}</p>
+                    <p className="text-sm text-gray-500">Durum</p>
+                    <span className={`inline-flex items-center gap-2 px-3 py-1 rounded-lg ${getStatusBadgeClass(selectedProduct.status)} text-xs font-bold border`}>
+                      {getStatusIcon(selectedProduct.status)}
+                      {DRAFT_STATUS_LABELS[selectedProduct.status]?.text || "Bilinmiyor"}
+                    </span>
                   </div>
                 </div>
+
+                {/* Reject Reason */}
+                {selectedProduct.rejectReason && (
+                  <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                    <h3 className="font-bold text-red-900 mb-2">Red Nedeni</h3>
+                    <p className="text-red-700 text-sm">{selectedProduct.rejectReason}</p>
+                  </div>
+                )}
+
+                {/* Stores Information */}
+                {selectedProduct.stores && selectedProduct.stores.length > 0 && (
+                  <div>
+                    <h3 className="font-bold text-gray-900 mb-3">Mağaza Bilgileri</h3>
+                    <div className="space-y-4">
+                      {selectedProduct.stores.map((store, index) => (
+                        <div key={store.id || index} className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <div>
+                              <p className="text-sm text-gray-500">Birim Türü</p>
+                              <p className="font-bold text-gray-900">{store.unitType || "—"}</p>
+                            </div>
+                            <div>
+                              <p className="text-sm text-gray-500">Stok Miktarı</p>
+                              <p className="font-bold text-gray-900">{store.stockQuantity || 0}</p>
+                            </div>
+                            <div>
+                              <p className="text-sm text-gray-500">Min. Sipariş</p>
+                              <p className="font-bold text-gray-900">{store.minOrderQuantity || "—"}</p>
+                            </div>
+                            <div>
+                              <p className="text-sm text-gray-500">Birim Fiyat</p>
+                              <p className="font-bold text-gray-900">
+                                {store.unitPrice !== undefined ? `${store.unitPrice} ${store.currencyCode || "TRY"}` : "—"}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                 {/* Description */}
                 {selectedProduct.description && (
                   <div>
                     <h3 className="font-bold text-gray-900 mb-2">Açıklama</h3>
                     <p className="text-gray-600 text-sm">{selectedProduct.description}</p>
-                  </div>
-                )}
-
-                {/* Attributes */}
-                {selectedProduct.attributes && Object.keys(selectedProduct.attributes).length > 0 && (
-                  <div>
-                    <h3 className="font-bold text-gray-900 mb-2">Özellikler</h3>
-                    <div className="grid grid-cols-2 gap-3">
-                      {Object.entries(selectedProduct.attributes).map(([key, value]) => (
-                        <div key={key} className="bg-gray-50 rounded-lg p-3">
-                          <p className="text-xs text-gray-500">{key}</p>
-                          <p className="font-semibold text-gray-900">{value}</p>
-                        </div>
-                      ))}
-                    </div>
                   </div>
                 )}
 
