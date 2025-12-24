@@ -4,6 +4,10 @@ export const statusOptions = [
   { value: "Paid", label: "Ödendi" },
   { value: "Shipped", label: "Kargoya Verildi" },
   { value: "Delivered", label: "Teslim Edildi" },
+  { value: "Cancelled", label: "İptal Edildi" },
+  { value: "Refunded", label: "İade Edildi" },
+  { value: "PaymentFailed", label: "Ödeme Başarısız" },
+  { value: "Completed", label: "Tamamlandı" },
 ];
 
 export const statusLabels = {
@@ -13,4 +17,7 @@ export const statusLabels = {
   Shipped:        { text: "Kargoya Verildi", color: "bg-purple-100 text-purple-700" },
   Delivered:      { text: "Teslim Edildi", color: "bg-green-100 text-green-700" },
   Cancelled:      { text: "İptal Edildi", color: "bg-red-100 text-red-700" },
+  Refunded:       { text: "İade Edildi", color: "bg-orange-100 text-orange-700" },
+  PaymentFailed:  { text: "Ödeme Başarısız", color: "bg-red-100 text-red-700" },
+  Completed:      { text: "Tamamlandı", color: "bg-emerald-100 text-emerald-700" },
 };

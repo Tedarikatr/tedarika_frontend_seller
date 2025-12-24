@@ -18,6 +18,7 @@ import {
   FileText,
   Upload,
   BarChart3,
+  PackageX,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -98,6 +99,9 @@ const Sidebar = ({ isOpen, onClose }) => {
           <SectionTitle title="İŞLEMLER" collapsed={collapsed} />
           <SidebarLink to="/seller/orders" icon={<ShoppingCart size={18} />} collapsed={collapsed} onClick={onClose}>
             Siparişler
+          </SidebarLink>
+          <SidebarLink to="/seller/orders/refund-requests" icon={<PackageX size={18} />} collapsed={collapsed} onClick={onClose}>
+            İade Talepleri
           </SidebarLink>
           <SidebarLink to="/seller/quotations" icon={<ClipboardList size={18} />} collapsed={collapsed} onClick={onClose}>
             Teklifler
