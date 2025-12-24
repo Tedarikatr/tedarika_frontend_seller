@@ -34,6 +34,7 @@ import ProductDraftDetailPage from "@/pages/seller/products/ProductDraftDetailPa
 import ProductDraftUploadPage from "@/pages/seller/products/ProductDraftUploadPage";
 import OrderListPage from "@/pages/seller/orders/OrderListPage";
 import OrderDetailPage from "@/pages/seller/orders/OrderDetailPage";
+import RefundRequestsPage from "@/pages/seller/orders/RefundRequestsPage";
 import SellerQuotationListPage from "@/pages/seller/quotations/QuotationListPage";
 import QuotationDetailPage from "@/pages/seller/quotations/QuotationDetailPage";
 import StoreReviewsPage from "@/pages/seller/reviews/StoreReviewsPage";
@@ -127,6 +128,7 @@ function App() {
         <Route path="quotations/:id" element={<QuotationDetailPage />} />
         <Route path="orders" element={<OrderListPage />} />
         <Route path="orders/:orderId" element={<OrderDetailPage />} />
+        <Route path="orders/refund-requests" element={<RefundRequestsPage />} />
         <Route path="campaigns" element={<CampaignListPage />} />
         <Route path="campaigns/new" element={<CampaignCreatePage />} />
         <Route path="campaigns/:id" element={<CampaignDetailPage />} />

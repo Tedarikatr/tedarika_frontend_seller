@@ -49,3 +49,34 @@ export const updateCarrierInfo = async (orderId, carrierData) => {
 // ✅ Siparişi iptal et
 export const cancelOrder = (orderId) =>
   apiRequest(`/SellerOrder/cancel/${orderId}`, "PUT", null, true);
+
+// ========== İADE İŞLEMLERİ ==========
+
+/**
+ * İade taleplerini listele
+ * @returns {Promise<Array>} - İade talepleri listesi
+ */
+export const fetchRefundRequests = () =>
+  apiRequest("/SellerOrder/refund-requests", "GET", null, true);
+
+/**
+ * İade talebini onayla veya reddet
+ * @param {string} requestId - İade talebi ID
+ * @param {Object} decision - Karar bilgisi
+ * @param {boolean} decision.approve - Onay durumu (true/false)
+ * @param {string} decision.sellerNote - Satıcı notu
+ * @returns {Promise<Object>} - Güncellenmiş iade talebi
+ */
+export const decideRefundRequest = (requestId, decision) =>
+  apiRequest(`/SellerOrder/refund-request/${requestId}/decision`, "PUT", decision, true);
+
+/**
+ * İade incelemesi yap (ürün geldiğinde)
+ * @param {string} requestId - İade talebi ID
+ * @param {Object} inspection - İnceleme bilgisi
+ * @param {boolean} inspection.acceptReturn - İadeyi kabul et
+ * @param {string} inspection.sellerNote - Satıcı notu
+ * @returns {Promise<Object>} - Güncellenmiş iade talebi
+ */
+export const inspectRefundRequest = (requestId, inspection) =>
+  apiRequest(`/SellerOrder/refund-request/${requestId}/inspection`, "PUT", inspection, true);
