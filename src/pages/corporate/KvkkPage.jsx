@@ -380,6 +380,7 @@ const KvkkPage = () => {
             </div>
           </div>
         </div>
+        </div>
 
         <Footer />
       </div>
