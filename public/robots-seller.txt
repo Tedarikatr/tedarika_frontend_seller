@@ -1,0 +1,35 @@
+# Tedarika Seller Panel - www.seller.tedarika.com.tr
+# Bu robots.txt dosyası yalnızca www.seller.tedarika.com.tr domain'i için geçerlidir
+
+User-agent: *
+Allow: /
+Allow: /seller/landing
+Allow: /seller/register
+Allow: /seller/appointment
+Allow: /corporate/
+
+# Private alanlar - indexlenmemeli
+Disallow: /seller/login
+Disallow: /seller/dashboard
+Disallow: /seller/profile
+Disallow: /seller/orders
+Disallow: /seller/products
+Disallow: /seller/store
+Disallow: /seller/finance
+Disallow: /seller/brands
+Disallow: /seller/reviews
+Disallow: /seller/quotations
+Disallow: /seller/campaigns
+Disallow: /seller/location
+Disallow: /seller/company
+Disallow: /seller/reports
+Disallow: /seller/chat
+Disallow: /seller/subscription
+Disallow: /seller/apply
+
+# API endpoint'leri
+Disallow: /api/
+
+# Bu domain için sitemap (sitemap-index.xml kullanılıyor)
+Sitemap: https://www.seller.tedarika.com.tr/sitemap.xml
+
