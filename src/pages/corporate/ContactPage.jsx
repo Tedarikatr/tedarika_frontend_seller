@@ -1,11 +1,25 @@
 import React, { useRef, useState } from "react";
 import { useToast } from "@/contexts/ToastContext";
 import { Helmet } from "react-helmet-async";
+import { useLocation } from "react-router-dom";
 import { Mail, MessageSquare, Phone } from "lucide-react";
 import SellerHeader from "@/components/sellerLanding/SellerHeader";
 import Footer from "@/components/corporate/Footer";
+import { createSeoMeta, getBreadcrumbSchema } from "@/utils/seo";
 
 const ContactPage = () => {
+  const location = useLocation();
+  const seoMeta = createSeoMeta({
+    title: "İletişim | Tedarika Satıcı Paneli",
+    description: "Tedarika satıcı destek ekibi ile iletişime geçin. Sorularınız için bizimle iletişime geçebilirsiniz. E-posta, telefon ve WhatsApp desteği.",
+    path: location.pathname,
+    keywords: "tedarika iletişim, satıcı destek, müşteri hizmetleri, iletişim bilgileri, destek hattı"
+  });
+
+  const breadcrumbSchema = getBreadcrumbSchema([
+    { name: "Ana Sayfa", url: "/" },
+    { name: "İletişim", url: location.pathname }
+  ]);
   const toast = useToast();
   const subjectRef = useRef();
   const messageRef = useRef();
@@ -41,8 +55,57 @@ const ContactPage = () => {
   return (
     <>
       <Helmet>
-        <title>İletişim | Tedarika Satıcı Paneli</title>
-        <meta name="description" content="Tedarika satıcı destek ekibi ile iletişime geçin. Sorularınız için bizimle iletişime geçebilirsiniz." />
+        <title>{seoMeta.title}</title>
+        <meta name="description" content={seoMeta.description} />
+        <meta name="keywords" content={seoMeta.keywords} />
+        <link rel="canonical" href={seoMeta.canonical} />
+        
+        {/* Hreflang Tags */}
+        {seoMeta.hreflang.map(({ hreflang, href }) => (
+          <link key={hreflang} rel="alternate" hreflang={hreflang} href={href} />
+        ))}
+        
+        {/* Open Graph */}
+        <meta property="og:title" content={seoMeta.og.title} />
+        <meta property="og:description" content={seoMeta.og.description} />
+        <meta property="og:type" content={seoMeta.og.type} />
+        <meta property="og:url" content={seoMeta.og.url} />
+        <meta property="og:image" content={seoMeta.og.image} />
+        <meta property="og:locale" content={seoMeta.og.locale} />
+        <meta property="og:site_name" content={seoMeta.og.siteName} />
+        
+        {/* Twitter */}
+        <meta name="twitter:card" content={seoMeta.twitter.card} />
+        <meta name="twitter:title" content={seoMeta.twitter.title} />
+        <meta name="twitter:description" content={seoMeta.twitter.description} />
+        <meta name="twitter:image" content={seoMeta.twitter.image} />
+        
+        {/* Structured Data */}
+        <script type="application/ld+json">
+          {JSON.stringify(breadcrumbSchema)}
+        </script>
+        
+        {/* ContactPage Schema */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "ContactPage",
+            "name": "İletişim",
+            "description": seoMeta.description,
+            "url": seoMeta.canonical,
+            "mainEntity": {
+              "@type": "Organization",
+              "name": "Tedarika",
+              "contactPoint": {
+                "@type": "ContactPoint",
+                "telephone": "+90-538-236-26-05",
+                "contactType": "Customer Service",
+                "email": "info@tedarika.app",
+                "availableLanguage": ["Turkish", "English"]
+              }
+            }
+          })}
+        </script>
       </Helmet>
 
       <div className="bg-white min-h-screen">

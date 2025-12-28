@@ -225,7 +225,7 @@ const ProductRow = ({ product, onRefresh, onFeedback, hasCoverage }) => {
               <img
                 key={t.key || t.url || i}
                 src={withBuster(t.url, buster)}
-                alt=""
+                alt={`${product.name || 'Ürün'} görseli ${i + 1}`}
                 className="w-8 h-8 rounded-md border border-gray-300 object-cover bg-white"
               />
             ))}

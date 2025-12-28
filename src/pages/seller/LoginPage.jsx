@@ -1,10 +1,19 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link, useLocation } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import { loginSeller } from "@/api/sellerAuthService";
 import { Mail, Lock, CheckCircle } from "lucide-react";
 import { useToast } from "@/contexts/ToastContext";
+import { createSeoMeta } from "@/utils/seo";
 
 const LoginPage = () => {
+  const location = useLocation();
+  const seoMeta = createSeoMeta({
+    title: "Satıcı Girişi | Tedarika B2B Pazaryeri",
+    description: "Tedarika satıcı paneline giriş yapın. Mağazanızı yönetin, siparişlerinizi takip edin ve satışlarınızı artırın.",
+    path: location.pathname,
+    keywords: "tedarika giriş, satıcı girişi, B2B satıcı paneli, mağaza yönetimi"
+  });
   const [formData, setFormData] = useState({ emailOrPhone: "", password: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
@@ -58,6 +67,35 @@ const LoginPage = () => {
   };
 
   return (
+    <>
+      <Helmet>
+        <title>{seoMeta.title}</title>
+        <meta name="description" content={seoMeta.description} />
+        <meta name="keywords" content={seoMeta.keywords} />
+        <link rel="canonical" href={seoMeta.canonical} />
+        <meta name="robots" content="index, follow" />
+        
+        {/* Hreflang Tags */}
+        {seoMeta.hreflang.map(({ hreflang, href }) => (
+          <link key={hreflang} rel="alternate" hreflang={hreflang} href={href} />
+        ))}
+        
+        {/* Open Graph */}
+        <meta property="og:title" content={seoMeta.og.title} />
+        <meta property="og:description" content={seoMeta.og.description} />
+        <meta property="og:type" content={seoMeta.og.type} />
+        <meta property="og:url" content={seoMeta.og.url} />
+        <meta property="og:image" content={seoMeta.og.image} />
+        <meta property="og:locale" content={seoMeta.og.locale} />
+        <meta property="og:site_name" content={seoMeta.og.siteName} />
+        
+        {/* Twitter */}
+        <meta name="twitter:card" content={seoMeta.twitter.card} />
+        <meta name="twitter:title" content={seoMeta.twitter.title} />
+        <meta name="twitter:description" content={seoMeta.twitter.description} />
+        <meta name="twitter:image" content={seoMeta.twitter.image} />
+      </Helmet>
+      
     <div className="min-h-screen flex flex-col md:flex-row bg-[#002d2f] text-white">
       {/* Sol bilgi alanı */}
       <div className="w-full md:w-1/2 flex flex-col justify-center items-start px-10 py-20 space-y-8 bg-gradient-to-br from-[#003e3f] via-[#004b49] to-[#005c5a]">
@@ -132,6 +170,7 @@ const LoginPage = () => {
         </form>
       </div>
     </div>
+    </>
   );
 };
 

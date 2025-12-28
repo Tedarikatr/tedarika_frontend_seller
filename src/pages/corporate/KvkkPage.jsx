@@ -1,10 +1,24 @@
 import React from "react";
 import { Helmet } from "react-helmet-async";
+import { useLocation } from "react-router-dom";
 import { Shield, Lock, Eye, FileText, Bell, UserCheck } from "lucide-react";
 import SellerHeader from "@/components/sellerLanding/SellerHeader";
 import Footer from "@/components/corporate/Footer";
+import { createSeoMeta, getBreadcrumbSchema } from "@/utils/seo";
 
 const KvkkPage = () => {
+  const location = useLocation();
+  const seoMeta = createSeoMeta({
+    title: "KVKK | Kişisel Verilerin Korunması | Tedarika Satıcı Paneli",
+    description: "Tedarika kişisel verilerin korunması politikası. KVKK kapsamında haklarınız ve veri güvenliği. Kişisel verilerinizin güvenliği bizim için önceliklidir.",
+    path: location.pathname,
+    keywords: "KVKK, kişisel verilerin korunması, veri güvenliği, gizlilik politikası, tedarika KVKK"
+  });
+
+  const breadcrumbSchema = getBreadcrumbSchema([
+    { name: "Ana Sayfa", url: "/" },
+    { name: "KVKK", url: location.pathname }
+  ]);
   const sections = [
     {
       title: "Kişisel Verilerin Toplanması",
@@ -41,8 +55,35 @@ const KvkkPage = () => {
   return (
     <>
       <Helmet>
-        <title>KVKK | Tedarika Satıcı Paneli</title>
-        <meta name="description" content="Tedarika kişisel verilerin korunması politikası. KVKK kapsamında haklarınız ve veri güvenliği." />
+        <title>{seoMeta.title}</title>
+        <meta name="description" content={seoMeta.description} />
+        <meta name="keywords" content={seoMeta.keywords} />
+        <link rel="canonical" href={seoMeta.canonical} />
+        
+        {/* Hreflang Tags */}
+        {seoMeta.hreflang.map(({ hreflang, href }) => (
+          <link key={hreflang} rel="alternate" hreflang={hreflang} href={href} />
+        ))}
+        
+        {/* Open Graph */}
+        <meta property="og:title" content={seoMeta.og.title} />
+        <meta property="og:description" content={seoMeta.og.description} />
+        <meta property="og:type" content={seoMeta.og.type} />
+        <meta property="og:url" content={seoMeta.og.url} />
+        <meta property="og:image" content={seoMeta.og.image} />
+        <meta property="og:locale" content={seoMeta.og.locale} />
+        <meta property="og:site_name" content={seoMeta.og.siteName} />
+        
+        {/* Twitter */}
+        <meta name="twitter:card" content={seoMeta.twitter.card} />
+        <meta name="twitter:title" content={seoMeta.twitter.title} />
+        <meta name="twitter:description" content={seoMeta.twitter.description} />
+        <meta name="twitter:image" content={seoMeta.twitter.image} />
+        
+        {/* Structured Data */}
+        <script type="application/ld+json">
+          {JSON.stringify(breadcrumbSchema)}
+        </script>
       </Helmet>
 
       <div className="bg-white min-h-screen">

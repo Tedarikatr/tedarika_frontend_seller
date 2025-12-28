@@ -1,10 +1,24 @@
 import React, { useState } from "react";
 import { Helmet } from "react-helmet-async";
+import { useLocation } from "react-router-dom";
 import { ChevronDown, ChevronUp, HelpCircle, MessageCircle, Mail } from "lucide-react";
 import SellerHeader from "@/components/sellerLanding/SellerHeader";
 import Footer from "@/components/corporate/Footer";
+import { createSeoMeta, getBreadcrumbSchema } from "@/utils/seo";
 
 const SssPage = () => {
+  const location = useLocation();
+  const seoMeta = createSeoMeta({
+    title: "Sıkça Sorulan Sorular (SSS) | Tedarika Satıcı Paneli",
+    description: "Tedarika satıcı paneli hakkında sıkça sorulan sorular ve cevapları. Satıcı olma, ürün ekleme, ödeme, sipariş takibi ve daha fazlası.",
+    path: location.pathname,
+    keywords: "tedarika SSS, sıkça sorulan sorular, satıcı soruları, yardım, destek, FAQ"
+  });
+
+  const breadcrumbSchema = getBreadcrumbSchema([
+    { name: "Ana Sayfa", url: "/" },
+    { name: "SSS", url: location.pathname }
+  ]);
   const [openIndex, setOpenIndex] = useState(null);
 
   const faqs = [
@@ -57,8 +71,51 @@ const SssPage = () => {
   return (
     <>
       <Helmet>
-        <title>Sıkça Sorulan Sorular | Tedarika Satıcı Paneli</title>
-        <meta name="description" content="Tedarika satıcı paneli hakkında sıkça sorulan sorular ve cevapları." />
+        <title>{seoMeta.title}</title>
+        <meta name="description" content={seoMeta.description} />
+        <meta name="keywords" content={seoMeta.keywords} />
+        <link rel="canonical" href={seoMeta.canonical} />
+        
+        {/* Hreflang Tags */}
+        {seoMeta.hreflang.map(({ hreflang, href }) => (
+          <link key={hreflang} rel="alternate" hreflang={hreflang} href={href} />
+        ))}
+        
+        {/* Open Graph */}
+        <meta property="og:title" content={seoMeta.og.title} />
+        <meta property="og:description" content={seoMeta.og.description} />
+        <meta property="og:type" content={seoMeta.og.type} />
+        <meta property="og:url" content={seoMeta.og.url} />
+        <meta property="og:image" content={seoMeta.og.image} />
+        <meta property="og:locale" content={seoMeta.og.locale} />
+        <meta property="og:site_name" content={seoMeta.og.siteName} />
+        
+        {/* Twitter */}
+        <meta name="twitter:card" content={seoMeta.twitter.card} />
+        <meta name="twitter:title" content={seoMeta.twitter.title} />
+        <meta name="twitter:description" content={seoMeta.twitter.description} />
+        <meta name="twitter:image" content={seoMeta.twitter.image} />
+        
+        {/* Structured Data - FAQPage */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": faqs.map(faq => ({
+              "@type": "Question",
+              "name": faq.question,
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": faq.answer
+              }
+            }))
+          })}
+        </script>
+        
+        {/* Breadcrumb Schema */}
+        <script type="application/ld+json">
+          {JSON.stringify(breadcrumbSchema)}
+        </script>
       </Helmet>
 
       <div className="bg-white min-h-screen">

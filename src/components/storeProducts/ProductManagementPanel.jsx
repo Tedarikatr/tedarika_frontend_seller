@@ -251,7 +251,7 @@ const ProductManagementPanel = ({
                     product.imageUrl ||
                     "/placeholder.png"
                   }
-                  alt=""
+                  alt={product?.name || "Ürün görseli"}
                   className="w-20 h-20 rounded-xl object-cover border-2 border-white/30 shadow-lg"
                 />
                 <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-white rounded-full flex items-center justify-center shadow-lg">
@@ -516,7 +516,7 @@ const ProductManagementPanel = ({
                     <div key={i} className="relative group">
                       <img
                         src={`${url}?v=${buster}`}
-                        alt=""
+                        alt={`${product?.name || 'Ürün'} görseli ${i + 1}`}
                         className="w-full aspect-square rounded-xl object-cover border-2 border-gray-200 shadow-sm group-hover:shadow-lg transition-all"
                       />
                       <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 rounded-xl transition-opacity flex items-center justify-center">

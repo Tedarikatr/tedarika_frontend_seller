@@ -64,7 +64,7 @@ const Thumb = ({ img, buster, onPreview, onDelete }) => (
   <div className="group relative">
     <img
       src={withBuster(img.url, buster)}
-      alt=""
+      alt="Ürün görseli"
       className="w-28 h-28 object-cover rounded-xl border"
       onClick={() => onPreview(img)}
     />
@@ -103,7 +103,7 @@ const Lightbox = ({ open, img, buster, onClose }) => {
         <div className="p-4 flex flex-col gap-3">
           <img
             src={withBuster(img?.url, buster)}
-            alt=""
+            alt="Ürün görseli önizleme"
             className="max-h-[65vh] w-full object-contain rounded-lg bg-gray-50"
           />
           <div className="flex items-center justify-between">
