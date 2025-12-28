@@ -100,7 +100,7 @@ const ContactPage = () => {
                 "@type": "ContactPoint",
                 "telephone": "+90-538-236-26-05",
                 "contactType": "Customer Service",
-                "email": "info@tedarika.app",
+                "email": "info@tedarika.com.tr",
                 "availableLanguage": ["Turkish", "English"]
               }
             }
@@ -134,8 +134,8 @@ const ContactPage = () => {
               </div>
               <h3 className="text-xl font-bold text-gray-900">E-posta</h3>
             </div>
-            <a href="mailto:info@tedarika.app" className="text-teal-600 hover:text-teal-700 font-semibold">
-              info@tedarika.app
+            <a href="mailto:info@tedarika.com.tr" className="text-teal-600 hover:text-teal-700 font-semibold">
+              info@tedarika.com.tr
             </a>
           </div>
 

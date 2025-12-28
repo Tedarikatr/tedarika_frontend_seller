@@ -158,7 +158,7 @@ export const getOrganizationSchema = () => {
       'contactType': 'Customer Service',
       'availableLanguage': ['Turkish', 'English'],
       'areaServed': 'TR',
-      'email': 'info@tedarika.app'
+      'email': 'info@tedarika.com.tr'
     },
     'sameAs': [
       'https://www.linkedin.com/company/tedarika',

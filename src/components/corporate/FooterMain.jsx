@@ -64,8 +64,8 @@ const FooterMain = () => {
                 </div>
                 <div>
                   <div className="text-xs text-white/50">E-posta</div>
-                  <a href="mailto:info@tedarika.app" className="text-white font-semibold hover:text-[#3D8E94] transition-colors">
-                    info@tedarika.app
+                  <a href="mailto:info@tedarika.com.tr" className="text-white font-semibold hover:text-[#3D8E94] transition-colors">
+                    info@tedarika.com.tr
                   </a>
                 </div>
               </div>

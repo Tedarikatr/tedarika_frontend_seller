@@ -60,7 +60,7 @@ const SssPage = () => {
     },
     {
       question: "Teknik destek nasıl alınır?",
-      answer: "7/24 canlı destek hattımız, e-posta (info@tedarika.app) veya WhatsApp (+90 538 236 26 05) üzerinden bizimle iletişime geçebilirsiniz. Ayrıca yardım merkezimizde detaylı kılavuzlar bulabilirsiniz."
+      answer: "7/24 canlı destek hattımız, e-posta (info@tedarika.com.tr) veya WhatsApp (+90 538 236 26 05) üzerinden bizimle iletişime geçebilirsiniz. Ayrıca yardım merkezimizde detaylı kılavuzlar bulabilirsiniz."
     }
   ];
 
@@ -194,7 +194,7 @@ const SssPage = () => {
               WhatsApp ile İletişim
             </a>
             <a
-              href="mailto:info@tedarika.app"
+              href="mailto:info@tedarika.com.tr"
               className="inline-flex items-center gap-3 bg-white text-emerald-700 border-2 border-emerald-500 px-6 py-3 rounded-xl font-bold hover:bg-emerald-50 transition-all hover:scale-105"
             >
               <Mail className="w-5 h-5" />

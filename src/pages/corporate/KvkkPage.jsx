@@ -38,7 +38,7 @@ const KvkkPage = () => {
     {
       title: "Haklarınız",
       icon: UserCheck,
-      content: "KVKK kapsamında, kişisel verilerinize erişim, düzeltme, silme ve işlemenin durdurulmasını talep etme haklarına sahipsiniz. Taleplerinizi info@tedarika.app adresine iletebilirsiniz."
+      content: "KVKK kapsamında, kişisel verilerinize erişim, düzeltme, silme ve işlemenin durdurulmasını talep etme haklarına sahipsiniz. Taleplerinizi info@tedarika.com.tr adresine iletebilirsiniz."
     },
     {
       title: "Veri Paylaşımı",
@@ -144,8 +144,8 @@ const KvkkPage = () => {
               </div>
               <div>
                 <p className="text-sm text-gray-500 font-medium">E-posta</p>
-                <a href="mailto:info@tedarika.app" className="text-emerald-700 font-bold text-lg hover:text-emerald-800">
-                  info@tedarika.app
+                <a href="mailto:info@tedarika.com.tr" className="text-emerald-700 font-bold text-lg hover:text-emerald-800">
+                  info@tedarika.com.tr
                 </a>
               </div>
             </div>
