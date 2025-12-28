@@ -5,6 +5,8 @@ import { registerSeller } from "@/api/sellerAuthService";
 import { Mail, Lock, User, Phone, CheckCircle } from "lucide-react";
 import { useToast } from "@/contexts/ToastContext";
 import { createSeoMeta } from "@/utils/seo";
+import SellerHeader from "@/components/sellerLanding/SellerHeader";
+import Footer from "@/components/corporate/Footer";
 
 const RegisterPage = () => {
   const location = useLocation();
@@ -135,69 +137,73 @@ const handleSubmit = async (e) => {
         <meta name="twitter:image" content={seoMeta.twitter.image} />
       </Helmet>
       
-    <div className="min-h-screen flex flex-col md:flex-row bg-[#002d2f] text-white">
-      <div className="w-full md:w-1/2 flex flex-col justify-center items-start px-10 py-20 space-y-8 bg-gradient-to-br from-[#003e3f] via-[#004b49] to-[#005c5a]">
-        <h2 className="text-4xl font-extrabold leading-tight tracking-tight">
-          Global Pazarlara Profesyonel Erişim
-        </h2>
-        <p className="text-[#b8dedb] max-w-md text-sm leading-relaxed">
-          Satıcı hesabı oluşturun, mağazanızı açın ve 150+ ülkedeki B2B alıcılara ulaşın.
-        </p>
-        <ul className="space-y-3 text-sm">
-          {[
-            "5 dakikada hızlı kayıt",
-            "Binlerce kurumsal alıcı",
-            "Güvenli ödeme garantisi",
-          ].map((item, i) => (
-            <li key={i} className="flex items-center gap-2">
-              <CheckCircle size={18} className="text-emerald-400" />
-              <span>{item}</span>
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      <div className="w-full md:w-1/2 bg-white text-[#003636] flex items-center justify-center py-16 px-8">
-        <form onSubmit={handleSubmit} className="w-full max-w-md">
-          <h3 className="text-3xl font-bold text-center mb-10">Satıcı Kaydı</h3>
-          <div className="space-y-5">
-            <FormInput name="name" value={formData.name} onChange={handleChange} placeholder="Ad" icon={<User size={18} />} />
-            <FormInput name="lastName" value={formData.lastName} onChange={handleChange} placeholder="Soyad" icon={<User size={18} />} />
-            <FormInput name="email" value={formData.email} onChange={handleChange} placeholder="E-posta" icon={<Mail size={18} />} type="email" />
-            <PhoneInput name="phone" value={formData.phone} onChange={handleChange} />
-            <FormInput name="password" value={formData.password} onChange={handleChange} placeholder="Şifre" icon={<Lock size={18} />} type="password" />
-          </div>
-
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className={`mt-8 w-full bg-gradient-to-r from-[#00d18c] to-[#00a980] hover:opacity-90 text-white font-semibold py-3 rounded-xl transition ${
-              isSubmitting ? "opacity-50 cursor-not-allowed" : ""
-            }`}
-          >
-            {isSubmitting ? "Kayıt Yapılıyor..." : "Hesap Oluştur"}
-          </button>
-
-          <p className="mt-6 text-center text-sm text-gray-600">
-            Hesabın var mı?{" "}
-            <Link
-              to="/seller/login"
-              className="text-emerald-600 font-semibold hover:underline"
-            >
-              Giriş Yap
-            </Link>
+    <div className="min-h-screen flex flex-col bg-white">
+      <SellerHeader />
+      <div className="flex flex-col md:flex-row flex-1 bg-[#002d2f] text-white">
+        <div className="w-full md:w-1/2 flex flex-col justify-center items-start px-10 py-20 space-y-8 bg-gradient-to-br from-[#003e3f] via-[#004b49] to-[#005c5a]">
+          <h2 className="text-4xl font-extrabold leading-tight tracking-tight">
+            Global Pazarlara Profesyonel Erişim
+          </h2>
+          <p className="text-[#b8dedb] max-w-md text-sm leading-relaxed">
+            Satıcı hesabı oluşturun, mağazanızı açın ve 150+ ülkedeki B2B alıcılara ulaşın.
           </p>
+          <ul className="space-y-3 text-sm">
+            {[
+              "5 dakikada hızlı kayıt",
+              "Binlerce kurumsal alıcı",
+              "Güvenli ödeme garantisi",
+            ].map((item, i) => (
+              <li key={i} className="flex items-center gap-2">
+                <CheckCircle size={18} className="text-emerald-400" />
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
 
-          {/* Back Button */}
-          <button
-            type="button"
-            onClick={handleBack}
-            className="mt-4 w-full text-center text-sm text-gray-600 underline"
-          >
-            Geri Dön
-          </button>
-        </form>
+        <div className="w-full md:w-1/2 bg-white text-[#003636] flex items-center justify-center py-16 px-8">
+          <form onSubmit={handleSubmit} className="w-full max-w-md">
+            <h3 className="text-3xl font-bold text-center mb-10">Satıcı Kaydı</h3>
+            <div className="space-y-5">
+              <FormInput name="name" value={formData.name} onChange={handleChange} placeholder="Ad" icon={<User size={18} />} />
+              <FormInput name="lastName" value={formData.lastName} onChange={handleChange} placeholder="Soyad" icon={<User size={18} />} />
+              <FormInput name="email" value={formData.email} onChange={handleChange} placeholder="E-posta" icon={<Mail size={18} />} type="email" />
+              <PhoneInput name="phone" value={formData.phone} onChange={handleChange} />
+              <FormInput name="password" value={formData.password} onChange={handleChange} placeholder="Şifre" icon={<Lock size={18} />} type="password" />
+            </div>
+
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className={`mt-8 w-full bg-gradient-to-r from-[#00d18c] to-[#00a980] hover:opacity-90 text-white font-semibold py-3 rounded-xl transition ${
+                isSubmitting ? "opacity-50 cursor-not-allowed" : ""
+              }`}
+            >
+              {isSubmitting ? "Kayıt Yapılıyor..." : "Hesap Oluştur"}
+            </button>
+
+            <p className="mt-6 text-center text-sm text-gray-600">
+              Hesabın var mı?{" "}
+              <Link
+                to="/seller/login"
+                className="text-emerald-600 font-semibold hover:underline"
+              >
+                Giriş Yap
+              </Link>
+            </p>
+
+            {/* Back Button */}
+            <button
+              type="button"
+              onClick={handleBack}
+              className="mt-4 w-full text-center text-sm text-gray-600 underline"
+            >
+              Geri Dön
+            </button>
+          </form>
+        </div>
       </div>
+      <Footer />
     </div>
     </>
   );
