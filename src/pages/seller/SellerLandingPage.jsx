@@ -1,4 +1,5 @@
 import { Helmet } from "react-helmet-async";
+import { useLocation } from "react-router-dom";
 import SellerHeader from "@/components/sellerLanding/SellerHeader";
 import HeroSection from "@/components/sellerLanding/HeroSection";
 import FeaturesSection from "@/components/sellerLanding/FeaturesSection";
@@ -13,69 +14,66 @@ import GlobalOpportunitiesSection from "@/components/sellerLanding/GlobalOpportu
 import HeroImpactSection from "@/components/sellerLanding/HeroImpactSection";
 import Footer from "@/components/corporate/Footer";
 import SupportFormSection from "@/components/sellerLanding/SupportFormSection";
+import {
+  createSeoMeta,
+  getOrganizationSchema,
+  getWebsiteSchema,
+  getHreflangUrls
+} from "@/utils/seo";
 
 
 
 const SellerLandingPage = () => {
+  const location = useLocation();
+  const seoMeta = createSeoMeta({
+    title: "Tedarika Satıcı Paneli - B2B Pazaryeri ile İhracat Yapın | Ücretsiz Mağaza",
+    description: "Türkiye'nin en hızlı büyüyen B2B pazaryerinde mağazanızı ücretsiz açın. Global alıcılara ulaşın, güvenli ödeme alın, kolay ürün yönetimi. KOBİ'ler ve üreticiler için dijital ihracat platformu.",
+    path: location.pathname,
+    keywords: "B2B pazaryeri, ihracat platformu, tedarika satıcı, mağaza açma, toptan satış, KOBİ ihracat, üretici satış, global ticaret, online satış, B2B e-ticaret, Türkiye ihracat, dijital ticaret"
+  });
+
+  const organizationSchema = getOrganizationSchema();
+  const websiteSchema = getWebsiteSchema(location.pathname);
+
   return (
     <>
       <Helmet>
-        <title>Tedarika Satıcı Paneli - B2B Pazaryeri ile İhracat Yapın | Ücretsiz Mağaza</title>
-        <meta 
-          name="description" 
-          content="Türkiye'nin en hızlı büyüyen B2B pazaryerinde mağazanızı ücretsiz açın. Global alıcılara ulaşın, güvenli ödeme alın, kolay ürün yönetimi. KOBİ'ler ve üreticiler için dijital ihracat platformu." 
-        />
-        <meta 
-          name="keywords" 
-          content="B2B pazaryeri, ihracat platformu, tedarika satıcı, mağaza açma, toptan satış, KOBİ ihracat, üretici satış, global ticaret, online satış, B2B e-ticaret" 
-        />
+        <title>{seoMeta.title}</title>
+        <meta name="description" content={seoMeta.description} />
+        <meta name="keywords" content={seoMeta.keywords} />
+        <link rel="canonical" href={seoMeta.canonical} />
+        
+        {/* Hreflang Tags */}
+        {seoMeta.hreflang.map(({ hreflang, href }) => (
+          <link key={hreflang} rel="alternate" hreflang={hreflang} href={href} />
+        ))}
         
         {/* Open Graph */}
-        <meta property="og:title" content="Tedarika Satıcı Paneli - B2B Pazaryerinde Mağazanızı Açın" />
-        <meta property="og:description" content="Türkiye'den dünyaya ihracat yapın. Güvenli ödeme, kolay ürün yönetimi, global alıcılara ulaşın." />
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://seller.tedarika.com/" />
-        <meta property="og:image" content="https://seller.tedarika.com/logo.svg" />
+        <meta property="og:title" content={seoMeta.og.title} />
+        <meta property="og:description" content={seoMeta.og.description} />
+        <meta property="og:type" content={seoMeta.og.type} />
+        <meta property="og:url" content={seoMeta.og.url} />
+        <meta property="og:image" content={seoMeta.og.image} />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:image:alt" content="Tedarika Satıcı Paneli - B2B Pazaryeri" />
+        <meta property="og:locale" content={seoMeta.og.locale} />
+        <meta property="og:site_name" content={seoMeta.og.siteName} />
         
         {/* Twitter */}
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Tedarika Satıcı Paneli - B2B Pazaryeri ile İhracat Yapın" />
-        <meta name="twitter:description" content="Türkiye'den dünyaya ihracat yapın. Güvenli ödeme, kolay ürün yönetimi, global alıcılara ulaşın." />
+        <meta name="twitter:card" content={seoMeta.twitter.card} />
+        <meta name="twitter:title" content={seoMeta.twitter.title} />
+        <meta name="twitter:description" content={seoMeta.twitter.description} />
+        <meta name="twitter:image" content={seoMeta.twitter.image} />
+        <meta name="twitter:image:alt" content="Tedarika Satıcı Paneli - B2B Pazaryeri" />
         
         {/* Structured Data - JSON-LD */}
         <script type="application/ld+json">
-          {JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "WebSite",
-            "name": "Tedarika Satıcı Paneli",
-            "url": "https://seller.tedarika.com",
-            "description": "Türkiye'nin en hızlı büyüyen B2B pazaryeri. İhracat yapın, global alıcılara ulaşın.",
-            "potentialAction": {
-              "@type": "SearchAction",
-              "target": "https://seller.tedarika.com/search?q={search_term_string}",
-              "query-input": "required name=search_term_string"
-            }
-          })}
+          {JSON.stringify(websiteSchema)}
         </script>
         
         <script type="application/ld+json">
-          {JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "Organization",
-            "name": "Tedarika",
-            "url": "https://tedarika.com",
-            "logo": "https://seller.tedarika.com/logo.svg",
-            "contactPoint": {
-              "@type": "ContactPoint",
-              "telephone": "+90-538-236-26-05",
-              "contactType": "Customer Service",
-              "availableLanguage": ["Turkish", "English"]
-            },
-            "sameAs": [
-              "https://www.linkedin.com/company/tedarika",
-              "https://twitter.com/tedarika"
-            ]
-          })}
+          {JSON.stringify(organizationSchema)}
         </script>
       </Helmet>
 

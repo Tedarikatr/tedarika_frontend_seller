@@ -47,8 +47,8 @@ const Footer = () => {
               </div>
               <div className="flex items-center gap-2">
                 <Mail className="w-4 h-4 text-lime-300" />
-                <a href="mailto:info@tedarika.app" className="hover:underline">
-                  info@tedarika.app
+                <a href="mailto:info@tedarika.com.tr" className="hover:underline">
+                  info@tedarika.com.tr
                 </a>
               </div>
             </div>

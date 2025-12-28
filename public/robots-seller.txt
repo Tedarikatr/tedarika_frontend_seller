@@ -1,19 +1,15 @@
-# Tedarika Seller Panel - Robots.txt
-# Bu dosya hem seller.tedarika.com.tr hem de satici.tedarika.com.tr için geçerlidir
+# Tedarika Seller Panel - www.seller.tedarika.com.tr
+# Bu robots.txt dosyası yalnızca www.seller.tedarika.com.tr domain'i için geçerlidir
 
 User-agent: *
 Allow: /
 Allow: /seller/landing
 Allow: /seller/register
-Allow: /seller/login
 Allow: /seller/appointment
-Allow: /corporate/about
-Allow: /corporate/contact
-Allow: /corporate/kvkk
-Allow: /corporate/sss
-Allow: /corporate/contracts
+Allow: /corporate/
 
-# Disallow private pages
+# Private alanlar - indexlenmemeli
+Disallow: /seller/login
 Disallow: /seller/dashboard
 Disallow: /seller/profile
 Disallow: /seller/orders
@@ -29,14 +25,11 @@ Disallow: /seller/company
 Disallow: /seller/reports
 Disallow: /seller/chat
 Disallow: /seller/subscription
+Disallow: /seller/apply
 
-# Crawl-delay (opsiyonel - sunucu yükünü azaltmak için)
-Crawl-delay: 1
+# API endpoint'leri
+Disallow: /api/
 
-# Sitemaps
-# Ana domain sitemap'i
-Sitemap: https://www.tedarika.com.tr/sitemap.xml
-
-# Subdomain sitemaps
+# Bu domain için sitemap (sitemap-index.xml kullanılıyor)
 Sitemap: https://www.seller.tedarika.com.tr/sitemap.xml
-Sitemap: https://www.satici.tedarika.com.tr/sitemap.xml
+
