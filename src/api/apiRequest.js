@@ -1,6 +1,10 @@
 // src/api/apiRequest.js
 const BASE_URL = import.meta.env.VITE_API_URL;
-console.log("ENV:", import.meta.env);
+
+// ⚠️ GÜVENLİK: Environment variable'ları production'da loglamayın
+if (import.meta.env.DEV) {
+  console.log("API Base URL:", BASE_URL ? "✅ Set" : "❌ Missing");
+}
 
 // URL birleştirme: sondaki/baştaki slash dertlerini çözer
 const join = (base, path) =>
