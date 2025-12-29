@@ -139,69 +139,46 @@ const handleSubmit = async (e) => {
       
     <div className="min-h-screen flex flex-col bg-white">
       <SellerHeader />
-      <div className="flex flex-col md:flex-row flex-1 bg-[#002d2f] text-white">
-        <div className="w-full md:w-1/2 flex flex-col justify-center items-start px-10 py-20 space-y-8 bg-gradient-to-br from-[#003e3f] via-[#004b49] to-[#005c5a]">
-          <h2 className="text-4xl font-extrabold leading-tight tracking-tight">
-            Global Pazarlara Profesyonel Erişim
-          </h2>
-          <p className="text-[#b8dedb] max-w-md text-sm leading-relaxed">
-            Satıcı hesabı oluşturun, mağazanızı açın ve 150+ ülkedeki B2B alıcılara ulaşın.
+      <div className="flex flex-1 items-center justify-center bg-white py-24 px-4">
+        <form onSubmit={handleSubmit} className="w-full max-w-lg mx-auto bg-white rounded-3xl shadow-2xl p-10 border border-gray-100">
+          <h3 className="text-4xl font-bold text-center mb-12 text-gray-900">Satıcı Kaydı</h3>
+          <div className="space-y-7">
+            <FormInput name="name" value={formData.name} onChange={handleChange} placeholder="Ad" icon={<User size={22} />} inputClassName="text-base" />
+            <FormInput name="lastName" value={formData.lastName} onChange={handleChange} placeholder="Soyad" icon={<User size={22} />} inputClassName="text-base" />
+            <FormInput name="email" value={formData.email} onChange={handleChange} placeholder="E-posta" icon={<Mail size={22} />} type="email" inputClassName="text-base" />
+            <PhoneInput name="phone" value={formData.phone} onChange={handleChange} inputClassName="text-base" />
+            <FormInput name="password" value={formData.password} onChange={handleChange} placeholder="Şifre" icon={<Lock size={22} />} type="password" inputClassName="text-base" />
+          </div>
+
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className={`mt-10 w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-4 rounded-2xl text-lg transition shadow-lg ${
+              isSubmitting ? "opacity-50 cursor-not-allowed" : ""
+            }`}
+          >
+            {isSubmitting ? "Kayıt Yapılıyor..." : "Hesap Oluştur"}
+          </button>
+
+          <p className="mt-8 text-center text-base text-gray-600">
+            Hesabın var mı?{" "}
+            <Link
+              to="/seller/login"
+              className="text-emerald-600 font-semibold hover:underline"
+            >
+              Giriş Yap
+            </Link>
           </p>
-          <ul className="space-y-3 text-sm">
-            {[
-              "5 dakikada hızlı kayıt",
-              "Binlerce kurumsal alıcı",
-              "Güvenli ödeme garantisi",
-            ].map((item, i) => (
-              <li key={i} className="flex items-center gap-2">
-                <CheckCircle size={18} className="text-emerald-400" />
-                <span>{item}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
 
-        <div className="w-full md:w-1/2 bg-white text-[#003636] flex items-center justify-center py-16 px-8">
-          <form onSubmit={handleSubmit} className="w-full max-w-md">
-            <h3 className="text-3xl font-bold text-center mb-10">Satıcı Kaydı</h3>
-            <div className="space-y-5">
-              <FormInput name="name" value={formData.name} onChange={handleChange} placeholder="Ad" icon={<User size={18} />} />
-              <FormInput name="lastName" value={formData.lastName} onChange={handleChange} placeholder="Soyad" icon={<User size={18} />} />
-              <FormInput name="email" value={formData.email} onChange={handleChange} placeholder="E-posta" icon={<Mail size={18} />} type="email" />
-              <PhoneInput name="phone" value={formData.phone} onChange={handleChange} />
-              <FormInput name="password" value={formData.password} onChange={handleChange} placeholder="Şifre" icon={<Lock size={18} />} type="password" />
-            </div>
-
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className={`mt-8 w-full bg-gradient-to-r from-[#00d18c] to-[#00a980] hover:opacity-90 text-white font-semibold py-3 rounded-xl transition ${
-                isSubmitting ? "opacity-50 cursor-not-allowed" : ""
-              }`}
-            >
-              {isSubmitting ? "Kayıt Yapılıyor..." : "Hesap Oluştur"}
-            </button>
-
-            <p className="mt-6 text-center text-sm text-gray-600">
-              Hesabın var mı?{" "}
-              <Link
-                to="/seller/login"
-                className="text-emerald-600 font-semibold hover:underline"
-              >
-                Giriş Yap
-              </Link>
-            </p>
-
-            {/* Back Button */}
-            <button
-              type="button"
-              onClick={handleBack}
-              className="mt-4 w-full text-center text-sm text-gray-600 underline"
-            >
-              Geri Dön
-            </button>
-          </form>
-        </div>
+          {/* Back Button */}
+          <button
+            type="button"
+            onClick={handleBack}
+            className="mt-5 w-full text-center text-base text-gray-500 underline"
+          >
+            Geri Dön
+          </button>
+        </form>
       </div>
       <Footer />
     </div>
@@ -209,8 +186,8 @@ const handleSubmit = async (e) => {
   );
 };
 
-const FormInput = ({ name, value, onChange, placeholder, icon, type = "text" }) => (
-  <div className="flex items-center gap-3 px-4 py-2 rounded-lg bg-[#f0fdfa] border border-[#bde7e3] focus-within:ring-2 ring-[#00d18c] transition">
+const FormInput = ({ name, value, onChange, placeholder, icon, type = "text", inputClassName = "" }) => (
+  <div className="flex items-center gap-3 px-5 py-3 rounded-xl bg-[#f0fdfa] border border-[#bde7e3] focus-within:ring-2 ring-[#00d18c] transition">
     {icon}
     <input
       type={type}
@@ -219,16 +196,16 @@ const FormInput = ({ name, value, onChange, placeholder, icon, type = "text" }) 
       onChange={onChange}
       required
       placeholder={placeholder}
-      className="w-full bg-transparent outline-none text-[#003636] placeholder-[#7aa5a2] text-sm"
+      className={`w-full bg-transparent outline-none text-[#003636] placeholder-[#7aa5a2] ${inputClassName}`}
     />
   </div>
 );
 
-const PhoneInput = ({ name, value, onChange }) => (
-  <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#f0fdfa] border border-[#bde7e3] focus-within:ring-2 ring-[#00d18c] transition">
+const PhoneInput = ({ name, value, onChange, inputClassName = "" }) => (
+  <div className="flex items-center gap-2 px-5 py-3 rounded-xl bg-[#f0fdfa] border border-[#bde7e3] focus-within:ring-2 ring-[#00d18c] transition">
     <span className="flex items-center gap-1">
       <img src="https://flagcdn.com/w20/tr.png" alt="TR" className="w-5 h-3 rounded-sm" />
-      <span className="text-[#003636] font-semibold text-sm">+90</span>
+      <span className="text-[#003636] font-semibold text-base">+90</span>
     </span>
     <input
       type="tel"
@@ -239,7 +216,7 @@ const PhoneInput = ({ name, value, onChange }) => (
       pattern="[0-9]*"
       placeholder="5XXXXXXXXX"
       required
-      className="w-full bg-transparent outline-none text-[#003636] placeholder-[#7aa5a2] text-sm"
+      className={`w-full bg-transparent outline-none text-[#003636] placeholder-[#7aa5a2] ${inputClassName}`}
     />
   </div>
 );
