@@ -16,6 +16,12 @@ const FooterMain = () => {
     { label: "SSS", path: "/corporate/sss" },
   ];
 
+  const portalLinks = [
+    { label: "Yatırımcı İlişkileri", url: "https://www.portal.tedarika.com.tr/yatirimci-iliskileri" },
+    { label: "Blog", url: "https://www.portal.tedarika.com.tr/blog" },
+    { label: "Haberler", url: "https://www.portal.tedarika.com.tr/haberler" },
+  ];
+
   const contracts = [
     { label: "Mesafeli Satış Sözleşmesi", file: publicUrl("docs/mesafeli_satis_sozlesmesi.pdf") },
     { label: "Web Sitesi Gizlilik Politikası", file: publicUrl("docs/web_sitesi_gizlilik_politikasi.pdf") },
@@ -27,7 +33,7 @@ const FooterMain = () => {
   return (
     <footer className="w-full px-4 sm:px-6 lg:px-8 py-12 sm:py-16 bg-gradient-to-br from-[#003033] via-[#003033] to-[#3D4E52] text-white">
       <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-12 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 lg:gap-12 mb-12">
           {/* Sol: Logo ve İletişim Bilgileri */}
           <div className="lg:col-span-2">
             <a href="/seller/landing" className="inline-block mb-6 group">
@@ -87,6 +93,28 @@ const FooterMain = () => {
                   >
                     → {topic.label}
                   </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Portal linkler */}
+          <div>
+            <h4 className="font-bold text-white mb-5 text-lg flex items-center gap-2">
+              <div className="w-1 h-6 bg-gradient-to-b from-[#3D8E94] to-[#91babe] rounded-full"></div>
+              Portal
+            </h4>
+            <ul className="space-y-3 text-sm">
+              {portalLinks.map((link, index) => (
+                <li key={index}>
+                  <a 
+                    href={link.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-white/70 hover:text-white hover:translate-x-1 inline-block transition-all duration-300"
+                  >
+                    → {link.label}
+                  </a>
                 </li>
               ))}
             </ul>
