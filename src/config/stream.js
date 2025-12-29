@@ -1,7 +1,8 @@
 // Stream Chat Configuration
+// ⚠️ GÜVENLİK: API key ve secret sadece environment variable'lardan alınmalı
 export const STREAM_CONFIG = {
-  apiKey: import.meta.env.VITE_STREAM_API_KEY || "zdjtpxgnhck6",
-  apiSecret: import.meta.env.VITE_STREAM_API_SECRET || "m6wpw2da96wtmr3s2xbekacync8pv5wcf6m3atk4xgurw4bwhmszx95x9yn32kj8",
+  apiKey: import.meta.env.VITE_STREAM_API_KEY,
+  apiSecret: import.meta.env.VITE_STREAM_API_SECRET,
 };
 
 // Environment kontrolü
