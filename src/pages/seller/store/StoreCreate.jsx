@@ -1,6 +1,3 @@
-// =============================
-// src/pages/seller/store/StoreCreate.jsx (Final - Modern, Çoklu Seçim Etiketli)
-// =============================
 import { useState, useEffect } from "react";
 import { createStore, getAllCategories } from "@/api/sellerStoreService";
 import { useNavigate } from "react-router-dom";

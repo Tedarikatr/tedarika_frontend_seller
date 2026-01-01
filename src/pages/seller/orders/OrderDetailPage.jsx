@@ -3,8 +3,8 @@
 // =============================
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { 
-  fetchOrderDetail, 
+import {
+  fetchOrderDetail,
   fetchPaymentDetail,
   updateOrderStatus,
   updateCarrierInfo,
@@ -40,37 +40,37 @@ import {
 // Modern Status Badge
 const StatusBadge = ({ status }) => {
   const statusConfig = {
-    Created: { 
-      bg: "from-blue-50 to-cyan-50", 
-      text: "text-blue-700", 
+    Created: {
+      bg: "from-blue-50 to-cyan-50",
+      text: "text-blue-700",
       border: "border-blue-200",
       icon: <Clock size={16} />,
       label: "Oluşturuldu"
     },
-    Confirmed: { 
-      bg: "from-emerald-50 to-green-50", 
-      text: "text-emerald-700", 
+    Confirmed: {
+      bg: "from-emerald-50 to-green-50",
+      text: "text-emerald-700",
       border: "border-emerald-200",
       icon: <CheckCircle size={16} />,
       label: "Onaylandı"
     },
-    Delivered: { 
-      bg: "from-purple-50 to-pink-50", 
-      text: "text-purple-700", 
+    Delivered: {
+      bg: "from-purple-50 to-pink-50",
+      text: "text-purple-700",
       border: "border-purple-200",
       icon: <Package size={16} />,
       label: "Teslim Edildi"
     },
-    Cancelled: { 
-      bg: "from-red-50 to-rose-50", 
-      text: "text-red-700", 
+    Cancelled: {
+      bg: "from-red-50 to-rose-50",
+      text: "text-red-700",
       border: "border-red-200",
       icon: <XCircle size={16} />,
       label: "İptal Edildi"
     },
-    default: { 
-      bg: "from-gray-50 to-gray-100", 
-      text: "text-gray-700", 
+    default: {
+      bg: "from-gray-50 to-gray-100",
+      text: "text-gray-700",
       border: "border-gray-200",
       icon: <Clock size={16} />,
       label: "Bilinmiyor"
@@ -167,7 +167,7 @@ const OrderDetailPage = () => {
   // Sipariş durumunu güncelle (Created -> Confirmed)
   const handleUpdateStatus = async () => {
     if (!window.confirm("Siparişi onaylamak istediğinize emin misiniz?")) return;
-    
+
     setStatusLoading(true);
     try {
       console.log("Sipariş onaylanıyor:", orderId, "Status: Confirmed");
@@ -211,7 +211,7 @@ const OrderDetailPage = () => {
   // Siparişi iptal et
   const handleCancelOrder = async () => {
     if (!window.confirm("Siparişi iptal etmek istediğinize emin misiniz? Bu işlem geri alınamaz!")) return;
-    
+
     setCancelLoading(true);
     try {
       await cancelOrder(Number(orderId));
@@ -269,7 +269,7 @@ const OrderDetailPage = () => {
             <ArrowLeft size={20} />
             Geri Dön
           </button>
-          
+
           <div className="flex items-center justify-between flex-wrap gap-4">
             <div className="flex items-center gap-4">
               <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center shadow-lg">
@@ -285,10 +285,10 @@ const OrderDetailPage = () => {
                 </p>
               </div>
             </div>
-            
+
             <div className="flex flex-wrap items-center gap-3">
               <StatusBadge status={order.status} />
-              
+
               {/* Sipariş İşlemleri */}
               <div className="flex flex-wrap gap-2">
                 {order.status === "Created" && (
@@ -305,7 +305,7 @@ const OrderDetailPage = () => {
                     Onayla
                   </button>
                 )}
-                
+
                 {(order.status === "Created" || order.status === "Confirmed") && (
                   <>
                     <button
@@ -315,7 +315,7 @@ const OrderDetailPage = () => {
                       <Truck className="w-4 h-4" />
                       Kargo Bilgisi
                     </button>
-                    
+
                     <button
                       onClick={handleCancelOrder}
                       disabled={cancelLoading}
@@ -338,40 +338,40 @@ const OrderDetailPage = () => {
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-6 py-8 space-y-6">
-        
+
         {/* Genel Bilgiler Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <InfoCard 
-            icon={Store} 
-            label="Mağaza" 
+          <InfoCard
+            icon={Store}
+            label="Mağaza"
             value={order.storeName}
           />
-          <InfoCard 
-            icon={Calendar} 
-            label="Oluşturulma" 
+          <InfoCard
+            icon={Calendar}
+            label="Oluşturulma"
             value={new Date(order.createdAt).toLocaleString("tr-TR")}
           />
-          <InfoCard 
-            icon={DollarSign} 
-            label="Toplam Tutar" 
+          <InfoCard
+            icon={DollarSign}
+            label="Toplam Tutar"
             value={`₺${order.totalAmount.toFixed(2)} ${order.currency}`}
             colorClass="text-emerald-700 text-lg"
           />
-          <InfoCard 
-            icon={Truck} 
-            label="Kargo Şirketi" 
+          <InfoCard
+            icon={Truck}
+            label="Kargo Şirketi"
             value={order.carrierCompany || "Henüz Eklenmedi"}
             colorClass={order.carrierCompany ? "text-gray-900" : "text-gray-400"}
           />
-          <InfoCard 
-            icon={Package} 
-            label="Takip Numarası" 
+          <InfoCard
+            icon={Package}
+            label="Takip Numarası"
             value={order.trackingNumber || "Henüz Eklenmedi"}
             colorClass={order.trackingNumber ? "text-gray-900" : "text-gray-400"}
           />
-          <InfoCard 
-            icon={MapPin} 
-            label="Teslimat Adresi" 
+          <InfoCard
+            icon={MapPin}
+            label="Teslimat Adresi"
             value={order.shippingAddress}
           />
         </div>

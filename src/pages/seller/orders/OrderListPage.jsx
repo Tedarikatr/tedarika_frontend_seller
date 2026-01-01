@@ -18,7 +18,6 @@ import {
   Sparkles
 } from "lucide-react";
 
-// 🎨 Modern Status Badge
 const StatusBadge = ({ status }) => {
   const statusConfig = {
     Created: { 
