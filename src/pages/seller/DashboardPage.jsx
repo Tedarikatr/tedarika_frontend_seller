@@ -62,7 +62,7 @@ const StatCard = ({ title, value, icon, delay }) => (
   >
     {/* Background Gradient on Hover */}
     <div className={`absolute inset-0 bg-gradient-to-br ${colorMap[title]} opacity-0 group-hover:opacity-5 transition-opacity duration-300`} />
-    
+
     <div className="relative z-10 flex flex-col gap-3">
       <div className="flex justify-between items-start">
         <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide">{title}</p>
@@ -74,7 +74,7 @@ const StatCard = ({ title, value, icon, delay }) => (
         {value}
       </p>
     </div>
-    
+
     {/* Bottom accent line */}
     <div className={`absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r ${colorMap[title]} transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left`} />
   </motion.div>
@@ -231,7 +231,7 @@ const DashboardPage = () => {
               >
                 {/* Gradient overlay on hover */}
                 <div className={`absolute inset-0 bg-gradient-to-br ${item.color} opacity-0 group-hover:opacity-10 transition-opacity duration-300`} />
-                
+
                 <div className="relative z-10 flex flex-col items-center gap-3">
                   <div className={`p-4 bg-gradient-to-br ${item.color} rounded-xl text-white text-2xl shadow-lg group-hover:scale-110 transition-transform duration-300`}>
                     {item.icon}
@@ -271,13 +271,13 @@ const DashboardPage = () => {
               <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
               <XAxis dataKey="name" stroke="#6B7280" style={{ fontSize: '14px', fontWeight: '500' }} />
               <YAxis stroke="#6B7280" style={{ fontSize: '14px', fontWeight: '500' }} />
-              <Tooltip 
-                contentStyle={{ 
-                  backgroundColor: 'white', 
-                  border: '2px solid #10B981', 
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: 'white',
+                  border: '2px solid #10B981',
                   borderRadius: '12px',
                   boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
-                }} 
+                }}
               />
               <Line
                 type="monotone"
@@ -337,16 +337,16 @@ const DashboardPage = () => {
                   <Cell key={index} fill={color} stroke="white" strokeWidth={2} />
                 ))}
               </Pie>
-              <Tooltip 
-                contentStyle={{ 
-                  backgroundColor: 'white', 
-                  border: '2px solid #3B82F6', 
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: 'white',
+                  border: '2px solid #3B82F6',
                   borderRadius: '12px',
                   boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
-                }} 
+                }}
               />
-              <Legend 
-                verticalAlign="bottom" 
+              <Legend
+                verticalAlign="bottom"
                 height={36}
                 iconType="circle"
                 wrapperStyle={{ fontSize: '14px', fontWeight: '600' }}
