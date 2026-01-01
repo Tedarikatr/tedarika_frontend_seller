@@ -9,13 +9,13 @@ import OwnedBrandsSection from "@/components/Brand/OwnedBrandsSection";
 import BrandList from "@/components/Brand/BrandList";
 import Pagination from "@/components/ui/Pagination";
 import Toast from "@/components/ui/Toast";
-import { 
-  Award, 
-  Sparkles, 
-  Search, 
-  CheckCircle, 
-  Package, 
-  TrendingUp 
+import {
+  Award,
+  Sparkles,
+  Search,
+  CheckCircle,
+  Package,
+  TrendingUp
 } from "lucide-react";
 
 export default function SellerBrandPage() {
@@ -91,7 +91,7 @@ export default function SellerBrandPage() {
     const owned = ownedBrands.length;
     const pending = ownerships.filter(o => o.status === 0 || o.status === "Pending").length;
     const total = brands.length;
-    
+
     return { owned, pending, total };
   }, [ownedBrands.length, ownerships, brands.length]);
 
@@ -104,7 +104,7 @@ export default function SellerBrandPage() {
           <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent pointer-events-none"></div>
           <div className="absolute top-10 right-10 w-32 h-32 bg-white/10 rounded-full blur-3xl"></div>
           <div className="absolute bottom-10 left-10 w-40 h-40 bg-purple-400/20 rounded-full blur-3xl"></div>
-          
+
           <div className="relative z-10">
             <div className="flex items-center justify-center gap-3 mb-4">
               <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center shadow-xl animate-pulse">
@@ -152,11 +152,10 @@ export default function SellerBrandPage() {
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`flex-1 px-6 py-3 rounded-xl font-bold text-sm transition-all duration-300 ${
-                activeTab === tab
-                  ? "bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-lg scale-105"
-                  : "text-gray-600 hover:bg-gray-100"
-              }`}
+              className={`flex-1 px-6 py-3 rounded-xl font-bold text-sm transition-all duration-300 ${activeTab === tab
+                ? "bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-lg scale-105"
+                : "text-gray-600 hover:bg-gray-100"
+                }`}
             >
               {tab === "owned" ? "Sahip Olduklarım" : "Tüm Markalar"}
             </button>
