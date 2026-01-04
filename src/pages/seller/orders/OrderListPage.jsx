@@ -274,7 +274,6 @@ const OrderListPage = () => {
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-2">
-                          <DollarSign size={16} className="text-emerald-600" />
                           <span className="font-bold text-gray-900">
                             ₺{order.totalAmount.toFixed(2)}
                           </span>
