@@ -93,8 +93,12 @@ const QuotationDetailPage = () => {
   };
 
   const handleStatusChange = async (statusValue) => {
-    if (quotation.status !== 0) {
-      toast.error("Bu teklifin durumu zaten güncellenmiş.");
+    if (quotation.status === 2) {
+      toast.error("Kabul edilmiş teklifin durumu değiştirilemez.");
+      return;
+    }
+    if (quotation.status === 3) {
+      toast.error("Reddedilmiş teklifin durumu değiştirilemez.");
       return;
     }
 
@@ -369,7 +373,7 @@ const QuotationDetailPage = () => {
             <h2 className="text-2xl font-bold text-gray-800">Durumu Güncelle</h2>
           </div>
           
-          {quotation.status === 0 ? (
+          {(quotation.status !== 2 && quotation.status !== 3) ? (
             <div className="flex flex-wrap gap-4">
               <button
                 onClick={() => handleStatusChange(2)}
