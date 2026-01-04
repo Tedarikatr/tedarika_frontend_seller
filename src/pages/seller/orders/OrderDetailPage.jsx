@@ -134,6 +134,15 @@ const OrderDetailPage = () => {
     try {
       const data = await fetchOrderDetail(Number(orderId));
       setOrder(data);
+      
+      // Ödeme bilgilerini otomatik olarak yükle
+      try {
+        const paymentData = await fetchPaymentDetail(Number(orderId));
+        setPayment(paymentData);
+      } catch (paymentErr) {
+        console.log("Ödeme detayları yüklenemedi:", paymentErr);
+        // Ödeme bilgisi yoksa sessizce devam et
+      }
     } catch (err) {
       console.error("Detay yüklenemedi:", err);
     } finally {
@@ -143,7 +152,6 @@ const OrderDetailPage = () => {
 
   useEffect(() => {
     loadOrder();
-    setPayment(null);
     setPaymentOpen(false);
     setPaymentError("");
   }, [orderId]);
@@ -306,7 +314,7 @@ const OrderDetailPage = () => {
                   </button>
                 )}
 
-                {(order.status === "Created" || order.status === "Confirmed") && (
+                {(order.status === "Created" || order.status === "Confirmed" || (payment && payment.isPaid !== false)) && (
                   <>
                     <button
                       onClick={() => setShowCarrierModal(true)}
