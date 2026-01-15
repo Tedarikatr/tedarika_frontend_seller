@@ -2,7 +2,7 @@
 // MyStoreProductTable.jsx
 // =============================
 import React from "react";
-import { Package, Tag, Hash, Settings, Image as ImageIcon, DollarSign, TrendingUp, Eye } from "lucide-react";
+import { Settings, Image as ImageIcon, TrendingUp } from "lucide-react";
 
 const MyStoreProductTable = ({ products, onManage }) => {
   if (!products?.length) {
@@ -26,22 +26,7 @@ const MyStoreProductTable = ({ products, onManage }) => {
                 #
               </th>
               <th className="px-4 py-4 text-left text-xs font-bold text-emerald-800 uppercase tracking-wider">
-                ID
-              </th>
-              <th className="px-4 py-4 text-left text-xs font-bold text-emerald-800 uppercase tracking-wider">
                 Ürün
-              </th>
-              <th className="px-4 py-4 text-left text-xs font-bold text-emerald-800 uppercase tracking-wider">
-                Kategori
-              </th>
-              <th className="px-4 py-4 text-left text-xs font-bold text-emerald-800 uppercase tracking-wider">
-                Marka
-              </th>
-              <th className="px-4 py-4 text-left text-xs font-bold text-emerald-800 uppercase tracking-wider">
-                Barkod
-              </th>
-              <th className="px-4 py-4 text-left text-xs font-bold text-emerald-800 uppercase tracking-wider">
-                Fiyat
               </th>
               <th className="px-4 py-4 text-center text-xs font-bold text-emerald-800 uppercase tracking-wider">
                 Durum
@@ -69,12 +54,6 @@ const MyStoreProductTable = ({ products, onManage }) => {
                   <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500 font-medium">
                     {index + 1}
                   </td>
-                  <td className="px-4 py-4 whitespace-nowrap">
-                    <div className="flex items-center gap-2">
-                      <Hash className="w-4 h-4 text-gray-400" />
-                      <span className="text-sm font-semibold text-gray-700">{product.id}</span>
-                    </div>
-                  </td>
                   <td className="px-4 py-4">
                     <div className="flex items-center gap-3">
                       <div className="relative group">
@@ -90,32 +69,6 @@ const MyStoreProductTable = ({ products, onManage }) => {
                       <div className="min-w-0">
                         <div className="font-bold text-gray-900 truncate">{product.name}</div>
                       </div>
-                    </div>
-                  </td>
-                  <td className="px-4 py-4">
-                    <div className="text-sm font-semibold text-gray-900 truncate">
-                      {product.categoryName || "—"}
-                    </div>
-                  </td>
-                  <td className="px-4 py-4 whitespace-nowrap">
-                    <div className="flex items-center gap-2">
-                      <Tag className="w-4 h-4 text-gray-400" />
-                      <span className="text-sm text-gray-700 font-medium">
-                        {product.brand || "—"}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="px-4 py-4 whitespace-nowrap">
-                    <span className="px-3 py-1 rounded-lg bg-gray-100 text-gray-700 text-xs font-mono font-semibold">
-                      {product.barcode || "—"}
-                    </span>
-                  </td>
-                  <td className="px-4 py-4 whitespace-nowrap">
-                    <div className="flex items-center gap-2">
-                      <DollarSign className="w-4 h-4 text-emerald-600" />
-                      <span className="text-sm font-bold text-gray-900">
-                        {product.price ? `₺${product.price.toLocaleString('tr-TR')}` : "—"}
-                      </span>
                     </div>
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap text-center">
@@ -185,58 +138,15 @@ const MyStoreProductTable = ({ products, onManage }) => {
                         </span>
                       )}
                     </div>
-                    <div className="flex items-center gap-2 text-xs text-gray-500">
-                      <Hash className="w-3 h-3" />
-                      <span className="font-semibold">#{product.id}</span>
-                    </div>
                   </div>
                 </div>
               </div>
 
-              {/* Details Grid */}
-              <div className="p-4 space-y-3">
-                {/* Kategori & Marka */}
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <div className="text-xs text-gray-500 mb-1 font-semibold">Kategori</div>
-                    <div className="text-sm font-bold text-gray-900 truncate">
-                      {product.categoryName || "—"}
-                    </div>
-                  </div>
-                  <div>
-                    <div className="text-xs text-gray-500 mb-1 font-semibold">Marka</div>
-                    <div className="flex items-center gap-1">
-                      <Tag className="w-3 h-3 text-gray-400" />
-                      <span className="text-sm font-bold text-gray-900 truncate">
-                        {product.brand || "—"}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Barkod & Fiyat */}
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <div className="text-xs text-gray-500 mb-1 font-semibold">Barkod</div>
-                    <span className="inline-block px-2 py-1 rounded-lg bg-gray-100 text-gray-700 text-xs font-mono font-semibold">
-                      {product.barcode || "—"}
-                    </span>
-                  </div>
-                  <div>
-                    <div className="text-xs text-gray-500 mb-1 font-semibold">Fiyat</div>
-                    <div className="flex items-center gap-1">
-                      <DollarSign className="w-4 h-4 text-emerald-600" />
-                      <span className="text-sm font-bold text-gray-900">
-                        {product.price ? `₺${product.price.toLocaleString('tr-TR')}` : "—"}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Action Button */}
+              {/* Action Button */}
+              <div className="p-4">
                 <button
                   onClick={() => onManage(product)}
-                  className="w-full mt-2 inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-sm font-bold hover:shadow-lg hover:scale-105 transition-all duration-300"
+                  className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-sm font-bold hover:shadow-lg hover:scale-105 transition-all duration-300"
                 >
                   <Settings className="w-4 h-4" />
                   Ürün Yönetimi

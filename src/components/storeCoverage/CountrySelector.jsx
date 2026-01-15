@@ -28,47 +28,68 @@ const CountrySelector = ({ regionId, selectedCountries, onChange }) => {
     fetchCountries();
   }, [regionId]);
 
-  const toggleCountry = (id) => {
-    if (selectedCountries.includes(id)) {
-      onChange(selectedCountries.filter((c) => c !== id));
-    } else {
-      onChange([...selectedCountries, id]);
-    }
+  const handleSelectChange = (e) => {
+    const selectedValues = Array.from(e.target.selectedOptions, option => Number(option.value));
+    onChange(selectedValues);
   };
 
   return (
     <div className="space-y-2">
       <label className="text-sm font-semibold text-gray-800">
-        Ülkeleri Seç <span className="text-red-500">*</span>
+        Ülke Seç <span className="text-red-500">*</span>
       </label>
 
-      {loading ? (
-        <div className="flex items-center gap-2 text-xs text-gray-500 animate-pulse">
+      <div className="relative">
+        <select
+          multiple
+          value={selectedCountries.map(String)}
+          onChange={handleSelectChange}
+          disabled={loading || !regionId || countries.length === 0}
+          size={Math.min(countries.length, 8)}
+          className={`w-full appearance-none bg-white border rounded-lg px-4 py-2 text-sm transition focus:outline-none focus:ring-2 ${
+            loading || !regionId || countries.length === 0
+              ? "border-gray-300 text-gray-400 bg-gray-50 cursor-not-allowed"
+              : "border-gray-300 text-gray-700 focus:ring-blue-500"
+          }`}
+        >
+          {loading ? (
+            <option disabled>Ülkeler yükleniyor...</option>
+          ) : countries.length === 0 ? (
+            <option disabled>Bu bölgeye ait ülke bulunamadı.</option>
+          ) : (
+            countries.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.name}
+              </option>
+            ))
+          )}
+        </select>
+
+        {/* Custom arrow icon */}
+        <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
+          <svg
+            className="w-4 h-4 text-gray-500"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            viewBox="0 0 24 24"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+          </svg>
+        </div>
+      </div>
+
+      {loading && (
+        <div className="flex items-center gap-2 text-xs text-gray-500 mt-1 animate-pulse">
           <Loader2 className="w-4 h-4 animate-spin" />
           Ülkeler yükleniyor...
         </div>
-      ) : countries.length === 0 ? (
-        <p className="text-sm text-gray-500 italic">Bu bölgeye ait ülke bulunamadı.</p>
-      ) : (
-        <div className="flex flex-wrap gap-2">
-          {countries.map((c) => {
-            const isSelected = selectedCountries.includes(c.id);
-            return (
-              <button
-                key={c.id}
-                type="button"
-                onClick={() => toggleCountry(c.id)}
-                className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all border shadow-sm ${
-                  isSelected
-                    ? "bg-blue-600 text-white border-blue-600 hover:bg-blue-700"
-                    : "bg-white text-gray-800 border-gray-300 hover:bg-gray-100"
-                }`}
-              >
-                {c.name}
-              </button>
-            );
-          })}
-        </div>
+      )}
+
+      {selectedCountries.length > 0 && (
+        <p className="text-xs text-gray-600 mt-1">
+          {selectedCountries.length} ülke seçildi
+        </p>
       )}
     </div>
   );
