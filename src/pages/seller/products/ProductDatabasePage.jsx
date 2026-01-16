@@ -1,9 +1,8 @@
 import React, { useEffect, useState, useMemo } from "react";
 import {
-  fetchProductDatabase,
   addProductToStore,
-  fetchMyStoreProducts,
 } from "@/api/sellerStoreService";
+import { useProductCache } from "@/contexts/ProductCacheContext";
 import ProductDatabaseTable from "@/components/storeProducts/ProductDatabaseTable";
 import ProductRequestForm from "@/components/storeProducts/ProductRequestForm";
 import Pagination from "@/components/ui/Pagination";
@@ -14,26 +13,30 @@ import {
   Sparkles, 
   TrendingUp,
   CheckCircle,
-  ListFilter
+  ListFilter,
+  RefreshCw
 } from "lucide-react";
 
 const ITEMS_PER_PAGE = 10;
 
 const ProductDatabasePage = () => {
+  const { getProductDatabase, getMyStoreProducts } = useProductCache();
   const [products, setProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const [addedProductNames, setAddedProductNames] = useState([]);
   const [addingId, setAddingId] = useState(null);
   const [showForm, setShowForm] = useState(false);
 
-  const loadProducts = async () => {
-    setLoading(true);
+  const loadProducts = async (forceRefresh = false) => {
+    const isLoadingState = forceRefresh ? setRefreshing : setLoading;
+    isLoadingState(true);
     try {
       const [allProducts, myStoreProducts] = await Promise.all([
-        fetchProductDatabase(),
-        fetchMyStoreProducts(),
+        getProductDatabase(forceRefresh),
+        getMyStoreProducts(forceRefresh),
       ]);
 
       setProducts(allProducts || []);
@@ -45,8 +48,12 @@ const ProductDatabasePage = () => {
     } catch (err) {
       console.error("Ürünler alınamadı:", err.response?.data || err.message);
     } finally {
-      setLoading(false);
+      isLoadingState(false);
     }
+  };
+
+  const handleRefresh = async () => {
+    await loadProducts(true);
   };
 
   const handleAddProduct = async (productId, productName) => {
@@ -77,6 +84,8 @@ const ProductDatabasePage = () => {
       prod.name?.toLowerCase().includes(term) ||
       prod.brand?.toLowerCase().includes(term) ||
       prod.categoryName?.toLowerCase().includes(term) ||
+      prod.ean?.toLowerCase().includes(term) ||
+      prod.sku?.toLowerCase().includes(term) ||
       prod.barcode?.toLowerCase().includes(term)
     );
   });
@@ -107,14 +116,28 @@ const ProductDatabasePage = () => {
           <div className="absolute bottom-10 left-10 w-40 h-40 bg-emerald-400/20 rounded-full blur-3xl"></div>
           
           <div className="relative z-10">
-            <div className="flex items-center justify-center gap-3 mb-4">
-              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center shadow-xl animate-pulse">
-                <Database className="w-8 h-8 text-white" />
+            <div className="flex items-center justify-between mb-4 flex-wrap gap-4">
+              <div className="flex items-center justify-center gap-3 mx-auto sm:mx-0">
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center shadow-xl animate-pulse">
+                  <Database className="w-8 h-8 text-white" />
+                </div>
+                <h1 className="text-5xl font-extrabold text-white tracking-tight">
+                  Ürün Veritabanı
+                </h1>
+                <Sparkles className="w-8 h-8 text-yellow-300 animate-pulse" />
               </div>
-              <h1 className="text-5xl font-extrabold text-white tracking-tight">
-                Ürün Veritabanı
-              </h1>
-              <Sparkles className="w-8 h-8 text-yellow-300 animate-pulse" />
+              <button
+                onClick={handleRefresh}
+                disabled={loading || refreshing}
+                className="bg-white/20 hover:bg-white/30 backdrop-blur-md border border-white/30 rounded-2xl px-6 py-3 text-white font-medium transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-lg hover:shadow-xl mx-auto sm:mx-0"
+                title="Ürünleri yenile"
+              >
+                <RefreshCw 
+                  size={20} 
+                  className={refreshing ? "animate-spin" : ""} 
+                />
+                <span className="hidden sm:inline">Yenile</span>
+              </button>
             </div>
             <p className="text-emerald-100 text-lg font-medium">
               Binlerce ürün arasından seçim yapın ve mağazanıza ekleyin
@@ -207,6 +230,7 @@ const ProductDatabasePage = () => {
             <div className="bg-white rounded-3xl shadow-2xl overflow-hidden border-2 border-gray-200">
               <ProductDatabaseTable
                 products={visibleProducts}
+                startIndex={startIdx}
                 onAdd={(id) => {
                   const prod = products.find((p) => String(p.id) === String(id));
                   handleAddProduct(id, prod?.name);
