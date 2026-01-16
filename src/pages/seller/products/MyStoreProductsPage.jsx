@@ -4,9 +4,9 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  fetchMyStoreProducts,
   getStoreCoverage,
 } from "@/api/sellerStoreService";
+import { useProductCache } from "@/contexts/ProductCacheContext";
 import MyStoreProductTable from "@/components/storeProducts/MyStoreProductTable";
 import ProductManagementPanel from "@/components/storeProducts/ProductManagementPanel";
 import Pagination from "@/components/ui/Pagination";
@@ -17,32 +17,41 @@ import {
   TrendingUp, 
   ShoppingBag,
   Sparkles,
-  AlertCircle
+  AlertCircle,
+  RefreshCw
 } from "lucide-react";
 
 const ITEMS_PER_PAGE = 10;
 
 const MyStoreProductsPage = () => {
   const navigate = useNavigate();
+  const { getMyStoreProducts } = useProductCache();
   const [products, setProducts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [feedback, setFeedback] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const [hasCoverage, setHasCoverage] = useState(true);
 
   // Panel state
   const [selectedProduct, setSelectedProduct] = useState(null);
 
-  const loadProducts = async () => {
-    setLoading(true);
+  const loadProducts = async (forceRefresh = false) => {
+    const isLoadingState = forceRefresh ? setRefreshing : setLoading;
+    isLoadingState(true);
     try {
-      const data = await fetchMyStoreProducts();
+      const data = await getMyStoreProducts(forceRefresh);
       setProducts(data || []);
     } catch (error) {
       console.error("Ürünler alınamadı:", error);
     } finally {
-      setLoading(false);
+      isLoadingState(false);
     }
+  };
+
+  const handleRefresh = async () => {
+    await loadProducts(true);
+    showFeedback("Ürünler yenilendi", "success");
   };
 
   const checkCoverage = async () => {
@@ -93,17 +102,31 @@ const MyStoreProductsPage = () => {
               </div>
             </div>
             
-            {!loading && (
-              <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl px-6 py-3">
-                <div className="flex items-center gap-3">
-                  <Package size={24} />
-                  <div>
-                    <div className="text-xs text-emerald-100">Toplam Ürün</div>
-                    <div className="text-2xl font-bold">{products.length}</div>
+            <div className="flex items-center gap-3">
+              {!loading && (
+                <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl px-6 py-3">
+                  <div className="flex items-center gap-3">
+                    <Package size={24} />
+                    <div>
+                      <div className="text-xs text-emerald-100">Toplam Ürün</div>
+                      <div className="text-2xl font-bold">{products.length}</div>
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
+              )}
+              <button
+                onClick={handleRefresh}
+                disabled={loading || refreshing}
+                className="bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 rounded-2xl px-6 py-3 text-white font-medium transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-lg hover:shadow-xl"
+                title="Ürünleri yenile"
+              >
+                <RefreshCw 
+                  size={20} 
+                  className={refreshing ? "animate-spin" : ""} 
+                />
+                <span className="hidden sm:inline">Yenile</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -231,7 +254,7 @@ const MyStoreProductsPage = () => {
           product={selectedProduct}
           onClose={() => setSelectedProduct(null)}
           onFeedback={showFeedback}
-          onRefresh={loadProducts}
+          onRefresh={() => loadProducts(true)}
           hasCoverage={hasCoverage}
         />
       )}

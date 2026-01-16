@@ -1,6 +1,7 @@
 // src/App.jsx
 import { Routes, Route, Navigate } from "react-router-dom";
 import { ToastProvider } from "@/contexts/ToastContext";
+import { ProductCacheProvider } from "@/contexts/ProductCacheContext";
 
 // Public seller pages
 import SellerLandingPage from "@/pages/seller/SellerLandingPage";
@@ -60,7 +61,8 @@ import ScrollToTop from "@/components/ScrollToTop";
 function App() {
   return (
     <ToastProvider>
-      <ScrollToTop />
+      <ProductCacheProvider>
+        <ScrollToTop />
       <Routes>
       {/* ── Public seller routes ───────────────────────────── */}
       <Route path="/seller/landing" element={<SellerLandingPage />} />
@@ -146,6 +148,7 @@ function App() {
       {/* ── 404 redirect ───────────────────────────── */}
       <Route path="*" element={<Navigate to="/seller/landing" replace />} />
     </Routes>
+      </ProductCacheProvider>
     </ToastProvider>
   );
 }
