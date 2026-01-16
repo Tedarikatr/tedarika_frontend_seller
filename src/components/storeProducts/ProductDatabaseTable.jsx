@@ -1,7 +1,13 @@
 import React from "react";
-import { CheckCircle, Plus, Tag, Package, Hash } from "lucide-react";
+import { CheckCircle, Plus, Tag, Package } from "lucide-react";
 
-const ProductDatabaseTable = ({ products = [], onAdd, addingId, addedIds = [] }) => {
+const ProductDatabaseTable = ({
+  products = [],
+  onAdd,
+  addingId,
+  addedIds = [],
+  startIndex = 0,
+}) => {
   return (
     <div className="w-full overflow-x-auto">
       <table className="min-w-full">
@@ -9,9 +15,6 @@ const ProductDatabaseTable = ({ products = [], onAdd, addingId, addedIds = [] })
           <tr>
             <th className="px-6 py-4 text-left text-xs font-bold text-emerald-800 uppercase tracking-wider">
               #
-            </th>
-            <th className="px-6 py-4 text-left text-xs font-bold text-emerald-800 uppercase tracking-wider">
-              ID
             </th>
             <th className="px-6 py-4 text-left text-xs font-bold text-emerald-800 uppercase tracking-wider">
               Ürün Adı
@@ -23,7 +26,10 @@ const ProductDatabaseTable = ({ products = [], onAdd, addingId, addedIds = [] })
               Marka
             </th>
             <th className="px-6 py-4 text-left text-xs font-bold text-emerald-800 uppercase tracking-wider">
-              Barkod
+              EAN
+            </th>
+            <th className="px-6 py-4 text-left text-xs font-bold text-emerald-800 uppercase tracking-wider">
+              SKU
             </th>
             <th className="px-6 py-4 text-center text-xs font-bold text-emerald-800 uppercase tracking-wider">
               İşlem
@@ -42,13 +48,7 @@ const ProductDatabaseTable = ({ products = [], onAdd, addingId, addedIds = [] })
                 className="hover:bg-gradient-to-r hover:from-emerald-50 hover:to-teal-50 transition-all duration-200"
               >
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-medium">
-                  {index + 1}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="flex items-center gap-2">
-                    <Hash className="w-4 h-4 text-gray-400" />
-                    <span className="text-sm font-semibold text-gray-700">{prod.id}</span>
-                  </div>
+                  {startIndex + index + 1}
                 </td>
                 <td className="px-6 py-4">
                   <div className="flex items-center gap-2">
@@ -72,7 +72,12 @@ const ProductDatabaseTable = ({ products = [], onAdd, addingId, addedIds = [] })
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <span className="px-3 py-1 rounded-lg bg-gray-100 text-gray-700 text-xs font-mono font-semibold">
-                    {prod.barcode}
+                    {prod.ean ?? prod.barcode ?? "-"}
+                  </span>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <span className="px-3 py-1 rounded-lg bg-gray-100 text-gray-700 text-xs font-mono font-semibold">
+                    {prod.sku ?? "-"}
                   </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-center">

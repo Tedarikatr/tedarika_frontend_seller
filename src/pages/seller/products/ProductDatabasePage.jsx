@@ -84,6 +84,8 @@ const ProductDatabasePage = () => {
       prod.name?.toLowerCase().includes(term) ||
       prod.brand?.toLowerCase().includes(term) ||
       prod.categoryName?.toLowerCase().includes(term) ||
+      prod.ean?.toLowerCase().includes(term) ||
+      prod.sku?.toLowerCase().includes(term) ||
       prod.barcode?.toLowerCase().includes(term)
     );
   });
@@ -228,6 +230,7 @@ const ProductDatabasePage = () => {
             <div className="bg-white rounded-3xl shadow-2xl overflow-hidden border-2 border-gray-200">
               <ProductDatabaseTable
                 products={visibleProducts}
+                startIndex={startIdx}
                 onAdd={(id) => {
                   const prod = products.find((p) => String(p.id) === String(id));
                   handleAddProduct(id, prod?.name);
