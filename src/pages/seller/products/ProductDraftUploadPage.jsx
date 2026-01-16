@@ -78,9 +78,9 @@ const ProductDraftUploadPage = () => {
     setLoading(true);
     try {
       // Validate JSON
-      JSON.parse(jsonText);
-      
-      await addProductJson(jsonText);
+      const parsedJson = JSON.parse(jsonText);
+
+      await addProductJson(parsedJson);
       toast.success("JSON başarıyla gönderildi!");
       navigate("/seller/products/drafts");
     } catch (err) {
@@ -228,7 +228,7 @@ const ProductDraftUploadPage = () => {
                 <FileSpreadsheet className="w-20 h-20 mx-auto text-green-600 mb-4" />
                 <h2 className="text-2xl font-bold text-gray-900 mb-2">Excel Dosyası Yükle</h2>
                 <p className="text-gray-600">
-                  Excel formatında toplu ürün bilgilerinizi yükleyin
+                  Excel/CSV formatında toplu ürün bilgilerinizi yükleyin
                 </p>
               </div>
 
@@ -239,7 +239,7 @@ const ProductDraftUploadPage = () => {
                   <div className="flex-1">
                     <h3 className="font-semibold text-gray-900 mb-1">Örnek Şablon</h3>
                     <p className="text-sm text-gray-600 mb-3">
-                      Ürün bilgilerinizi doğru formatta yüklemek için örnek Excel şablonunu indirin veya önizleyin
+                      Ürün bilgilerinizi doğru formatta yüklemek için örnek şablonu indirin veya önizleyin
                     </p>
                     <div className="flex flex-wrap gap-2">
                       <button
@@ -250,16 +250,24 @@ const ProductDraftUploadPage = () => {
                         Önizle
                       </button>
                       <a
-                        href="/templates/Tedarika_Urun_Sablon.xlsx"
-                        download="Tedarika_Urun_Sablon.xlsx"
+                        href="/templates/Tedarika_Urun_Sablon.csv"
+                        download="Tedarika_Urun_Sablon.csv"
                         className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-semibold"
                       >
                         <Download className="w-4 h-4" />
-                        İndir
+                        CSV İndir
                       </a>
                     </div>
                   </div>
                 </div>
+              </div>
+              <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4">
+                <p className="text-sm text-emerald-900 font-semibold mb-2">
+                  Güncel başlıklar (sıralama birebir aynı olmalı):
+                </p>
+                <p className="text-xs text-emerald-800 font-mono break-words">
+                  UrunAdi*	Aciklama	SKU*	EAN*	MarkaId	MarkaAdi	KategoriId	AltKategoriId	GTIP	Gorsel1Url	Gorsel2Url	Gorsel3Url	Gorsel4Url	BirimTipi*	StokAdedi*	MinSiparisAdedi	MaxSiparisAdedi	BirimFiyat*	ParaBirimi*
+                </p>
               </div>
 
               <div>
@@ -537,16 +545,14 @@ const ProductDraftUploadPage = () => {
                 <div className="bg-white rounded-lg p-8 text-center">
                   <FileSpreadsheet className="w-16 h-16 mx-auto text-green-600 mb-4" />
                   <h3 className="text-xl font-bold text-gray-900 mb-2">Tedarika Ürün Şablonu</h3>
-                  <p className="text-gray-600 mb-4">Excel şablonu aşağıdaki alanları içerir:</p>
+                  <p className="text-gray-600 mb-4">Şablon aşağıdaki alanları içerir:</p>
                   
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-3 text-left mb-6 max-w-4xl mx-auto">
                     {[
-                      "İşlem Türü", "Ürün Kodu", "SKU", "Barkod", "Ürün Adı", "Açıklama",
-                      "Kategori Yolu", "Marka", "Para Birimi", "Liste Fiyatı", "Satış Fiyatı", "KDV Oranı",
-                      "Stok Adedi", "Stok Kodu", "Kargo Desi", "Ağırlık (Kg)", "En (Cm)", "Boy (Cm)",
-                      "Yükseklik (Cm)", "Ana Görsel URL", "Ek Görsel URL (1-5)", "Varyant Özellikleri",
-                      "Varyant Sıralama", "Garanti Süresi (Ay)", "Menşei", "Teslimat Süresi (Gün)",
-                      "Minimum Sipariş Adedi", "Durum"
+                      "UrunAdi*", "Aciklama", "SKU*", "EAN*", "MarkaId", "MarkaAdi",
+                      "KategoriId", "AltKategoriId", "GTIP", "Gorsel1Url", "Gorsel2Url", "Gorsel3Url",
+                      "Gorsel4Url", "BirimTipi*", "StokAdedi*", "MinSiparisAdedi", "MaxSiparisAdedi",
+                      "BirimFiyat*", "ParaBirimi*"
                     ].map((field, idx) => (
                       <div key={idx} className="bg-gray-50 px-3 py-2 rounded text-sm text-gray-700 border border-gray-200">
                         ✓ {field}
@@ -572,12 +578,12 @@ const ProductDraftUploadPage = () => {
                 Kapat
               </button>
               <a
-                href="/templates/Tedarika_Urun_Sablon.xlsx"
-                download="Tedarika_Urun_Sablon.xlsx"
+                href="/templates/Tedarika_Urun_Sablon.csv"
+                download="Tedarika_Urun_Sablon.csv"
                 className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold"
               >
                 <Download className="w-4 h-4" />
-                Şablonu İndir
+                CSV Şablonu İndir
               </a>
             </div>
           </div>
