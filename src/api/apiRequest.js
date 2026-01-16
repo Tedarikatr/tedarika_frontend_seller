@@ -14,13 +14,14 @@ export async function apiRequest(
   endpoint,
   method = "GET",
   data = null,
-  useAuth = false
+  useAuth = false,
+  options = {}
 ) {
   if (!BASE_URL) {
     throw new Error("VITE_API_URL tanımlı değil. .env / Vercel env'i kontrol edin.");
   }
 
-  const headers = { Accept: "*/*" };
+  const headers = { Accept: "*/*", ...(options.headers || {}) };
 
   if (useAuth) {
     const token = localStorage.getItem("sellerToken");
@@ -33,13 +34,32 @@ export async function apiRequest(
   if (data) {
     if (data instanceof FormData) {
       config.body = data; // FormData ise Content-Type ekleme
+    } else if (typeof data === "string" && options.rawBody) {
+      if (!headers["Content-Type"]) {
+        headers["Content-Type"] = "text/plain";
+      }
+      config.body = data;
     } else {
       headers["Content-Type"] = "application/json";
       config.body = JSON.stringify(data);
     }
   }
 
-  const response = await fetch(join(BASE_URL, endpoint), config);
+  let timeoutId;
+  if (options.timeoutMs) {
+    const controller = new AbortController();
+    config.signal = controller.signal;
+    timeoutId = setTimeout(() => controller.abort(), options.timeoutMs);
+  } else if (options.signal) {
+    config.signal = options.signal;
+  }
+
+  let response;
+  try {
+    response = await fetch(join(BASE_URL, endpoint), config);
+  } finally {
+    if (timeoutId) clearTimeout(timeoutId);
+  }
 
   if (!response.ok) {
     const errorText = await response.text().catch(() => "");

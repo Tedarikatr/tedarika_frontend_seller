@@ -28,12 +28,10 @@ export const fetchDraftProductDetail = async (productDraftId) => {
 
 /**
  * JSON formatında ürün ekle
- * @param {string} jsonString - JSON formatında ürün bilgisi
+ * @param {Object|Array} jsonData - JSON formatında ürün bilgisi
  */
-export const addProductJson = async (jsonString) => {
-  return await apiRequest("/SellerProductDraft/add-product-json", "POST", jsonString, true, {
-    "Content-Type": "application/json"
-  });
+export const addProductJson = async (jsonData) => {
+  return await apiRequest("/SellerProductDraft/add-product-json", "POST", jsonData, true);
 };
 
 /**
@@ -41,7 +39,9 @@ export const addProductJson = async (jsonString) => {
  * @param {FormData} formData - ExcelFile, UploadName (opsiyonel)
  */
 export const addProductExcel = async (formData) => {
-  return await apiRequest("/SellerProductDraft/add-product-excel", "POST", formData, true);
+  return await apiRequest("/SellerProductDraft/add-product-excel", "POST", formData, true, {
+    timeoutMs: 10 * 60 * 1000,
+  });
 };
 
 /**
@@ -49,7 +49,9 @@ export const addProductExcel = async (formData) => {
  * @param {FormData} formData - XmlFile, UploadName
  */
 export const addProductXml = async (formData) => {
-  return await apiRequest("/SellerProductDraft/add-product-xml", "POST", formData, true);
+  return await apiRequest("/SellerProductDraft/add-product-xml", "POST", formData, true, {
+    timeoutMs: 10 * 60 * 1000,
+  });
 };
 
 /**
@@ -57,5 +59,7 @@ export const addProductXml = async (formData) => {
  * @param {Object} data - { xmlUrl, uploadName }
  */
 export const addProductXmlFromUrl = async (data) => {
-  return await apiRequest("/SellerProductDraft/add-product-xml-from-url", "POST", data, true);
+  return await apiRequest("/SellerProductDraft/add-product-xml-from-url", "POST", data, true, {
+    timeoutMs: 10 * 60 * 1000,
+  });
 };
