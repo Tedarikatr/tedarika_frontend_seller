@@ -90,7 +90,7 @@ const Sidebar = ({ isOpen, onClose }) => {
             Ürünlerim
           </SidebarLink>
           <SidebarLink to="/seller/products/database" icon={<ChevronRight size={14} />} collapsed={collapsed} onClick={onClose}>
-            Veritabanı
+            Ürün Kataloğu
           </SidebarLink>
           <SidebarLink to="/seller/products/drafts" icon={<FileText size={18} />} collapsed={collapsed} onClick={onClose}>
             Toplu Yükleme

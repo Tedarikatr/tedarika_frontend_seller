@@ -2,6 +2,7 @@
 // MyStoreProductsPage.jsx - Ultra Modern & Beautiful 🎨
 // =============================
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   fetchMyStoreProducts,
   getStoreCoverage,
@@ -22,6 +23,7 @@ import {
 const ITEMS_PER_PAGE = 10;
 
 const MyStoreProductsPage = () => {
+  const navigate = useNavigate();
   const [products, setProducts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [feedback, setFeedback] = useState(null);
@@ -195,7 +197,10 @@ const MyStoreProductsPage = () => {
               <p className="text-gray-500 text-sm mb-6">
                 Mağazanıza ürün ekleyerek satışa başlayabilirsiniz
               </p>
-              <button className="px-6 py-3 bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all">
+              <button 
+                onClick={() => navigate("/seller/products/database")}
+                className="px-6 py-3 bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all"
+              >
                 Ürün Ekle
               </button>
             </div>
