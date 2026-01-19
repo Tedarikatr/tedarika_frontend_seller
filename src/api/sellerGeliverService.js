@@ -4,6 +4,10 @@ export const createGeliverIntegrationRequest = async () => {
   return await apiRequest("/api/SellerGeliver/integration-request", "POST", null, true);
 };
 
+export const getGeliverIntegrationDetails = async () => {
+  return await apiRequest("/api/SellerGeliver/integration-details", "GET", null, true);
+};
+
 export const autoRegisterGeliver = async () => {
   return await apiRequest("/api/SellerGeliver/auto-register", "POST", null, true);
 };
