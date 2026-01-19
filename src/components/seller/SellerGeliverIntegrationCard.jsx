@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import {
   createGeliverIntegrationRequest,
+  autoRegisterGeliver,
   saveGeliverIntegrationDetails,
   uploadGeliverAgreement,
 } from "@/api/sellerGeliverService";
+import { CARRIER_COMPANY_ENUMS } from "@/constants/carrierCompanies";
 import {
   Link2,
   ShieldCheck,
@@ -13,6 +15,7 @@ import {
   Loader2,
   CheckCircle,
   XCircle,
+  Zap,
 } from "lucide-react";
 
 const STATUS_META = {
@@ -47,8 +50,10 @@ export default function SellerGeliverIntegrationCard() {
   const [status, setStatus] = useState(null);
   const [agreementInfo, setAgreementInfo] = useState(null);
   const [message, setMessage] = useState("");
+  const [messageType, setMessageType] = useState("success");
 
   const [requestLoading, setRequestLoading] = useState(false);
+  const [autoRegisterLoading, setAutoRegisterLoading] = useState(false);
   const [detailsLoading, setDetailsLoading] = useState(false);
   const [agreementLoading, setAgreementLoading] = useState(false);
 
@@ -72,14 +77,36 @@ export default function SellerGeliverIntegrationCard() {
   const handleRequest = async () => {
     setRequestLoading(true);
     setMessage("");
+    setMessageType("success");
     try {
       const data = await createGeliverIntegrationRequest();
       setStatus(data);
       setMessage("Entegrasyon talebi başarıyla oluşturuldu/güncellendi.");
     } catch (err) {
+      setMessageType("error");
       setMessage(`Talep oluşturulamadı: ${err?.message || "Bilinmeyen hata"}`);
     } finally {
       setRequestLoading(false);
+    }
+  };
+
+  const handleAutoRegister = async () => {
+    setAutoRegisterLoading(true);
+    setMessage("");
+    setMessageType("success");
+    try {
+      const data = await autoRegisterGeliver();
+      setStatus(data);
+      setMessage(
+        data?.isSkipped
+          ? "Geliver otomatik kayıt zaten tamamlanmış."
+          : "Geliver otomatik kayıt tamamlandı ve entegrasyon aktif edildi."
+      );
+    } catch (err) {
+      setMessageType("error");
+      setMessage(err?.message || "Otomatik kayıt başarısız. Manuel entegrasyona geçebilirsiniz.");
+    } finally {
+      setAutoRegisterLoading(false);
     }
   };
 
@@ -95,6 +122,7 @@ export default function SellerGeliverIntegrationCard() {
     e.preventDefault();
     setDetailsLoading(true);
     setMessage("");
+    setMessageType("success");
     try {
       const payload = {
         apiToken: detailsForm.apiToken.trim(),
@@ -106,6 +134,7 @@ export default function SellerGeliverIntegrationCard() {
       setStatus(data);
       setMessage(data?.isSkipped ? "Mevcut entegrasyon bilgileri zaten kayıtlı." : "Entegrasyon bilgileri kaydedildi.");
     } catch (err) {
+      setMessageType("error");
       setMessage(`Entegrasyon kaydı başarısız: ${err?.message || "Bilinmeyen hata"}`);
     } finally {
       setDetailsLoading(false);
@@ -124,12 +153,14 @@ export default function SellerGeliverIntegrationCard() {
   const handleUploadAgreement = async (e) => {
     e.preventDefault();
     if (!agreementForm.file || !agreementForm.carrierCompany) {
+      setMessageType("error");
       setMessage("Lütfen taşıyıcı şirket kodu ve anlaşma dosyasını seçin.");
       return;
     }
 
     setAgreementLoading(true);
     setMessage("");
+    setMessageType("success");
     try {
       const formData = new FormData();
       formData.append("carrierCompany", String(agreementForm.carrierCompany));
@@ -150,6 +181,7 @@ export default function SellerGeliverIntegrationCard() {
       setMessage("Anlaşma dosyası başarıyla yüklendi.");
       setAgreementForm((prev) => ({ ...prev, file: null }));
     } catch (err) {
+      setMessageType("error");
       setMessage(`Anlaşma yüklenemedi: ${err?.message || "Bilinmeyen hata"}`);
     } finally {
       setAgreementLoading(false);
@@ -171,8 +203,18 @@ export default function SellerGeliverIntegrationCard() {
       </div>
 
       {message && (
-        <div className="mb-6 flex items-center gap-2 rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-700">
-          <CheckCircle className="w-4 h-4 text-emerald-600" />
+        <div
+          className={`mb-6 flex items-center gap-2 rounded-xl border px-4 py-3 text-sm ${
+            messageType === "error"
+              ? "border-rose-200 bg-rose-50 text-rose-700"
+              : "border-emerald-200 bg-emerald-50 text-emerald-700"
+          }`}
+        >
+          {messageType === "error" ? (
+            <XCircle className="w-4 h-4" />
+          ) : (
+            <CheckCircle className="w-4 h-4" />
+          )}
           {message}
         </div>
       )}
@@ -184,15 +226,26 @@ export default function SellerGeliverIntegrationCard() {
             <ShieldCheck className="w-5 h-5 text-emerald-600" />
             <h3 className="text-lg font-semibold text-gray-900">Entegrasyon Durumu</h3>
           </div>
-          <button
-            type="button"
-            onClick={handleRequest}
-            disabled={requestLoading}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-emerald-200 bg-emerald-50 text-emerald-700 text-sm font-semibold hover:bg-emerald-100 transition disabled:opacity-50"
-          >
-            {requestLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
-            Talep Oluştur / Durumu Getir
-          </button>
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={handleAutoRegister}
+              disabled={autoRegisterLoading}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-sky-200 bg-sky-50 text-sky-700 text-sm font-semibold hover:bg-sky-100 transition disabled:opacity-50"
+            >
+              {autoRegisterLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4" />}
+              Otomatik Kayıt
+            </button>
+            <button
+              type="button"
+              onClick={handleRequest}
+              disabled={requestLoading}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-emerald-200 bg-emerald-50 text-emerald-700 text-sm font-semibold hover:bg-emerald-100 transition disabled:opacity-50"
+            >
+              {requestLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
+              Talep Oluştur / Durumu Getir
+            </button>
+          </div>
         </div>
 
         {status ? (
@@ -305,14 +358,13 @@ export default function SellerGeliverIntegrationCard() {
           <h3 className="text-lg font-semibold text-gray-900">Taşıyıcı Anlaşması Yükle</h3>
         </div>
         <form onSubmit={handleUploadAgreement} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Field
-            label="Taşıyıcı Şirket Kodu"
+          <SelectField
+            label="Taşıyıcı Şirket"
             name="carrierCompany"
             value={agreementForm.carrierCompany}
             onChange={handleAgreementChange}
-            placeholder="Örn: 0"
             required
-            type="number"
+            options={CARRIER_COMPANY_ENUMS}
           />
           <Field
             label="Geçerlilik Başlangıcı"
@@ -368,7 +420,7 @@ export default function SellerGeliverIntegrationCard() {
       <div className="mt-6 flex items-start gap-2 text-xs text-gray-500">
         <XCircle className="w-4 h-4 text-gray-400" />
         <span>
-          Not: Taşıyıcı şirket kodu backend enum değeridir. Eğer kodu bilmiyorsanız destek ekibinizden bilgi alınız.
+          Not: Otomatik kayıt çalışmazsa manuel entegrasyon bilgileri ile devam edebilirsiniz.
         </span>
       </div>
     </div>
@@ -390,6 +442,30 @@ function Field({ label, name, value, onChange, placeholder, required, type = "te
         type={type}
         className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none"
       />
+    </div>
+  );
+}
+
+function SelectField({ label, name, value, onChange, required, options }) {
+  return (
+    <div className="flex flex-col gap-1">
+      <label className="text-sm font-medium text-gray-700">
+        {label} {required && <span className="text-rose-600">*</span>}
+      </label>
+      <select
+        name={name}
+        value={value}
+        onChange={onChange}
+        required={required}
+        className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none"
+      >
+        <option value="">Seçiniz...</option>
+        {options.map((opt) => (
+          <option key={opt.value} value={opt.value}>
+            {opt.label} ({opt.value})
+          </option>
+        ))}
+      </select>
     </div>
   );
 }
