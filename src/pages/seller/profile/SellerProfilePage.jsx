@@ -12,6 +12,7 @@ import {
   Award,
   CheckCircle,
   Bell,
+  Truck,
 } from "lucide-react";
 
 import useSellerSetupStatus from "@/hooks/useSellerSetupStatus";
@@ -23,6 +24,7 @@ import CompanyInfoCard from "@/components/seller/CompanyInfoCard";
 import SellerFinanceInfoCard from "@/components/seller/SellerFinanceInfoCard";
 import BulletinPreferencesCard from "@/components/seller/BulletinPreferencesCard";
 import SubscriptionPlans from "@/components/seller/SubscriptionPlans"; // 👈 SubscriptionPage'den çıkarılıp component olarak kaydedilecek
+import SellerGeliverIntegrationCard from "@/components/seller/SellerGeliverIntegrationCard";
 
 const TABS = [
   { key: "seller", label: "Satıcı", icon: <UserCircle className="w-5 h-5" /> },
@@ -30,6 +32,7 @@ const TABS = [
   { key: "store", label: "Mağaza", icon: <Store className="w-5 h-5" /> },
   { key: "subscription", label: "Abonelik", icon: <ShieldCheck className="w-5 h-5" /> },
   { key: "finance", label: "Ödeme", icon: <CreditCard className="w-5 h-5" /> },
+  { key: "cargo", label: "Kargo Entegrasyonu", icon: <Truck className="w-5 h-5" /> },
   { key: "notifications", label: "Bildirimler", icon: <Bell className="w-5 h-5" /> },
 ];
 
@@ -55,6 +58,8 @@ const SellerProfilePage = () => {
         return <SubscriptionPlans />; // 👈 burada planlar gösteriliyor
       case "finance":
         return <SellerFinanceInfoCard />;
+      case "cargo":
+        return <SellerGeliverIntegrationCard />;
       case "notifications":
         return <BulletinPreferencesCard />;
       default:

@@ -3,6 +3,7 @@
 // =============================
 import React, { useEffect, useState } from "react";
 import { fetchStoreOrders } from "@/api/sellerOrderService";
+import { getGeliverOrderTracking } from "@/api/sellerGeliverService";
 import { Link, useNavigate } from "react-router-dom";
 import { statusLabels } from "@/constants/orderStatus";
 import { 
@@ -15,7 +16,9 @@ import {
   Eye,
   Calendar,
   DollarSign,
-  Sparkles
+  Sparkles,
+  Truck,
+  Loader2
 } from "lucide-react";
 
 const StatusBadge = ({ status }) => {
@@ -71,6 +74,8 @@ const StatusBadge = ({ status }) => {
 const OrderListPage = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [trackingMap, setTrackingMap] = useState({});
+  const [trackingLoading, setTrackingLoading] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -84,10 +89,23 @@ const OrderListPage = () => {
       try {
         const res = await fetchStoreOrders();
         setOrders(res);
+        setTrackingLoading(true);
+        const entries = await Promise.all(
+          (res || []).map(async (order) => {
+            try {
+              const tracking = await getGeliverOrderTracking(order.id);
+              return [order.id, tracking];
+            } catch {
+              return [order.id, null];
+            }
+          })
+        );
+        setTrackingMap(Object.fromEntries(entries));
       } catch (err) {
         console.error("Siparişler alınamadı:", err);
       } finally {
         setLoading(false);
+        setTrackingLoading(false);
       }
     };
 
@@ -240,6 +258,9 @@ const OrderListPage = () => {
                     <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
                       Durum
                     </th>
+                    <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                      Kargo Etiketi
+                    </th>
                     <th className="px-6 py-4 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">
                       İşlem
                     </th>
@@ -282,6 +303,12 @@ const OrderListPage = () => {
                       <td className="px-6 py-4">
                         <StatusBadge status={order.status} />
                       </td>
+                      <td className="px-6 py-4">
+                        <TrackingBadge
+                          loading={trackingLoading}
+                          tracking={trackingMap[order.id]}
+                        />
+                      </td>
                       <td className="px-6 py-4 text-center">
                         <Link
                           to={`/seller/orders/${order.id}`}
@@ -300,6 +327,41 @@ const OrderListPage = () => {
         </div>
       </div>
     </div>
+  );
+};
+
+const TrackingBadge = ({ loading, tracking }) => {
+  if (loading && !tracking) {
+    return (
+      <span className="inline-flex items-center gap-2 text-xs text-gray-500">
+        <Loader2 className="w-3 h-3 animate-spin" />
+        Yükleniyor
+      </span>
+    );
+  }
+
+  if (!tracking) {
+    return <span className="text-xs text-gray-400">-</span>;
+  }
+
+  const statusText = tracking.trackingStatus || (tracking.fileUrl || tracking.responsiveLabelUrl ? "Etiket Var" : "Kayıt Var");
+  const normalized = String(statusText || "").toLowerCase();
+  let badgeClass = "bg-gray-50 text-gray-700 border-gray-200";
+  let icon = <Truck size={12} />;
+
+  if (normalized.includes("deliver")) {
+    badgeClass = "bg-emerald-50 text-emerald-700 border-emerald-200";
+  } else if (normalized.includes("transit") || normalized.includes("in")) {
+    badgeClass = "bg-blue-50 text-blue-700 border-blue-200";
+  } else if (normalized.includes("return") || normalized.includes("cancel")) {
+    badgeClass = "bg-rose-50 text-rose-700 border-rose-200";
+  }
+
+  return (
+    <span className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold border ${badgeClass}`}>
+      {icon}
+      {statusText}
+    </span>
   );
 };
 
