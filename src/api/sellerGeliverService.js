@@ -1,40 +1,40 @@
 import { apiRequest } from "./apiRequest";
 
 export const createGeliverIntegrationRequest = async () => {
-  return await apiRequest("/api/SellerGeliver/integration-request", "POST", null, true);
+  return await apiRequest("/SellerGeliver/integration-request", "POST", null, true);
 };
 
 export const getGeliverIntegrationDetails = async () => {
-  return await apiRequest("/api/SellerGeliver/integration-details", "GET", null, true);
+  return await apiRequest("/SellerGeliver/integration-details", "GET", null, true);
 };
 
 export const autoRegisterGeliver = async () => {
-  return await apiRequest("/api/SellerGeliver/auto-register", "POST", null, true);
+  return await apiRequest("/SellerGeliver/auto-register", "POST", null, true);
 };
 
 export const saveGeliverIntegrationDetails = async (payload) => {
-  return await apiRequest("/api/SellerGeliver/integration-details", "POST", payload, true);
+  return await apiRequest("/SellerGeliver/integration-details", "POST", payload, true);
 };
 
 export const uploadGeliverAgreement = async (formData) => {
-  return await apiRequest("/api/SellerGeliver/agreements", "POST", formData, true);
+  return await apiRequest("/SellerGeliver/agreements", "POST", formData, true);
 };
 
 export const getGeliverOrderTracking = async (orderId) => {
-  return await apiRequest(`/api/SellerGeliver/orders/${orderId}/tracking`, "GET", null, true);
+  return await apiRequest(`/SellerGeliver/orders/${orderId}/tracking`, "GET", null, true);
 };
 
 export const createGeliverOrderLabel = async (orderId, payload) => {
-  return await apiRequest(`/api/SellerGeliver/orders/${orderId}/geliver-label`, "POST", payload, true);
+  return await apiRequest(`/SellerGeliver/orders/${orderId}/geliver-label`, "POST", payload, true);
 };
 
 export const uploadGeliverOrderLabel = async (orderId, formData) => {
-  return await apiRequest(`/api/SellerGeliver/orders/${orderId}/label`, "POST", formData, true);
+  return await apiRequest(`/SellerGeliver/orders/${orderId}/label`, "POST", formData, true);
 };
 
 export const downloadGeliverOrderLabel = async (orderId) => {
   const response = await fetch(
-    `${import.meta.env.VITE_API_URL}/api/SellerGeliver/orders/${orderId}/label`,
+    `${import.meta.env.VITE_API_URL}/SellerGeliver/orders/${orderId}/label`,
     {
       method: "GET",
       headers: {
@@ -51,5 +51,5 @@ export const downloadGeliverOrderLabel = async (orderId) => {
 };
 
 export const updateGeliverTracking = async (payload) => {
-  return await apiRequest("/api/SellerGeliver/tracking", "POST", payload, true);
+  return await apiRequest("/SellerGeliver/tracking", "POST", payload, true);
 };
