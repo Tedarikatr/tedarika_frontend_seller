@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   createGeliverIntegrationRequest,
+  getGeliverIntegrationDetails,
   autoRegisterGeliver,
   saveGeliverIntegrationDetails,
   uploadGeliverAgreement,
@@ -48,9 +49,11 @@ const toIso = (value) => {
 
 export default function SellerGeliverIntegrationCard() {
   const [status, setStatus] = useState(null);
+  const [agreements, setAgreements] = useState([]);
   const [agreementInfo, setAgreementInfo] = useState(null);
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState("success");
+  const [initialLoading, setInitialLoading] = useState(true);
 
   const [requestLoading, setRequestLoading] = useState(false);
   const [autoRegisterLoading, setAutoRegisterLoading] = useState(false);
@@ -73,6 +76,55 @@ export default function SellerGeliverIntegrationCard() {
   });
 
   const statusMeta = status ? STATUS_META[status.status] || null : null;
+  const carrierLabelMap = useMemo(
+    () =>
+      CARRIER_COMPANY_ENUMS.reduce((acc, item) => {
+        acc[item.value] = item.label;
+        return acc;
+      }, {}),
+    []
+  );
+
+  const hasIntegrationInfo = Boolean(
+    status &&
+      (status.status === 1 ||
+        status.integrationCompletedAt ||
+        status.senderAddressId ||
+        status.providerServiceCode ||
+        status.tokenMasked)
+  );
+
+  const loadIntegrationDetails = async () => {
+    setInitialLoading(true);
+    try {
+      const data = await getGeliverIntegrationDetails();
+      const integration = data?.integration || data;
+      if (integration) {
+        setStatus(integration);
+        setDetailsForm((prev) => ({
+          ...prev,
+          senderAddressId: integration.senderAddressId || prev.senderAddressId,
+          providerServiceCode: integration.providerServiceCode || prev.providerServiceCode,
+          autoLabelEnabled:
+            typeof integration.autoLabelEnabled === "boolean"
+              ? integration.autoLabelEnabled
+              : prev.autoLabelEnabled,
+        }));
+      }
+      if (Array.isArray(data?.agreements)) {
+        setAgreements(data.agreements);
+      }
+    } catch (err) {
+      setMessageType("error");
+      setMessage(err?.message || "Entegrasyon bilgileri alınamadı.");
+    } finally {
+      setInitialLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadIntegrationDetails();
+  }, []);
 
   const handleRequest = async () => {
     setRequestLoading(true);
@@ -97,6 +149,7 @@ export default function SellerGeliverIntegrationCard() {
     try {
       const data = await autoRegisterGeliver();
       setStatus(data);
+      await loadIntegrationDetails();
       setMessage(
         data?.isSkipped
           ? "Geliver otomatik kayıt zaten tamamlanmış."
@@ -132,6 +185,7 @@ export default function SellerGeliverIntegrationCard() {
       };
       const data = await saveGeliverIntegrationDetails(payload);
       setStatus(data);
+      await loadIntegrationDetails();
       setMessage(data?.isSkipped ? "Mevcut entegrasyon bilgileri zaten kayıtlı." : "Entegrasyon bilgileri kaydedildi.");
     } catch (err) {
       setMessageType("error");
@@ -178,6 +232,9 @@ export default function SellerGeliverIntegrationCard() {
       formData.append("file", agreementForm.file);
       const data = await uploadGeliverAgreement(formData);
       setAgreementInfo(data);
+      if (data) {
+        setAgreements((prev) => [data, ...prev]);
+      }
       setMessage("Anlaşma dosyası başarıyla yüklendi.");
       setAgreementForm((prev) => ({ ...prev, file: null }));
     } catch (err) {
@@ -201,6 +258,13 @@ export default function SellerGeliverIntegrationCard() {
           </p>
         </div>
       </div>
+
+      {initialLoading && (
+        <div className="mb-6 flex items-center gap-2 rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-600">
+          <Loader2 className="w-4 h-4 animate-spin" />
+          Entegrasyon bilgileri yükleniyor...
+        </div>
+      )}
 
       {message && (
         <div
@@ -230,7 +294,7 @@ export default function SellerGeliverIntegrationCard() {
             <button
               type="button"
               onClick={handleAutoRegister}
-              disabled={autoRegisterLoading}
+              disabled={autoRegisterLoading || hasIntegrationInfo}
               className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-sky-200 bg-sky-50 text-sky-700 text-sm font-semibold hover:bg-sky-100 transition disabled:opacity-50"
             >
               {autoRegisterLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4" />}
@@ -239,7 +303,7 @@ export default function SellerGeliverIntegrationCard() {
             <button
               type="button"
               onClick={handleRequest}
-              disabled={requestLoading}
+              disabled={requestLoading || hasIntegrationInfo}
               className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-emerald-200 bg-emerald-50 text-emerald-700 text-sm font-semibold hover:bg-emerald-100 transition disabled:opacity-50"
             >
               {requestLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
@@ -288,6 +352,13 @@ export default function SellerGeliverIntegrationCard() {
         )}
       </div>
 
+      {hasIntegrationInfo && (
+        <div className="mb-6 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700 flex items-center gap-2">
+          <CheckCircle className="w-4 h-4" />
+          Mevcut entegrasyon bilgileri bulundu. Başvuru süreçleri kapatıldı.
+        </div>
+      )}
+
       {/* Entegrasyon Bilgileri */}
       <div className="rounded-2xl border border-gray-200 p-5 mb-6">
         <div className="flex items-center gap-2 mb-4">
@@ -302,6 +373,7 @@ export default function SellerGeliverIntegrationCard() {
             onChange={handleDetailsChange}
             placeholder="geliver_token"
             required
+            disabled={hasIntegrationInfo}
           />
           <Field
             label="Gönderici Adres ID"
@@ -310,6 +382,7 @@ export default function SellerGeliverIntegrationCard() {
             onChange={handleDetailsChange}
             placeholder="address_id"
             required
+            disabled={hasIntegrationInfo}
           />
           <Field
             label="Servis Kodu"
@@ -318,6 +391,7 @@ export default function SellerGeliverIntegrationCard() {
             onChange={handleDetailsChange}
             placeholder="service_code"
             required
+            disabled={hasIntegrationInfo}
           />
           <div className="flex items-center gap-2 mt-2">
             <input
@@ -326,6 +400,7 @@ export default function SellerGeliverIntegrationCard() {
               type="checkbox"
               checked={detailsForm.autoLabelEnabled}
               onChange={handleDetailsChange}
+              disabled={hasIntegrationInfo}
               className="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
             />
             <label htmlFor="autoLabelEnabled" className="text-sm text-gray-700">
@@ -335,7 +410,7 @@ export default function SellerGeliverIntegrationCard() {
           <div className="md:col-span-2 flex items-center gap-3 mt-2">
             <button
               type="submit"
-              disabled={detailsLoading}
+              disabled={detailsLoading || hasIntegrationInfo}
               className="inline-flex items-center gap-2 px-5 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-sm font-semibold hover:shadow-lg transition disabled:opacity-50"
             >
               {detailsLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
@@ -417,6 +492,51 @@ export default function SellerGeliverIntegrationCard() {
         )}
       </div>
 
+      {/* Anlaşmalar */}
+      {agreements.length > 0 && (
+        <div className="mt-6 rounded-2xl border border-gray-200 p-5 bg-gray-50">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Yüklenmiş Anlaşmalar</h3>
+          <div className="space-y-3 text-sm">
+            {agreements.map((agreement) => (
+              <div
+                key={agreement.id}
+                className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-gray-200 bg-white px-4 py-3"
+              >
+                <div className="space-y-1">
+                  <div className="font-semibold text-gray-800">
+                    {carrierLabelMap[agreement.carrierCompany] ||
+                      agreement.carrierCompany}
+                  </div>
+                  <div className="text-xs text-gray-500">
+                    {agreement.notes || "Not belirtilmemiş"}
+                  </div>
+                </div>
+                <div className="text-xs text-gray-500">
+                  {agreement.validFrom
+                    ? new Date(agreement.validFrom).toLocaleDateString("tr-TR")
+                    : "-"}{" "}
+                  →{" "}
+                  {agreement.validUntil
+                    ? new Date(agreement.validUntil).toLocaleDateString("tr-TR")
+                    : "-"}
+                </div>
+                {agreement.agreementFileUrl && (
+                  <a
+                    href={agreement.agreementFileUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-2 px-3 py-2 rounded-xl border border-gray-200 text-gray-700 text-xs font-semibold hover:bg-gray-100 transition"
+                  >
+                    <FileText className="w-4 h-4" />
+                    Dosyayı Aç
+                  </a>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div className="mt-6 flex items-start gap-2 text-xs text-gray-500">
         <XCircle className="w-4 h-4 text-gray-400" />
         <span>
@@ -427,7 +547,7 @@ export default function SellerGeliverIntegrationCard() {
   );
 }
 
-function Field({ label, name, value, onChange, placeholder, required, type = "text" }) {
+function Field({ label, name, value, onChange, placeholder, required, type = "text", disabled }) {
   return (
     <div className="flex flex-col gap-1">
       <label className="text-sm font-medium text-gray-700">
@@ -440,6 +560,7 @@ function Field({ label, name, value, onChange, placeholder, required, type = "te
         placeholder={placeholder || label}
         required={required}
         type={type}
+        disabled={disabled}
         className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none"
       />
     </div>
