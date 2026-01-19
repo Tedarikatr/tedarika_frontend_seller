@@ -1,0 +1,35 @@
+import { apiRequest } from "./apiRequest";
+
+export const createGeliverIntegrationRequest = async () => {
+  return await apiRequest("/api/SellerGeliver/integration-request", "POST", null, true);
+};
+
+export const saveGeliverIntegrationDetails = async (payload) => {
+  return await apiRequest("/api/SellerGeliver/integration-details", "POST", payload, true);
+};
+
+export const uploadGeliverAgreement = async (formData) => {
+  return await apiRequest("/api/SellerGeliver/agreements", "POST", formData, true);
+};
+
+export const getGeliverOrderTracking = async (orderId) => {
+  return await apiRequest(`/api/SellerGeliver/orders/${orderId}/tracking`, "GET", null, true);
+};
+
+export const downloadGeliverOrderLabel = async (orderId) => {
+  const response = await fetch(
+    `${import.meta.env.VITE_API_URL}/api/SellerGeliver/orders/${orderId}/label`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("sellerToken")}`,
+      },
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("Kargo etiketi indirilemedi.");
+  }
+
+  return await response.blob();
+};

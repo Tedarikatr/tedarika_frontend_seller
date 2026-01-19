@@ -10,6 +10,10 @@ import {
   updateCarrierInfo,
   cancelOrder
 } from "@/api/sellerOrderService";
+import {
+  downloadGeliverOrderLabel,
+  getGeliverOrderTracking,
+} from "@/api/sellerGeliverService";
 import { statusLabels } from "@/constants/orderStatus";
 import { CARRIER_OPTIONS } from "@/constants/carrierCompanies";
 import { toast } from "react-hot-toast";
@@ -34,7 +38,8 @@ import {
   Edit,
   Ban,
   Loader2,
-  Send
+  Send,
+  RefreshCw
 } from "lucide-react";
 
 // Modern Status Badge
@@ -113,6 +118,10 @@ const OrderDetailPage = () => {
   const [paymentOpen, setPaymentOpen] = useState(false);
   const [paymentLoading, setPaymentLoading] = useState(false);
   const [paymentError, setPaymentError] = useState("");
+  const [geliverTracking, setGeliverTracking] = useState(null);
+  const [geliverLoading, setGeliverLoading] = useState(false);
+  const [geliverError, setGeliverError] = useState("");
+  const [labelDownloading, setLabelDownloading] = useState(false);
 
   // Kargo Modal State
   const [showCarrierModal, setShowCarrierModal] = useState(false);
@@ -150,8 +159,23 @@ const OrderDetailPage = () => {
     }
   };
 
+  const loadGeliverTracking = async () => {
+    setGeliverLoading(true);
+    setGeliverError("");
+    try {
+      const data = await getGeliverOrderTracking(Number(orderId));
+      setGeliverTracking(data);
+    } catch (err) {
+      setGeliverTracking(null);
+      setGeliverError(err?.message || "Geliver kargo bilgisi alınamadı.");
+    } finally {
+      setGeliverLoading(false);
+    }
+  };
+
   useEffect(() => {
     loadOrder();
+    loadGeliverTracking();
     setPaymentOpen(false);
     setPaymentError("");
   }, [orderId]);
@@ -230,6 +254,28 @@ const OrderDetailPage = () => {
       toast.error("Sipariş iptal edilemedi.");
     } finally {
       setCancelLoading(false);
+    }
+  };
+
+  const handleDownloadLabel = async () => {
+    setLabelDownloading(true);
+    try {
+      const blob = await downloadGeliverOrderLabel(Number(orderId));
+      const fileName =
+        geliverTracking?.fileName ||
+        `geliver-label-${order?.orderNumber || orderId}.pdf`;
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      toast.error(err?.message || "Kargo etiketi indirilemedi.");
+    } finally {
+      setLabelDownloading(false);
     }
   };
 
@@ -382,6 +428,93 @@ const OrderDetailPage = () => {
             label="Teslimat Adresi"
             value={order.shippingAddress}
           />
+        </div>
+
+        {/* Geliver Kargo Etiketi */}
+        <div className="bg-white rounded-3xl shadow-2xl border border-gray-200 overflow-hidden">
+          <div className="bg-gradient-to-r from-sky-50 to-blue-50 px-6 py-4 border-b border-sky-100 flex items-center justify-between flex-wrap gap-3">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-500 to-blue-600 flex items-center justify-center text-white shadow-lg">
+                <Truck size={20} />
+              </div>
+              <div>
+                <h2 className="text-lg font-bold text-gray-800">Geliver Kargo Etiketi</h2>
+                <p className="text-xs text-gray-500">Siparişin etiket ve takip durumu</p>
+              </div>
+            </div>
+            <button
+              onClick={loadGeliverTracking}
+              disabled={geliverLoading}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-sky-200 text-sky-700 text-sm font-semibold rounded-xl shadow-sm hover:shadow transition disabled:opacity-50"
+            >
+              {geliverLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
+              Yenile
+            </button>
+          </div>
+
+          <div className="p-6 space-y-4">
+            {geliverLoading ? (
+              <div className="flex items-center gap-2 text-sm text-gray-500">
+                <Loader2 className="w-4 h-4 animate-spin" />
+                Geliver bilgileri yükleniyor...
+              </div>
+            ) : geliverTracking ? (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                  <InfoRow label="Shipment ID" value={geliverTracking.shipmentId} />
+                  <InfoRow label="Takip Numarası" value={geliverTracking.trackingNumber} />
+                  <InfoRow label="Takip Durumu" value={geliverTracking.trackingStatus} />
+                  <InfoRow
+                    label="Takip Güncelleme"
+                    value={
+                      geliverTracking.trackingUpdatedAt
+                        ? new Date(geliverTracking.trackingUpdatedAt).toLocaleString("tr-TR")
+                        : "-"
+                    }
+                  />
+                  <InfoRow label="Etiket Dosyası" value={geliverTracking.fileName || "-"} />
+                  <InfoRow label="Kayıt Durumu" value={geliverTracking.isSkipped ? "Zaten Kayıtlı" : "Yeni"} />
+                </div>
+
+                <div className="flex flex-wrap gap-3">
+                  <button
+                    onClick={handleDownloadLabel}
+                    disabled={labelDownloading}
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-sm font-semibold hover:shadow-lg transition disabled:opacity-50"
+                  >
+                    {labelDownloading ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileText className="w-4 h-4" />}
+                    Etiketi İndir
+                  </button>
+                  {geliverTracking.fileUrl && (
+                    <a
+                      href={geliverTracking.fileUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-gray-200 text-gray-700 text-sm font-semibold hover:bg-gray-50 transition"
+                    >
+                      <Eye className="w-4 h-4" />
+                      Etiketi Görüntüle
+                    </a>
+                  )}
+                  {geliverTracking.trackingUrl && (
+                    <a
+                      href={geliverTracking.trackingUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-gray-200 text-gray-700 text-sm font-semibold hover:bg-gray-50 transition"
+                    >
+                      <Package className="w-4 h-4" />
+                      Kargo Takip
+                    </a>
+                  )}
+                </div>
+              </>
+            ) : (
+              <div className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-600">
+                {geliverError || "Bu sipariş için Geliver etiketi bulunmuyor."}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Ödeme Bilgileri */}
@@ -683,6 +816,13 @@ const OrderDetailPage = () => {
     </div>
   );
 };
+
+const InfoRow = ({ label, value }) => (
+  <div className="flex flex-col gap-1">
+    <span className="text-xs text-gray-500">{label}</span>
+    <span className="font-semibold text-gray-800 break-all">{value || "-"}</span>
+  </div>
+);
 
 // Formatlayıcı
 function fmt(n) {
