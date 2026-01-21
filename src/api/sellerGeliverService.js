@@ -12,6 +12,10 @@ export const autoRegisterGeliver = async () => {
   return await apiRequest("/SellerGeliver/auto-register", "POST", null, true);
 };
 
+export const matchExistingGeliverAccount = async (payload) => {
+  return await apiRequest("/SellerGeliver/match-existing-account", "POST", payload, true);
+};
+
 export const saveGeliverIntegrationDetails = async (payload) => {
   return await apiRequest("/SellerGeliver/integration-details", "POST", payload, true);
 };

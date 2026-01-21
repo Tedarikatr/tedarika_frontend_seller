@@ -13,9 +13,6 @@ import {
 import {
   downloadGeliverOrderLabel,
   getGeliverOrderTracking,
-  createGeliverOrderLabel,
-  uploadGeliverOrderLabel,
-  updateGeliverTracking,
 } from "@/api/sellerGeliverService";
 import { statusLabels } from "@/constants/orderStatus";
 import { CARRIER_OPTIONS } from "@/constants/carrierCompanies";
@@ -43,7 +40,9 @@ import {
   Loader2,
   Send,
   RefreshCw,
-  Upload
+  Upload,
+  Printer,
+  Download
 } from "lucide-react";
 
 // Modern Status Badge
@@ -125,28 +124,9 @@ const OrderDetailPage = () => {
   const [geliverTracking, setGeliverTracking] = useState(null);
   const [geliverLoading, setGeliverLoading] = useState(false);
   const [geliverError, setGeliverError] = useState("");
-  const [labelDownloading, setLabelDownloading] = useState(false);
-  const [labelSaving, setLabelSaving] = useState(false);
-  const [labelUploading, setLabelUploading] = useState(false);
-  const [trackingUpdating, setTrackingUpdating] = useState(false);
-  const [labelUploadFile, setLabelUploadFile] = useState(null);
-  const [manualLabelForm, setManualLabelForm] = useState({
-    labelUrl: "",
-    responsiveLabelUrl: "",
-    shipmentId: "",
-    trackingNumber: "",
-    trackingUrl: "",
-    trackingStatus: "",
-    trackingUpdatedAt: "",
-    contentType: "application/pdf",
-  });
-  const [trackingForm, setTrackingForm] = useState({
-    shipmentId: "",
-    trackingNumber: "",
-    trackingUrl: "",
-    trackingStatus: "",
-    trackingUpdatedAt: "",
-  });
+  const [showLabelModal, setShowLabelModal] = useState(false);
+  const [labelLoading, setLabelLoading] = useState(false);
+  const [labelPdfUrl, setLabelPdfUrl] = useState(null);
 
   // Kargo Modal State
   const [showCarrierModal, setShowCarrierModal] = useState(false);
@@ -198,32 +178,6 @@ const OrderDetailPage = () => {
     }
   };
 
-  useEffect(() => {
-    if (!geliverTracking) return;
-    setManualLabelForm((prev) => ({
-      ...prev,
-      shipmentId: geliverTracking.shipmentId || prev.shipmentId,
-      trackingNumber: geliverTracking.trackingNumber || prev.trackingNumber,
-      trackingUrl: geliverTracking.trackingUrl || prev.trackingUrl,
-      trackingStatus: geliverTracking.trackingStatus || prev.trackingStatus,
-      trackingUpdatedAt: geliverTracking.trackingUpdatedAt
-        ? new Date(geliverTracking.trackingUpdatedAt).toISOString().slice(0, 16)
-        : prev.trackingUpdatedAt,
-      contentType: geliverTracking.contentType || prev.contentType,
-      labelUrl: geliverTracking.fileUrl || prev.labelUrl,
-      responsiveLabelUrl: geliverTracking.responsiveLabelUrl || prev.responsiveLabelUrl,
-    }));
-    setTrackingForm((prev) => ({
-      ...prev,
-      shipmentId: geliverTracking.shipmentId || prev.shipmentId,
-      trackingNumber: geliverTracking.trackingNumber || prev.trackingNumber,
-      trackingUrl: geliverTracking.trackingUrl || prev.trackingUrl,
-      trackingStatus: geliverTracking.trackingStatus || prev.trackingStatus,
-      trackingUpdatedAt: geliverTracking.trackingUpdatedAt
-        ? new Date(geliverTracking.trackingUpdatedAt).toISOString().slice(0, 16)
-        : prev.trackingUpdatedAt,
-    }));
-  }, [geliverTracking]);
 
   useEffect(() => {
     loadOrder();
@@ -231,6 +185,14 @@ const OrderDetailPage = () => {
     setPaymentOpen(false);
     setPaymentError("");
   }, [orderId]);
+
+  useEffect(() => {
+    return () => {
+      if (labelPdfUrl) {
+        window.URL.revokeObjectURL(labelPdfUrl);
+      }
+    };
+  }, [labelPdfUrl]);
 
   const handleFetchPayment = async () => {
     setPaymentLoading(true);
@@ -309,107 +271,48 @@ const OrderDetailPage = () => {
     }
   };
 
-  const handleDownloadLabel = async () => {
-    setLabelDownloading(true);
+  const handleViewLabel = async () => {
+    setLabelLoading(true);
+    setLabelPdfUrl(null);
     try {
       const blob = await downloadGeliverOrderLabel(Number(orderId));
-      const fileName =
-        geliverTracking?.fileName ||
-        `geliver-label-${order?.orderNumber || orderId}.pdf`;
       const url = window.URL.createObjectURL(blob);
+      setLabelPdfUrl(url);
+      setShowLabelModal(true);
+    } catch (err) {
+      toast.error(err?.message || "Kargo etiketi yüklenemedi.");
+    } finally {
+      setLabelLoading(false);
+    }
+  };
+
+  const handlePrintLabel = () => {
+    if (labelPdfUrl) {
+      const printWindow = window.open(labelPdfUrl, "_blank");
+      if (printWindow) {
+        printWindow.onload = () => {
+          printWindow.print();
+        };
+      }
+    }
+  };
+
+  const handleDownloadLabel = () => {
+    if (labelPdfUrl) {
       const link = document.createElement("a");
-      link.href = url;
-      link.download = fileName;
+      link.href = labelPdfUrl;
+      link.download = `geliver-label-${order?.orderNumber || orderId}.pdf`;
       document.body.appendChild(link);
       link.click();
       link.remove();
-      window.URL.revokeObjectURL(url);
-    } catch (err) {
-      toast.error(err?.message || "Kargo etiketi indirilemedi.");
-    } finally {
-      setLabelDownloading(false);
     }
   };
 
-  const handleManualLabelChange = (e) => {
-    const { name, value } = e.target;
-    setManualLabelForm((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleManualLabelSave = async (e) => {
-    e.preventDefault();
-    if (!manualLabelForm.shipmentId || !manualLabelForm.labelUrl) {
-      toast.error("Shipment ID ve label URL zorunludur.");
-      return;
-    }
-    setLabelSaving(true);
-    try {
-      const payload = {
-        labelUrl: manualLabelForm.labelUrl.trim(),
-        responsiveLabelUrl: manualLabelForm.responsiveLabelUrl.trim() || null,
-        shipmentId: manualLabelForm.shipmentId.trim(),
-        trackingNumber: manualLabelForm.trackingNumber.trim() || null,
-        trackingUrl: manualLabelForm.trackingUrl.trim() || null,
-        trackingStatus: manualLabelForm.trackingStatus.trim() || null,
-        trackingUpdatedAt: manualLabelForm.trackingUpdatedAt
-          ? new Date(manualLabelForm.trackingUpdatedAt).toISOString()
-          : null,
-        contentType: manualLabelForm.contentType || "application/pdf",
-      };
-      const data = await createGeliverOrderLabel(Number(orderId), payload);
-      toast.success(data?.isSkipped ? "Etiket zaten kayıtlı." : "Etiket bilgisi kaydedildi.");
-      await loadGeliverTracking();
-    } catch (err) {
-      toast.error(err?.message || "Etiket kaydedilemedi.");
-    } finally {
-      setLabelSaving(false);
-    }
-  };
-
-  const handleLabelUpload = async () => {
-    if (!labelUploadFile) {
-      toast.error("Lütfen bir etiket dosyası seçin.");
-      return;
-    }
-    setLabelUploading(true);
-    try {
-      const formData = new FormData();
-      formData.append("file", labelUploadFile);
-      await uploadGeliverOrderLabel(Number(orderId), formData);
-      toast.success("Etiket dosyası yüklendi.");
-      setLabelUploadFile(null);
-      await loadGeliverTracking();
-    } catch (err) {
-      toast.error(err?.message || "Etiket yüklenemedi.");
-    } finally {
-      setLabelUploading(false);
-    }
-  };
-
-  const handleTrackingUpdate = async (e) => {
-    e.preventDefault();
-    if (!trackingForm.shipmentId) {
-      toast.error("Shipment ID zorunludur.");
-      return;
-    }
-    setTrackingUpdating(true);
-    try {
-      const payload = {
-        shipmentId: trackingForm.shipmentId.trim(),
-        trackingNumber: trackingForm.trackingNumber.trim() || null,
-        trackingUrl: trackingForm.trackingUrl.trim() || null,
-        trackingStatus: trackingForm.trackingStatus.trim() || null,
-        trackingUpdatedAt: trackingForm.trackingUpdatedAt
-          ? new Date(trackingForm.trackingUpdatedAt).toISOString()
-          : null,
-      };
-      await updateGeliverTracking(payload);
-      toast.success("Takip bilgisi güncellendi.");
-      await loadGeliverTracking();
-    } catch (err) {
-      toast.error(err?.message || "Takip bilgisi güncellenemedi.");
-    } finally {
-      setTrackingUpdating(false);
+  const handleCloseLabelModal = () => {
+    setShowLabelModal(false);
+    if (labelPdfUrl) {
+      window.URL.revokeObjectURL(labelPdfUrl);
+      setLabelPdfUrl(null);
     }
   };
 
@@ -504,6 +407,21 @@ const OrderDetailPage = () => {
                       Kargo Bilgisi
                     </button>
 
+                    {geliverTracking?.fileUrl && (
+                      <button
+                        onClick={handleViewLabel}
+                        disabled={labelLoading}
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white rounded-xl font-semibold transition-all disabled:opacity-50 border border-white/30"
+                      >
+                        {labelLoading ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <FileText className="w-4 h-4" />
+                        )}
+                        Kargo Etiketi Görüntüle
+                      </button>
+                    )}
+
                     <button
                       onClick={handleCancelOrder}
                       disabled={cancelLoading}
@@ -564,229 +482,6 @@ const OrderDetailPage = () => {
           />
         </div>
 
-        {/* Geliver Kargo Etiketi */}
-        <div className="bg-white rounded-3xl shadow-2xl border border-gray-200 overflow-hidden">
-          <div className="bg-gradient-to-r from-sky-50 to-blue-50 px-6 py-4 border-b border-sky-100 flex items-center justify-between flex-wrap gap-3">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-500 to-blue-600 flex items-center justify-center text-white shadow-lg">
-                <Truck size={20} />
-              </div>
-              <div>
-                <h2 className="text-lg font-bold text-gray-800">Geliver Kargo Etiketi</h2>
-                <p className="text-xs text-gray-500">Siparişin etiket ve takip durumu</p>
-              </div>
-            </div>
-            <button
-              onClick={loadGeliverTracking}
-              disabled={geliverLoading}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-sky-200 text-sky-700 text-sm font-semibold rounded-xl shadow-sm hover:shadow transition disabled:opacity-50"
-            >
-              {geliverLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
-              Yenile
-            </button>
-          </div>
-
-          <div className="p-6 space-y-4">
-            {geliverLoading ? (
-              <div className="flex items-center gap-2 text-sm text-gray-500">
-                <Loader2 className="w-4 h-4 animate-spin" />
-                Geliver bilgileri yükleniyor...
-              </div>
-            ) : geliverTracking ? (
-              <>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                  <InfoRow label="Shipment ID" value={geliverTracking.shipmentId} />
-                  <InfoRow label="Takip Numarası" value={geliverTracking.trackingNumber} />
-                  <InfoRow label="Takip Durumu" value={geliverTracking.trackingStatus} />
-                  <InfoRow
-                    label="Takip Güncelleme"
-                    value={
-                      geliverTracking.trackingUpdatedAt
-                        ? new Date(geliverTracking.trackingUpdatedAt).toLocaleString("tr-TR")
-                        : "-"
-                    }
-                  />
-                  <InfoRow label="Etiket Dosyası" value={geliverTracking.fileName || "-"} />
-                  <InfoRow label="Kayıt Durumu" value={geliverTracking.isSkipped ? "Zaten Kayıtlı" : "Yeni"} />
-                </div>
-
-                <div className="flex flex-wrap gap-3">
-                  <button
-                    onClick={handleDownloadLabel}
-                    disabled={labelDownloading}
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-sm font-semibold hover:shadow-lg transition disabled:opacity-50"
-                  >
-                    {labelDownloading ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileText className="w-4 h-4" />}
-                    Etiketi İndir
-                  </button>
-                  {geliverTracking.fileUrl && (
-                    <a
-                      href={geliverTracking.fileUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-gray-200 text-gray-700 text-sm font-semibold hover:bg-gray-50 transition"
-                    >
-                      <Eye className="w-4 h-4" />
-                      Etiketi Görüntüle
-                    </a>
-                  )}
-                  {geliverTracking.trackingUrl && (
-                    <a
-                      href={geliverTracking.trackingUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-gray-200 text-gray-700 text-sm font-semibold hover:bg-gray-50 transition"
-                    >
-                      <Package className="w-4 h-4" />
-                      Kargo Takip
-                    </a>
-                  )}
-                </div>
-
-              </>
-            ) : (
-              <div className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-600">
-                {geliverError || "Bu sipariş için Geliver etiketi bulunmuyor."}
-              </div>
-            )}
-
-            <div className="border-t border-gray-100 pt-5 space-y-6">
-              {/* Manuel Etiket Yükleme */}
-              <div className="bg-gray-50 border border-gray-200 rounded-2xl p-4">
-                <h3 className="text-sm font-semibold text-gray-800 mb-3">Manuel Etiket Yükleme</h3>
-                <div className="flex flex-wrap items-center gap-3">
-                  <input
-                    type="file"
-                    accept="application/pdf"
-                    onChange={(e) => setLabelUploadFile(e.target.files?.[0] || null)}
-                    className="text-sm"
-                  />
-                  <button
-                    onClick={handleLabelUpload}
-                    disabled={labelUploading}
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white border border-gray-200 text-gray-700 text-sm font-semibold hover:bg-gray-100 transition disabled:opacity-50"
-                  >
-                    {labelUploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
-                    Etiketi Yükle
-                  </button>
-                </div>
-              </div>
-
-              {/* Manuel Etiket Kaydı */}
-              <form onSubmit={handleManualLabelSave} className="bg-white border border-gray-200 rounded-2xl p-4 space-y-4">
-                <h3 className="text-sm font-semibold text-gray-800">Manuel Etiket Kaydı</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-                  <InputField
-                    label="Label URL"
-                    name="labelUrl"
-                    value={manualLabelForm.labelUrl}
-                    onChange={handleManualLabelChange}
-                    required
-                  />
-                  <InputField
-                    label="Responsive Label URL"
-                    name="responsiveLabelUrl"
-                    value={manualLabelForm.responsiveLabelUrl}
-                    onChange={handleManualLabelChange}
-                  />
-                  <InputField
-                    label="Shipment ID"
-                    name="shipmentId"
-                    value={manualLabelForm.shipmentId}
-                    onChange={handleManualLabelChange}
-                    required
-                  />
-                  <InputField
-                    label="Tracking No"
-                    name="trackingNumber"
-                    value={manualLabelForm.trackingNumber}
-                    onChange={handleManualLabelChange}
-                  />
-                  <InputField
-                    label="Tracking URL"
-                    name="trackingUrl"
-                    value={manualLabelForm.trackingUrl}
-                    onChange={handleManualLabelChange}
-                  />
-                  <InputField
-                    label="Tracking Status"
-                    name="trackingStatus"
-                    value={manualLabelForm.trackingStatus}
-                    onChange={handleManualLabelChange}
-                  />
-                  <InputField
-                    label="Tracking Updated At"
-                    name="trackingUpdatedAt"
-                    value={manualLabelForm.trackingUpdatedAt}
-                    onChange={handleManualLabelChange}
-                    type="datetime-local"
-                  />
-                  <InputField
-                    label="Content Type"
-                    name="contentType"
-                    value={manualLabelForm.contentType}
-                    onChange={handleManualLabelChange}
-                  />
-                </div>
-                <button
-                  type="submit"
-                  disabled={labelSaving}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-sky-600 to-blue-600 text-white text-sm font-semibold hover:shadow-lg transition disabled:opacity-50"
-                >
-                  {labelSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-                  Etiket Bilgisini Kaydet
-                </button>
-              </form>
-
-              {/* Takip Bilgisi Güncelle */}
-              <form onSubmit={handleTrackingUpdate} className="bg-white border border-gray-200 rounded-2xl p-4 space-y-4">
-                <h3 className="text-sm font-semibold text-gray-800">Takip Bilgisi Güncelle</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-                  <InputField
-                    label="Shipment ID"
-                    name="shipmentId"
-                    value={trackingForm.shipmentId}
-                    onChange={(e) => setTrackingForm((prev) => ({ ...prev, shipmentId: e.target.value }))}
-                    required
-                  />
-                  <InputField
-                    label="Tracking No"
-                    name="trackingNumber"
-                    value={trackingForm.trackingNumber}
-                    onChange={(e) => setTrackingForm((prev) => ({ ...prev, trackingNumber: e.target.value }))}
-                  />
-                  <InputField
-                    label="Tracking URL"
-                    name="trackingUrl"
-                    value={trackingForm.trackingUrl}
-                    onChange={(e) => setTrackingForm((prev) => ({ ...prev, trackingUrl: e.target.value }))}
-                  />
-                  <InputField
-                    label="Tracking Status"
-                    name="trackingStatus"
-                    value={trackingForm.trackingStatus}
-                    onChange={(e) => setTrackingForm((prev) => ({ ...prev, trackingStatus: e.target.value }))}
-                  />
-                  <InputField
-                    label="Tracking Updated At"
-                    name="trackingUpdatedAt"
-                    value={trackingForm.trackingUpdatedAt}
-                    onChange={(e) => setTrackingForm((prev) => ({ ...prev, trackingUpdatedAt: e.target.value }))}
-                    type="datetime-local"
-                  />
-                </div>
-                <button
-                  type="submit"
-                  disabled={trackingUpdating}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white border border-gray-200 text-gray-700 text-sm font-semibold hover:bg-gray-50 transition disabled:opacity-50"
-                >
-                  {trackingUpdating ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
-                  Takip Bilgisini Güncelle
-                </button>
-              </form>
-            </div>
-          </div>
-        </div>
 
         {/* Ödeme Bilgileri */}
         <div className="bg-white rounded-3xl shadow-2xl border border-gray-200 overflow-hidden">
@@ -975,6 +670,77 @@ const OrderDetailPage = () => {
           </div>
         </div>
       </div>
+
+      {/* Kargo Etiketi Görüntüleme Modal */}
+      {showLabelModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-3xl shadow-2xl max-w-5xl w-full h-[90vh] flex flex-col overflow-hidden animate-[slideUp_0.3s_ease-out]">
+            {/* Modal Header */}
+            <div className="bg-gradient-to-r from-sky-600 to-blue-600 px-6 py-5 text-white flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                  <FileText size={24} />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold">Kargo Etiketi</h3>
+                  <p className="text-sky-100 text-sm">Sipariş No: {order.orderNumber}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                {labelPdfUrl && (
+                  <>
+                    <button
+                      onClick={handlePrintLabel}
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white rounded-xl font-semibold transition-all border border-white/30"
+                    >
+                      <Printer className="w-4 h-4" />
+                      Yazdır
+                    </button>
+                    <button
+                      onClick={handleDownloadLabel}
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white rounded-xl font-semibold transition-all border border-white/30"
+                    >
+                      <Download className="w-4 h-4" />
+                      İndir
+                    </button>
+                  </>
+                )}
+                <button
+                  onClick={handleCloseLabelModal}
+                  className="w-10 h-10 rounded-xl bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white flex items-center justify-center transition-all border border-white/30"
+                >
+                  <XCircle className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+
+            {/* Modal Body - PDF Viewer */}
+            <div className="flex-1 overflow-hidden bg-gray-100">
+              {labelLoading ? (
+                <div className="h-full flex items-center justify-center">
+                  <div className="text-center">
+                    <Loader2 className="w-12 h-12 animate-spin text-sky-600 mx-auto mb-4" />
+                    <p className="text-gray-600 font-medium">Kargo etiketi yükleniyor...</p>
+                  </div>
+                </div>
+              ) : labelPdfUrl ? (
+                <iframe
+                  src={labelPdfUrl}
+                  className="w-full h-full border-0"
+                  title="Kargo Etiketi"
+                />
+              ) : (
+                <div className="h-full flex items-center justify-center">
+                  <div className="text-center">
+                    <FileText className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                    <p className="text-gray-600 font-medium">Kargo etiketi yüklenemedi.</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Kargo Bilgisi Modal */}
       {showCarrierModal && (
