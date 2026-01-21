@@ -11,9 +11,9 @@ import {
   cancelOrder
 } from "@/api/sellerOrderService";
 import {
-  downloadGeliverOrderLabel,
-  getGeliverOrderTracking,
-} from "@/api/sellerGeliverService";
+  downloadOrderCarrierLabel,
+  getOrderCarrierTracking,
+} from "@/api/sellerOrderCarrierService";
 import { statusLabels } from "@/constants/orderStatus";
 import { CARRIER_OPTIONS } from "@/constants/carrierCompanies";
 import { toast } from "react-hot-toast";
@@ -171,11 +171,11 @@ const OrderDetailPage = () => {
     setGeliverLoading(true);
     setGeliverError("");
     try {
-      const data = await getGeliverOrderTracking(Number(orderId));
+      const data = await getOrderCarrierTracking(Number(orderId));
       setGeliverTracking(data);
     } catch (err) {
       setGeliverTracking(null);
-      setGeliverError(err?.message || "Geliver kargo bilgisi alınamadı.");
+      setGeliverError(err?.message || "Kargo bilgisi alınamadı.");
     } finally {
       setGeliverLoading(false);
     }
@@ -278,7 +278,7 @@ const OrderDetailPage = () => {
     setLabelLoading(true);
     setLabelPdfUrl(null);
     try {
-      const blob = await downloadGeliverOrderLabel(Number(orderId));
+      const blob = await downloadOrderCarrierLabel(Number(orderId));
       const url = window.URL.createObjectURL(blob);
       setLabelPdfUrl(url);
       setShowLabelModal(true);

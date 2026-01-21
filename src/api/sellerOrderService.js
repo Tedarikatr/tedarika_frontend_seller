@@ -43,7 +43,8 @@ export const updateOrderStatus = async (orderId, status) => {
 // ✅ Kargo bilgisi güncelle
 export const updateCarrierInfo = async (orderId, carrierData) => {
   console.log("Kargo güncelleniyor:", orderId, carrierData);
-  return await apiRequest(`/SellerOrder/update-carrier/${orderId}`, "PUT", carrierData, true);
+  // Yeni controller: SellerOrderCarrier
+  return await apiRequest(`/SellerOrderCarrier/orders/${orderId}/carrier`, "PUT", carrierData, true);
 };
 
 // ✅ Siparişi iptal et
