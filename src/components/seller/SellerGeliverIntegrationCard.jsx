@@ -653,12 +653,12 @@ export default function SellerGeliverIntegrationCard() {
           </div>
         </form>
 
-        {agreementInfo && (
-          <div className="mt-4 rounded-xl border border-purple-100 bg-purple-50 px-4 py-3 text-sm text-purple-800 flex items-center gap-2">
-            <CheckCircle className="w-4 h-4 text-purple-600" />
-            Anlaşma yüklendi: {agreementInfo.agreementFileUrl ? "Dosya bağlantısı hazır." : "Kayıt tamamlandı."}
-          </div>
-        )}
+          {agreementInfo && (
+            <div className="mt-4 rounded-xl border border-purple-100 bg-purple-50 px-4 py-3 text-sm text-purple-800 flex items-center gap-2">
+              <CheckCircle className="w-4 h-4 text-purple-600" />
+              Anlaşma yüklendi: {agreementInfo.agreementFileUrl ? "Dosya bağlantısı hazır." : "Kayıt tamamlandı."}
+            </div>
+          )}
         )}
       </div>
 
