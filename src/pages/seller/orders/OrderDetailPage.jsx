@@ -42,7 +42,10 @@ import {
   RefreshCw,
   Upload,
   Printer,
-  Download
+  Download,
+  Activity,
+  Navigation,
+  Circle
 } from "lucide-react";
 
 // Modern Status Badge
@@ -482,6 +485,110 @@ const OrderDetailPage = () => {
           />
         </div>
 
+        {/* Kargo Takip Durumu ve Webhook Timeline */}
+        {geliverTracking && (
+          <div className="bg-white rounded-3xl shadow-2xl border border-gray-200 overflow-hidden">
+            <div className="bg-gradient-to-r from-indigo-50 to-purple-50 px-6 py-4 border-b border-indigo-100 flex items-center justify-between flex-wrap gap-3">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-lg">
+                  <Activity size={20} />
+                </div>
+                <div>
+                  <h2 className="text-lg font-bold text-gray-800">Kargo Takip Durumu</h2>
+                  <p className="text-xs text-gray-500">Webhook ile otomatik güncellenir</p>
+                </div>
+              </div>
+              <button
+                onClick={loadGeliverTracking}
+                disabled={geliverLoading}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-indigo-200 text-indigo-700 text-sm font-semibold rounded-xl shadow-sm hover:shadow transition disabled:opacity-50"
+              >
+                {geliverLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
+                Yenile
+              </button>
+            </div>
+
+            <div className="p-6">
+              {/* Tracking Status Timeline */}
+              <div className="mb-6">
+                <h3 className="text-sm font-semibold text-gray-700 mb-4 flex items-center gap-2">
+                  <Navigation className="w-4 h-4" />
+                  Takip Durumu Timeline
+                </h3>
+                <TrackingTimeline
+                  trackingStatus={geliverTracking.trackingStatus}
+                  orderStatus={order.status}
+                  trackingUpdatedAt={geliverTracking.trackingUpdatedAt}
+                />
+              </div>
+
+              {/* Tracking Bilgileri */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl p-4 border border-blue-200">
+                  <p className="text-xs text-blue-600 mb-1">Tracking Status</p>
+                  <p className="font-bold text-gray-800">
+                    {geliverTracking.trackingStatus ? (
+                      <span className="inline-flex items-center gap-2">
+                        <Circle className="w-2 h-2 fill-current" />
+                        {geliverTracking.trackingStatus}
+                      </span>
+                    ) : (
+                      "Henüz güncellenmedi"
+                    )}
+                  </p>
+                </div>
+                <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-4 border border-purple-200">
+                  <p className="text-xs text-purple-600 mb-1">Sipariş Durumu</p>
+                  <p className="font-bold text-gray-800">
+                    <StatusBadge status={order.status} />
+                  </p>
+                </div>
+                {geliverTracking.trackingUpdatedAt && (
+                  <div className="bg-gradient-to-br from-emerald-50 to-green-50 rounded-xl p-4 border border-emerald-200">
+                    <p className="text-xs text-emerald-600 mb-1">Son Güncelleme</p>
+                    <p className="font-bold text-gray-800">
+                      {new Date(geliverTracking.trackingUpdatedAt).toLocaleString("tr-TR")}
+                    </p>
+                  </div>
+                )}
+                {geliverTracking.shipmentId && (
+                  <div className="bg-gradient-to-br from-amber-50 to-yellow-50 rounded-xl p-4 border border-amber-200">
+                    <p className="text-xs text-amber-600 mb-1">Shipment ID</p>
+                    <p className="font-bold text-gray-800 text-xs break-all">{geliverTracking.shipmentId}</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Webhook Mapping Bilgisi */}
+              <div className="bg-gradient-to-br from-gray-50 to-white border border-gray-200 rounded-xl p-4">
+                <div className="flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-indigo-100 flex items-center justify-center flex-shrink-0">
+                    <InfoIcon className="w-4 h-4 text-indigo-600" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-xs font-semibold text-gray-700 mb-1">Webhook Durum Mapping</p>
+                    <p className="text-xs text-gray-600">
+                      Geliver webhook'larından gelen tracking durumları otomatik olarak sipariş durumuna çevrilir:
+                    </p>
+                    <div className="mt-2 space-y-1 text-xs">
+                      <div className="flex items-center gap-2">
+                        <span className="text-gray-500">PRE_TRANSIT / TRANSIT</span>
+                        <span className="text-gray-400">→</span>
+                        <span className="font-semibold text-blue-600">Shipped (Kargoya verildi)</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-gray-500">DELIVERED</span>
+                        <span className="text-gray-400">→</span>
+                        <span className="font-semibold text-purple-600">Delivered (Teslim edildi)</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
 
         {/* Ödeme Bilgileri */}
         <div className="bg-white rounded-3xl shadow-2xl border border-gray-200 overflow-hidden">
@@ -860,6 +967,128 @@ const InfoRow = ({ label, value }) => (
     <span className="font-semibold text-gray-800 break-all">{value || "-"}</span>
   </div>
 );
+
+// Tracking Timeline Component
+const TrackingTimeline = ({ trackingStatus, orderStatus, trackingUpdatedAt }) => {
+  const getStatusSteps = () => {
+    const steps = [
+      {
+        key: "SHIPPED",
+        label: "Kargoya Verildi",
+        trackingStatuses: ["PRE_TRANSIT", "TRANSIT", "IN_TRANSIT", "OUT_FOR_DELIVERY"],
+        orderStatuses: ["Shipped"],
+        icon: <Truck className="w-4 h-4" />,
+        color: "blue"
+      },
+      {
+        key: "DELIVERED",
+        label: "Teslim Edildi",
+        trackingStatuses: ["DELIVERED"],
+        orderStatuses: ["Delivered"],
+        icon: <CheckCircle className="w-4 h-4" />,
+        color: "purple"
+      }
+    ];
+
+    return steps.map((step, index) => {
+      // Check if this step is active based on tracking status or order status
+      const isActiveByTracking = trackingStatus && step.trackingStatuses.some(ts => 
+        trackingStatus.toUpperCase().includes(ts) || ts.includes(trackingStatus.toUpperCase())
+      );
+      const isActiveByOrder = step.orderStatuses.includes(orderStatus);
+      const isActive = isActiveByTracking || isActiveByOrder;
+      
+      // Check if completed (only delivered can be completed)
+      const isCompleted = step.key === "DELIVERED" && orderStatus === "Delivered";
+      
+      return {
+        ...step,
+        isActive,
+        isCompleted,
+        isLast: index === steps.length - 1,
+        isActiveByTracking,
+        isActiveByOrder
+      };
+    });
+  };
+
+  const steps = getStatusSteps();
+
+  return (
+    <div className="relative">
+      {/* Timeline Line */}
+      <div className="absolute left-5 top-0 bottom-0 w-0.5 bg-gray-200" />
+      
+      <div className="space-y-6">
+        {steps.map((step, index) => (
+          <div key={step.key} className="relative flex items-start gap-4">
+            {/* Status Icon */}
+            <div
+              className={`relative z-10 w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all ${
+                step.isCompleted
+                  ? "bg-purple-500 border-purple-500 text-white shadow-lg scale-110"
+                  : step.isActive
+                  ? "bg-blue-500 border-blue-500 text-white shadow-lg scale-110"
+                  : "bg-white border-gray-300 text-gray-400"
+              }`}
+            >
+              {step.isCompleted || step.isActive ? (
+                step.icon
+              ) : (
+                <Circle className="w-3 h-3 fill-current" />
+              )}
+            </div>
+
+            {/* Status Content */}
+            <div className="flex-1 pt-1">
+              <div
+                className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-semibold mb-2 ${
+                  step.isCompleted
+                    ? "bg-purple-100 text-purple-700 border border-purple-200"
+                    : step.isActive
+                    ? "bg-blue-100 text-blue-700 border border-blue-200"
+                    : "bg-gray-100 text-gray-500 border border-gray-200"
+                }`}
+              >
+                {step.label}
+                {step.isActive && (
+                  <span className="text-xs font-normal opacity-75">
+                    {step.isActiveByTracking ? "(Webhook)" : "(Manuel)"}
+                  </span>
+                )}
+              </div>
+              <div className="text-xs text-gray-500 space-y-1.5">
+                <div className="flex items-center gap-2">
+                  <span className="font-medium">Tracking Status:</span>
+                  <span className="font-semibold text-gray-700">
+                    {step.trackingStatuses.join(" / ")}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="font-medium">Sipariş Durumu:</span>
+                  <span className="font-semibold text-gray-700">{step.orderStatuses.join(" / ")}</span>
+                </div>
+                {step.isActive && trackingUpdatedAt && (
+                  <div className="mt-2 pt-2 border-t border-gray-200">
+                    <p className="text-emerald-600 font-medium flex items-center gap-1">
+                      <CheckCircle className="w-3 h-3" />
+                      Son Güncelleme: {new Date(trackingUpdatedAt).toLocaleString("tr-TR")}
+                    </p>
+                    {trackingStatus && (
+                      <p className="text-gray-600 mt-1">
+                        Mevcut Durum: <span className="font-semibold">{trackingStatus}</span>
+                      </p>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
 
 const InputField = ({ label, name, value, onChange, type = "text", required }) => (
   <label className="flex flex-col gap-1 text-xs text-gray-500">
