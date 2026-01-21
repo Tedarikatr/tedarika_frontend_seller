@@ -13,9 +13,6 @@ import {
 import {
   downloadGeliverOrderLabel,
   getGeliverOrderTracking,
-  createGeliverOrderLabel,
-  uploadGeliverOrderLabel,
-  updateGeliverTracking,
 } from "@/api/sellerGeliverService";
 import { statusLabels } from "@/constants/orderStatus";
 import { CARRIER_OPTIONS } from "@/constants/carrierCompanies";
@@ -43,7 +40,12 @@ import {
   Loader2,
   Send,
   RefreshCw,
-  Upload
+  Upload,
+  Printer,
+  Download,
+  Activity,
+  Navigation,
+  Circle
 } from "lucide-react";
 
 // Modern Status Badge
@@ -125,28 +127,9 @@ const OrderDetailPage = () => {
   const [geliverTracking, setGeliverTracking] = useState(null);
   const [geliverLoading, setGeliverLoading] = useState(false);
   const [geliverError, setGeliverError] = useState("");
-  const [labelDownloading, setLabelDownloading] = useState(false);
-  const [labelSaving, setLabelSaving] = useState(false);
-  const [labelUploading, setLabelUploading] = useState(false);
-  const [trackingUpdating, setTrackingUpdating] = useState(false);
-  const [labelUploadFile, setLabelUploadFile] = useState(null);
-  const [manualLabelForm, setManualLabelForm] = useState({
-    labelUrl: "",
-    responsiveLabelUrl: "",
-    shipmentId: "",
-    trackingNumber: "",
-    trackingUrl: "",
-    trackingStatus: "",
-    trackingUpdatedAt: "",
-    contentType: "application/pdf",
-  });
-  const [trackingForm, setTrackingForm] = useState({
-    shipmentId: "",
-    trackingNumber: "",
-    trackingUrl: "",
-    trackingStatus: "",
-    trackingUpdatedAt: "",
-  });
+  const [showLabelModal, setShowLabelModal] = useState(false);
+  const [labelLoading, setLabelLoading] = useState(false);
+  const [labelPdfUrl, setLabelPdfUrl] = useState(null);
 
   // Kargo Modal State
   const [showCarrierModal, setShowCarrierModal] = useState(false);
@@ -198,32 +181,6 @@ const OrderDetailPage = () => {
     }
   };
 
-  useEffect(() => {
-    if (!geliverTracking) return;
-    setManualLabelForm((prev) => ({
-      ...prev,
-      shipmentId: geliverTracking.shipmentId || prev.shipmentId,
-      trackingNumber: geliverTracking.trackingNumber || prev.trackingNumber,
-      trackingUrl: geliverTracking.trackingUrl || prev.trackingUrl,
-      trackingStatus: geliverTracking.trackingStatus || prev.trackingStatus,
-      trackingUpdatedAt: geliverTracking.trackingUpdatedAt
-        ? new Date(geliverTracking.trackingUpdatedAt).toISOString().slice(0, 16)
-        : prev.trackingUpdatedAt,
-      contentType: geliverTracking.contentType || prev.contentType,
-      labelUrl: geliverTracking.fileUrl || prev.labelUrl,
-      responsiveLabelUrl: geliverTracking.responsiveLabelUrl || prev.responsiveLabelUrl,
-    }));
-    setTrackingForm((prev) => ({
-      ...prev,
-      shipmentId: geliverTracking.shipmentId || prev.shipmentId,
-      trackingNumber: geliverTracking.trackingNumber || prev.trackingNumber,
-      trackingUrl: geliverTracking.trackingUrl || prev.trackingUrl,
-      trackingStatus: geliverTracking.trackingStatus || prev.trackingStatus,
-      trackingUpdatedAt: geliverTracking.trackingUpdatedAt
-        ? new Date(geliverTracking.trackingUpdatedAt).toISOString().slice(0, 16)
-        : prev.trackingUpdatedAt,
-    }));
-  }, [geliverTracking]);
 
   useEffect(() => {
     loadOrder();
@@ -231,6 +188,14 @@ const OrderDetailPage = () => {
     setPaymentOpen(false);
     setPaymentError("");
   }, [orderId]);
+
+  useEffect(() => {
+    return () => {
+      if (labelPdfUrl) {
+        window.URL.revokeObjectURL(labelPdfUrl);
+      }
+    };
+  }, [labelPdfUrl]);
 
   const handleFetchPayment = async () => {
     setPaymentLoading(true);
@@ -309,107 +274,48 @@ const OrderDetailPage = () => {
     }
   };
 
-  const handleDownloadLabel = async () => {
-    setLabelDownloading(true);
+  const handleViewLabel = async () => {
+    setLabelLoading(true);
+    setLabelPdfUrl(null);
     try {
       const blob = await downloadGeliverOrderLabel(Number(orderId));
-      const fileName =
-        geliverTracking?.fileName ||
-        `geliver-label-${order?.orderNumber || orderId}.pdf`;
       const url = window.URL.createObjectURL(blob);
+      setLabelPdfUrl(url);
+      setShowLabelModal(true);
+    } catch (err) {
+      toast.error(err?.message || "Kargo etiketi yüklenemedi.");
+    } finally {
+      setLabelLoading(false);
+    }
+  };
+
+  const handlePrintLabel = () => {
+    if (labelPdfUrl) {
+      const printWindow = window.open(labelPdfUrl, "_blank");
+      if (printWindow) {
+        printWindow.onload = () => {
+          printWindow.print();
+        };
+      }
+    }
+  };
+
+  const handleDownloadLabel = () => {
+    if (labelPdfUrl) {
       const link = document.createElement("a");
-      link.href = url;
-      link.download = fileName;
+      link.href = labelPdfUrl;
+      link.download = `geliver-label-${order?.orderNumber || orderId}.pdf`;
       document.body.appendChild(link);
       link.click();
       link.remove();
-      window.URL.revokeObjectURL(url);
-    } catch (err) {
-      toast.error(err?.message || "Kargo etiketi indirilemedi.");
-    } finally {
-      setLabelDownloading(false);
     }
   };
 
-  const handleManualLabelChange = (e) => {
-    const { name, value } = e.target;
-    setManualLabelForm((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleManualLabelSave = async (e) => {
-    e.preventDefault();
-    if (!manualLabelForm.shipmentId || !manualLabelForm.labelUrl) {
-      toast.error("Shipment ID ve label URL zorunludur.");
-      return;
-    }
-    setLabelSaving(true);
-    try {
-      const payload = {
-        labelUrl: manualLabelForm.labelUrl.trim(),
-        responsiveLabelUrl: manualLabelForm.responsiveLabelUrl.trim() || null,
-        shipmentId: manualLabelForm.shipmentId.trim(),
-        trackingNumber: manualLabelForm.trackingNumber.trim() || null,
-        trackingUrl: manualLabelForm.trackingUrl.trim() || null,
-        trackingStatus: manualLabelForm.trackingStatus.trim() || null,
-        trackingUpdatedAt: manualLabelForm.trackingUpdatedAt
-          ? new Date(manualLabelForm.trackingUpdatedAt).toISOString()
-          : null,
-        contentType: manualLabelForm.contentType || "application/pdf",
-      };
-      const data = await createGeliverOrderLabel(Number(orderId), payload);
-      toast.success(data?.isSkipped ? "Etiket zaten kayıtlı." : "Etiket bilgisi kaydedildi.");
-      await loadGeliverTracking();
-    } catch (err) {
-      toast.error(err?.message || "Etiket kaydedilemedi.");
-    } finally {
-      setLabelSaving(false);
-    }
-  };
-
-  const handleLabelUpload = async () => {
-    if (!labelUploadFile) {
-      toast.error("Lütfen bir etiket dosyası seçin.");
-      return;
-    }
-    setLabelUploading(true);
-    try {
-      const formData = new FormData();
-      formData.append("file", labelUploadFile);
-      await uploadGeliverOrderLabel(Number(orderId), formData);
-      toast.success("Etiket dosyası yüklendi.");
-      setLabelUploadFile(null);
-      await loadGeliverTracking();
-    } catch (err) {
-      toast.error(err?.message || "Etiket yüklenemedi.");
-    } finally {
-      setLabelUploading(false);
-    }
-  };
-
-  const handleTrackingUpdate = async (e) => {
-    e.preventDefault();
-    if (!trackingForm.shipmentId) {
-      toast.error("Shipment ID zorunludur.");
-      return;
-    }
-    setTrackingUpdating(true);
-    try {
-      const payload = {
-        shipmentId: trackingForm.shipmentId.trim(),
-        trackingNumber: trackingForm.trackingNumber.trim() || null,
-        trackingUrl: trackingForm.trackingUrl.trim() || null,
-        trackingStatus: trackingForm.trackingStatus.trim() || null,
-        trackingUpdatedAt: trackingForm.trackingUpdatedAt
-          ? new Date(trackingForm.trackingUpdatedAt).toISOString()
-          : null,
-      };
-      await updateGeliverTracking(payload);
-      toast.success("Takip bilgisi güncellendi.");
-      await loadGeliverTracking();
-    } catch (err) {
-      toast.error(err?.message || "Takip bilgisi güncellenemedi.");
-    } finally {
-      setTrackingUpdating(false);
+  const handleCloseLabelModal = () => {
+    setShowLabelModal(false);
+    if (labelPdfUrl) {
+      window.URL.revokeObjectURL(labelPdfUrl);
+      setLabelPdfUrl(null);
     }
   };
 
@@ -504,6 +410,21 @@ const OrderDetailPage = () => {
                       Kargo Bilgisi
                     </button>
 
+                    {geliverTracking?.fileUrl && (
+                      <button
+                        onClick={handleViewLabel}
+                        disabled={labelLoading}
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white rounded-xl font-semibold transition-all disabled:opacity-50 border border-white/30"
+                      >
+                        {labelLoading ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <FileText className="w-4 h-4" />
+                        )}
+                        Kargo Etiketi Görüntüle
+                      </button>
+                    )}
+
                     <button
                       onClick={handleCancelOrder}
                       disabled={cancelLoading}
@@ -564,229 +485,131 @@ const OrderDetailPage = () => {
           />
         </div>
 
-        {/* Geliver Kargo Etiketi */}
-        <div className="bg-white rounded-3xl shadow-2xl border border-gray-200 overflow-hidden">
-          <div className="bg-gradient-to-r from-sky-50 to-blue-50 px-6 py-4 border-b border-sky-100 flex items-center justify-between flex-wrap gap-3">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-500 to-blue-600 flex items-center justify-center text-white shadow-lg">
-                <Truck size={20} />
+        {/* Kargo Takip Durumu ve Webhook Timeline */}
+        {geliverTracking && (
+          <div className="bg-white rounded-3xl shadow-2xl border border-gray-200 overflow-hidden">
+            <div className="bg-gradient-to-r from-indigo-50 to-purple-50 px-6 py-4 border-b border-indigo-100 flex items-center justify-between flex-wrap gap-3">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-lg">
+                  <Activity size={20} />
+                </div>
+                <div>
+                  <h2 className="text-lg font-bold text-gray-800">Kargo Takip Durumu</h2>
+                  <p className="text-xs text-gray-500">Webhook ile otomatik güncellenir</p>
+                </div>
               </div>
-              <div>
-                <h2 className="text-lg font-bold text-gray-800">Geliver Kargo Etiketi</h2>
-                <p className="text-xs text-gray-500">Siparişin etiket ve takip durumu</p>
+              <button
+                onClick={loadGeliverTracking}
+                disabled={geliverLoading}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-indigo-200 text-indigo-700 text-sm font-semibold rounded-xl shadow-sm hover:shadow transition disabled:opacity-50"
+              >
+                {geliverLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
+                Yenile
+              </button>
+            </div>
+
+            <div className="p-6">
+              {/* Tracking Status Timeline */}
+              <div className="mb-6">
+                <h3 className="text-sm font-semibold text-gray-700 mb-4 flex items-center gap-2">
+                  <Navigation className="w-4 h-4" />
+                  Takip Durumu Timeline
+                </h3>
+                <TrackingTimeline
+                  trackingStatus={geliverTracking.trackingStatus}
+                  orderStatus={order.status}
+                  trackingUpdatedAt={geliverTracking.trackingUpdatedAt}
+                />
+              </div>
+
+              {/* Tracking Bilgileri */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl p-4 border border-blue-200">
+                  <p className="text-xs text-blue-600 mb-1">Tracking Status</p>
+                  <p className="font-bold text-gray-800">
+                    {geliverTracking.trackingStatus ? (
+                      <span className="inline-flex items-center gap-2">
+                        <Circle className="w-2 h-2 fill-current" />
+                        {geliverTracking.trackingStatus}
+                      </span>
+                    ) : (
+                      "Henüz güncellenmedi"
+                    )}
+                  </p>
+                </div>
+                <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-4 border border-purple-200">
+                  <p className="text-xs text-purple-600 mb-1">Sipariş Durumu</p>
+                  <p className="font-bold text-gray-800">
+                    <StatusBadge status={order.status} />
+                  </p>
+                </div>
+                {geliverTracking.trackingUpdatedAt && (
+                  <div className="bg-gradient-to-br from-emerald-50 to-green-50 rounded-xl p-4 border border-emerald-200">
+                    <p className="text-xs text-emerald-600 mb-1">Son Güncelleme</p>
+                    <p className="font-bold text-gray-800">
+                      {new Date(geliverTracking.trackingUpdatedAt).toLocaleString("tr-TR")}
+                    </p>
+                  </div>
+                )}
+                {geliverTracking.shipmentId && (
+                  <div className="bg-gradient-to-br from-amber-50 to-yellow-50 rounded-xl p-4 border border-amber-200">
+                    <p className="text-xs text-amber-600 mb-1">Shipment ID</p>
+                    <p className="font-bold text-gray-800 text-xs break-all">{geliverTracking.shipmentId}</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Webhook Mapping Bilgisi */}
+              <div className="bg-gradient-to-br from-gray-50 to-white border border-gray-200 rounded-xl p-4">
+                <div className="flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-indigo-100 flex items-center justify-center flex-shrink-0">
+                    <InfoIcon className="w-4 h-4 text-indigo-600" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-xs font-semibold text-gray-700 mb-1">Webhook Durum Mapping</p>
+                    <p className="text-xs text-gray-600 mb-2">
+                      Geliver webhook'larından gelen tracking durumları otomatik olarak sipariş durumuna çevrilir:
+                    </p>
+                    <div className="space-y-1.5 text-xs">
+                      <div className="flex items-center gap-2 p-2 bg-blue-50 rounded-lg border border-blue-100">
+                        <span className="text-gray-600 font-medium">PRE_TRANSIT / TRANSIT / OUT_FOR_DELIVERY</span>
+                        <span className="text-gray-400">→</span>
+                        <span className="font-semibold text-blue-600">Shipped</span>
+                        <span className="text-gray-500 text-xs">(Kargoya verildi / Yolda / Dağıtımda)</span>
+                      </div>
+                      <div className="flex items-center gap-2 p-2 bg-purple-50 rounded-lg border border-purple-100">
+                        <span className="text-gray-600 font-medium">DELIVERED</span>
+                        <span className="text-gray-400">→</span>
+                        <span className="font-semibold text-purple-600">Delivered</span>
+                        <span className="text-gray-500 text-xs">(Teslim edildi)</span>
+                      </div>
+                      <div className="flex items-center gap-2 p-2 bg-amber-50 rounded-lg border border-amber-100">
+                        <span className="text-gray-600 font-medium">RETURNED</span>
+                        <span className="text-gray-400">→</span>
+                        <span className="font-semibold text-amber-600">RefundPending</span>
+                        <span className="text-gray-500 text-xs">(İade/inceleme süreci)</span>
+                      </div>
+                      <div className="flex items-center gap-2 p-2 bg-red-50 rounded-lg border border-red-100">
+                        <span className="text-gray-600 font-medium">CANCELLED</span>
+                        <span className="text-gray-400">→</span>
+                        <span className="font-semibold text-red-600">Cancelled</span>
+                        <span className="text-gray-500 text-xs">(Kargo iptal edildi)</span>
+                      </div>
+                    </div>
+                    <div className="mt-3 pt-3 border-t border-gray-200">
+                      <p className="text-xs text-gray-600">
+                        <span className="font-semibold">Not:</span> Webhook işlemleri idempotent'tir. 
+                        Aynı webhook birden fazla kez gelirse sadece en yeni olan işlenir. 
+                        Sipariş durumu geçişleri geçerlilik kontrolünden geçer.
+                      </p>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
-            <button
-              onClick={loadGeliverTracking}
-              disabled={geliverLoading}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-sky-200 text-sky-700 text-sm font-semibold rounded-xl shadow-sm hover:shadow transition disabled:opacity-50"
-            >
-              {geliverLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
-              Yenile
-            </button>
           </div>
+        )}
 
-          <div className="p-6 space-y-4">
-            {geliverLoading ? (
-              <div className="flex items-center gap-2 text-sm text-gray-500">
-                <Loader2 className="w-4 h-4 animate-spin" />
-                Geliver bilgileri yükleniyor...
-              </div>
-            ) : geliverTracking ? (
-              <>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                  <InfoRow label="Shipment ID" value={geliverTracking.shipmentId} />
-                  <InfoRow label="Takip Numarası" value={geliverTracking.trackingNumber} />
-                  <InfoRow label="Takip Durumu" value={geliverTracking.trackingStatus} />
-                  <InfoRow
-                    label="Takip Güncelleme"
-                    value={
-                      geliverTracking.trackingUpdatedAt
-                        ? new Date(geliverTracking.trackingUpdatedAt).toLocaleString("tr-TR")
-                        : "-"
-                    }
-                  />
-                  <InfoRow label="Etiket Dosyası" value={geliverTracking.fileName || "-"} />
-                  <InfoRow label="Kayıt Durumu" value={geliverTracking.isSkipped ? "Zaten Kayıtlı" : "Yeni"} />
-                </div>
-
-                <div className="flex flex-wrap gap-3">
-                  <button
-                    onClick={handleDownloadLabel}
-                    disabled={labelDownloading}
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-sm font-semibold hover:shadow-lg transition disabled:opacity-50"
-                  >
-                    {labelDownloading ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileText className="w-4 h-4" />}
-                    Etiketi İndir
-                  </button>
-                  {geliverTracking.fileUrl && (
-                    <a
-                      href={geliverTracking.fileUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-gray-200 text-gray-700 text-sm font-semibold hover:bg-gray-50 transition"
-                    >
-                      <Eye className="w-4 h-4" />
-                      Etiketi Görüntüle
-                    </a>
-                  )}
-                  {geliverTracking.trackingUrl && (
-                    <a
-                      href={geliverTracking.trackingUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-gray-200 text-gray-700 text-sm font-semibold hover:bg-gray-50 transition"
-                    >
-                      <Package className="w-4 h-4" />
-                      Kargo Takip
-                    </a>
-                  )}
-                </div>
-
-              </>
-            ) : (
-              <div className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-600">
-                {geliverError || "Bu sipariş için Geliver etiketi bulunmuyor."}
-              </div>
-            )}
-
-            <div className="border-t border-gray-100 pt-5 space-y-6">
-              {/* Manuel Etiket Yükleme */}
-              <div className="bg-gray-50 border border-gray-200 rounded-2xl p-4">
-                <h3 className="text-sm font-semibold text-gray-800 mb-3">Manuel Etiket Yükleme</h3>
-                <div className="flex flex-wrap items-center gap-3">
-                  <input
-                    type="file"
-                    accept="application/pdf"
-                    onChange={(e) => setLabelUploadFile(e.target.files?.[0] || null)}
-                    className="text-sm"
-                  />
-                  <button
-                    onClick={handleLabelUpload}
-                    disabled={labelUploading}
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white border border-gray-200 text-gray-700 text-sm font-semibold hover:bg-gray-100 transition disabled:opacity-50"
-                  >
-                    {labelUploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
-                    Etiketi Yükle
-                  </button>
-                </div>
-              </div>
-
-              {/* Manuel Etiket Kaydı */}
-              <form onSubmit={handleManualLabelSave} className="bg-white border border-gray-200 rounded-2xl p-4 space-y-4">
-                <h3 className="text-sm font-semibold text-gray-800">Manuel Etiket Kaydı</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-                  <InputField
-                    label="Label URL"
-                    name="labelUrl"
-                    value={manualLabelForm.labelUrl}
-                    onChange={handleManualLabelChange}
-                    required
-                  />
-                  <InputField
-                    label="Responsive Label URL"
-                    name="responsiveLabelUrl"
-                    value={manualLabelForm.responsiveLabelUrl}
-                    onChange={handleManualLabelChange}
-                  />
-                  <InputField
-                    label="Shipment ID"
-                    name="shipmentId"
-                    value={manualLabelForm.shipmentId}
-                    onChange={handleManualLabelChange}
-                    required
-                  />
-                  <InputField
-                    label="Tracking No"
-                    name="trackingNumber"
-                    value={manualLabelForm.trackingNumber}
-                    onChange={handleManualLabelChange}
-                  />
-                  <InputField
-                    label="Tracking URL"
-                    name="trackingUrl"
-                    value={manualLabelForm.trackingUrl}
-                    onChange={handleManualLabelChange}
-                  />
-                  <InputField
-                    label="Tracking Status"
-                    name="trackingStatus"
-                    value={manualLabelForm.trackingStatus}
-                    onChange={handleManualLabelChange}
-                  />
-                  <InputField
-                    label="Tracking Updated At"
-                    name="trackingUpdatedAt"
-                    value={manualLabelForm.trackingUpdatedAt}
-                    onChange={handleManualLabelChange}
-                    type="datetime-local"
-                  />
-                  <InputField
-                    label="Content Type"
-                    name="contentType"
-                    value={manualLabelForm.contentType}
-                    onChange={handleManualLabelChange}
-                  />
-                </div>
-                <button
-                  type="submit"
-                  disabled={labelSaving}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-sky-600 to-blue-600 text-white text-sm font-semibold hover:shadow-lg transition disabled:opacity-50"
-                >
-                  {labelSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-                  Etiket Bilgisini Kaydet
-                </button>
-              </form>
-
-              {/* Takip Bilgisi Güncelle */}
-              <form onSubmit={handleTrackingUpdate} className="bg-white border border-gray-200 rounded-2xl p-4 space-y-4">
-                <h3 className="text-sm font-semibold text-gray-800">Takip Bilgisi Güncelle</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-                  <InputField
-                    label="Shipment ID"
-                    name="shipmentId"
-                    value={trackingForm.shipmentId}
-                    onChange={(e) => setTrackingForm((prev) => ({ ...prev, shipmentId: e.target.value }))}
-                    required
-                  />
-                  <InputField
-                    label="Tracking No"
-                    name="trackingNumber"
-                    value={trackingForm.trackingNumber}
-                    onChange={(e) => setTrackingForm((prev) => ({ ...prev, trackingNumber: e.target.value }))}
-                  />
-                  <InputField
-                    label="Tracking URL"
-                    name="trackingUrl"
-                    value={trackingForm.trackingUrl}
-                    onChange={(e) => setTrackingForm((prev) => ({ ...prev, trackingUrl: e.target.value }))}
-                  />
-                  <InputField
-                    label="Tracking Status"
-                    name="trackingStatus"
-                    value={trackingForm.trackingStatus}
-                    onChange={(e) => setTrackingForm((prev) => ({ ...prev, trackingStatus: e.target.value }))}
-                  />
-                  <InputField
-                    label="Tracking Updated At"
-                    name="trackingUpdatedAt"
-                    value={trackingForm.trackingUpdatedAt}
-                    onChange={(e) => setTrackingForm((prev) => ({ ...prev, trackingUpdatedAt: e.target.value }))}
-                    type="datetime-local"
-                  />
-                </div>
-                <button
-                  type="submit"
-                  disabled={trackingUpdating}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white border border-gray-200 text-gray-700 text-sm font-semibold hover:bg-gray-50 transition disabled:opacity-50"
-                >
-                  {trackingUpdating ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
-                  Takip Bilgisini Güncelle
-                </button>
-              </form>
-            </div>
-          </div>
-        </div>
 
         {/* Ödeme Bilgileri */}
         <div className="bg-white rounded-3xl shadow-2xl border border-gray-200 overflow-hidden">
@@ -976,6 +799,77 @@ const OrderDetailPage = () => {
         </div>
       </div>
 
+      {/* Kargo Etiketi Görüntüleme Modal */}
+      {showLabelModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-3xl shadow-2xl max-w-5xl w-full h-[90vh] flex flex-col overflow-hidden animate-[slideUp_0.3s_ease-out]">
+            {/* Modal Header */}
+            <div className="bg-gradient-to-r from-sky-600 to-blue-600 px-6 py-5 text-white flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                  <FileText size={24} />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold">Kargo Etiketi</h3>
+                  <p className="text-sky-100 text-sm">Sipariş No: {order.orderNumber}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                {labelPdfUrl && (
+                  <>
+                    <button
+                      onClick={handlePrintLabel}
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white rounded-xl font-semibold transition-all border border-white/30"
+                    >
+                      <Printer className="w-4 h-4" />
+                      Yazdır
+                    </button>
+                    <button
+                      onClick={handleDownloadLabel}
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white rounded-xl font-semibold transition-all border border-white/30"
+                    >
+                      <Download className="w-4 h-4" />
+                      İndir
+                    </button>
+                  </>
+                )}
+                <button
+                  onClick={handleCloseLabelModal}
+                  className="w-10 h-10 rounded-xl bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white flex items-center justify-center transition-all border border-white/30"
+                >
+                  <XCircle className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+
+            {/* Modal Body - PDF Viewer */}
+            <div className="flex-1 overflow-hidden bg-gray-100">
+              {labelLoading ? (
+                <div className="h-full flex items-center justify-center">
+                  <div className="text-center">
+                    <Loader2 className="w-12 h-12 animate-spin text-sky-600 mx-auto mb-4" />
+                    <p className="text-gray-600 font-medium">Kargo etiketi yükleniyor...</p>
+                  </div>
+                </div>
+              ) : labelPdfUrl ? (
+                <iframe
+                  src={labelPdfUrl}
+                  className="w-full h-full border-0"
+                  title="Kargo Etiketi"
+                />
+              ) : (
+                <div className="h-full flex items-center justify-center">
+                  <div className="text-center">
+                    <FileText className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                    <p className="text-gray-600 font-medium">Kargo etiketi yüklenemedi.</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Kargo Bilgisi Modal */}
       {showCarrierModal && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
@@ -1094,6 +988,174 @@ const InfoRow = ({ label, value }) => (
     <span className="font-semibold text-gray-800 break-all">{value || "-"}</span>
   </div>
 );
+
+// Tracking Timeline Component
+const TrackingTimeline = ({ trackingStatus, orderStatus, trackingUpdatedAt }) => {
+  const getStatusSteps = () => {
+    const steps = [
+      {
+        key: "SHIPPED",
+        label: "Kargoya Verildi / Yolda / Dağıtımda",
+        trackingStatuses: ["PRE_TRANSIT", "TRANSIT", "IN_TRANSIT", "OUT_FOR_DELIVERY"],
+        orderStatuses: ["Shipped"],
+        icon: <Truck className="w-4 h-4" />,
+        color: "blue",
+        description: "Kargo şirketine verildi, yolda veya dağıtımda"
+      },
+      {
+        key: "DELIVERED",
+        label: "Teslim Edildi",
+        trackingStatuses: ["DELIVERED"],
+        orderStatuses: ["Delivered"],
+        icon: <CheckCircle className="w-4 h-4" />,
+        color: "purple",
+        description: "Kargo alıcıya teslim edildi"
+      },
+      {
+        key: "RETURNED",
+        label: "İade / İnceleme",
+        trackingStatuses: ["RETURNED"],
+        orderStatuses: ["RefundPending"],
+        icon: <RefreshCw className="w-4 h-4" />,
+        color: "amber",
+        description: "Kargo iade edildi, inceleme süreci başlatıldı"
+      },
+      {
+        key: "CANCELLED",
+        label: "Kargo İptal Edildi",
+        trackingStatuses: ["CANCELLED"],
+        orderStatuses: ["Cancelled"],
+        icon: <XCircle className="w-4 h-4" />,
+        color: "red",
+        description: "Kargo iptal edildi"
+      }
+    ];
+
+    return steps.map((step, index) => {
+      // Check if this step is active based on tracking status or order status
+      const normalizedTrackingStatus = trackingStatus?.toUpperCase()?.trim();
+      const isActiveByTracking = normalizedTrackingStatus && step.trackingStatuses.some(ts => 
+        normalizedTrackingStatus === ts || 
+        normalizedTrackingStatus.includes(ts) || 
+        ts.includes(normalizedTrackingStatus)
+      );
+      const isActiveByOrder = step.orderStatuses.includes(orderStatus);
+      const isActive = isActiveByTracking || isActiveByOrder;
+      
+      // Check if completed (only delivered can be completed)
+      const isCompleted = step.key === "DELIVERED" && orderStatus === "Delivered";
+      
+      // Check if error state (cancelled or returned)
+      const isError = step.key === "CANCELLED" || step.key === "RETURNED";
+      
+      return {
+        ...step,
+        isActive,
+        isCompleted,
+        isError,
+        isLast: index === steps.length - 1,
+        isActiveByTracking,
+        isActiveByOrder
+      };
+    });
+  };
+
+  const steps = getStatusSteps();
+  const activeStep = steps.find(s => s.isActive);
+
+  return (
+    <div className="relative">
+      {/* Timeline Line */}
+      <div className="absolute left-5 top-0 bottom-0 w-0.5 bg-gray-200" />
+      
+      <div className="space-y-6">
+        {steps.map((step, index) => {
+          // Only show active steps and the next step, or all if none are active
+          const shouldShow = step.isActive || 
+                           (index === 0 && !activeStep) || 
+                           (activeStep && index <= steps.findIndex(s => s.key === activeStep.key) + 1);
+          
+          if (!shouldShow && !step.isError) return null;
+
+          return (
+            <div key={step.key} className="relative flex items-start gap-4">
+              {/* Status Icon */}
+              <div
+                className={`relative z-10 w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all ${
+                  step.isCompleted
+                    ? "bg-purple-500 border-purple-500 text-white shadow-lg scale-110"
+                    : step.isError && step.isActive
+                    ? "bg-red-500 border-red-500 text-white shadow-lg scale-110"
+                    : step.isError
+                    ? "bg-red-100 border-red-300 text-red-600"
+                    : step.isActive
+                    ? "bg-blue-500 border-blue-500 text-white shadow-lg scale-110"
+                    : "bg-white border-gray-300 text-gray-400"
+                }`}
+              >
+                {step.isCompleted || step.isActive ? (
+                  step.icon
+                ) : (
+                  <Circle className="w-3 h-3 fill-current" />
+                )}
+              </div>
+
+              {/* Status Content */}
+              <div className="flex-1 pt-1">
+                <div
+                  className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-semibold mb-2 ${
+                    step.isCompleted
+                      ? "bg-purple-100 text-purple-700 border border-purple-200"
+                      : step.isError && step.isActive
+                      ? "bg-red-100 text-red-700 border border-red-200"
+                      : step.isError
+                      ? "bg-red-50 text-red-600 border border-red-200"
+                      : step.isActive
+                      ? "bg-blue-100 text-blue-700 border border-blue-200"
+                      : "bg-gray-100 text-gray-500 border border-gray-200"
+                  }`}
+                >
+                  {step.label}
+                  {step.isActive && (
+                    <span className="text-xs font-normal opacity-75">
+                      {step.isActiveByTracking ? "(Webhook)" : "(Manuel)"}
+                    </span>
+                  )}
+                </div>
+                <div className="text-xs text-gray-500 space-y-1.5">
+                  <p className="text-gray-600 italic">{step.description}</p>
+                  <div className="flex items-center gap-2">
+                    <span className="font-medium">Tracking Status:</span>
+                    <span className="font-semibold text-gray-700">
+                      {step.trackingStatuses.join(" / ")}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="font-medium">Sipariş Durumu:</span>
+                    <span className="font-semibold text-gray-700">{step.orderStatuses.join(" / ")}</span>
+                  </div>
+                  {step.isActive && trackingUpdatedAt && (
+                    <div className="mt-2 pt-2 border-t border-gray-200">
+                      <p className="text-emerald-600 font-medium flex items-center gap-1">
+                        <CheckCircle className="w-3 h-3" />
+                        Son Güncelleme: {new Date(trackingUpdatedAt).toLocaleString("tr-TR")}
+                      </p>
+                      {trackingStatus && (
+                        <p className="text-gray-600 mt-1">
+                          Mevcut Durum: <span className="font-semibold">{trackingStatus}</span>
+                        </p>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
 
 const InputField = ({ label, name, value, onChange, type = "text", required }) => (
   <label className="flex flex-col gap-1 text-xs text-gray-500">

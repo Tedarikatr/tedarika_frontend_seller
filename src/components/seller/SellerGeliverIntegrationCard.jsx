@@ -5,6 +5,7 @@ import {
   autoRegisterGeliver,
   saveGeliverIntegrationDetails,
   uploadGeliverAgreement,
+  matchExistingGeliverAccount,
 } from "@/api/sellerGeliverService";
 import { CARRIER_COMPANY_ENUMS } from "@/constants/carrierCompanies";
 import {
@@ -17,6 +18,10 @@ import {
   CheckCircle,
   XCircle,
   Zap,
+  ChevronDown,
+  ChevronUp,
+  LogIn,
+  UserPlus,
 } from "lucide-react";
 
 const STATUS_META = {
@@ -57,10 +62,21 @@ export default function SellerGeliverIntegrationCard() {
 
   const [requestLoading, setRequestLoading] = useState(false);
   const [autoRegisterLoading, setAutoRegisterLoading] = useState(false);
+  const [matchAccountLoading, setMatchAccountLoading] = useState(false);
   const [detailsLoading, setDetailsLoading] = useState(false);
   const [agreementLoading, setAgreementLoading] = useState(false);
+  const [showIntegrationDetails, setShowIntegrationDetails] = useState(false);
+  const [showAgreementForm, setShowAgreementForm] = useState(false);
+  const [showMatchAccountForm, setShowMatchAccountForm] = useState(false);
 
   const [detailsForm, setDetailsForm] = useState({
+    apiToken: "",
+    senderAddressId: "",
+    providerServiceCode: "",
+    autoLabelEnabled: true,
+  });
+
+  const [matchAccountForm, setMatchAccountForm] = useState({
     apiToken: "",
     senderAddressId: "",
     providerServiceCode: "",
@@ -160,6 +176,44 @@ export default function SellerGeliverIntegrationCard() {
       setMessage(err?.message || "Otomatik kayıt başarısız. Manuel entegrasyona geçebilirsiniz.");
     } finally {
       setAutoRegisterLoading(false);
+    }
+  };
+
+  const handleMatchAccountChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setMatchAccountForm((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
+  };
+
+  const handleMatchExistingAccount = async (e) => {
+    e.preventDefault();
+    setMatchAccountLoading(true);
+    setMessage("");
+    setMessageType("success");
+    try {
+      const payload = {
+        apiToken: matchAccountForm.apiToken.trim(),
+        senderAddressId: matchAccountForm.senderAddressId.trim() || undefined,
+        providerServiceCode: matchAccountForm.providerServiceCode.trim() || undefined,
+        autoLabelEnabled: Boolean(matchAccountForm.autoLabelEnabled),
+      };
+      const data = await matchExistingGeliverAccount(payload);
+      if (data?.isValid && data?.integrationStatus) {
+        setStatus(data.integrationStatus);
+        await loadIntegrationDetails();
+        setMessage(data?.message || "Geliver hesabı başarıyla eşleştirildi ve entegrasyon aktif edildi.");
+        setShowMatchAccountForm(false);
+      } else {
+        setMessageType("error");
+        setMessage(data?.message || "Hesap eşleştirme başarısız. Token'ı kontrol edin.");
+      }
+    } catch (err) {
+      setMessageType("error");
+      setMessage(err?.message || "Hesap eşleştirme başarısız. Token'ı kontrol edin.");
+    } finally {
+      setMatchAccountLoading(false);
     }
   };
 
@@ -290,26 +344,19 @@ export default function SellerGeliverIntegrationCard() {
             <ShieldCheck className="w-5 h-5 text-emerald-600" />
             <h3 className="text-lg font-semibold text-gray-900">Entegrasyon Durumu</h3>
           </div>
-          <div className="flex flex-wrap items-center gap-2">
-            <button
-              type="button"
-              onClick={handleAutoRegister}
-              disabled={autoRegisterLoading || hasIntegrationInfo}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-sky-200 bg-sky-50 text-sky-700 text-sm font-semibold hover:bg-sky-100 transition disabled:opacity-50"
-            >
-              {autoRegisterLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4" />}
-              Otomatik Kayıt
-            </button>
-            <button
-              type="button"
-              onClick={handleRequest}
-              disabled={requestLoading || hasIntegrationInfo}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-emerald-200 bg-emerald-50 text-emerald-700 text-sm font-semibold hover:bg-emerald-100 transition disabled:opacity-50"
-            >
-              {requestLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
-              Talep Oluştur / Durumu Getir
-            </button>
-          </div>
+          {!hasIntegrationInfo && (
+            <div className="flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                onClick={handleRequest}
+                disabled={requestLoading}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-emerald-200 bg-emerald-50 text-emerald-700 text-sm font-semibold hover:bg-emerald-100 transition disabled:opacity-50"
+              >
+                {requestLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
+                Talep Oluştur / Durumu Getir
+              </button>
+            </div>
+          )}
         </div>
 
         {status ? (
@@ -359,13 +406,122 @@ export default function SellerGeliverIntegrationCard() {
         </div>
       )}
 
+      {/* Geliver Hesap Seçenekleri - Sadece kayıt bilgileri yoksa göster */}
+      {!hasIntegrationInfo && (
+        <div className="mb-6 rounded-2xl border border-gray-200 p-5 bg-gradient-to-br from-white to-gray-50">
+          <div className="flex items-center gap-2 mb-4">
+            <ShieldCheck className="w-5 h-5 text-sky-600" />
+            <h3 className="text-lg font-semibold text-gray-900">Geliver Entegrasyonu</h3>
+          </div>
+          <p className="text-sm text-gray-600 mb-4">
+            Geliver kargo entegrasyonunu başlatmak için aşağıdaki seçeneklerden birini seçin:
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <button
+              type="button"
+              onClick={() => setShowMatchAccountForm(!showMatchAccountForm)}
+              className="flex items-center justify-center gap-3 px-6 py-4 rounded-xl border-2 border-sky-200 bg-sky-50 text-sky-700 text-sm font-semibold hover:bg-sky-100 hover:border-sky-300 transition-all"
+            >
+              <LogIn className="w-5 h-5" />
+              Mevcut Geliver Hesabına Giriş Yap
+            </button>
+            <button
+              type="button"
+              onClick={handleAutoRegister}
+              disabled={autoRegisterLoading}
+              className="flex items-center justify-center gap-3 px-6 py-4 rounded-xl border-2 border-emerald-200 bg-emerald-50 text-emerald-700 text-sm font-semibold hover:bg-emerald-100 hover:border-emerald-300 transition-all disabled:opacity-50"
+            >
+              {autoRegisterLoading ? (
+                <Loader2 className="w-5 h-5 animate-spin" />
+              ) : (
+                <UserPlus className="w-5 h-5" />
+              )}
+              Geliver Kargo'da Yeni Hesap Aç
+            </button>
+          </div>
+
+          {/* Mevcut Hesap Giriş Formu */}
+          {showMatchAccountForm && (
+            <div className="mt-6 rounded-xl border border-sky-200 bg-sky-50 p-5">
+              <h4 className="text-sm font-semibold text-gray-900 mb-4">Mevcut Geliver Hesabı Bilgileri</h4>
+              <form onSubmit={handleMatchExistingAccount} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Field
+                  label="Geliver API Token"
+                  name="apiToken"
+                  value={matchAccountForm.apiToken}
+                  onChange={handleMatchAccountChange}
+                  placeholder="geliver_api_token"
+                  required
+                />
+                <Field
+                  label="Gönderici Adres ID (Opsiyonel)"
+                  name="senderAddressId"
+                  value={matchAccountForm.senderAddressId}
+                  onChange={handleMatchAccountChange}
+                  placeholder="address_id"
+                />
+                <Field
+                  label="Servis Kodu (Opsiyonel)"
+                  name="providerServiceCode"
+                  value={matchAccountForm.providerServiceCode}
+                  onChange={handleMatchAccountChange}
+                  placeholder="YURTICI_STANDART"
+                />
+                <div className="flex items-center gap-2 mt-2">
+                  <input
+                    id="matchAutoLabelEnabled"
+                    name="autoLabelEnabled"
+                    type="checkbox"
+                    checked={matchAccountForm.autoLabelEnabled}
+                    onChange={handleMatchAccountChange}
+                    className="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
+                  />
+                  <label htmlFor="matchAutoLabelEnabled" className="text-sm text-gray-700">
+                    Otomatik etiket oluşturma aktif olsun
+                  </label>
+                </div>
+                <div className="md:col-span-2 flex items-center gap-3 mt-2">
+                  <button
+                    type="submit"
+                    disabled={matchAccountLoading}
+                    className="inline-flex items-center gap-2 px-5 py-2 rounded-xl bg-gradient-to-r from-sky-600 to-blue-600 text-white text-sm font-semibold hover:shadow-lg transition disabled:opacity-50"
+                  >
+                    {matchAccountLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
+                    Hesabı Eşleştir
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowMatchAccountForm(false)}
+                    className="inline-flex items-center gap-2 px-5 py-2 rounded-xl border border-gray-300 bg-white text-gray-700 text-sm font-semibold hover:bg-gray-50 transition"
+                  >
+                    İptal
+                  </button>
+                </div>
+              </form>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Entegrasyon Bilgileri */}
       <div className="rounded-2xl border border-gray-200 p-5 mb-6">
-        <div className="flex items-center gap-2 mb-4">
-          <Link2 className="w-5 h-5 text-sky-600" />
-          <h3 className="text-lg font-semibold text-gray-900">Entegrasyon Bilgileri</h3>
-        </div>
-        <form onSubmit={handleSaveDetails} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <button
+          type="button"
+          onClick={() => setShowIntegrationDetails(!showIntegrationDetails)}
+          className="w-full flex items-center justify-between gap-2 mb-4"
+        >
+          <div className="flex items-center gap-2">
+            <Link2 className="w-5 h-5 text-sky-600" />
+            <h3 className="text-lg font-semibold text-gray-900">Entegrasyon Bilgileri</h3>
+          </div>
+          {showIntegrationDetails ? (
+            <ChevronUp className="w-5 h-5 text-gray-500" />
+          ) : (
+            <ChevronDown className="w-5 h-5 text-gray-500" />
+          )}
+        </button>
+        {showIntegrationDetails && (
+          <form onSubmit={handleSaveDetails} className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Field
             label="Geliver API Token"
             name="apiToken"
@@ -424,15 +580,28 @@ export default function SellerGeliverIntegrationCard() {
             )}
           </div>
         </form>
+        )}
       </div>
 
       {/* Anlaşma Yükleme */}
       <div className="rounded-2xl border border-gray-200 p-5">
-        <div className="flex items-center gap-2 mb-4">
-          <FileText className="w-5 h-5 text-purple-600" />
-          <h3 className="text-lg font-semibold text-gray-900">Taşıyıcı Anlaşması Yükle</h3>
-        </div>
-        <form onSubmit={handleUploadAgreement} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <button
+          type="button"
+          onClick={() => setShowAgreementForm(!showAgreementForm)}
+          className="w-full flex items-center justify-between gap-2 mb-4"
+        >
+          <div className="flex items-center gap-2">
+            <FileText className="w-5 h-5 text-purple-600" />
+            <h3 className="text-lg font-semibold text-gray-900">Taşıyıcı Anlaşması Yükle</h3>
+          </div>
+          {showAgreementForm ? (
+            <ChevronUp className="w-5 h-5 text-gray-500" />
+          ) : (
+            <ChevronDown className="w-5 h-5 text-gray-500" />
+          )}
+        </button>
+        {showAgreementForm && (
+          <form onSubmit={handleUploadAgreement} className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <SelectField
             label="Taşıyıcı Şirket"
             name="carrierCompany"
@@ -489,6 +658,7 @@ export default function SellerGeliverIntegrationCard() {
             <CheckCircle className="w-4 h-4 text-purple-600" />
             Anlaşma yüklendi: {agreementInfo.agreementFileUrl ? "Dosya bağlantısı hazır." : "Kayıt tamamlandı."}
           </div>
+        )}
         )}
       </div>
 
