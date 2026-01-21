@@ -6,12 +6,13 @@ Bu doküman, satıcı tarafında Geliver entegrasyonu ve sipariş kargo etiketi/
 
 1. [Genel Bilgiler](#genel-bilgiler)
 2. [Entegrasyon Akışları](#entegrasyon-akışları)
-3. [API Endpoint'leri](#api-endpointleri)
-4. [DTO Modelleri ve Örnekler](#dto-modelleri-ve-örnekler)
-5. [Kargo Maliyeti Entegrasyonu](#kargo-maliyeti-entegrasyonu)
-6. [Webhook Entegrasyonu](#webhook-entegrasyonu)
-7. [Frontend Kullanım Notları](#frontend-kullanım-notları)
-8. [Konfigürasyon](#konfigürasyon)
+3. [Kargo Etiketi Oluşturma Mekanizması](#kargo-etiketi-oluşturma-mekanizması) ⭐
+4. [API Endpoint'leri](#api-endpointleri)
+5. [DTO Modelleri ve Örnekler](#dto-modelleri-ve-örnekler)
+6. [Kargo Maliyeti Entegrasyonu](#kargo-maliyeti-entegrasyonu)
+7. [Webhook Entegrasyonu](#webhook-entegrasyonu)
+8. [Frontend Kullanım Notları](#frontend-kullanım-notları)
+9. [Konfigürasyon](#konfigürasyon)
 
 ---
 
@@ -48,6 +49,135 @@ Bu doküman, satıcı tarafında Geliver entegrasyonu ve sipariş kargo etiketi/
 2. **Entegrasyon detaylarını kaydet**: `POST /api/SellerGeliver/integration-details`
    - Token validate edilir ve organization bilgileri otomatik alınır
 3. **Anlaşma yükle**: `POST /api/SellerGeliver/agreements`
+
+---
+
+## Kargo Etiketi Oluşturma Mekanizması
+
+### Otomatik Kargo Etiketi Oluşturma (Varsayılan) ⭐
+
+**Sipariş oluşturulduğunda otomatik olarak kargo etiketi oluşturulur.**
+
+#### Akış
+
+1. **Sipariş Oluşturulur**
+   - Buyer sipariş oluşturur (`POST /api/BuyerOrder`)
+   - `OrderService.CreateOrderAsync` çalışır
+   - `OrderShippingLabelRequestedEvent` event'i publish edilir
+
+2. **Event Worker İşler**
+   - `OrderShippingLabelRequestedEventWorker` event'i dinler
+   - `OrderShippingLabelRequestedEventHandler` handler'ı çalışır
+   - `GeliverLabelAutomationService.CreateOrderShippingLabelAsync` çağrılır
+
+3. **Otomatik Etiket Oluşturma Kontrolleri**
+   - ✅ Entegrasyon aktif mi? (`Status == Active`)
+   - ✅ Otomatik etiket açık mı? (`AutoLabelEnabled == true`)
+   - ✅ API Token ve Sender Address ID mevcut mu?
+   - ✅ Sipariş için label zaten var mı? (varsa atlanır)
+
+4. **Geliver API İşlemleri**
+   - Geliver API'ye shipment oluşturma isteği gönderilir
+   - Offer'lar alınır (`offers.cheapest` seçilir)
+   - En ucuz offer kabul edilir (eğer label yoksa)
+   - **Kargo maliyeti tespit edilir ve siparişe eklenir**
+   - Label URL ve tracking bilgileri alınır
+
+5. **Veritabanı Kayıtları**
+   - `OrderShippingLabel` kaydı oluşturulur
+   - `Order.ShippingCost` güncellenir
+   - `Order.TotalAmount` güncellenir (ürün + kargo)
+   - `Payment.TotalAmount` güncellenir (eğer henüz completed değilse)
+
+#### Ön Koşullar
+
+- ✅ Geliver entegrasyonu aktif olmalı (`Status == Active`)
+- ✅ `AutoLabelEnabled == true` olmalı
+- ✅ `ApiToken` ve `SenderAddressId` dolu olmalı
+- ✅ Sipariş için alıcı adresi tam olmalı (name, phone, address, city)
+
+#### Ne Zaman Atlanır?
+
+- Entegrasyon aktif değilse
+- `AutoLabelEnabled == false` ise
+- API Token veya Sender Address ID eksikse
+- Sipariş için zaten label mevcutsa
+- Alıcı adresi eksikse
+
+#### Örnek Senaryo
+
+```javascript
+// 1. Buyer sipariş oluşturur
+const order = await fetch('/api/BuyerOrder', {
+  method: 'POST',
+  body: JSON.stringify({ /* order data */ })
+});
+
+// 2. Backend'de otomatik olarak:
+// - Order oluşturulur
+// - OrderShippingLabelRequestedEvent publish edilir
+// - Worker event'i yakalar
+// - GeliverLabelAutomationService çalışır
+// - Geliver API'ye shipment isteği gönderilir
+// - Offer'lar alınır, en ucuz seçilir
+// - Shipping cost tespit edilir ve kaydedilir
+// - Label oluşturulur ve kaydedilir
+
+// 3. Satıcı hiçbir şey yapmaz - her şey otomatik!
+```
+
+---
+
+### Manuel Kargo Etiketi Oluşturma
+
+Satıcı isterse manuel olarak da kargo etiketi oluşturabilir veya yükleyebilir.
+
+#### Yöntem 1: Geliver API'den Label Bilgileriyle Kaydetme
+
+**POST** `/api/SellerGeliver/orders/{orderId}/geliver-label`
+
+Satıcı Geliver API'den label bilgilerini alıp bu endpoint'e gönderir.
+
+#### Yöntem 2: Dosya Yükleme
+
+**POST** `/api/SellerGeliver/orders/{orderId}/label`
+
+Satıcı kargo etiketini PDF olarak yükler.
+
+#### Ne Zaman Manuel Kullanılır?
+
+- Otomatik etiket oluşturma kapalıysa (`AutoLabelEnabled == false`)
+- Otomatik oluşturma başarısız olduysa
+- Satıcı farklı bir kargo firması kullanmak istiyorsa
+- Özel bir işlem gerekiyorsa
+
+---
+
+### Otomatik vs Manuel Karşılaştırma
+
+| Özellik | Otomatik | Manuel |
+|---------|----------|--------|
+| **Tetikleme** | Sipariş oluşturulduğunda otomatik | Satıcı tarafından tetiklenir |
+| **Zamanlama** | Anında (event-driven) | Satıcı istediğinde |
+| **Kargo Maliyeti** | Otomatik tespit edilir ve kaydedilir | Manuel girilir |
+| **Offer Seçimi** | En ucuz offer otomatik seçilir | Satıcı seçer |
+| **Kontrol** | `AutoLabelEnabled` ile kontrol edilir | Her zaman mümkün |
+| **Hata Yönetimi** | Log'lanır, satıcıya bildirim gönderilmez | Satıcı hatayı görür |
+
+---
+
+### Otomatik Etiket Oluşturmayı Kontrol Etme
+
+**Açma/Kapama:**
+- Entegrasyon detaylarında `autoLabelEnabled` alanı ile kontrol edilir
+- Varsayılan: `true` (açık)
+
+**Kontrol Endpoint'i:**
+- `GET /api/SellerGeliver/integration-details` → `integration.autoLabelEnabled` değerini kontrol edin
+
+**Güncelleme:**
+- `POST /api/SellerGeliver/integration-details` → `autoLabelEnabled` değerini güncelleyin
+- `POST /api/SellerGeliver/match-existing-account` → `autoLabelEnabled` değerini ayarlayın
 
 ---
 
@@ -533,6 +663,86 @@ file: <dosya>
 
 ---
 
+### 12. Sipariş Kargo Etiketi Görüntüleme (SellerOrderController) ⭐
+
+**GET** `/api/SellerOrder/detail/{orderId}/shipping-label`
+
+Satıcının sipariş detay sayfasında kargo etiketini görüntülemesi için kullanılır. Bu endpoint, otomatik oluşturulan veya manuel yüklenen tüm kargo etiketlerini görüntülemek için kullanılabilir.
+
+#### Request Parameters
+- `orderId` (int, path, zorunlu): Sipariş ID
+
+#### Response
+`OrderShippingLabelDto`
+```json
+{
+  "orderId": 123,
+  "fileName": "label_123.pdf",
+  "fileUrl": "https://storage.example.com/labels/label_123.pdf",
+  "shipmentId": "ship_123456789",
+  "responsiveLabelUrl": "https://geliver.io/labels/label_123_a4.pdf",
+  "trackingNumber": "TRK123456789",
+  "trackingUrl": "https://geliver.io/track/TRK123456789",
+  "trackingStatus": "IN_TRANSIT",
+  "trackingUpdatedAt": "2026-01-20T12:00:00Z",
+  "contentType": "application/pdf",
+  "createdAt": "2026-01-20T12:00:00Z",
+  "isSkipped": false
+}
+```
+
+**Hata Durumları:**
+- `401 Unauthorized`: Sipariş bu mağazaya ait değilse
+- `404 Not Found`: Kargo etiketi bulunamadıysa (henüz oluşturulmamış veya yüklenmemiş)
+- `500 Internal Server Error`: Sunucu hatası
+
+**Notlar:**
+- Siparişin mağazaya ait olduğu otomatik olarak kontrol edilir (`storeId` context'ten alınır)
+- Kargo etiketi bulunamazsa `404 Not Found` döner
+- Bu endpoint, satıcının sipariş detay sayfasında kargo etiketini görüntülemesi için kullanılır
+- Otomatik oluşturulan veya manuel yüklenen tüm etiketler bu endpoint ile görüntülenebilir
+- Label URL'i (`fileUrl`) ile PDF dosyası indirilebilir veya iframe'de gösterilebilir
+
+**Kullanım Senaryosu:**
+```javascript
+// Sipariş detay sayfasında kargo etiketi görüntüleme
+async function loadShippingLabel(orderId) {
+  try {
+    const response = await fetch(`/api/SellerOrder/detail/${orderId}/shipping-label`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    if (response.ok) {
+      const label = await response.json();
+      // Label bilgilerini göster
+      displayLabelInfo(label);
+      
+      // Label PDF'ini göster
+      if (label.fileUrl) {
+        showLabelPdf(label.fileUrl);
+      }
+      
+      // Tracking bilgilerini göster
+      if (label.trackingNumber) {
+        showTrackingInfo(label.trackingNumber, label.trackingUrl, label.trackingStatus);
+      }
+    } else if (response.status === 404) {
+      // Label henüz oluşturulmamış
+      showMessage('Kargo etiketi henüz oluşturulmamış. Otomatik olarak oluşturulacak veya manuel olarak yükleyebilirsiniz.');
+    } else {
+      showError('Kargo etiketi yüklenirken hata oluştu.');
+    }
+  } catch (error) {
+    console.error('Kargo etiketi yükleme hatası:', error);
+    showError('Kargo etiketi yüklenirken bir hata oluştu.');
+  }
+}
+```
+
+---
+
 ## DTO Modelleri ve Örnekler
 
 ### GeliverIntegrationStatusDto
@@ -784,6 +994,24 @@ Webhook'lar şu yöntemlerle doğrulanır:
 }
 ```
 
+**Ek Örnek Payload (OUT_FOR_DELIVERY):**
+
+```json
+{
+  "type": "TRACK_UPDATED",
+  "shipmentID": "ship_987654321",
+  "trackingNumber": "TRK987654321",
+  "trackingURL": "https://geliver.io/track/TRK987654321",
+  "trackingUpdatedAt": "2026-01-21T12:00:00Z",
+  "trackingStatus": {
+    "trackingStatusCode": "OUT_FOR_DELIVERY",
+    "statusDetails": "Kurye dağıtım için yola çıktı",
+    "statusDate": "2026-01-21T12:00:00Z",
+    "locationName": "Ankara"
+  }
+}
+```
+
 ### Otomatik Webhook Kaydı
 
 Entegrasyon aktif edildiğinde webhook otomatik olarak kaydedilir (eğer `Geliver:WebhookRegistration:Enabled = true` ise).
@@ -801,18 +1029,108 @@ Entegrasyon aktif edildiğinde webhook otomatik olarak kaydedilir (eğer `Gelive
 }
 ```
 
-### Tracking Status Mapping
+### Tracking Status Mapping ve Otomatik Sipariş Durumu Güncelleme
 
-Geliver tracking status'leri otomatik olarak `OrderStatus`'e map edilir:
+Geliver webhook'larından gelen tracking status'leri otomatik olarak `OrderStatus`'e map edilir ve sipariş durumu güncellenir.
 
-- `CREATED` → `Shipped`
-- `IN_TRANSIT` → `Shipped`
-- `OUT_FOR_DELIVERY` → `Shipped`
-- `DELIVERED` → `Delivered`
-- `RETURNED` → `RefundPending`
-- `CANCELLED` → `Cancelled`
+#### Güncel Mapping
 
-**Not:** Sipariş durumu geçişleri `OrderService` tarafından kontrol edilir (örneğin `Delivered` → `Shipped` geçişi yapılamaz).
+**Geliver Tracking Status → OrderStatus:**
+- `PRE_TRANSIT` → `Shipped` (Kargoya verildi)
+- `TRANSIT` → `Shipped` (Yolda)
+- `OUT_FOR_DELIVERY` → `Shipped` (Dağıtımda)
+- `DELIVERED` → `Delivered` (Teslim edildi)
+- `RETURNED` → `RefundPending` (İade/inceleme süreci başlatılır)
+- `CANCELLED` → `Cancelled` (Kargo iptal edildi)
+- Diğer status'ler → Mapping yok (sipariş durumu değişmez)
+
+**Not:** 
+- Mapping sadece yukarıdaki durumlar için yapılır
+- Sipariş durumu geçişleri `OrderService.IsValidStatusTransition` tarafından kontrol edilir
+- Geçersiz geçişler (örneğin `Delivered` → `Shipped`) yapılamaz ve log'lanır
+- Webhook'dan gelen tracking status'ü `OrderShippingLabel.TrackingStatus` alanına kaydedilir
+
+#### Webhook İşleme Akışı
+
+1. **Geliver Webhook Gelir**
+   - `POST /api/geliver/webhook` endpoint'ine istek gelir
+   - Signature/Secret validation yapılır (HMAC-SHA256 veya raw secret)
+
+2. **Payload Parse Edilir**
+   - `GeliverWebhookEventDto` olarak deserialize edilir
+   - `shipmentID` veya `shipmentId` alanından shipment ID alınır
+
+3. **Label Bulunur**
+   - `OrderShippingLabel` repository'den `ShipmentId` ile bulunur
+   - Label bulunamazsa log'lanır ve işlem sonlandırılır
+
+4. **Tracking Güncellemesi**
+   - `ApplyTrackingUpdateAsync` çağrılır
+   - Idempotency kontrolü yapılır (`TrackingUpdatedAt` ile)
+   - Eski güncellemeler atlanır
+
+5. **Order Status Güncellemesi**
+   - `MapTrackingStatusToOrderStatus` ile tracking status → OrderStatus mapping yapılır
+   - `OrderService.UpdateOrderStatusAsync` çağrılır
+   - Geçerli geçiş kontrolü yapılır
+   - Başarılı olursa `OrderStatusChangedEvent` publish edilir
+
+6. **Tracking Bilgileri Kaydedilir**
+   - `OrderShippingLabel` güncellenir
+   - `Order.TrackingNumber` güncellenir (eğer tracking number varsa)
+
+#### Örnek Webhook Payload
+
+```json
+{
+  "type": "TRACK_UPDATED",
+  "shipmentID": "ship_123456789",
+  "trackingNumber": "TRK123456789",
+  "trackingURL": "https://geliver.io/track/TRK123456789",
+  "trackingUpdatedAt": "2026-01-21T10:00:00Z",
+  "trackingStatus": {
+    "trackingStatusCode": "DELIVERED",
+    "trackingSubStatusCode": "DELIVERED_TO_RECIPIENT",
+    "statusDetails": "Teslim edildi",
+    "statusDate": "2026-01-21T10:00:00Z",
+    "locationName": "İstanbul"
+  }
+}
+```
+
+#### Idempotency
+
+Webhook işlemleri idempotent'tir:
+- `TrackingUpdatedAt` alanı ile eski güncellemeler atlanır
+- Aynı webhook birden fazla kez gelirse sadece en yeni olan işlenir
+- Bu sayede duplicate webhook'lar sorun yaratmaz
+
+#### Sipariş Durumu Geçiş Kuralları
+
+`OrderService.IsValidStatusTransition` metoduna göre geçerli geçişler:
+
+| Mevcut Durum | Geçerli Yeni Durumlar |
+|--------------|----------------------|
+| `Created` | `AwaitingPayment`, `Paid`, `Cancelled`, `PaymentFailed` |
+| `AwaitingPayment` | `Paid`, `PaymentFailed`, `Cancelled` |
+| `Paid` | `Shipped`, `Cancelled`, `RefundPending` |
+| `Shipped` | `Delivered`, `RefundPending` |
+| `Delivered` | `Completed`, `RefundPending` |
+| `RefundPending` | `Refunded` |
+| `Cancelled` | `RefundPending`, `Refunded` |
+
+**Webhook Mapping Sonuçları:**
+- `PRE_TRANSIT` / `TRANSIT` / `OUT_FOR_DELIVERY` → `Shipped` (sadece `Paid` durumundan geçiş yapılabilir)
+- `DELIVERED` → `Delivered` (sadece `Shipped` durumundan geçiş yapılabilir)
+- `RETURNED` → `RefundPending` (`Paid`, `Shipped` veya `Delivered` durumlarından geçiş yapılabilir)
+- `CANCELLED` → `Cancelled` (`Created`, `AwaitingPayment` veya `Paid` durumlarından geçiş yapılabilir; diğer durumlarda geçiş reddedilir ve log'lanır)
+
+**Örnek Senaryo:**
+1. Sipariş `Paid` durumunda
+2. Webhook gelir: `TRANSIT` → Sipariş `Shipped` olur ✅
+3. Webhook gelir: `DELIVERED` → Sipariş `Delivered` olur ✅
+4. Webhook gelir: `TRANSIT` (tekrar) → Sipariş durumu değişmez (zaten `Shipped`) ✅
+5. Webhook gelir: `DELIVERED` (tekrar) → Sipariş durumu değişmez (zaten `Delivered`) ✅
 
 ---
 
@@ -847,9 +1165,40 @@ Geliver tracking status'leri otomatik olarak `OrderStatus`'e map edilir:
 
 ### Sipariş Kargo Etiketi
 
-- **Otomatik oluşturma**: Sipariş oluşturulduğunda, entegrasyon aktif ve `autoLabelEnabled=true` ise worker servis tarafından otomatik olarak Geliver API'si çağrılarak kargo etiketi oluşturulur. Frontend'in ek bir işlem yapmasına gerek yoktur.
-- **Manuel kayıt**: Geliver API çağrısı sonrası `orders/{orderId}/geliver-label` ile kaydedilir.
-- **Manuel yükleme**: Satıcı paneli dosya yükleme için `orders/{orderId}/label`.
+#### Otomatik Oluşturma (Varsayılan) ⭐
+
+**Sipariş oluşturulduğunda otomatik olarak kargo etiketi oluşturulur.**
+
+**Akış:**
+1. Buyer sipariş oluşturur → `OrderShippingLabelRequestedEvent` publish edilir
+2. Worker event'i yakalar → `OrderShippingLabelRequestedEventHandler` çalışır
+3. `GeliverLabelAutomationService` otomatik olarak:
+   - Entegrasyon kontrolü yapar (aktif mi? `autoLabelEnabled=true` mı?)
+   - Geliver API'ye shipment oluşturma isteği gönderir
+   - Offer'ları alır, en ucuz olanı seçer
+   - Kargo maliyetini tespit eder ve siparişe ekler
+   - Label'ı oluşturur ve kaydeder
+
+**Ön Koşullar:**
+- ✅ Entegrasyon aktif (`Status == Active`)
+- ✅ `AutoLabelEnabled == true`
+- ✅ `ApiToken` ve `SenderAddressId` mevcut
+- ✅ Alıcı adresi tam
+
+**Frontend'in Yapması Gereken:**
+- ❌ **Hiçbir şey!** Her şey otomatik çalışır
+- ✅ Sipariş detaylarında label'ın oluşturulup oluşturulmadığını kontrol edebilir
+- ✅ Hata durumunda satıcıya manuel oluşturma seçeneği sunabilir
+
+#### Manuel Oluşturma
+
+- **Geliver API ile**: `POST /api/SellerGeliver/orders/{orderId}/geliver-label`
+- **Dosya yükleme**: `POST /api/SellerGeliver/orders/{orderId}/label`
+
+**Ne Zaman Kullanılır?**
+- Otomatik etiket oluşturma kapalıysa
+- Otomatik oluşturma başarısız olduysa
+- Satıcı farklı bir kargo firması kullanmak istiyorsa
 
 ### Kargo Maliyeti Gösterimi
 

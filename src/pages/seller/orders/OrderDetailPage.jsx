@@ -567,20 +567,41 @@ const OrderDetailPage = () => {
                   </div>
                   <div className="flex-1">
                     <p className="text-xs font-semibold text-gray-700 mb-1">Webhook Durum Mapping</p>
-                    <p className="text-xs text-gray-600">
+                    <p className="text-xs text-gray-600 mb-2">
                       Geliver webhook'larından gelen tracking durumları otomatik olarak sipariş durumuna çevrilir:
                     </p>
-                    <div className="mt-2 space-y-1 text-xs">
-                      <div className="flex items-center gap-2">
-                        <span className="text-gray-500">PRE_TRANSIT / TRANSIT</span>
+                    <div className="space-y-1.5 text-xs">
+                      <div className="flex items-center gap-2 p-2 bg-blue-50 rounded-lg border border-blue-100">
+                        <span className="text-gray-600 font-medium">PRE_TRANSIT / TRANSIT / OUT_FOR_DELIVERY</span>
                         <span className="text-gray-400">→</span>
-                        <span className="font-semibold text-blue-600">Shipped (Kargoya verildi)</span>
+                        <span className="font-semibold text-blue-600">Shipped</span>
+                        <span className="text-gray-500 text-xs">(Kargoya verildi / Yolda / Dağıtımda)</span>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-gray-500">DELIVERED</span>
+                      <div className="flex items-center gap-2 p-2 bg-purple-50 rounded-lg border border-purple-100">
+                        <span className="text-gray-600 font-medium">DELIVERED</span>
                         <span className="text-gray-400">→</span>
-                        <span className="font-semibold text-purple-600">Delivered (Teslim edildi)</span>
+                        <span className="font-semibold text-purple-600">Delivered</span>
+                        <span className="text-gray-500 text-xs">(Teslim edildi)</span>
                       </div>
+                      <div className="flex items-center gap-2 p-2 bg-amber-50 rounded-lg border border-amber-100">
+                        <span className="text-gray-600 font-medium">RETURNED</span>
+                        <span className="text-gray-400">→</span>
+                        <span className="font-semibold text-amber-600">RefundPending</span>
+                        <span className="text-gray-500 text-xs">(İade/inceleme süreci)</span>
+                      </div>
+                      <div className="flex items-center gap-2 p-2 bg-red-50 rounded-lg border border-red-100">
+                        <span className="text-gray-600 font-medium">CANCELLED</span>
+                        <span className="text-gray-400">→</span>
+                        <span className="font-semibold text-red-600">Cancelled</span>
+                        <span className="text-gray-500 text-xs">(Kargo iptal edildi)</span>
+                      </div>
+                    </div>
+                    <div className="mt-3 pt-3 border-t border-gray-200">
+                      <p className="text-xs text-gray-600">
+                        <span className="font-semibold">Not:</span> Webhook işlemleri idempotent'tir. 
+                        Aynı webhook birden fazla kez gelirse sadece en yeni olan işlenir. 
+                        Sipariş durumu geçişleri geçerlilik kontrolünden geçer.
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -974,11 +995,12 @@ const TrackingTimeline = ({ trackingStatus, orderStatus, trackingUpdatedAt }) =>
     const steps = [
       {
         key: "SHIPPED",
-        label: "Kargoya Verildi",
+        label: "Kargoya Verildi / Yolda / Dağıtımda",
         trackingStatuses: ["PRE_TRANSIT", "TRANSIT", "IN_TRANSIT", "OUT_FOR_DELIVERY"],
         orderStatuses: ["Shipped"],
         icon: <Truck className="w-4 h-4" />,
-        color: "blue"
+        color: "blue",
+        description: "Kargo şirketine verildi, yolda veya dağıtımda"
       },
       {
         key: "DELIVERED",
@@ -986,14 +1008,36 @@ const TrackingTimeline = ({ trackingStatus, orderStatus, trackingUpdatedAt }) =>
         trackingStatuses: ["DELIVERED"],
         orderStatuses: ["Delivered"],
         icon: <CheckCircle className="w-4 h-4" />,
-        color: "purple"
+        color: "purple",
+        description: "Kargo alıcıya teslim edildi"
+      },
+      {
+        key: "RETURNED",
+        label: "İade / İnceleme",
+        trackingStatuses: ["RETURNED"],
+        orderStatuses: ["RefundPending"],
+        icon: <RefreshCw className="w-4 h-4" />,
+        color: "amber",
+        description: "Kargo iade edildi, inceleme süreci başlatıldı"
+      },
+      {
+        key: "CANCELLED",
+        label: "Kargo İptal Edildi",
+        trackingStatuses: ["CANCELLED"],
+        orderStatuses: ["Cancelled"],
+        icon: <XCircle className="w-4 h-4" />,
+        color: "red",
+        description: "Kargo iptal edildi"
       }
     ];
 
     return steps.map((step, index) => {
       // Check if this step is active based on tracking status or order status
-      const isActiveByTracking = trackingStatus && step.trackingStatuses.some(ts => 
-        trackingStatus.toUpperCase().includes(ts) || ts.includes(trackingStatus.toUpperCase())
+      const normalizedTrackingStatus = trackingStatus?.toUpperCase()?.trim();
+      const isActiveByTracking = normalizedTrackingStatus && step.trackingStatuses.some(ts => 
+        normalizedTrackingStatus === ts || 
+        normalizedTrackingStatus.includes(ts) || 
+        ts.includes(normalizedTrackingStatus)
       );
       const isActiveByOrder = step.orderStatuses.includes(orderStatus);
       const isActive = isActiveByTracking || isActiveByOrder;
@@ -1001,10 +1045,14 @@ const TrackingTimeline = ({ trackingStatus, orderStatus, trackingUpdatedAt }) =>
       // Check if completed (only delivered can be completed)
       const isCompleted = step.key === "DELIVERED" && orderStatus === "Delivered";
       
+      // Check if error state (cancelled or returned)
+      const isError = step.key === "CANCELLED" || step.key === "RETURNED";
+      
       return {
         ...step,
         isActive,
         isCompleted,
+        isError,
         isLast: index === steps.length - 1,
         isActiveByTracking,
         isActiveByOrder
@@ -1013,6 +1061,7 @@ const TrackingTimeline = ({ trackingStatus, orderStatus, trackingUpdatedAt }) =>
   };
 
   const steps = getStatusSteps();
+  const activeStep = steps.find(s => s.isActive);
 
   return (
     <div className="relative">
@@ -1020,71 +1069,89 @@ const TrackingTimeline = ({ trackingStatus, orderStatus, trackingUpdatedAt }) =>
       <div className="absolute left-5 top-0 bottom-0 w-0.5 bg-gray-200" />
       
       <div className="space-y-6">
-        {steps.map((step, index) => (
-          <div key={step.key} className="relative flex items-start gap-4">
-            {/* Status Icon */}
-            <div
-              className={`relative z-10 w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all ${
-                step.isCompleted
-                  ? "bg-purple-500 border-purple-500 text-white shadow-lg scale-110"
-                  : step.isActive
-                  ? "bg-blue-500 border-blue-500 text-white shadow-lg scale-110"
-                  : "bg-white border-gray-300 text-gray-400"
-              }`}
-            >
-              {step.isCompleted || step.isActive ? (
-                step.icon
-              ) : (
-                <Circle className="w-3 h-3 fill-current" />
-              )}
-            </div>
+        {steps.map((step, index) => {
+          // Only show active steps and the next step, or all if none are active
+          const shouldShow = step.isActive || 
+                           (index === 0 && !activeStep) || 
+                           (activeStep && index <= steps.findIndex(s => s.key === activeStep.key) + 1);
+          
+          if (!shouldShow && !step.isError) return null;
 
-            {/* Status Content */}
-            <div className="flex-1 pt-1">
+          return (
+            <div key={step.key} className="relative flex items-start gap-4">
+              {/* Status Icon */}
               <div
-                className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-semibold mb-2 ${
+                className={`relative z-10 w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all ${
                   step.isCompleted
-                    ? "bg-purple-100 text-purple-700 border border-purple-200"
+                    ? "bg-purple-500 border-purple-500 text-white shadow-lg scale-110"
+                    : step.isError && step.isActive
+                    ? "bg-red-500 border-red-500 text-white shadow-lg scale-110"
+                    : step.isError
+                    ? "bg-red-100 border-red-300 text-red-600"
                     : step.isActive
-                    ? "bg-blue-100 text-blue-700 border border-blue-200"
-                    : "bg-gray-100 text-gray-500 border border-gray-200"
+                    ? "bg-blue-500 border-blue-500 text-white shadow-lg scale-110"
+                    : "bg-white border-gray-300 text-gray-400"
                 }`}
               >
-                {step.label}
-                {step.isActive && (
-                  <span className="text-xs font-normal opacity-75">
-                    {step.isActiveByTracking ? "(Webhook)" : "(Manuel)"}
-                  </span>
+                {step.isCompleted || step.isActive ? (
+                  step.icon
+                ) : (
+                  <Circle className="w-3 h-3 fill-current" />
                 )}
               </div>
-              <div className="text-xs text-gray-500 space-y-1.5">
-                <div className="flex items-center gap-2">
-                  <span className="font-medium">Tracking Status:</span>
-                  <span className="font-semibold text-gray-700">
-                    {step.trackingStatuses.join(" / ")}
-                  </span>
+
+              {/* Status Content */}
+              <div className="flex-1 pt-1">
+                <div
+                  className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-semibold mb-2 ${
+                    step.isCompleted
+                      ? "bg-purple-100 text-purple-700 border border-purple-200"
+                      : step.isError && step.isActive
+                      ? "bg-red-100 text-red-700 border border-red-200"
+                      : step.isError
+                      ? "bg-red-50 text-red-600 border border-red-200"
+                      : step.isActive
+                      ? "bg-blue-100 text-blue-700 border border-blue-200"
+                      : "bg-gray-100 text-gray-500 border border-gray-200"
+                  }`}
+                >
+                  {step.label}
+                  {step.isActive && (
+                    <span className="text-xs font-normal opacity-75">
+                      {step.isActiveByTracking ? "(Webhook)" : "(Manuel)"}
+                    </span>
+                  )}
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className="font-medium">Sipariş Durumu:</span>
-                  <span className="font-semibold text-gray-700">{step.orderStatuses.join(" / ")}</span>
-                </div>
-                {step.isActive && trackingUpdatedAt && (
-                  <div className="mt-2 pt-2 border-t border-gray-200">
-                    <p className="text-emerald-600 font-medium flex items-center gap-1">
-                      <CheckCircle className="w-3 h-3" />
-                      Son Güncelleme: {new Date(trackingUpdatedAt).toLocaleString("tr-TR")}
-                    </p>
-                    {trackingStatus && (
-                      <p className="text-gray-600 mt-1">
-                        Mevcut Durum: <span className="font-semibold">{trackingStatus}</span>
-                      </p>
-                    )}
+                <div className="text-xs text-gray-500 space-y-1.5">
+                  <p className="text-gray-600 italic">{step.description}</p>
+                  <div className="flex items-center gap-2">
+                    <span className="font-medium">Tracking Status:</span>
+                    <span className="font-semibold text-gray-700">
+                      {step.trackingStatuses.join(" / ")}
+                    </span>
                   </div>
-                )}
+                  <div className="flex items-center gap-2">
+                    <span className="font-medium">Sipariş Durumu:</span>
+                    <span className="font-semibold text-gray-700">{step.orderStatuses.join(" / ")}</span>
+                  </div>
+                  {step.isActive && trackingUpdatedAt && (
+                    <div className="mt-2 pt-2 border-t border-gray-200">
+                      <p className="text-emerald-600 font-medium flex items-center gap-1">
+                        <CheckCircle className="w-3 h-3" />
+                        Son Güncelleme: {new Date(trackingUpdatedAt).toLocaleString("tr-TR")}
+                      </p>
+                      {trackingStatus && (
+                        <p className="text-gray-600 mt-1">
+                          Mevcut Durum: <span className="font-semibold">{trackingStatus}</span>
+                        </p>
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
