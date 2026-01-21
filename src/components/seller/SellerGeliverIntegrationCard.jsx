@@ -601,64 +601,66 @@ export default function SellerGeliverIntegrationCard() {
           )}
         </button>
         {showAgreementForm && (
-          <form onSubmit={handleUploadAgreement} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <SelectField
-            label="Taşıyıcı Şirket"
-            name="carrierCompany"
-            value={agreementForm.carrierCompany}
-            onChange={handleAgreementChange}
-            required
-            options={CARRIER_COMPANY_ENUMS}
-          />
-          <Field
-            label="Geçerlilik Başlangıcı"
-            name="validFrom"
-            value={agreementForm.validFrom}
-            onChange={handleAgreementChange}
-            type="datetime-local"
-          />
-          <Field
-            label="Geçerlilik Bitişi"
-            name="validUntil"
-            value={agreementForm.validUntil}
-            onChange={handleAgreementChange}
-            type="datetime-local"
-          />
-          <Field
-            label="Notlar (opsiyonel)"
-            name="notes"
-            value={agreementForm.notes}
-            onChange={handleAgreementChange}
-            placeholder="Not bırakabilirsiniz"
-          />
-          <div className="flex flex-col gap-2 md:col-span-2">
-            <label className="text-sm font-medium text-gray-700">Anlaşma Dosyası (PDF)</label>
-            <div className="flex items-center gap-3">
-              <input
-                type="file"
-                name="file"
-                accept="application/pdf"
+          <>
+            <form onSubmit={handleUploadAgreement} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <SelectField
+                label="Taşıyıcı Şirket"
+                name="carrierCompany"
+                value={agreementForm.carrierCompany}
                 onChange={handleAgreementChange}
-                className="flex-1 text-sm"
+                required
+                options={CARRIER_COMPANY_ENUMS}
               />
-              <button
-                type="submit"
-                disabled={agreementLoading}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-purple-600 text-white text-sm font-semibold hover:bg-purple-700 transition disabled:opacity-50"
-              >
-                {agreementLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
-                Yükle
-              </button>
-            </div>
-          </div>
-        </form>
+              <Field
+                label="Geçerlilik Başlangıcı"
+                name="validFrom"
+                value={agreementForm.validFrom}
+                onChange={handleAgreementChange}
+                type="datetime-local"
+              />
+              <Field
+                label="Geçerlilik Bitişi"
+                name="validUntil"
+                value={agreementForm.validUntil}
+                onChange={handleAgreementChange}
+                type="datetime-local"
+              />
+              <Field
+                label="Notlar (opsiyonel)"
+                name="notes"
+                value={agreementForm.notes}
+                onChange={handleAgreementChange}
+                placeholder="Not bırakabilirsiniz"
+              />
+              <div className="flex flex-col gap-2 md:col-span-2">
+                <label className="text-sm font-medium text-gray-700">Anlaşma Dosyası (PDF)</label>
+                <div className="flex items-center gap-3">
+                  <input
+                    type="file"
+                    name="file"
+                    accept="application/pdf"
+                    onChange={handleAgreementChange}
+                    className="flex-1 text-sm"
+                  />
+                  <button
+                    type="submit"
+                    disabled={agreementLoading}
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-purple-600 text-white text-sm font-semibold hover:bg-purple-700 transition disabled:opacity-50"
+                  >
+                    {agreementLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+                    Yükle
+                  </button>
+                </div>
+              </div>
+            </form>
 
-          {agreementInfo && (
-            <div className="mt-4 rounded-xl border border-purple-100 bg-purple-50 px-4 py-3 text-sm text-purple-800 flex items-center gap-2">
-              <CheckCircle className="w-4 h-4 text-purple-600" />
-              Anlaşma yüklendi: {agreementInfo.agreementFileUrl ? "Dosya bağlantısı hazır." : "Kayıt tamamlandı."}
-            </div>
-          )}
+            {agreementInfo && (
+              <div className="mt-4 rounded-xl border border-purple-100 bg-purple-50 px-4 py-3 text-sm text-purple-800 flex items-center gap-2">
+                <CheckCircle className="w-4 h-4 text-purple-600" />
+                Anlaşma yüklendi: {agreementInfo.agreementFileUrl ? "Dosya bağlantısı hazır." : "Kayıt tamamlandı."}
+              </div>
+            )}
+          </>
         )}
       </div>
 
