@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { loginSeller } from "@/api/sellerAuthService";
-import { Mail, Lock, CheckCircle } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { useToast } from "@/contexts/ToastContext";
 import { createSeoMeta } from "@/utils/seo";
 import SellerHeader from "@/components/sellerLanding/SellerHeader";
@@ -113,16 +113,24 @@ const LoginPage = () => {
               autoComplete="username"
               inputClassName="text-base"
             />
-            <FormInput
+            <FormInputPassword
               name="password"
               value={formData.password}
               onChange={handleChange}
               placeholder="Şifre"
-              type="password"
               icon={<Lock size={22} />}
               autoComplete="current-password"
               inputClassName="text-base"
             />
+          </div>
+
+          <div className="flex justify-end mt-1">
+            <Link
+              to="/seller/forgot-password"
+              className="text-sm text-emerald-600 font-medium hover:underline"
+            >
+              Şifremi unuttum
+            </Link>
           </div>
 
           <button
@@ -171,5 +179,32 @@ const FormInput = ({ name, value, onChange, placeholder, icon, type = "text", au
     />
   </div>
 );
+
+const FormInputPassword = ({ name, value, onChange, placeholder, icon, autoComplete, inputClassName = "" }) => {
+  const [showPassword, setShowPassword] = useState(false);
+  return (
+    <div className="flex items-center gap-3 px-5 py-3 rounded-xl bg-[#f0fdfa] border border-[#bde7e3] focus-within:ring-2 ring-[#00d18c] transition">
+      {icon}
+      <input
+        type={showPassword ? "text" : "password"}
+        name={name}
+        value={value}
+        onChange={onChange}
+        required
+        placeholder={placeholder}
+        autoComplete={autoComplete}
+        className={`w-full bg-transparent outline-none text-[#003636] placeholder-[#7aa5a2] ${inputClassName}`}
+      />
+      <button
+        type="button"
+        onClick={() => setShowPassword((s) => !s)}
+        className="p-1 rounded-lg text-[#7aa5a2] hover:text-[#003636] hover:bg-white/50 transition"
+        aria-label={showPassword ? "Parolayı gizle" : "Parolayı görüntüle"}
+      >
+        {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+      </button>
+    </div>
+  );
+};
 
 export default LoginPage;

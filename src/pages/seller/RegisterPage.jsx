@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { registerSeller } from "@/api/sellerAuthService";
-import { Mail, Lock, User, Phone, CheckCircle } from "lucide-react";
+import { Mail, Lock, User, Phone, Eye, EyeOff } from "lucide-react";
 import { useToast } from "@/contexts/ToastContext";
 import { createSeoMeta } from "@/utils/seo";
 import SellerHeader from "@/components/sellerLanding/SellerHeader";
@@ -147,7 +147,7 @@ const handleSubmit = async (e) => {
             <FormInput name="lastName" value={formData.lastName} onChange={handleChange} placeholder="Soyad" icon={<User size={22} />} inputClassName="text-base" />
             <FormInput name="email" value={formData.email} onChange={handleChange} placeholder="E-posta" icon={<Mail size={22} />} type="email" inputClassName="text-base" />
             <PhoneInput name="phone" value={formData.phone} onChange={handleChange} inputClassName="text-base" />
-            <FormInput name="password" value={formData.password} onChange={handleChange} placeholder="Şifre" icon={<Lock size={22} />} type="password" inputClassName="text-base" />
+            <FormInputPassword name="password" value={formData.password} onChange={handleChange} placeholder="Şifre" icon={<Lock size={22} />} inputClassName="text-base" />
           </div>
 
           <button
@@ -200,6 +200,32 @@ const FormInput = ({ name, value, onChange, placeholder, icon, type = "text", in
     />
   </div>
 );
+
+const FormInputPassword = ({ name, value, onChange, placeholder, icon, inputClassName = "" }) => {
+  const [showPassword, setShowPassword] = useState(false);
+  return (
+    <div className="flex items-center gap-3 px-5 py-3 rounded-xl bg-[#f0fdfa] border border-[#bde7e3] focus-within:ring-2 ring-[#00d18c] transition">
+      {icon}
+      <input
+        type={showPassword ? "text" : "password"}
+        name={name}
+        value={value}
+        onChange={onChange}
+        required
+        placeholder={placeholder}
+        className={`w-full bg-transparent outline-none text-[#003636] placeholder-[#7aa5a2] ${inputClassName}`}
+      />
+      <button
+        type="button"
+        onClick={() => setShowPassword((s) => !s)}
+        className="p-1 rounded-lg text-[#7aa5a2] hover:text-[#003636] hover:bg-white/50 transition"
+        aria-label={showPassword ? "Parolayı gizle" : "Parolayı görüntüle"}
+      >
+        {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+      </button>
+    </div>
+  );
+};
 
 const PhoneInput = ({ name, value, onChange, inputClassName = "" }) => (
   <div className="flex items-center gap-2 px-5 py-3 rounded-xl bg-[#f0fdfa] border border-[#bde7e3] focus-within:ring-2 ring-[#00d18c] transition">
