@@ -17,3 +17,18 @@ export function fetchSellerProfile() {
   export function getSellerProfile() {
     return apiRequest("/SellerUser/profile", "GET", null, true); // <== useAuth: true
   }
+
+/** Şifremi unuttum – Adım 1: E-posta ile kod talep. */
+export function requestForgetPasswordReset(email) {
+  return apiRequest("/SellerUser/request-forget-password-reset", "POST", { email });
+}
+
+/** Şifremi unuttum – Adım 2: Kodu doğrula ve şifre sıfırla. */
+export function forgetPassword({ email, code, newPassword, newPasswordConfirm }) {
+  return apiRequest("/SellerUser/forget-password", "POST", {
+    email,
+    code,
+    newPassword,
+    newPasswordConfirm,
+  });
+}

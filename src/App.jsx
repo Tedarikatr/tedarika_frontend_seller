@@ -7,6 +7,7 @@ import { ProductCacheProvider } from "@/contexts/ProductCacheContext";
 import SellerLandingPage from "@/pages/seller/SellerLandingPage";
 import RegisterPage from "@/pages/seller/RegisterPage";
 import LoginPage from "@/pages/seller/LoginPage";
+import ForgotPasswordPage from "@/pages/seller/ForgotPasswordPage";
 import SellerApplicationPage from "@/pages/seller/SellerApplicationPage";
 import SellerBrandListPage from "@/pages/seller/brands/SellerBrandListPage";
 
@@ -68,6 +69,7 @@ function App() {
       <Route path="/seller/landing" element={<SellerLandingPage />} />
       <Route path="/seller/register" element={<RegisterPage />} />
       <Route path="/seller/login" element={<LoginPage />} />
+      <Route path="/seller/forgot-password" element={<ForgotPasswordPage />} />
       <Route path="/seller/apply" element={<SellerApplicationPage />} />
       <Route path="/seller" element={<Navigate to="/seller/landing" replace />} />
       <Route path="/seller/appointment" element={<SellerAppointment />} />
