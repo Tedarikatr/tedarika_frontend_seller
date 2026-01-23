@@ -1,5 +1,6 @@
-import React from "react";
-import { CheckCircle, Plus, Tag, Package } from "lucide-react";
+import React, { useState } from "react";
+import { CheckCircle, Plus, Tag, Package, List } from "lucide-react";
+import ProductAttributesModal from "./ProductAttributesModal";
 
 const ProductDatabaseTable = ({
   products = [],
@@ -8,6 +9,7 @@ const ProductDatabaseTable = ({
   addedIds = [],
   startIndex = 0,
 }) => {
+  const [selectedProductForAttributes, setSelectedProductForAttributes] = useState(null);
   return (
     <div className="w-full overflow-x-auto">
       <table className="min-w-full">
@@ -81,31 +83,50 @@ const ProductDatabaseTable = ({
                   </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-center">
-                  {isAdded ? (
-                    <span className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-green-100 to-emerald-100 border-2 border-green-300 text-green-800 text-sm font-bold shadow-sm">
-                      <CheckCircle className="w-4 h-4" />
-                      Mağazada Var
-                    </span>
-                  ) : (
+                  <div className="flex items-center justify-center gap-2 flex-wrap">
                     <button
-                      onClick={() => onAdd(productId)}
-                      disabled={isAdding}
-                      className={`inline-flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-bold transition-all duration-300 ${
-                        isAdding
-                          ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                          : "bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:shadow-lg hover:scale-105"
-                      }`}
+                      onClick={() => setSelectedProductForAttributes(prod)}
+                      className="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 text-white text-sm font-bold hover:shadow-lg hover:scale-105 transition-all duration-300"
                     >
-                      <Plus className="w-4 h-4" />
-                      {isAdding ? "Ekleniyor..." : "Mağazama Ekle"}
+                      <List className="w-4 h-4" />
+                      Özellikler
                     </button>
-                  )}
+                    {isAdded ? (
+                      <span className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-green-100 to-emerald-100 border-2 border-green-300 text-green-800 text-sm font-bold shadow-sm">
+                        <CheckCircle className="w-4 h-4" />
+                        Mağazada Var
+                      </span>
+                    ) : (
+                      <button
+                        onClick={() => onAdd(productId)}
+                        disabled={isAdding}
+                        className={`inline-flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-bold transition-all duration-300 ${
+                          isAdding
+                            ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                            : "bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:shadow-lg hover:scale-105"
+                        }`}
+                      >
+                        <Plus className="w-4 h-4" />
+                        {isAdding ? "Ekleniyor..." : "Mağazama Ekle"}
+                      </button>
+                    )}
+                  </div>
                 </td>
               </tr>
             );
           })}
         </tbody>
       </table>
+
+      {/* Attributes Modal */}
+      {selectedProductForAttributes && (
+        <ProductAttributesModal
+          productId={selectedProductForAttributes.id || selectedProductForAttributes.productId}
+          productName={selectedProductForAttributes.name}
+          isOpen={!!selectedProductForAttributes}
+          onClose={() => setSelectedProductForAttributes(null)}
+        />
+      )}
     </div>
   );
 };

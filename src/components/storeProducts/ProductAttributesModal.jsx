@@ -1,0 +1,179 @@
+import React, { useState, useEffect } from "react";
+import { X, Loader2, Info, CheckCircle2 } from "lucide-react";
+import { getProductAttributes } from "@/api/sellerProductAttributeService";
+import { useToast } from "@/contexts/ToastContext";
+
+const ProductAttributesModal = ({ productId, productName, isOpen, onClose }) => {
+  const [attributes, setAttributes] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const toast = useToast();
+
+  useEffect(() => {
+    if (isOpen && productId) {
+      loadAttributes();
+    } else {
+      setAttributes([]);
+    }
+  }, [isOpen, productId]);
+
+  const loadAttributes = async () => {
+    setLoading(true);
+    try {
+      const data = await getProductAttributes(productId);
+      setAttributes(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error("Özellikler yüklenemedi:", err);
+      toast.error(err?.message || "Özellikler yüklenirken hata oluştu.");
+      setAttributes([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in"
+      onClick={onClose}
+    >
+      <div
+        className="bg-white rounded-3xl shadow-2xl border-2 border-gray-200 max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col animate-slide-up"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="bg-gradient-to-r from-emerald-600 via-teal-600 to-green-600 text-white px-6 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
+              <Info className="w-5 h-5" />
+            </div>
+            <div>
+              <h2 className="text-xl font-bold">Ürün Özellikleri</h2>
+              <p className="text-sm text-emerald-100 truncate max-w-md">
+                {productName || "Ürün"}
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={onClose}
+            className="w-10 h-10 rounded-xl bg-white/20 hover:bg-white/30 backdrop-blur-sm flex items-center justify-center transition-colors"
+            aria-label="Kapat"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* Content */}
+        <div className="flex-1 overflow-y-auto p-6">
+          {loading ? (
+            <div className="flex flex-col items-center justify-center py-12">
+              <Loader2 className="w-12 h-12 text-emerald-600 animate-spin mb-4" />
+              <p className="text-gray-600 font-medium">Özellikler yükleniyor...</p>
+            </div>
+          ) : attributes.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-12">
+              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center mb-4">
+                <Info className="w-8 h-8 text-gray-400" />
+              </div>
+              <p className="text-gray-600 font-medium text-center">
+                Bu ürün için kayıtlı özellik bulunmuyor.
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {attributes.map((attrSet, idx) => (
+                <div
+                  key={attrSet.attributeSetId || idx}
+                  className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-2xl border-2 border-emerald-200 p-5 shadow-lg"
+                >
+                  <div className="flex items-center gap-2 mb-4">
+                    <CheckCircle2 className="w-5 h-5 text-emerald-600" />
+                    <h3 className="font-bold text-emerald-800 text-sm uppercase tracking-wide">
+                      Özellik Seti {idx + 1}
+                    </h3>
+                  </div>
+
+                  {attrSet.values && Object.keys(attrSet.values).length > 0 ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {Object.entries(attrSet.values).map(([key, value]) => (
+                        <div
+                          key={key}
+                          className="bg-white rounded-xl p-3 border border-emerald-200 shadow-sm"
+                        >
+                          <div className="text-xs font-semibold text-emerald-700 uppercase tracking-wide mb-1">
+                            {key}
+                          </div>
+                          <div className="text-sm font-medium text-gray-900">
+                            {value !== null && value !== undefined
+                              ? String(value)
+                              : "-"}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-gray-500 italic">
+                      Bu set için özellik değeri bulunmuyor.
+                    </p>
+                  )}
+
+                  {(attrSet.createdAt || attrSet.updatedAt) && (
+                    <div className="mt-4 pt-4 border-t border-emerald-200 text-xs text-gray-500">
+                      {attrSet.createdAt && (
+                        <div>
+                          Oluşturulma:{" "}
+                          {new Date(attrSet.createdAt).toLocaleString("tr-TR")}
+                        </div>
+                      )}
+                      {attrSet.updatedAt && (
+                        <div>
+                          Güncellenme:{" "}
+                          {new Date(attrSet.updatedAt).toLocaleString("tr-TR")}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Footer */}
+        <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end">
+          <button
+            onClick={onClose}
+            className="px-6 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-semibold hover:shadow-lg transition-all"
+          >
+            Kapat
+          </button>
+        </div>
+      </div>
+
+      <style>{`
+        @keyframes fade-in {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        @keyframes slide-up {
+          from {
+            transform: translateY(20px);
+            opacity: 0;
+          }
+          to {
+            transform: translateY(0);
+            opacity: 1;
+          }
+        }
+        .animate-fade-in {
+          animation: fade-in 0.2s ease-out;
+        }
+        .animate-slide-up {
+          animation: slide-up 0.3s ease-out;
+        }
+      `}</style>
+    </div>
+  );
+};
+
+export default ProductAttributesModal;
