@@ -761,10 +761,9 @@ const OrderDetailPage = () => {
                   <div className="flex justify-center mb-4">
                     <div className="relative">
                       <img
-                        src={
-                          item.storeProductImageUrl ||
-                          "/tedarika/assets/images/product-placeholder.svg"
-                        }
+                        src={item.storeProductImageUrl || ""}
+                        onError={(e) => { e.target.style.display = 'none'; }}
+                        style={{ display: item.storeProductImageUrl ? 'block' : 'none' }}
                         alt={item.productName}
                         className="w-32 h-32 object-cover rounded-xl border-2 border-gray-200 shadow-lg"
                       />

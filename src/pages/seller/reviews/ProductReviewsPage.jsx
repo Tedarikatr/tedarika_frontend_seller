@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { fetchProductReviews, replyToProductReview } from "@/api/sellerReviewService";
 import ProductReviewItem from "@/components/storeProducts/ProductReviewItem";
-import { LoaderCircle } from "lucide-react";
+import { LoaderCircle, MessageSquare } from "lucide-react";
 
 const ProductReviewsPage = ({ productId: defaultId }) => {
   const params = useParams();
@@ -56,7 +56,9 @@ const ProductReviewsPage = ({ productId: defaultId }) => {
         </div>
       ) : reviews.length === 0 ? (
         <div className="flex flex-col items-center justify-center text-center py-12 text-gray-500">
-          <img src="/tedarika/assets/images/empty-state.svg" alt="Boş" className="w-32 mb-4 opacity-80" />
+          <div className="w-24 h-24 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center mb-4">
+            <MessageSquare size={48} className="text-gray-400" />
+          </div>
           <p className="text-lg font-medium">Henüz yorum yapılmamış</p>
           <p className="text-sm mt-1">Ürününüze gelen yorumlar burada listelenecek.</p>
         </div>

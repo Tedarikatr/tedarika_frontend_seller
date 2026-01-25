@@ -1,7 +1,12 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { ChevronDown, Menu, MessageCircle, X } from "lucide-react";
-import Logo from "../../assets/images/logo.svg";
+
+const publicUrl = (path) => {
+  return `${import.meta.env.BASE_URL}${path}`.replace(/\/{2,}/g, "/");
+};
+
+const Logo = publicUrl("images/tedarikaisortagımlogo500x500.png");
 
 const mainNavLinks = [
   { label: "Resmi Anasayfa", href: "/" },
@@ -24,7 +29,7 @@ const SellerHeader = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <header className="bg-[#003032] border-b border-white/10 shadow-sm w-full">
+    <header className="bg-[#003032] border-b border-white/10 shadow-sm w-full relative z-[100]">
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         <div className="flex items-center justify-between gap-4 py-3.5">
           <a
@@ -52,7 +57,7 @@ const SellerHeader = () => {
               </a>
             ))}
 
-            <div className="relative group">
+            <div className="relative group z-50">
               <button
                 type="button"
                 className="flex items-center gap-1 hover:text-white hover:bg-white/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 rounded-lg px-2 py-1"
@@ -61,13 +66,13 @@ const SellerHeader = () => {
                 Kurumsal
                 <ChevronDown className="w-4 h-4" />
               </button>
-              <div className="absolute left-0 top-full mt-2 hidden w-48 rounded-lg border border-white/10 bg-[#002829] shadow-lg group-hover:block group-focus-within:block">
-                <div className="py-2 text-sm text-white/80">
+              <div className="absolute left-0 top-full mt-2 hidden w-48 rounded-lg border border-white/10 bg-[#002829] shadow-xl group-hover:block group-focus-within:block z-[9999]">
+                <div className="py-2 text-sm text-white">
                   {corporateLinks.map((link) => (
                     <a
                       key={link.label}
                       href={link.href}
-                      className="block px-3 py-2 hover:bg-white/5 hover:text-white transition-colors"
+                      className="block px-3 py-2 hover:bg-white/10 hover:text-white transition-colors"
                     >
                       {link.label}
                     </a>
@@ -92,7 +97,7 @@ const SellerHeader = () => {
               Giriş Yap
             </button>
 
-            <div className="relative group">
+            <div className="relative group z-50">
               <button
                 type="button"
                 className="flex items-center gap-1 text-white/80 font-semibold text-sm px-3 py-2 rounded-lg hover:text-white hover:bg-white/5 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
@@ -101,15 +106,15 @@ const SellerHeader = () => {
                 Destek
                 <ChevronDown className="w-4 h-4" />
               </button>
-              <div className="absolute right-0 top-full mt-2 hidden w-56 rounded-lg border border-white/10 bg-[#002829] shadow-lg group-hover:block group-focus-within:block">
-                <div className="py-2 text-sm text-white/80">
+              <div className="absolute right-0 top-full mt-2 hidden w-56 rounded-lg border border-white/10 bg-[#002829] shadow-xl group-hover:block group-focus-within:block z-[9999]">
+                <div className="py-2 text-sm text-white">
                   {supportLinks.map((link) => (
                     <a
                       key={link.label}
                       href={link.href}
                       target={link.external ? "_blank" : undefined}
                       rel={link.external ? "noopener noreferrer" : undefined}
-                      className="flex items-center gap-2 px-3 py-2 hover:bg-white/5 hover:text-white transition-colors"
+                      className="flex items-center gap-2 px-3 py-2 hover:bg-white/10 hover:text-white transition-colors"
                     >
                       {link.label === "WhatsApp Destek" && (
                         <MessageCircle className="w-4 h-4" />
