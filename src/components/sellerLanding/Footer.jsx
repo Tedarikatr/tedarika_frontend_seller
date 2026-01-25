@@ -89,7 +89,7 @@ const Footer = () => {
               />
             ))}
             <img
-              src={publicUrl("images/son.jpg")}
+              src={publicUrl("images/etbis.jpg")}
               alt="ETBİS Kayıt QR Kodu"
               className="h-10 rounded-sm border border-gray-600 shadow-md"
             />

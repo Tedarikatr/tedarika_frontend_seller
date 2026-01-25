@@ -44,7 +44,7 @@ const FooterBottom = () => {
 
             {/* ETBİS görseli */}
             <img
-              src={publicUrl("images/son.jpg")}
+              src={publicUrl("images/etbis.jpg")}
               alt="ETBİS Kayıt QR Kodu"
               className="h-12 rounded-xl border-2 border-white/10 shadow-lg hover:border-white/30 transition-all"
             />

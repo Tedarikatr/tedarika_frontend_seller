@@ -6,7 +6,7 @@ const publicUrl = (path) => {
   return `${import.meta.env.BASE_URL}${path}`.replace(/\/{2,}/g, "/");
 };
 
-const Logo = publicUrl("images/tedarikaisortagımlogo500x500.png");
+const Logo = publicUrl("images/logo.png");
 
 const mainNavLinks = [
   { label: "Resmi Anasayfa", href: "/" },
@@ -31,27 +31,24 @@ const SellerHeader = () => {
   return (
     <header className="bg-[#003032] border-b border-white/10 shadow-sm w-full relative z-[100]">
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
-        <div className="flex items-center justify-between gap-4 py-3.5">
+        <div className="flex items-center justify-between gap-4 py-1">
           <a
             href="/seller/landing"
             className="flex items-center gap-3"
             aria-label="Tedarika Satıcı Paneli"
           >
-            <img src={Logo} alt="Tedarika Logo" className="h-12 sm:h-14" />
-            <span className="hidden sm:inline text-white font-semibold tracking-wide">
-              Satıcı Paneli
-            </span>
+            <img src={Logo} alt="Tedarika Logo" className="h-32 sm:h-40 -my-8" />
           </a>
 
           <nav
-            className="hidden lg:flex items-center gap-6 text-sm text-white/80"
+            className="hidden lg:flex items-center gap-6 text-base font-semibold text-white"
             aria-label="Ana menü"
           >
             {mainNavLinks.map((link) => (
               <a
                 key={link.label}
                 href={link.href}
-                className="hover:text-white hover:bg-white/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 rounded-lg px-2 py-1"
+                className="hover:text-emerald-300 hover:bg-white/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 rounded-lg px-3 py-2"
               >
                 {link.label}
               </a>
@@ -60,23 +57,25 @@ const SellerHeader = () => {
             <div className="relative group z-50">
               <button
                 type="button"
-                className="flex items-center gap-1 hover:text-white hover:bg-white/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 rounded-lg px-2 py-1"
+                className="flex items-center gap-1 hover:text-emerald-300 hover:bg-white/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 rounded-lg px-3 py-2"
                 aria-haspopup="true"
               >
                 Kurumsal
                 <ChevronDown className="w-4 h-4" />
               </button>
-              <div className="absolute left-0 top-full mt-2 hidden w-48 rounded-lg border border-white/10 bg-[#002829] shadow-xl group-hover:block group-focus-within:block z-[9999]">
-                <div className="py-2 text-sm text-white">
-                  {corporateLinks.map((link) => (
-                    <a
-                      key={link.label}
-                      href={link.href}
-                      className="block px-3 py-2 hover:bg-white/10 hover:text-white transition-colors"
-                    >
-                      {link.label}
-                    </a>
-                  ))}
+              <div className="absolute left-0 top-full pt-2 hidden w-48 group-hover:block group-focus-within:block z-[9999]">
+                <div className="rounded-lg border border-white/10 bg-[#002829] shadow-xl">
+                  <div className="py-2 text-sm text-white">
+                    {corporateLinks.map((link) => (
+                      <a
+                        key={link.label}
+                        href={link.href}
+                        className="block px-3 py-2 hover:bg-white/10 hover:text-white transition-colors"
+                      >
+                        {link.label}
+                      </a>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
@@ -86,13 +85,13 @@ const SellerHeader = () => {
           <div className="hidden sm:flex items-center gap-2 lg:gap-3">
             <button
               onClick={() => navigate("/seller/register")}
-              className="bg-white text-[#003032] font-semibold text-sm px-4 py-2 rounded-lg hover:bg-emerald-100 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
+              className="bg-white text-[#003032] font-bold text-base px-5 py-2.5 rounded-lg hover:bg-emerald-100 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
             >
               Kayıt Ol
             </button>
             <button
               onClick={() => navigate("/seller/login")}
-              className="border border-white/80 text-white font-semibold text-sm px-4 py-2 rounded-lg hover:bg-white/10 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
+              className="border-2 border-white text-white font-bold text-base px-5 py-2.5 rounded-lg hover:bg-white/10 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
             >
               Giriş Yap
             </button>
@@ -100,28 +99,30 @@ const SellerHeader = () => {
             <div className="relative group z-50">
               <button
                 type="button"
-                className="flex items-center gap-1 text-white/80 font-semibold text-sm px-3 py-2 rounded-lg hover:text-white hover:bg-white/5 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
+                className="flex items-center gap-1 text-white font-semibold text-base px-3 py-2 rounded-lg hover:text-emerald-300 hover:bg-white/10 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
                 aria-haspopup="true"
               >
                 Destek
                 <ChevronDown className="w-4 h-4" />
               </button>
-              <div className="absolute right-0 top-full mt-2 hidden w-56 rounded-lg border border-white/10 bg-[#002829] shadow-xl group-hover:block group-focus-within:block z-[9999]">
-                <div className="py-2 text-sm text-white">
-                  {supportLinks.map((link) => (
-                    <a
-                      key={link.label}
-                      href={link.href}
-                      target={link.external ? "_blank" : undefined}
-                      rel={link.external ? "noopener noreferrer" : undefined}
-                      className="flex items-center gap-2 px-3 py-2 hover:bg-white/10 hover:text-white transition-colors"
-                    >
-                      {link.label === "WhatsApp Destek" && (
-                        <MessageCircle className="w-4 h-4" />
-                      )}
-                      <span>{link.label}</span>
-                    </a>
-                  ))}
+              <div className="absolute right-0 top-full pt-2 hidden w-56 group-hover:block group-focus-within:block z-[9999]">
+                <div className="rounded-lg border border-white/10 bg-[#002829] shadow-xl">
+                  <div className="py-2 text-sm text-white">
+                    {supportLinks.map((link) => (
+                      <a
+                        key={link.label}
+                        href={link.href}
+                        target={link.external ? "_blank" : undefined}
+                        rel={link.external ? "noopener noreferrer" : undefined}
+                        className="flex items-center gap-2 px-3 py-2 hover:bg-white/10 hover:text-white transition-colors"
+                      >
+                        {link.label === "WhatsApp Destek" && (
+                          <MessageCircle className="w-4 h-4" />
+                        )}
+                        <span>{link.label}</span>
+                      </a>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
