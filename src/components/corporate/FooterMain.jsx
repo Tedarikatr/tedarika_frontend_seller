@@ -42,7 +42,7 @@ const FooterMain = () => {
                 <img
                   src={Logo}
                   alt="Tedarika Logo"
-                  className="w-24 group-hover:scale-110 transition-transform duration-300"
+                  className="w-32 sm:w-36 group-hover:scale-110 transition-transform duration-300"
                 />
                 <div>
                   <div className="text-3xl font-black text-white">Tedarika</div>

@@ -31,27 +31,24 @@ const SellerHeader = () => {
   return (
     <header className="bg-[#003032] border-b border-white/10 shadow-sm w-full relative z-[100]">
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
-        <div className="flex items-center justify-between gap-4 py-3.5">
+        <div className="flex items-center justify-between gap-4 py-1">
           <a
             href="/seller/landing"
             className="flex items-center gap-3"
             aria-label="Tedarika Satıcı Paneli"
           >
-            <img src={Logo} alt="Tedarika Logo" className="h-12 sm:h-14" />
-            <span className="hidden sm:inline text-white font-semibold tracking-wide">
-              Satıcı Paneli
-            </span>
+            <img src={Logo} alt="Tedarika Logo" className="h-14 sm:h-16" />
           </a>
 
           <nav
-            className="hidden lg:flex items-center gap-6 text-sm text-white/80"
+            className="hidden lg:flex items-center gap-6 text-base font-semibold text-white"
             aria-label="Ana menü"
           >
             {mainNavLinks.map((link) => (
               <a
                 key={link.label}
                 href={link.href}
-                className="hover:text-white hover:bg-white/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 rounded-lg px-2 py-1"
+                className="hover:text-emerald-300 hover:bg-white/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 rounded-lg px-3 py-2"
               >
                 {link.label}
               </a>
@@ -60,7 +57,7 @@ const SellerHeader = () => {
             <div className="relative group z-50">
               <button
                 type="button"
-                className="flex items-center gap-1 hover:text-white hover:bg-white/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 rounded-lg px-2 py-1"
+                className="flex items-center gap-1 hover:text-emerald-300 hover:bg-white/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 rounded-lg px-3 py-2"
                 aria-haspopup="true"
               >
                 Kurumsal
@@ -86,13 +83,13 @@ const SellerHeader = () => {
           <div className="hidden sm:flex items-center gap-2 lg:gap-3">
             <button
               onClick={() => navigate("/seller/register")}
-              className="bg-white text-[#003032] font-semibold text-sm px-4 py-2 rounded-lg hover:bg-emerald-100 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
+              className="bg-white text-[#003032] font-bold text-base px-5 py-2.5 rounded-lg hover:bg-emerald-100 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
             >
               Kayıt Ol
             </button>
             <button
               onClick={() => navigate("/seller/login")}
-              className="border border-white/80 text-white font-semibold text-sm px-4 py-2 rounded-lg hover:bg-white/10 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
+              className="border-2 border-white text-white font-bold text-base px-5 py-2.5 rounded-lg hover:bg-white/10 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
             >
               Giriş Yap
             </button>
@@ -100,7 +97,7 @@ const SellerHeader = () => {
             <div className="relative group z-50">
               <button
                 type="button"
-                className="flex items-center gap-1 text-white/80 font-semibold text-sm px-3 py-2 rounded-lg hover:text-white hover:bg-white/5 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
+                className="flex items-center gap-1 text-white font-semibold text-base px-3 py-2 rounded-lg hover:text-emerald-300 hover:bg-white/10 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
                 aria-haspopup="true"
               >
                 Destek
