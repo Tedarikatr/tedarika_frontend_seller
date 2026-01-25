@@ -37,7 +37,7 @@ const SellerHeader = () => {
             className="flex items-center gap-3"
             aria-label="Tedarika Satıcı Paneli"
           >
-            <img src={Logo} alt="Tedarika Logo" className="h-14 sm:h-16" />
+            <img src={Logo} alt="Tedarika Logo" className="h-32 sm:h-40 -my-8" />
           </a>
 
           <nav
@@ -63,17 +63,19 @@ const SellerHeader = () => {
                 Kurumsal
                 <ChevronDown className="w-4 h-4" />
               </button>
-              <div className="absolute left-0 top-full mt-2 hidden w-48 rounded-lg border border-white/10 bg-[#002829] shadow-xl group-hover:block group-focus-within:block z-[9999]">
-                <div className="py-2 text-sm text-white">
-                  {corporateLinks.map((link) => (
-                    <a
-                      key={link.label}
-                      href={link.href}
-                      className="block px-3 py-2 hover:bg-white/10 hover:text-white transition-colors"
-                    >
-                      {link.label}
-                    </a>
-                  ))}
+              <div className="absolute left-0 top-full pt-2 hidden w-48 group-hover:block group-focus-within:block z-[9999]">
+                <div className="rounded-lg border border-white/10 bg-[#002829] shadow-xl">
+                  <div className="py-2 text-sm text-white">
+                    {corporateLinks.map((link) => (
+                      <a
+                        key={link.label}
+                        href={link.href}
+                        className="block px-3 py-2 hover:bg-white/10 hover:text-white transition-colors"
+                      >
+                        {link.label}
+                      </a>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
@@ -103,22 +105,24 @@ const SellerHeader = () => {
                 Destek
                 <ChevronDown className="w-4 h-4" />
               </button>
-              <div className="absolute right-0 top-full mt-2 hidden w-56 rounded-lg border border-white/10 bg-[#002829] shadow-xl group-hover:block group-focus-within:block z-[9999]">
-                <div className="py-2 text-sm text-white">
-                  {supportLinks.map((link) => (
-                    <a
-                      key={link.label}
-                      href={link.href}
-                      target={link.external ? "_blank" : undefined}
-                      rel={link.external ? "noopener noreferrer" : undefined}
-                      className="flex items-center gap-2 px-3 py-2 hover:bg-white/10 hover:text-white transition-colors"
-                    >
-                      {link.label === "WhatsApp Destek" && (
-                        <MessageCircle className="w-4 h-4" />
-                      )}
-                      <span>{link.label}</span>
-                    </a>
-                  ))}
+              <div className="absolute right-0 top-full pt-2 hidden w-56 group-hover:block group-focus-within:block z-[9999]">
+                <div className="rounded-lg border border-white/10 bg-[#002829] shadow-xl">
+                  <div className="py-2 text-sm text-white">
+                    {supportLinks.map((link) => (
+                      <a
+                        key={link.label}
+                        href={link.href}
+                        target={link.external ? "_blank" : undefined}
+                        rel={link.external ? "noopener noreferrer" : undefined}
+                        className="flex items-center gap-2 px-3 py-2 hover:bg-white/10 hover:text-white transition-colors"
+                      >
+                        {link.label === "WhatsApp Destek" && (
+                          <MessageCircle className="w-4 h-4" />
+                        )}
+                        <span>{link.label}</span>
+                      </a>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
