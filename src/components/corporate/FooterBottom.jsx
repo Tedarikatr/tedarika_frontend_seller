@@ -35,7 +35,7 @@ const FooterBottom = () => {
               {paymentIcons.map((icon) => (
                 <img
                   key={icon}
-                  src={publicUrl(`assets/images/${icon}.svg`)}
+                  src={publicUrl(`images/${icon}.svg`)}
                   alt={`${icon} logosu`}
                   className="h-6 rounded-lg opacity-70 hover:opacity-100 transition-all duration-200 hover:scale-110"
                 />
@@ -44,7 +44,7 @@ const FooterBottom = () => {
 
             {/* ETBİS görseli */}
             <img
-              src={publicUrl("assets/images/son.jpg")}
+              src={publicUrl("images/son.jpg")}
               alt="ETBİS Kayıt QR Kodu"
               className="h-12 rounded-xl border-2 border-white/10 shadow-lg hover:border-white/30 transition-all"
             />

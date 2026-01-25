@@ -1,7 +1,7 @@
 // =============================
 // MyStoreProductsPage.jsx - Ultra Modern & Beautiful 🎨
 // =============================
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   getStoreCoverage,
@@ -18,7 +18,9 @@ import {
   ShoppingBag,
   Sparkles,
   AlertCircle,
-  RefreshCw
+  RefreshCw,
+  Search,
+  ListFilter
 } from "lucide-react";
 
 const ITEMS_PER_PAGE = 10;
@@ -27,6 +29,7 @@ const MyStoreProductsPage = () => {
   const navigate = useNavigate();
   const { getMyStoreProducts } = useProductCache();
   const [products, setProducts] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [feedback, setFeedback] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -78,8 +81,22 @@ const MyStoreProductsPage = () => {
     loadProducts();
   }, []);
 
+  // Filtreleme
+  const filteredProducts = useMemo(() => {
+    if (!searchTerm.trim()) return products;
+    const term = searchTerm.toLowerCase();
+    return products.filter((prod) =>
+      prod.name?.toLowerCase().includes(term) ||
+      prod.brand?.toLowerCase().includes(term) ||
+      prod.categoryName?.toLowerCase().includes(term) ||
+      prod.ean?.toLowerCase().includes(term) ||
+      prod.sku?.toLowerCase().includes(term) ||
+      prod.barcode?.toLowerCase().includes(term)
+    );
+  }, [products, searchTerm]);
+
   const start = (currentPage - 1) * ITEMS_PER_PAGE;
-  const currentItems = products.slice(start, start + ITEMS_PER_PAGE);
+  const currentItems = filteredProducts.slice(start, start + ITEMS_PER_PAGE);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
@@ -181,6 +198,33 @@ const MyStoreProductsPage = () => {
           </div>
         )}
 
+        {/* Search Bar */}
+        {!loading && products.length > 0 && (
+          <div className="mb-6 bg-white rounded-2xl shadow-lg p-5 border-2 border-gray-200">
+            <div className="flex flex-col sm:flex-row gap-4">
+              <div className="relative flex-1">
+                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <input
+                  type="text"
+                  placeholder="Ürün, marka, kategori, barkod ara..."
+                  value={searchTerm}
+                  onChange={(e) => {
+                    setSearchTerm(e.target.value);
+                    setCurrentPage(1);
+                  }}
+                  className="w-full pl-12 pr-4 py-3 rounded-xl border-2 border-gray-200 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 transition-all duration-300 text-gray-800"
+                />
+              </div>
+              <div className="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-xl border-2 border-emerald-200">
+                <ListFilter className="w-5 h-5 text-emerald-600" />
+                <span className="text-sm font-bold text-emerald-800 whitespace-nowrap">
+                  {filteredProducts.length} ürün bulundu
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Geri Bildirim */}
         {feedback && (
           <div
@@ -227,6 +271,24 @@ const MyStoreProductsPage = () => {
                 Ürün Ekle
               </button>
             </div>
+          ) : filteredProducts.length === 0 ? (
+            <div className="text-center py-20">
+              <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 mb-6 shadow-lg">
+                <Search size={48} className="text-gray-400" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-700 mb-2">
+                Ürün Bulunamadı
+              </h3>
+              <p className="text-gray-500 text-sm mb-6">
+                Aradığınız kriterlere uygun ürün bulunamadı.
+              </p>
+              <button 
+                onClick={() => setSearchTerm("")}
+                className="px-6 py-3 bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all"
+              >
+                Aramayı Temizle
+              </button>
+            </div>
           ) : (
             <MyStoreProductTable
               products={currentItems}
@@ -236,10 +298,10 @@ const MyStoreProductsPage = () => {
         </div>
 
         {/* Sayfalama */}
-        {!loading && products.length > ITEMS_PER_PAGE && (
+        {!loading && filteredProducts.length > ITEMS_PER_PAGE && (
           <div className="mt-8 flex justify-center">
             <Pagination
-              total={products.length}
+              total={filteredProducts.length}
               current={currentPage}
               perPage={ITEMS_PER_PAGE}
               onPageChange={setCurrentPage}

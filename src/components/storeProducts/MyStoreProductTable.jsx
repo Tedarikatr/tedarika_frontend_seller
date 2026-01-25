@@ -1,10 +1,12 @@
 // =============================
 // MyStoreProductTable.jsx
 // =============================
-import React from "react";
-import { Settings, Image as ImageIcon, TrendingUp } from "lucide-react";
+import React, { useState } from "react";
+import { Settings, Image as ImageIcon, TrendingUp, List } from "lucide-react";
+import ProductAttributesModal from "./ProductAttributesModal";
 
 const MyStoreProductTable = ({ products, onManage }) => {
+  const [selectedProductForAttributes, setSelectedProductForAttributes] = useState(null);
   if (!products?.length) {
     return (
       <div className="p-10 text-center">
@@ -84,13 +86,22 @@ const MyStoreProductTable = ({ products, onManage }) => {
                     )}
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap text-center">
-                    <button
-                      onClick={() => onManage(product)}
-                      className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-sm font-bold hover:shadow-lg hover:scale-105 transition-all duration-300"
-                    >
-                      <Settings className="w-4 h-4" />
-                      Yönet
-                    </button>
+                    <div className="flex items-center justify-center gap-2">
+                      <button
+                        onClick={() => setSelectedProductForAttributes(product)}
+                        className="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-sm font-bold hover:shadow-lg hover:scale-105 transition-all duration-300"
+                      >
+                        <List className="w-4 h-4" />
+                        Özellikler
+                      </button>
+                      <button
+                        onClick={() => onManage(product)}
+                        className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-sm font-bold hover:shadow-lg hover:scale-105 transition-all duration-300"
+                      >
+                        <Settings className="w-4 h-4" />
+                        Yönet
+                      </button>
+                    </div>
                   </td>
                 </tr>
               );
@@ -142,8 +153,15 @@ const MyStoreProductTable = ({ products, onManage }) => {
                 </div>
               </div>
 
-              {/* Action Button */}
-              <div className="p-4">
+              {/* Action Buttons */}
+              <div className="p-4 space-y-2">
+                <button
+                  onClick={() => setSelectedProductForAttributes(product)}
+                  className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-sm font-bold hover:shadow-lg hover:scale-105 transition-all duration-300"
+                >
+                  <List className="w-4 h-4" />
+                  Özellikler
+                </button>
                 <button
                   onClick={() => onManage(product)}
                   className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-sm font-bold hover:shadow-lg hover:scale-105 transition-all duration-300"
@@ -156,6 +174,16 @@ const MyStoreProductTable = ({ products, onManage }) => {
           );
         })}
       </div>
+
+      {/* Attributes Modal */}
+      {selectedProductForAttributes && (
+        <ProductAttributesModal
+          productId={selectedProductForAttributes.id || selectedProductForAttributes.storeProductId}
+          productName={selectedProductForAttributes.name}
+          isOpen={!!selectedProductForAttributes}
+          onClose={() => setSelectedProductForAttributes(null)}
+        />
+      )}
     </div>
   );
 };
