@@ -6,7 +6,7 @@ const publicUrl = (path) => {
   return `${import.meta.env.BASE_URL}${path}`.replace(/\/{2,}/g, "/");
 };
 
-const Logo = publicUrl("images/tedarikaisortagımlogo500x500.png");
+const Logo = publicUrl("images/logo.png");
 
 const mainNavLinks = [
   { label: "Resmi Anasayfa", href: "/" },

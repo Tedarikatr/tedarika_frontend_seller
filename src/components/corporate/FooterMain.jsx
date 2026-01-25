@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { Mail, Phone } from "lucide-react";
 
-const Logo = `${import.meta.env.BASE_URL}images/tedarikaisortagımlogo500x500.png`.replace(/\/{2,}/g, "/");
+const Logo = `${import.meta.env.BASE_URL}images/logo.png`.replace(/\/{2,}/g, "/");
 
 // BASE_URL'i kullanarak public içindeki dosyaların doğru yolu
 const publicUrl = (path) => {
