@@ -7,8 +7,17 @@ export default function BrandList({ brands, ownerships, sending, onOwnershipRequ
     const item = ownerships.find((o) => o.brandId === brandId);
     if (!item) return null;
     return {
-      type: BrandOwnershipType[item.ownershipType] || "-",
-      status: BrandOwnershipStatus[item.status] || "-",
+      type: typeof item.ownershipType === "number" 
+        ? BrandOwnershipType[item.ownershipType] 
+        : item.ownershipType || "-",
+      status: typeof item.status === "number"
+        ? BrandOwnershipStatus[item.status]
+        : item.status || "-",
+      // Original numeric values for internal use
+      ownershipType: typeof item.ownershipType === "number" ? item.ownershipType : 
+        Object.keys(BrandOwnershipType).find(key => BrandOwnershipType[key] === item.ownershipType) || 0,
+      statusNum: typeof item.status === "number" ? item.status :
+        Object.keys(BrandOwnershipStatus).find(key => BrandOwnershipStatus[key] === item.status) || 0,
     };
   };
 
