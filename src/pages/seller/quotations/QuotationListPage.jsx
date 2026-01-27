@@ -258,13 +258,13 @@ const QuotationListPage = () => {
                             </td>
                             <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-center">
                               <Link
-                            to={`/seller/quotations/${q.id}`}
-                            className="inline-flex items-center gap-1 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-xs sm:text-sm font-semibold hover:shadow-lg hover:scale-105 transition-all duration-300"
-                          >
-                            <span className="hidden sm:inline">Detay</span>
-                            <span className="sm:hidden">→</span>
-                          </Link>
-                        </td>
+                                to={`/seller/quotations/${q.id}`}
+                                className="inline-flex items-center gap-1 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-xs sm:text-sm font-semibold hover:shadow-lg hover:scale-105 transition-all duration-300"
+                              >
+                                <span className="hidden sm:inline">Detay</span>
+                                <span className="sm:hidden">→</span>
+                              </Link>
+                            </td>
                       </tr>
                     );
                   })}
