@@ -69,9 +69,14 @@ const SalesReportsPage = () => {
     setLoadingHistory(true);
     try {
       const data = await getExportHistory();
-      setExportHistory(data || []);
+      setExportHistory(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error("Export geçmişi yüklenemedi:", err);
+      setExportHistory([]);
+      // Sadece kritik hatalarda kullanıcıya bildir
+      if (err?.message && !err.message.includes("404")) {
+        toast.error("Rapor geçmişi yüklenemedi");
+      }
     } finally {
       setLoadingHistory(false);
     }
@@ -81,9 +86,14 @@ const SalesReportsPage = () => {
     setLoadingSchedules(true);
     try {
       const data = await getReportSchedules();
-      setSchedules(data || []);
+      setSchedules(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error("Zamanlanmış raporlar yüklenemedi:", err);
+      setSchedules([]);
+      // Sadece kritik hatalarda kullanıcıya bildir
+      if (err?.message && !err.message.includes("404")) {
+        toast.error("Zamanlanmış raporlar yüklenemedi");
+      }
     } finally {
       setLoadingSchedules(false);
     }
@@ -111,14 +121,34 @@ const SalesReportsPage = () => {
       if (report?.storagePath) {
         window.open(report.storagePath, "_blank");
         toast.success("Rapor başarıyla oluşturuldu ve açıldı");
+        // Listeyi yenile
+        setTimeout(() => {
+          loadExportHistory();
+        }, 1000);
       } else {
         toast.error("Rapor oluşturuldu ancak indirme linki bulunamadı");
       }
-
-      loadExportHistory();
     } catch (err) {
       console.error("Rapor oluşturulamadı:", err);
-      const errorMessage = err?.response?.data?.message || err?.message || "Rapor oluşturulamadı";
+      let errorMessage = "Rapor oluşturulamadı";
+      
+      // Hata mesajını parse et
+      if (err?.message) {
+        errorMessage = err.message;
+        // 404 Not Found hatası için özel mesaj
+        if (err.message.includes("404") || err.message.includes("Not Found") || err.message.includes("bulunamadı")) {
+          errorMessage = "Rapor servisi şu anda kullanılamıyor. Lütfen daha sonra tekrar deneyin.";
+        }
+        // 400 Bad Request hatası için
+        if (err.message.includes("400") || err.message.includes("Bad Request")) {
+          errorMessage = "Geçersiz istek. Lütfen tüm alanları kontrol edin.";
+        }
+        // 500 Internal Server Error için
+        if (err.message.includes("500") || err.message.includes("Internal Server Error")) {
+          errorMessage = "Sunucu hatası oluştu. Lütfen daha sonra tekrar deneyin.";
+        }
+      }
+      
       toast.error(errorMessage);
     } finally {
       setLoading(false);
@@ -149,7 +179,7 @@ const SalesReportsPage = () => {
 
       await createReportSchedule(requestBody);
 
-      toast.success("Zamanlanmış rapor oluşturuldu");
+      toast.success("Zamanlanmış rapor başarıyla oluşturuldu");
       setShowScheduleModal(false);
       loadSchedules();
       
@@ -159,7 +189,20 @@ const SalesReportsPage = () => {
       setScheduleEndDate("");
     } catch (err) {
       console.error("Zamanlama oluşturulamadı:", err);
-      const errorMessage = err?.response?.data?.message || err?.message || "Zamanlama oluşturulamadı";
+      let errorMessage = "Zamanlanmış rapor oluşturulamadı";
+      
+      if (err?.message) {
+        errorMessage = err.message;
+        // 404 Not Found hatası için özel mesaj
+        if (err.message.includes("404") || err.message.includes("Not Found")) {
+          errorMessage = "Rapor servisi şu anda kullanılamıyor. Lütfen daha sonra tekrar deneyin.";
+        }
+        // 400 Bad Request hatası için
+        if (err.message.includes("400") || err.message.includes("Bad Request")) {
+          errorMessage = "Geçersiz istek. Lütfen tüm alanları kontrol edin.";
+        }
+      }
+      
       toast.error(errorMessage);
     }
   };
@@ -171,11 +214,20 @@ const SalesReportsPage = () => {
 
     try {
       await deleteReportSchedule(scheduleId);
-      toast.success("Zamanlanmış rapor silindi");
+      toast.success("Zamanlanmış rapor başarıyla silindi");
       loadSchedules();
     } catch (err) {
       console.error("Zamanlama silinemedi:", err);
-      toast.error("Zamanlama silinemedi");
+      let errorMessage = "Zamanlanmış rapor silinemedi";
+      
+      if (err?.message) {
+        errorMessage = err.message;
+        if (err.message.includes("404") || err.message.includes("Not Found")) {
+          errorMessage = "Zamanlanmış rapor bulunamadı";
+        }
+      }
+      
+      toast.error(errorMessage);
     }
   };
 
@@ -239,15 +291,20 @@ const SalesReportsPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
       {/* Header */}
-      <div className="bg-gradient-to-r from-emerald-600 via-teal-600 to-green-600 text-white shadow-xl">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+      <div className="bg-gradient-to-r from-emerald-600 via-teal-600 to-green-600 text-white shadow-xl relative overflow-hidden">
+        {/* Dekoratif arka plan */}
+        <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent pointer-events-none"></div>
+        <div className="absolute top-10 right-10 w-32 h-32 bg-white/10 rounded-full blur-3xl hidden sm:block"></div>
+        <div className="absolute bottom-10 left-10 w-40 h-40 bg-purple-400/20 rounded-full blur-3xl hidden sm:block"></div>
+        
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8 relative z-10">
           <div className="flex items-center gap-3 sm:gap-4">
             <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center shadow-lg flex-shrink-0">
               <BarChart3 size={24} className="sm:w-8 sm:h-8" />
             </div>
-            <div className="min-w-0">
-              <h1 className="text-2xl sm:text-3xl font-bold mb-1">Satış Raporları</h1>
-              <p className="text-emerald-100 text-xs sm:text-sm">
+            <div className="min-w-0 flex-1">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-1">Satış Raporları</h1>
+              <p className="text-emerald-100 text-xs sm:text-sm lg:text-base">
                 Raporlarınızı oluşturun ve zamanlayın
               </p>
             </div>
@@ -348,28 +405,65 @@ const SalesReportsPage = () => {
                 <label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2 sm:mb-3">
                   Tarih Aralığı <span className="text-gray-400 font-normal text-xs">(Opsiyonel)</span>
                 </label>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
-                  <div className="relative">
-                    <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-                      <Calendar className="w-4 h-4 sm:w-5 sm:h-5" />
+                <div className="space-y-4">
+                  {/* Başlangıç Tarihi */}
+                  <div>
+                    <label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                      <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-sm"></div>
+                      <span>Başlangıç Tarihi</span>
+                      <span className="text-gray-400 font-normal text-xs">(GG/AA/YYYY)</span>
+                    </label>
+                    <div className="relative">
+                      <div className="absolute left-3 top-1/2 -translate-y-1/2 text-emerald-600 pointer-events-none z-10">
+                        <Calendar className="w-4 h-4 sm:w-5 sm:h-5" />
+                      </div>
+                      <input
+                        type="date"
+                        value={startDate}
+                        onChange={(e) => setStartDate(e.target.value)}
+                        className="w-full pl-10 sm:pl-11 pr-3 sm:pr-4 py-2.5 sm:py-3 text-sm border-2 border-emerald-300 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition bg-emerald-50/50 hover:bg-emerald-50 font-medium"
+                      />
                     </div>
-                    <input
-                      type="date"
-                      value={startDate}
-                      onChange={(e) => setStartDate(e.target.value)}
-                      className="w-full pl-10 sm:pl-11 pr-3 sm:pr-4 py-2 sm:py-3 text-sm border-2 border-gray-200 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition"
-                    />
+                    {startDate && (
+                      <p className="text-xs text-emerald-600 mt-1.5 flex items-center gap-1">
+                        <CheckCircle className="w-3 h-3" />
+                        {new Date(startDate).toLocaleDateString("tr-TR", {
+                          day: "2-digit",
+                          month: "2-digit",
+                          year: "numeric"
+                        })}
+                      </p>
+                    )}
                   </div>
-                  <div className="relative">
-                    <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-                      <Calendar className="w-4 h-4 sm:w-5 sm:h-5" />
+                  
+                  {/* Bitiş Tarihi */}
+                  <div>
+                    <label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                      <div className="w-2.5 h-2.5 rounded-full bg-teal-500 shadow-sm"></div>
+                      <span>Bitiş Tarihi</span>
+                      <span className="text-gray-400 font-normal text-xs">(GG/AA/YYYY)</span>
+                    </label>
+                    <div className="relative">
+                      <div className="absolute left-3 top-1/2 -translate-y-1/2 text-teal-600 pointer-events-none z-10">
+                        <Calendar className="w-4 h-4 sm:w-5 sm:h-5" />
+                      </div>
+                      <input
+                        type="date"
+                        value={endDate}
+                        onChange={(e) => setEndDate(e.target.value)}
+                        className="w-full pl-10 sm:pl-11 pr-3 sm:pr-4 py-2.5 sm:py-3 text-sm border-2 border-teal-300 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition bg-teal-50/50 hover:bg-teal-50 font-medium"
+                      />
                     </div>
-                    <input
-                      type="date"
-                      value={endDate}
-                      onChange={(e) => setEndDate(e.target.value)}
-                      className="w-full pl-10 sm:pl-11 pr-3 sm:pr-4 py-2 sm:py-3 text-sm border-2 border-gray-200 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition"
-                    />
+                    {endDate && (
+                      <p className="text-xs text-teal-600 mt-1.5 flex items-center gap-1">
+                        <CheckCircle className="w-3 h-3" />
+                        {new Date(endDate).toLocaleDateString("tr-TR", {
+                          day: "2-digit",
+                          month: "2-digit",
+                          year: "numeric"
+                        })}
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>
@@ -378,17 +472,18 @@ const SalesReportsPage = () => {
               <button
                 onClick={handleExport}
                 disabled={loading}
-                className="w-full py-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-xl font-bold hover:opacity-90 transition disabled:opacity-50 flex items-center justify-center gap-2"
+                className="w-full py-3 sm:py-3.5 bg-gradient-to-r from-emerald-600 via-teal-600 to-green-600 text-white rounded-xl font-bold hover:from-emerald-700 hover:via-teal-700 hover:to-green-700 hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm sm:text-base"
               >
                 {loading ? (
                   <>
                     <Loader2 className="w-5 h-5 animate-spin" />
-                    Oluşturuluyor...
+                    <span className="hidden sm:inline">Rapor Oluşturuluyor...</span>
+                    <span className="sm:hidden">Oluşturuluyor...</span>
                   </>
                 ) : (
                   <>
                     <Download className="w-5 h-5" />
-                    Raporu İndir
+                    Raporu Oluştur ve İndir
                   </>
                 )}
               </button>
@@ -412,60 +507,81 @@ const SalesReportsPage = () => {
             </div>
 
             {loadingSchedules ? (
-              <div className="flex justify-center py-8">
-                <Loader2 className="w-8 h-8 animate-spin text-emerald-600" />
+              <div className="flex justify-center py-12">
+                <div className="flex flex-col items-center gap-3">
+                  <Loader2 className="w-8 h-8 animate-spin text-emerald-600" />
+                  <p className="text-sm text-gray-500">Yükleniyor...</p>
+                </div>
               </div>
             ) : schedules.length === 0 ? (
-              <div className="text-center py-8">
-                <Clock className="w-16 h-16 text-gray-300 mx-auto mb-3" />
-                <p className="text-gray-500">Zamanlanmış rapor yok</p>
+              <div className="text-center py-12">
+                <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 mb-4 shadow-lg">
+                  <Clock className="w-10 h-10 text-gray-400" />
+                </div>
+                <h3 className="text-lg font-bold text-gray-700 mb-2">Zamanlanmış Rapor Yok</h3>
+                <p className="text-sm text-gray-500 mb-4">Otomatik rapor oluşturmak için yeni bir zamanlama ekleyin</p>
+                <button
+                  onClick={() => setShowScheduleModal(true)}
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition text-sm font-semibold"
+                >
+                  <Plus className="w-4 h-4" />
+                  İlk Zamanlamayı Oluştur
+                </button>
               </div>
             ) : (
               <div className="space-y-3 max-h-96 overflow-y-auto">
                 {schedules.map((schedule) => (
                   <div
                     key={schedule.id}
-                    className="p-4 border border-gray-200 rounded-lg hover:border-emerald-300 transition"
+                    className="p-4 border-2 border-gray-200 rounded-xl hover:border-emerald-300 hover:shadow-md transition-all bg-gradient-to-br from-white to-gray-50"
                   >
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-start gap-3 flex-1">
-                        {getReportTypeIcon(schedule.reportType)}
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-1">
-                            <p className="font-bold text-gray-900">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex items-start gap-3 flex-1 min-w-0">
+                        <div className="p-2 rounded-lg bg-emerald-100 flex-shrink-0">
+                          {getReportTypeIcon(schedule.reportType)}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-2 flex-wrap">
+                            <p className="font-bold text-gray-900 text-sm sm:text-base">
                               {getReportTypeLabel(schedule.reportType)}
                             </p>
                             {schedule.isActive ? (
-                              <span className="px-2 py-0.5 bg-green-100 text-green-700 rounded-full text-xs font-semibold">
+                              <span className="px-2 py-0.5 bg-green-100 text-green-700 rounded-full text-xs font-semibold whitespace-nowrap">
                                 Aktif
                               </span>
                             ) : (
-                              <span className="px-2 py-0.5 bg-gray-100 text-gray-700 rounded-full text-xs font-semibold">
+                              <span className="px-2 py-0.5 bg-gray-100 text-gray-700 rounded-full text-xs font-semibold whitespace-nowrap">
                                 Pasif
                               </span>
                             )}
                           </div>
                           {schedule.email && (
-                            <p className="text-sm text-gray-600 flex items-center gap-2 mt-1">
-                              <Mail className="w-4 h-4" />
-                              {schedule.email}
+                            <p className="text-xs sm:text-sm text-gray-600 flex items-center gap-2 mt-1 truncate">
+                              <Mail className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+                              <span className="truncate">{schedule.email}</span>
                             </p>
                           )}
                           <p className="text-xs text-gray-500 flex items-center gap-2 mt-1">
-                            <RefreshCw className="w-3 h-3" />
-                            {getCronDescription(schedule.cronExpression)}
+                            <RefreshCw className="w-3 h-3 flex-shrink-0" />
+                            <span>{getCronDescription(schedule.cronExpression)}</span>
                           </p>
                           {schedule.nextRunAt && (
                             <p className="text-xs text-gray-500 flex items-center gap-2 mt-1">
-                              <Clock className="w-3 h-3" />
-                              Sonraki: {new Date(schedule.nextRunAt).toLocaleString("tr-TR")}
+                              <Clock className="w-3 h-3 flex-shrink-0" />
+                              <span>Sonraki: {new Date(schedule.nextRunAt).toLocaleString("tr-TR", { 
+                                day: '2-digit', 
+                                month: '2-digit', 
+                                year: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                              })}</span>
                             </p>
                           )}
                         </div>
                       </div>
                       <button
                         onClick={() => handleDeleteSchedule(schedule.id)}
-                        className="text-red-600 hover:text-red-700 transition ml-2"
+                        className="text-red-600 hover:text-red-700 hover:bg-red-50 p-2 rounded-lg transition-all flex-shrink-0"
                         title="Sil"
                       >
                         <Trash2 className="w-5 h-5" />
@@ -486,13 +602,19 @@ const SalesReportsPage = () => {
           </div>
 
           {loadingHistory ? (
-            <div className="flex justify-center py-8">
-              <Loader2 className="w-8 h-8 animate-spin text-emerald-600" />
+            <div className="flex justify-center py-12">
+              <div className="flex flex-col items-center gap-3">
+                <Loader2 className="w-8 h-8 animate-spin text-emerald-600" />
+                <p className="text-sm text-gray-500">Rapor geçmişi yükleniyor...</p>
+              </div>
             </div>
           ) : exportHistory.length === 0 ? (
-            <div className="text-center py-8">
-              <FileText className="w-16 h-16 text-gray-300 mx-auto mb-3" />
-              <p className="text-gray-500">Henüz rapor indirilmedi</p>
+            <div className="text-center py-12">
+              <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 mb-4 shadow-lg">
+                <FileText className="w-10 h-10 text-gray-400" />
+              </div>
+              <h3 className="text-lg font-bold text-gray-700 mb-2">Henüz Rapor Oluşturulmadı</h3>
+              <p className="text-sm text-gray-500">Oluşturduğunuz raporlar burada görünecektir</p>
             </div>
           ) : (
             <div className="overflow-x-auto -mx-4 sm:mx-0">
@@ -710,28 +832,65 @@ const SalesReportsPage = () => {
                   <label className="block text-sm font-semibold text-gray-700 mb-3">
                     Tarih Aralığı <span className="text-gray-400 font-normal text-xs">(Opsiyonel)</span>
                   </label>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="relative">
-                      <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-                        <Calendar className="w-4 h-4" />
+                  <div className="space-y-4">
+                    {/* Başlangıç Tarihi */}
+                    <div>
+                      <label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                        <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-sm"></div>
+                        <span>Başlangıç Tarihi</span>
+                        <span className="text-gray-400 font-normal text-xs">(GG/AA/YYYY)</span>
+                      </label>
+                      <div className="relative">
+                        <div className="absolute left-3 top-1/2 -translate-y-1/2 text-emerald-600 pointer-events-none z-10">
+                          <Calendar className="w-4 h-4" />
+                        </div>
+                        <input
+                          type="date"
+                          value={scheduleStartDate}
+                          onChange={(e) => setScheduleStartDate(e.target.value)}
+                          className="w-full pl-10 pr-3 py-2 border-2 border-emerald-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition text-sm bg-emerald-50/50 hover:bg-emerald-50 font-medium"
+                        />
                       </div>
-                      <input
-                        type="date"
-                        value={scheduleStartDate}
-                        onChange={(e) => setScheduleStartDate(e.target.value)}
-                        className="w-full pl-10 pr-3 py-2 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition text-sm"
-                      />
+                      {scheduleStartDate && (
+                        <p className="text-xs text-emerald-600 mt-1.5 flex items-center gap-1">
+                          <CheckCircle className="w-3 h-3" />
+                          {new Date(scheduleStartDate).toLocaleDateString("tr-TR", {
+                            day: "2-digit",
+                            month: "2-digit",
+                            year: "numeric"
+                          })}
+                        </p>
+                      )}
                     </div>
-                    <div className="relative">
-                      <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-                        <Calendar className="w-4 h-4" />
+                    
+                    {/* Bitiş Tarihi */}
+                    <div>
+                      <label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                        <div className="w-2.5 h-2.5 rounded-full bg-teal-500 shadow-sm"></div>
+                        <span>Bitiş Tarihi</span>
+                        <span className="text-gray-400 font-normal text-xs">(GG/AA/YYYY)</span>
+                      </label>
+                      <div className="relative">
+                        <div className="absolute left-3 top-1/2 -translate-y-1/2 text-teal-600 pointer-events-none z-10">
+                          <Calendar className="w-4 h-4" />
+                        </div>
+                        <input
+                          type="date"
+                          value={scheduleEndDate}
+                          onChange={(e) => setScheduleEndDate(e.target.value)}
+                          className="w-full pl-10 pr-3 py-2 border-2 border-teal-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition text-sm bg-teal-50/50 hover:bg-teal-50 font-medium"
+                        />
                       </div>
-                      <input
-                        type="date"
-                        value={scheduleEndDate}
-                        onChange={(e) => setScheduleEndDate(e.target.value)}
-                        className="w-full pl-10 pr-3 py-2 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition text-sm"
-                      />
+                      {scheduleEndDate && (
+                        <p className="text-xs text-teal-600 mt-1.5 flex items-center gap-1">
+                          <CheckCircle className="w-3 h-3" />
+                          {new Date(scheduleEndDate).toLocaleDateString("tr-TR", {
+                            day: "2-digit",
+                            month: "2-digit",
+                            year: "numeric"
+                          })}
+                        </p>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -739,13 +898,13 @@ const SalesReportsPage = () => {
                 <div className="flex gap-3 pt-4">
                   <button
                     onClick={() => setShowScheduleModal(false)}
-                    className="flex-1 py-3 bg-gray-200 hover:bg-gray-300 rounded-xl font-semibold text-gray-700 transition"
+                    className="flex-1 py-3 bg-gray-200 hover:bg-gray-300 rounded-xl font-semibold text-gray-700 transition-all duration-200 hover:shadow-md"
                   >
                     İptal
                   </button>
                   <button
                     onClick={handleCreateSchedule}
-                    className="flex-1 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-xl font-semibold hover:opacity-90 transition"
+                    className="flex-1 py-3 bg-gradient-to-r from-emerald-600 via-teal-600 to-green-600 text-white rounded-xl font-semibold hover:from-emerald-700 hover:via-teal-700 hover:to-green-700 hover:shadow-xl transition-all duration-300"
                   >
                     Oluştur
                   </button>
