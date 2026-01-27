@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import {
   UserCircle,
   Building2,
@@ -31,12 +32,36 @@ const TABS = [
 ];
 
 const SellerProfilePage = () => {
+  const location = useLocation();
   const isSubscribed =
     localStorage.getItem("sellerSubscriptionActive") === "true";
 
   const [activeTab, setActiveTab] = useState(
     isSubscribed ? "seller" : "subscription"
   );
+
+  // Hash'ten tab belirleme
+  useEffect(() => {
+    const hash = location.hash.replace("#", "");
+    if (hash && TABS.some((tab) => tab.key === hash)) {
+      setActiveTab(hash);
+    }
+  }, [location.hash]);
+
+  // Custom event ile tab değiştirme (UserMenu'den gelen)
+  useEffect(() => {
+    const handleTabChange = (event) => {
+      const tab = event.detail?.tab;
+      if (tab && TABS.some((t) => t.key === tab)) {
+        setActiveTab(tab);
+      }
+    };
+
+    window.addEventListener("profile-tab-change", handleTabChange);
+    return () => {
+      window.removeEventListener("profile-tab-change", handleTabChange);
+    };
+  }, []);
 
   const renderActiveCard = () => {
     switch (activeTab) {
@@ -85,7 +110,11 @@ const SellerProfilePage = () => {
             {TABS.map((tab) => (
               <button
                 key={tab.key}
-                onClick={() => setActiveTab(tab.key)}
+                onClick={() => {
+                  setActiveTab(tab.key);
+                  // Hash'i güncelle
+                  window.history.replaceState(null, "", `/seller/profile#${tab.key}`);
+                }}
                 className={`group flex items-center gap-2 px-6 py-3 rounded-2xl text-sm font-bold transition-all duration-300 transform
                   ${
                     activeTab === tab.key

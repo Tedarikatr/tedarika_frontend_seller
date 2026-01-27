@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Menu } from "lucide-react";
 import NotificationDropdown from "@/components/notifications/NotificationDropdown";
+import UserMenu from "./UserMenu";
 import { getMyStore } from "@/api/sellerStoreService";
 
 const Topbar = ({ onMenuClick }) => {
@@ -103,26 +104,8 @@ const Topbar = ({ onMenuClick }) => {
                     {user?.email || ""}
                   </span>
                 </div>
-                {/* Mağaza Logosu veya Avatar */}
-                {storeLogo ? (
-                  <img
-                    src={storeLogo}
-                    alt="Mağaza Logosu"
-                    className="w-12 h-12 rounded-full object-cover shadow-xl border-2 border-white/30 hover:scale-110 transition-transform duration-300 cursor-pointer"
-                    title={user?.email || ""}
-                    onError={(e) => {
-                      // Logo yüklenemezse avatar göster
-                      setStoreLogo(null);
-                    }}
-                  />
-                ) : (
-                  <div
-                    className="w-12 h-12 flex items-center justify-center bg-gradient-to-br from-emerald-500 to-teal-600 text-white rounded-full font-extrabold text-lg shadow-xl border-2 border-white/30 hover:scale-110 transition-transform duration-300 cursor-pointer"
-                    title={user?.email || ""}
-                  >
-                    {initials}
-                  </div>
-                )}
+                {/* User Menu */}
+                <UserMenu user={user} storeLogo={storeLogo} initials={initials} />
               </div>
             </>
           )}
