@@ -137,7 +137,7 @@ const ProductDatabasePage = () => {
                     onChange={(e) => setSearchType(e.target.value)}
                     className="w-4 h-4 text-orange-500 focus:ring-orange-500"
                   />
-                  <span className="text-gray-700 font-medium">Toplu Ürün Ara</span>
+                  <span className="text-gray-700 font-medium">Toplu Ara</span>
                   <span className="bg-orange-500 text-white text-xs font-bold px-2 py-0.5 rounded ml-2">
                     Yeni
                   </span>
@@ -194,7 +194,7 @@ const ProductDatabasePage = () => {
             icon={ShoppingCart}
             title="Kendi ürününüzü toplu ekleyin"
             description="Hepsiburada kataloğunda bulunmayan ürünlerinizi toplu bir şekilde ekleyin."
-            linkText="Toplu ürün ekle"
+            linkText="Toplu ekle"
             onClick={() => navigate("/seller/products/draft/upload")}
             iconColor="text-purple-500"
           />
@@ -202,7 +202,7 @@ const ProductDatabasePage = () => {
             icon={List}
             title="Çok sayıda ürünü arayın"
             description="Hepsiburada kataloğundan birden fazla ürünü toplu olarak arayın."
-            linkText="Toplu ürün ara"
+            linkText="Toplu ara"
             onClick={() => {
               setSearchType("bulk");
               // Toplu arama için özel bir sayfa veya modal açılabilir

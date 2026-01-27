@@ -348,69 +348,53 @@ const ProductDraftUploadPage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
-      {/* Hero Header */}
-      <div className="bg-gradient-to-r from-emerald-600 via-teal-600 to-green-600 text-white shadow-xl">
-        <div className="max-w-5xl mx-auto px-6 py-8">
-          <button
-            onClick={() => navigate("/seller/products/drafts")}
-            className="mb-4 inline-flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl transition-all backdrop-blur-sm"
-          >
-            <ArrowLeft size={20} />
-            Geri Dön
-          </button>
-
-          <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center shadow-lg">
-              <Upload size={32} />
-            </div>
-            <div>
-              <h1 className="text-3xl font-bold mb-1 flex items-center gap-2">
-                Toplu Ürün Yükleme
-                <Sparkles size={24} className="text-yellow-300" />
-              </h1>
-              <p className="text-emerald-100 text-sm">
-                Excel, JSON veya XML ile ürünlerinizi sisteme ekleyin
-              </p>
-            </div>
-          </div>
-        </div>
+    <div className="min-h-screen bg-gray-50 py-4">
+      {/* Header */}
+      <div className="max-w-3xl mx-auto px-4 mb-4">
+        <button
+          onClick={() => navigate("/seller/products/drafts")}
+          className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-3 text-sm"
+        >
+          <ArrowLeft size={16} />
+          Geri Dön
+        </button>
+        <h1 className="text-xl font-bold text-gray-900">Ürün Yükleme</h1>
+        <p className="text-gray-600 text-sm mt-1">
+          Excel, JSON, XML veya manuel olarak ürünlerinizi yükleyin
+        </p>
       </div>
 
       {/* Main Content */}
-      <div className="max-w-5xl mx-auto px-6 py-8">
+      <div className="max-w-3xl mx-auto px-4">
         {/* Info Card */}
-        <div className="mb-8 bg-gradient-to-r from-blue-50 to-cyan-50 border-2 border-blue-200 rounded-2xl p-6">
-          <div className="flex items-start gap-4">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center flex-shrink-0 shadow-lg">
-              <AlertCircle className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <h3 className="font-bold text-blue-900 mb-2">Önemli Bilgiler</h3>
-              <ul className="text-sm text-blue-800 space-y-1">
+        <div className="mb-4 bg-blue-50 border border-blue-200 rounded-lg p-3">
+          <div className="flex items-start gap-2">
+            <AlertCircle className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
+            <div className="text-xs text-blue-800">
+              <p className="font-semibold mb-1">Önemli:</p>
+              <ul className="space-y-0.5">
                 <li>• Yüklenen ürünler önce incelemeye alınır</li>
                 <li>• Onaylanan ürünler otomatik olarak mağazanıza eklenir</li>
-                <li>• Geçersiz formatlar reddedilir ve size bildirilir</li>
               </ul>
             </div>
           </div>
         </div>
 
         {/* Tabs */}
-        <div className="mb-6 flex flex-wrap gap-3">
+        <div className="mb-4 flex flex-wrap gap-2">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             return (
               <button
                 key={tab.key}
                 onClick={() => setActiveTab(tab.key)}
-                className={`flex items-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all ${
+                className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
                   activeTab === tab.key
-                    ? `bg-gradient-to-r from-${tab.color}-600 to-${tab.color}-700 text-white shadow-lg scale-105`
-                    : "bg-white text-gray-700 border-2 border-gray-200 hover:border-gray-300"
+                    ? "bg-gray-900 text-white"
+                    : "bg-white text-gray-700 border border-gray-300 hover:border-gray-400"
                 }`}
               >
-                <Icon className="w-5 h-5" />
+                <Icon className="w-4 h-4" />
                 {tab.label}
               </button>
             );
@@ -418,76 +402,64 @@ const ProductDraftUploadPage = () => {
         </div>
 
         {/* Content */}
-        <div className="bg-white rounded-3xl shadow-2xl border-2 border-gray-200 p-8">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6">
           {/* Excel Upload */}
           {activeTab === "excel" && (
-            <div className="space-y-6">
-              <div className="text-center mb-6">
-                <FileSpreadsheet className="w-20 h-20 mx-auto text-green-600 mb-4" />
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">Excel Dosyası Yükle</h2>
-                <p className="text-gray-600">
-                  Excel/CSV formatında toplu ürün bilgilerinizi yükleyin
+            <div className="space-y-4">
+              <div className="text-center mb-4">
+                <h2 className="text-lg font-semibold text-gray-900 mb-1">Excel Dosyası Yükle</h2>
+                <p className="text-gray-600 text-sm">
+                  Excel/CSV formatında ürün bilgilerinizi yükleyin
                 </p>
               </div>
 
               {/* Download Template Button */}
-              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-xl p-4 mb-6">
-                <div className="flex items-start gap-3">
-                  <FileText className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
+                <div className="flex items-start gap-2">
+                  <FileText className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
                   <div className="flex-1">
-                    <h3 className="font-semibold text-gray-900 mb-1">Örnek Şablon</h3>
-                    <p className="text-sm text-gray-600 mb-3">
-                      Ürün bilgilerinizi doğru formatta yüklemek için örnek şablonu indirin veya önizleyin
-                    </p>
-                    <div className="flex flex-wrap gap-2">
+                    <h3 className="font-medium text-gray-900 text-sm mb-1">Örnek Şablon</h3>
+                    <div className="flex flex-wrap gap-2 mt-2">
                       <button
                         onClick={() => setShowTemplatePreview(true)}
-                        className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm font-semibold"
+                        className="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-600 text-white rounded text-xs font-medium hover:bg-blue-700 transition"
                       >
-                        <Eye className="w-4 h-4" />
+                        <Eye className="w-3 h-3" />
                         Önizle
                       </button>
                       <a
                         href="/templates/Tedarika_Urun_Sablon.csv"
                         download="Tedarika_Urun_Sablon.csv"
-                        className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-semibold"
+                        className="inline-flex items-center gap-1 px-3 py-1.5 bg-gray-700 text-white rounded text-xs font-medium hover:bg-gray-800 transition"
                       >
-                        <Download className="w-4 h-4" />
+                        <Download className="w-3 h-3" />
                         CSV İndir
                       </a>
                     </div>
                   </div>
                 </div>
               </div>
-              <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4">
-                <p className="text-sm text-emerald-900 font-semibold mb-2">
-                  Güncel başlıklar (sıralama birebir aynı olmalı):
-                </p>
-                <p className="text-xs text-emerald-800 font-mono break-words">
-                  UrunAdi*	Aciklama	SKU*	EAN*	MarkaId	MarkaAdi	KategoriId	AltKategoriId	GTIP	Gorsel1Url	Gorsel2Url	Gorsel3Url	Gorsel4Url	BirimTipi*	StokAdedi*	MinSiparisAdedi	MaxSiparisAdedi	BirimFiyat*	ParaBirimi*
-                </p>
-              </div>
 
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">
                   Excel Dosyası *
                 </label>
                 <input
                   type="file"
                   accept=".xlsx,.xls,.csv"
                   onChange={(e) => setExcelFile(e.target.files[0])}
-                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-green-500 focus:ring-4 focus:ring-green-100 transition-all"
+                  className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-gray-900 focus:ring-1 focus:ring-gray-900 text-sm"
                 />
                 {excelFile && (
-                  <p className="mt-2 text-sm text-green-600 flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4" />
+                  <p className="mt-1.5 text-xs text-green-600 flex items-center gap-1">
+                    <CheckCircle className="w-3 h-3" />
                     {excelFile.name}
                   </p>
                 )}
               </div>
 
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">
                   Yükleme Adı (Opsiyonel)
                 </label>
                 <input
@@ -495,23 +467,23 @@ const ProductDraftUploadPage = () => {
                   value={excelUploadName}
                   onChange={(e) => setExcelUploadName(e.target.value)}
                   placeholder="Örn: Ocak 2025 Ürünleri"
-                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-green-500 focus:ring-4 focus:ring-green-100 transition-all"
+                  className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-gray-900 focus:ring-1 focus:ring-gray-900 text-sm"
                 />
               </div>
 
               <button
                 onClick={handleExcelUpload}
                 disabled={loading || !excelFile}
-                className="w-full inline-flex items-center justify-center gap-2 px-6 py-4 rounded-xl bg-gradient-to-r from-green-600 to-emerald-600 text-white text-lg font-bold hover:shadow-lg hover:scale-105 transition-all disabled:opacity-50 disabled:hover:scale-100"
+                className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-gray-900 hover:bg-gray-800 text-white text-sm font-medium rounded-lg transition disabled:opacity-50"
               >
                 {loading ? (
                   <>
-                    <Loader2 className="w-5 h-5 animate-spin" />
+                    <Loader2 className="w-4 h-4 animate-spin" />
                     Yükleniyor...
                   </>
                 ) : (
                   <>
-                    <Upload className="w-5 h-5" />
+                    <Upload className="w-4 h-4" />
                     Excel Yükle
                   </>
                 )}
@@ -521,41 +493,40 @@ const ProductDraftUploadPage = () => {
 
           {/* JSON Upload */}
           {activeTab === "json" && (
-            <div className="space-y-6">
-              <div className="text-center mb-6">
-                <FileCode className="w-20 h-20 mx-auto text-blue-600 mb-4" />
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">JSON Formatı</h2>
-                <p className="text-gray-600">
+            <div className="space-y-4">
+              <div className="text-center mb-4">
+                <h2 className="text-lg font-semibold text-gray-900 mb-1">JSON Formatı</h2>
+                <p className="text-gray-600 text-sm">
                   JSON formatında ürün bilgilerinizi girin
                 </p>
               </div>
 
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">
                   JSON İçeriği *
                 </label>
                 <textarea
                   value={jsonText}
                   onChange={(e) => setJsonText(e.target.value)}
                   placeholder='{"name": "Ürün Adı", "brand": "Marka", ...}'
-                  rows={12}
-                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all font-mono text-sm"
+                  rows={10}
+                  className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-gray-900 focus:ring-1 focus:ring-gray-900 font-mono text-xs"
                 />
               </div>
 
               <button
                 onClick={handleJsonUpload}
                 disabled={loading || !jsonText.trim()}
-                className="w-full inline-flex items-center justify-center gap-2 px-6 py-4 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-lg font-bold hover:shadow-lg hover:scale-105 transition-all disabled:opacity-50 disabled:hover:scale-100"
+                className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-gray-900 hover:bg-gray-800 text-white text-sm font-medium rounded-lg transition disabled:opacity-50"
               >
                 {loading ? (
                   <>
-                    <Loader2 className="w-5 h-5 animate-spin" />
+                    <Loader2 className="w-4 h-4 animate-spin" />
                     Gönderiliyor...
                   </>
                 ) : (
                   <>
-                    <Upload className="w-5 h-5" />
+                    <Upload className="w-4 h-4" />
                     JSON Gönder
                   </>
                 )}
@@ -565,35 +536,34 @@ const ProductDraftUploadPage = () => {
 
           {/* XML File Upload */}
           {activeTab === "xml" && (
-            <div className="space-y-6">
-              <div className="text-center mb-6">
-                <FileText className="w-20 h-20 mx-auto text-purple-600 mb-4" />
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">XML Dosyası Yükle</h2>
-                <p className="text-gray-600">
+            <div className="space-y-4">
+              <div className="text-center mb-4">
+                <h2 className="text-lg font-semibold text-gray-900 mb-1">XML Dosyası Yükle</h2>
+                <p className="text-gray-600 text-sm">
                   XML formatında ürün bilgilerinizi yükleyin
                 </p>
               </div>
 
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">
                   XML Dosyası *
                 </label>
                 <input
                   type="file"
                   accept=".xml"
                   onChange={(e) => setXmlFile(e.target.files[0])}
-                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-purple-500 focus:ring-4 focus:ring-purple-100 transition-all"
+                  className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-gray-900 focus:ring-1 focus:ring-gray-900 text-sm"
                 />
                 {xmlFile && (
-                  <p className="mt-2 text-sm text-purple-600 flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4" />
+                  <p className="mt-1.5 text-xs text-green-600 flex items-center gap-1">
+                    <CheckCircle className="w-3 h-3" />
                     {xmlFile.name}
                   </p>
                 )}
               </div>
 
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">
                   Yükleme Adı (Opsiyonel)
                 </label>
                 <input
@@ -601,23 +571,23 @@ const ProductDraftUploadPage = () => {
                   value={xmlUploadName}
                   onChange={(e) => setXmlUploadName(e.target.value)}
                   placeholder="Örn: Ocak 2025 Ürünleri"
-                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-purple-500 focus:ring-4 focus:ring-purple-100 transition-all"
+                  className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-gray-900 focus:ring-1 focus:ring-gray-900 text-sm"
                 />
               </div>
 
               <button
                 onClick={handleXmlUpload}
                 disabled={loading || !xmlFile}
-                className="w-full inline-flex items-center justify-center gap-2 px-6 py-4 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 text-white text-lg font-bold hover:shadow-lg hover:scale-105 transition-all disabled:opacity-50 disabled:hover:scale-100"
+                className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-gray-900 hover:bg-gray-800 text-white text-sm font-medium rounded-lg transition disabled:opacity-50"
               >
                 {loading ? (
                   <>
-                    <Loader2 className="w-5 h-5 animate-spin" />
+                    <Loader2 className="w-4 h-4 animate-spin" />
                     Yükleniyor...
                   </>
                 ) : (
                   <>
-                    <Upload className="w-5 h-5" />
+                    <Upload className="w-4 h-4" />
                     XML Yükle
                   </>
                 )}
@@ -627,17 +597,16 @@ const ProductDraftUploadPage = () => {
 
           {/* XML URL Upload */}
           {activeTab === "xml-url" && (
-            <div className="space-y-6">
-              <div className="text-center mb-6">
-                <LinkIcon className="w-20 h-20 mx-auto text-orange-600 mb-4" />
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">XML URL ile Yükle</h2>
-                <p className="text-gray-600">
+            <div className="space-y-4">
+              <div className="text-center mb-4">
+                <h2 className="text-lg font-semibold text-gray-900 mb-1">XML URL ile Yükle</h2>
+                <p className="text-gray-600 text-sm">
                   XML dosyanızın URL'ini girerek yükleyin
                 </p>
               </div>
 
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">
                   XML URL *
                 </label>
                 <input
@@ -645,12 +614,12 @@ const ProductDraftUploadPage = () => {
                   value={xmlUrl}
                   onChange={(e) => setXmlUrl(e.target.value)}
                   placeholder="https://example.com/products.xml"
-                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-orange-500 focus:ring-4 focus:ring-orange-100 transition-all"
+                  className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-gray-900 focus:ring-1 focus:ring-gray-900 text-sm"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">
                   Yükleme Adı (Opsiyonel)
                 </label>
                 <input
@@ -658,13 +627,13 @@ const ProductDraftUploadPage = () => {
                   value={xmlUrlUploadName}
                   onChange={(e) => setXmlUrlUploadName(e.target.value)}
                   placeholder="Örn: API Entegrasyonu"
-                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-orange-500 focus:ring-4 focus:ring-orange-100 transition-all"
+                  className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-gray-900 focus:ring-1 focus:ring-gray-900 text-sm"
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
                     Kullanıcı Adı (Opsiyonel)
                   </label>
                   <input
@@ -672,11 +641,11 @@ const ProductDraftUploadPage = () => {
                     value={xmlUsername}
                     onChange={(e) => setXmlUsername(e.target.value)}
                     placeholder="Username"
-                    className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-orange-500 focus:ring-4 focus:ring-orange-100 transition-all"
+                    className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-gray-900 focus:ring-1 focus:ring-gray-900 text-sm"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
                     Şifre (Opsiyonel)
                   </label>
                   <input
@@ -684,7 +653,7 @@ const ProductDraftUploadPage = () => {
                     value={xmlPassword}
                     onChange={(e) => setXmlPassword(e.target.value)}
                     placeholder="Password"
-                    className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-orange-500 focus:ring-4 focus:ring-orange-100 transition-all"
+                    className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-gray-900 focus:ring-1 focus:ring-gray-900 text-sm"
                   />
                 </div>
               </div>
@@ -692,16 +661,16 @@ const ProductDraftUploadPage = () => {
               <button
                 onClick={handleXmlUrlUpload}
                 disabled={loading || !xmlUrl.trim()}
-                className="w-full inline-flex items-center justify-center gap-2 px-6 py-4 rounded-xl bg-gradient-to-r from-orange-600 to-red-600 text-white text-lg font-bold hover:shadow-lg hover:scale-105 transition-all disabled:opacity-50 disabled:hover:scale-100"
+                className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-gray-900 hover:bg-gray-800 text-white text-sm font-medium rounded-lg transition disabled:opacity-50"
               >
                 {loading ? (
                   <>
-                    <Loader2 className="w-5 h-5 animate-spin" />
+                    <Loader2 className="w-4 h-4 animate-spin" />
                     İşleniyor...
                   </>
                 ) : (
                   <>
-                    <Upload className="w-5 h-5" />
+                    <Upload className="w-4 h-4" />
                     XML URL İşle
                   </>
                 )}
@@ -711,49 +680,48 @@ const ProductDraftUploadPage = () => {
 
           {/* Manual Upload */}
           {activeTab === "manual" && (
-            <div className="space-y-6">
-              <div className="text-center mb-6">
-                <Package className="w-20 h-20 mx-auto text-emerald-600 mb-4" />
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">Manuel Ürün Yükleme</h2>
-                <p className="text-gray-600">
+            <div className="space-y-4">
+              <div className="text-center mb-4">
+                <h2 className="text-lg font-semibold text-gray-900 mb-1">Manuel Ürün Yükleme</h2>
+                <p className="text-gray-600 text-sm">
                   Excel, JSON veya XML olmadan doğrudan ürün bilgilerinizi girin
                 </p>
               </div>
 
               {/* Draft Name */}
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2">
-                  Taslak Adı (Opsiyonel)
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  Yükleme Adı (Opsiyonel)
                 </label>
                 <input
                   type="text"
                   value={draftName}
                   onChange={(e) => setDraftName(e.target.value)}
-                  placeholder="Örn: Manuel Ürün Yükleme - 2024"
-                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 transition-all"
+                  placeholder="Örn: Ocak 2025 Ürünleri"
+                  className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-gray-900 focus:ring-1 focus:ring-gray-900 text-sm"
                 />
               </div>
 
               {/* Products */}
-              <div className="space-y-6">
+              <div className="space-y-4">
                 {products.map((product, productIndex) => (
-                  <div key={productIndex} className="border-2 border-gray-200 rounded-xl p-6 bg-gray-50">
-                    <div className="flex items-center justify-between mb-4">
-                      <h3 className="text-lg font-bold text-gray-900">Ürün {productIndex + 1}</h3>
+                  <div key={productIndex} className="border border-gray-300 rounded-lg p-4 bg-gray-50">
+                    <div className="flex items-center justify-between mb-3">
+                      <h3 className="text-sm font-semibold text-gray-900">Ürün {productIndex + 1}</h3>
                       {products.length > 1 && (
                         <button
                           onClick={() => removeProduct(productIndex)}
                           className="text-red-600 hover:text-red-700 transition-colors"
                         >
-                          <X className="w-5 h-5" />
+                          <X className="w-4 h-4" />
                         </button>
                       )}
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       {/* Basic Info */}
                       <div>
-                        <label className="block text-sm font-semibold text-gray-700 mb-1">
+                        <label className="block text-xs font-medium text-gray-700 mb-1">
                           Ürün Adı *
                         </label>
                         <input
@@ -761,12 +729,12 @@ const ProductDraftUploadPage = () => {
                           value={product.name}
                           onChange={(e) => updateProduct(productIndex, "name", e.target.value)}
                           placeholder="Ürün adı"
-                          className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
+                          className="w-full px-2.5 py-1.5 rounded border border-gray-300 focus:border-gray-900 focus:ring-1 focus:ring-gray-900 text-sm"
                           required
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-semibold text-gray-700 mb-1">
+                        <label className="block text-xs font-medium text-gray-700 mb-1">
                           SKU *
                         </label>
                         <input
@@ -774,12 +742,12 @@ const ProductDraftUploadPage = () => {
                           value={product.sku}
                           onChange={(e) => updateProduct(productIndex, "sku", e.target.value)}
                           placeholder="SKU-001"
-                          className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
+                          className="w-full px-2.5 py-1.5 rounded border border-gray-300 focus:border-gray-900 focus:ring-1 focus:ring-gray-900 text-sm"
                           required
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-semibold text-gray-700 mb-1">
+                        <label className="block text-xs font-medium text-gray-700 mb-1">
                           EAN
                         </label>
                         <input
@@ -787,11 +755,11 @@ const ProductDraftUploadPage = () => {
                           value={product.ean}
                           onChange={(e) => updateProduct(productIndex, "ean", e.target.value)}
                           placeholder="1234567890123"
-                          className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
+                          className="w-full px-2.5 py-1.5 rounded border border-gray-300 focus:border-gray-900 focus:ring-1 focus:ring-gray-900 text-sm"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-semibold text-gray-700 mb-1">
+                        <label className="block text-xs font-medium text-gray-700 mb-1">
                           Marka Adı
                         </label>
                         <input
@@ -799,11 +767,11 @@ const ProductDraftUploadPage = () => {
                           value={product.brandName}
                           onChange={(e) => updateProduct(productIndex, "brandName", e.target.value)}
                           placeholder="Marka adı"
-                          className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
+                          className="w-full px-2.5 py-1.5 rounded border border-gray-300 focus:border-gray-900 focus:ring-1 focus:ring-gray-900 text-sm"
                         />
                       </div>
-                      <div>
-                        <label className="block text-sm font-semibold text-gray-700 mb-1">
+                      <div className="sm:col-span-2">
+                        <label className="block text-xs font-medium text-gray-700 mb-1">
                           Açıklama
                         </label>
                         <textarea
@@ -811,52 +779,52 @@ const ProductDraftUploadPage = () => {
                           onChange={(e) => updateProduct(productIndex, "description", e.target.value)}
                           placeholder="Ürün açıklaması"
                           rows={2}
-                          className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
+                          className="w-full px-2.5 py-1.5 rounded border border-gray-300 focus:border-gray-900 focus:ring-1 focus:ring-gray-900 text-sm"
                         />
                       </div>
 
                       {/* Store Info */}
-                      <div className="md:col-span-2 border-t pt-4 mt-4">
-                        <h4 className="font-semibold text-gray-900 mb-3">Mağaza Bilgileri</h4>
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      <div className="sm:col-span-2 border-t pt-3 mt-3">
+                        <h4 className="text-xs font-semibold text-gray-900 mb-2">Mağaza Bilgileri</h4>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
                           <div>
-                            <label className="block text-sm font-semibold text-gray-700 mb-1">
+                            <label className="block text-xs font-medium text-gray-700 mb-1">
                               Birim Türü *
                             </label>
                             <input
                               type="number"
                               value={product.store.unitType}
                               onChange={(e) => updateProduct(productIndex, "store.unitType", parseInt(e.target.value) || 0)}
-                              className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
+                              className="w-full px-2 py-1.5 rounded border border-gray-300 focus:border-gray-900 focus:ring-1 focus:ring-gray-900 text-sm"
                               required
                             />
                           </div>
                           <div>
-                            <label className="block text-sm font-semibold text-gray-700 mb-1">
-                              Stok Miktarı *
+                            <label className="block text-xs font-medium text-gray-700 mb-1">
+                              Stok *
                             </label>
                             <input
                               type="number"
                               value={product.store.stockQuantity}
                               onChange={(e) => updateProduct(productIndex, "store.stockQuantity", parseInt(e.target.value) || 0)}
-                              className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
+                              className="w-full px-2 py-1.5 rounded border border-gray-300 focus:border-gray-900 focus:ring-1 focus:ring-gray-900 text-sm"
                               required
                             />
                           </div>
                           <div>
-                            <label className="block text-sm font-semibold text-gray-700 mb-1">
+                            <label className="block text-xs font-medium text-gray-700 mb-1">
                               Min. Sipariş *
                             </label>
                             <input
                               type="number"
                               value={product.store.minOrderQuantity}
                               onChange={(e) => updateProduct(productIndex, "store.minOrderQuantity", parseInt(e.target.value) || 1)}
-                              className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
+                              className="w-full px-2 py-1.5 rounded border border-gray-300 focus:border-gray-900 focus:ring-1 focus:ring-gray-900 text-sm"
                               required
                             />
                           </div>
                           <div>
-                            <label className="block text-sm font-semibold text-gray-700 mb-1">
+                            <label className="block text-xs font-medium text-gray-700 mb-1">
                               Birim Fiyat *
                             </label>
                             <input
@@ -864,12 +832,12 @@ const ProductDraftUploadPage = () => {
                               step="0.01"
                               value={product.store.unitPrice}
                               onChange={(e) => updateProduct(productIndex, "store.unitPrice", parseFloat(e.target.value) || 0)}
-                              className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
+                              className="w-full px-2 py-1.5 rounded border border-gray-300 focus:border-gray-900 focus:ring-1 focus:ring-gray-900 text-sm"
                               required
                             />
                           </div>
                           <div>
-                            <label className="block text-sm font-semibold text-gray-700 mb-1">
+                            <label className="block text-xs font-medium text-gray-700 mb-1">
                               Para Birimi *
                             </label>
                             <input
@@ -877,180 +845,78 @@ const ProductDraftUploadPage = () => {
                               value={product.store.currencyCode}
                               onChange={(e) => updateProduct(productIndex, "store.currencyCode", e.target.value)}
                               placeholder="TRY"
-                              className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
+                              className="w-full px-2 py-1.5 rounded border border-gray-300 focus:border-gray-900 focus:ring-1 focus:ring-gray-900 text-sm"
                               required
                             />
-                          </div>
-                        </div>
-
-                        {/* Yeni Alanlar */}
-                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4">
-                          <div>
-                            <label className="block text-sm font-semibold text-gray-700 mb-1">
-                              Ana Ürün Kodu
-                            </label>
-                            <input
-                              type="text"
-                              value={product.store.mainProductCode}
-                              onChange={(e) => updateProduct(productIndex, "store.mainProductCode", e.target.value)}
-                              placeholder="MAIN-001"
-                              className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-sm font-semibold text-gray-700 mb-1">
-                              Stok Kodu
-                            </label>
-                            <input
-                              type="text"
-                              value={product.store.stockCode}
-                              onChange={(e) => updateProduct(productIndex, "store.stockCode", e.target.value)}
-                              placeholder="STOCK-001"
-                              className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-sm font-semibold text-gray-700 mb-1">
-                              Kritik Stok
-                            </label>
-                            <input
-                              type="number"
-                              value={product.store.criticalStock}
-                              onChange={(e) => updateProduct(productIndex, "store.criticalStock", e.target.value ? parseInt(e.target.value) : "")}
-                              placeholder="20"
-                              className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
-                            />
-                          </div>
-                        </div>
-
-                        {/* Paket Boyutları */}
-                        <div className="mt-4">
-                          <h5 className="text-sm font-semibold text-gray-700 mb-2">Paket Boyutları</h5>
-                          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                            <div>
-                              <label className="block text-xs text-gray-600 mb-1">En (cm)</label>
-                              <input
-                                type="number"
-                                step="0.1"
-                                value={product.store.width}
-                                onChange={(e) => updateProduct(productIndex, "store.width", e.target.value ? parseFloat(e.target.value) : "")}
-                                placeholder="30.5"
-                                className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
-                              />
-                            </div>
-                            <div>
-                              <label className="block text-xs text-gray-600 mb-1">Boy (cm)</label>
-                              <input
-                                type="number"
-                                step="0.1"
-                                value={product.store.length}
-                                onChange={(e) => updateProduct(productIndex, "store.length", e.target.value ? parseFloat(e.target.value) : "")}
-                                placeholder="40.0"
-                                className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
-                              />
-                            </div>
-                            <div>
-                              <label className="block text-xs text-gray-600 mb-1">Yükseklik (cm)</label>
-                              <input
-                                type="number"
-                                step="0.1"
-                                value={product.store.height}
-                                onChange={(e) => updateProduct(productIndex, "store.height", e.target.value ? parseFloat(e.target.value) : "")}
-                                placeholder="25.0"
-                                className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
-                              />
-                            </div>
-                            <div>
-                              <label className="block text-xs text-gray-600 mb-1">Ağırlık (kg)</label>
-                              <input
-                                type="number"
-                                step="0.1"
-                                value={product.store.weight}
-                                onChange={(e) => updateProduct(productIndex, "store.weight", e.target.value ? parseFloat(e.target.value) : "")}
-                                placeholder="2.5"
-                                className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
-                              />
-                            </div>
-                            <div>
-                              <label className="block text-xs text-gray-600 mb-1">Desi</label>
-                              <input
-                                type="number"
-                                step="0.1"
-                                value={product.store.volumeWeight}
-                                onChange={(e) => updateProduct(productIndex, "store.volumeWeight", e.target.value ? parseFloat(e.target.value) : "")}
-                                placeholder="3.2"
-                                className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
-                              />
-                            </div>
                           </div>
                         </div>
                       </div>
 
                       {/* Image URLs */}
-                      <div className="md:col-span-2">
-                        <div className="flex items-center justify-between mb-2">
-                          <label className="block text-sm font-semibold text-gray-700">
+                      <div className="sm:col-span-2">
+                        <div className="flex items-center justify-between mb-1.5">
+                          <label className="block text-xs font-medium text-gray-700">
                             Görsel URL'leri
                           </label>
                           <button
                             type="button"
                             onClick={() => addImageUrl(productIndex)}
-                            className="text-sm text-emerald-600 hover:text-emerald-700 flex items-center gap-1"
+                            className="text-xs text-gray-600 hover:text-gray-900 flex items-center gap-1"
                           >
-                            <Plus className="w-4 h-4" />
+                            <Plus className="w-3 h-3" />
                             Ekle
                           </button>
                         </div>
                         {product.imageUrls && product.imageUrls.map((url, urlIndex) => (
-                          <div key={urlIndex} className="flex gap-2 mb-2">
+                          <div key={urlIndex} className="flex gap-1.5 mb-1.5">
                             <input
                               type="url"
                               value={url}
                               onChange={(e) => updateImageUrl(productIndex, urlIndex, e.target.value)}
                               placeholder="https://example.com/image.jpg"
-                              className="flex-1 px-3 py-2 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
+                              className="flex-1 px-2 py-1.5 rounded border border-gray-300 focus:border-gray-900 focus:ring-1 focus:ring-gray-900 text-xs"
                             />
                             <button
                               type="button"
                               onClick={() => removeImageUrl(productIndex, urlIndex)}
                               className="text-red-600 hover:text-red-700"
                             >
-                              <X className="w-5 h-5" />
+                              <X className="w-4 h-4" />
                             </button>
                           </div>
                         ))}
                       </div>
 
                       {/* Color Variants */}
-                      <div className="md:col-span-2">
-                        <div className="flex items-center justify-between mb-2">
-                          <label className="block text-sm font-semibold text-gray-700">
+                      <div className="sm:col-span-2">
+                        <div className="flex items-center justify-between mb-1.5">
+                          <label className="block text-xs font-medium text-gray-700">
                             Renk Varyantları
                           </label>
                           <button
                             type="button"
                             onClick={() => addColorVariant(productIndex)}
-                            className="text-sm text-emerald-600 hover:text-emerald-700 flex items-center gap-1"
+                            className="text-xs text-gray-600 hover:text-gray-900 flex items-center gap-1"
                           >
-                            <Plus className="w-4 h-4" />
+                            <Plus className="w-3 h-3" />
                             Ekle
                           </button>
                         </div>
                         {product.colorVariants && product.colorVariants.map((variant, variantIndex) => (
-                          <div key={variantIndex} className="flex gap-2 mb-2">
+                          <div key={variantIndex} className="flex gap-1.5 mb-1.5">
                             <input
                               type="text"
                               value={variant}
                               onChange={(e) => updateColorVariant(productIndex, variantIndex, e.target.value)}
                               placeholder="Renk Beyaz"
-                              className="flex-1 px-3 py-2 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
+                              className="flex-1 px-2 py-1.5 rounded border border-gray-300 focus:border-gray-900 focus:ring-1 focus:ring-gray-900 text-xs"
                             />
                             <button
                               type="button"
                               onClick={() => removeColorVariant(productIndex, variantIndex)}
                               className="text-red-600 hover:text-red-700"
                             >
-                              <X className="w-5 h-5" />
+                              <X className="w-4 h-4" />
                             </button>
                           </div>
                         ))}
@@ -1063,9 +929,9 @@ const ProductDraftUploadPage = () => {
               {/* Add Product Button */}
               <button
                 onClick={addProduct}
-                className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-gray-100 hover:bg-gray-200 rounded-xl font-semibold text-gray-700 transition"
+                className="w-full inline-flex items-center justify-center gap-2 px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm font-medium text-gray-700 transition"
               >
-                <Plus className="w-5 h-5" />
+                <Plus className="w-4 h-4" />
                 Yeni Ürün Ekle
               </button>
 
@@ -1073,16 +939,16 @@ const ProductDraftUploadPage = () => {
               <button
                 onClick={handleManualUpload}
                 disabled={loading || products.length === 0}
-                className="w-full inline-flex items-center justify-center gap-2 px-6 py-4 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-lg font-bold hover:shadow-lg hover:scale-105 transition-all disabled:opacity-50 disabled:hover:scale-100"
+                className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-gray-900 hover:bg-gray-800 text-white text-sm font-medium rounded-lg transition disabled:opacity-50"
               >
                 {loading ? (
                   <>
-                    <Loader2 className="w-5 h-5 animate-spin" />
+                    <Loader2 className="w-4 h-4 animate-spin" />
                     Yükleniyor...
                   </>
                 ) : (
                   <>
-                    <Upload className="w-5 h-5" />
+                    <Upload className="w-4 h-4" />
                     Ürünleri Yükle
                   </>
                 )}
@@ -1094,53 +960,50 @@ const ProductDraftUploadPage = () => {
 
       {/* Template Preview Modal */}
       {showTemplatePreview && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-7xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg shadow-lg max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col">
             {/* Modal Header */}
-            <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-4 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <FileSpreadsheet className="w-6 h-6 text-white" />
-                <h2 className="text-xl font-bold text-white">Örnek Şablon Önizleme</h2>
+            <div className="bg-gray-900 px-4 py-3 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <FileSpreadsheet className="w-5 h-5 text-white" />
+                <h2 className="text-base font-semibold text-white">Örnek Şablon</h2>
               </div>
               <button
                 onClick={() => setShowTemplatePreview(false)}
                 className="text-white/80 hover:text-white transition-colors"
               >
-                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
+                <X className="w-5 h-5" />
               </button>
             </div>
 
             {/* Modal Body */}
-            <div className="flex-1 overflow-auto p-6">
-              <div className="mb-4 bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <p className="text-sm text-blue-800">
+            <div className="flex-1 overflow-auto p-4">
+              <div className="mb-3 bg-blue-50 border border-blue-200 rounded p-2">
+                <p className="text-xs text-blue-800">
                   <strong>Not:</strong> Bu şablonda örnek ürün verileri bulunmaktadır. Kendi ürünlerinizin bilgilerini aynı format ile doldurarak yükleyebilirsiniz.
                 </p>
               </div>
 
-              <div className="overflow-x-auto bg-gray-50 p-6 rounded-lg">
-                <div className="bg-white rounded-lg p-8 text-center">
-                  <FileSpreadsheet className="w-16 h-16 mx-auto text-green-600 mb-4" />
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">Tedarika Ürün Şablonu</h3>
-                  <p className="text-gray-600 mb-4">Şablon aşağıdaki alanları içerir:</p>
+              <div className="bg-gray-50 p-4 rounded">
+                <div className="bg-white rounded p-4 text-center">
+                  <h3 className="text-base font-semibold text-gray-900 mb-2">Tedarika Ürün Şablonu</h3>
+                  <p className="text-gray-600 text-sm mb-3">Şablon aşağıdaki alanları içerir:</p>
                   
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3 text-left mb-6 max-w-4xl mx-auto">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-left mb-4">
                     {[
                       "UrunAdi*", "Aciklama", "SKU*", "EAN*", "MarkaId", "MarkaAdi",
                       "KategoriId", "AltKategoriId", "GTIP", "Gorsel1Url", "Gorsel2Url", "Gorsel3Url",
                       "Gorsel4Url", "BirimTipi*", "StokAdedi*", "MinSiparisAdedi", "MaxSiparisAdedi",
                       "BirimFiyat*", "ParaBirimi*"
                     ].map((field, idx) => (
-                      <div key={idx} className="bg-gray-50 px-3 py-2 rounded text-sm text-gray-700 border border-gray-200">
+                      <div key={idx} className="bg-gray-50 px-2 py-1.5 rounded text-xs text-gray-700 border border-gray-200">
                         ✓ {field}
                       </div>
                     ))}
                   </div>
 
-                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4 text-left">
-                    <p className="text-sm text-yellow-800">
+                  <div className="bg-yellow-50 border border-yellow-200 rounded p-2 text-left">
+                    <p className="text-xs text-yellow-800">
                       <strong>💡 İpucu:</strong> Şablonu indirdikten sonra Excel ile açın ve örnek verileri inceleyerek kendi ürünlerinizi ekleyin.
                     </p>
                   </div>
@@ -1149,20 +1012,20 @@ const ProductDraftUploadPage = () => {
             </div>
 
             {/* Modal Footer */}
-            <div className="bg-gray-50 px-6 py-4 flex items-center justify-between border-t">
+            <div className="bg-gray-50 px-4 py-3 flex items-center justify-between border-t">
               <button
                 onClick={() => setShowTemplatePreview(false)}
-                className="px-4 py-2 text-gray-700 hover:bg-gray-200 rounded-lg transition-colors"
+                className="px-3 py-1.5 text-gray-700 hover:bg-gray-200 rounded text-sm transition-colors"
               >
                 Kapat
               </button>
               <a
                 href="/templates/Tedarika_Urun_Sablon.csv"
                 download="Tedarika_Urun_Sablon.csv"
-                className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-900 text-white rounded text-sm font-medium hover:bg-gray-800 transition"
               >
-                <Download className="w-4 h-4" />
-                CSV Şablonu İndir
+                <Download className="w-3.5 h-3.5" />
+                CSV İndir
               </a>
             </div>
           </div>
