@@ -1,8 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState } from "react";
 import {
-  AlertTriangle,
-  FileWarning,
   UserCircle,
   Building2,
   Store,
@@ -14,9 +11,6 @@ import {
   Bell,
   Truck,
 } from "lucide-react";
-
-import useSellerSetupStatus from "@/hooks/useSellerSetupStatus";
-import { DOC_LABELS } from "@/constants/companyDocuments";
 
 import SellerInfoCard from "@/components/seller/SellerInfoCard";
 import StoreInfoCard from "@/components/seller/StoreInfoCard";
@@ -37,8 +31,6 @@ const TABS = [
 ];
 
 const SellerProfilePage = () => {
-  const nav = useNavigate();
-  const { loading, hasExtraInfo, missingDocs } = useSellerSetupStatus();
   const isSubscribed =
     localStorage.getItem("sellerSubscriptionActive") === "true";
 
@@ -69,50 +61,6 @@ const SellerProfilePage = () => {
 
   return (
     <div className="min-h-screen bg-[#f9fafa] px-4 sm:px-6 lg:px-16 py-10">
-      {/* Uyarılar */}
-      <div className="max-w-6xl mx-auto space-y-4 mb-8">
-        {!loading && !hasExtraInfo && (
-          <div className="flex items-start gap-4 p-5 rounded-2xl border-2 border-amber-300 bg-gradient-to-r from-amber-50 to-yellow-50 shadow-lg hover:shadow-xl transition-all duration-300">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center text-white shadow-lg flex-shrink-0">
-              <AlertTriangle className="w-6 h-6" />
-            </div>
-            <div className="flex-1 pt-1">
-              <div className="font-bold text-amber-900 text-lg mb-1">Ekstra Bilgiler Eksik</div>
-              <p className="text-sm text-amber-800">
-                KEP adresi, yetkili kişi ve yetkili telefon bilgilerini
-                eklemeniz gerekir.
-              </p>
-            </div>
-            <button
-              onClick={() => nav("/seller/profile/extra-info")}
-              className="shrink-0 px-5 py-3 rounded-xl bg-gradient-to-r from-amber-600 to-amber-700 text-white text-sm font-semibold hover:shadow-lg hover:scale-105 transition-all duration-300"
-            >
-              Bilgileri Ekle
-            </button>
-          </div>
-        )}
-
-        {!loading && missingDocs.length > 0 && (
-          <div className="flex items-start gap-4 p-5 rounded-2xl border-2 border-rose-300 bg-gradient-to-r from-rose-50 to-pink-50 shadow-lg hover:shadow-xl transition-all duration-300">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-rose-500 to-rose-600 flex items-center justify-center text-white shadow-lg flex-shrink-0">
-              <FileWarning className="w-6 h-6" />
-            </div>
-            <div className="flex-1 pt-1">
-              <div className="font-bold text-rose-900 text-lg mb-1">Zorunlu Belgeler Eksik</div>
-              <p className="text-sm text-rose-800">
-                Eksikler: {missingDocs.map((t) => DOC_LABELS[t] || t).join(", ")}
-              </p>
-            </div>
-            <button
-              onClick={() => nav("/seller/company-documents")}
-              className="shrink-0 px-5 py-3 rounded-xl bg-gradient-to-r from-rose-600 to-rose-700 text-white text-sm font-semibold hover:shadow-lg hover:scale-105 transition-all duration-300"
-            >
-              Belge Yükle
-            </button>
-          </div>
-        )}
-      </div>
-
       {/* Hero Başlık */}
       <header className="mb-8 relative bg-gradient-to-r from-emerald-600 via-teal-600 to-green-600 rounded-3xl shadow-2xl px-8 py-12 sm:px-12 text-center overflow-hidden">
         {/* Dekoratif Arka Plan */}

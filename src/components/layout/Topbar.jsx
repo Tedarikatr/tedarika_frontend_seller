@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { Menu } from "lucide-react";
 import NotificationDropdown from "@/components/notifications/NotificationDropdown";
+import { getMyStore } from "@/api/sellerStoreService";
 
 const Topbar = ({ onMenuClick }) => {
   const [user, setUser] = useState(null);
+  const [storeLogo, setStoreLogo] = useState(null);
 
   useEffect(() => {
     const token = localStorage.getItem("sellerToken");
@@ -23,6 +25,25 @@ const Topbar = ({ onMenuClick }) => {
       console.error("Token çözümleme hatası:", err);
     }
   }, []);
+
+  // Mağaza logosunu yükle
+  useEffect(() => {
+    const loadStoreLogo = async () => {
+      try {
+        const store = await getMyStore();
+        if (store?.logoUrl) {
+          setStoreLogo(store.logoUrl);
+        }
+      } catch (err) {
+        // Mağaza bulunamadı veya logo yok, sessizce devam et
+        console.debug("Mağaza logosu yüklenemedi:", err);
+      }
+    };
+
+    if (user?.sellerId) {
+      loadStoreLogo();
+    }
+  }, [user?.sellerId]);
 
   const initials =
     user?.name?.[0]?.toUpperCase() ||
@@ -82,12 +103,26 @@ const Topbar = ({ onMenuClick }) => {
                     {user?.email || ""}
                   </span>
                 </div>
-                <div
-                  className="w-12 h-12 flex items-center justify-center bg-gradient-to-br from-emerald-500 to-teal-600 text-white rounded-full font-extrabold text-lg shadow-xl border-2 border-white/30 hover:scale-110 transition-transform duration-300 cursor-pointer"
-                  title={user?.email || ""}
-                >
-                  {initials}
-                </div>
+                {/* Mağaza Logosu veya Avatar */}
+                {storeLogo ? (
+                  <img
+                    src={storeLogo}
+                    alt="Mağaza Logosu"
+                    className="w-12 h-12 rounded-full object-cover shadow-xl border-2 border-white/30 hover:scale-110 transition-transform duration-300 cursor-pointer"
+                    title={user?.email || ""}
+                    onError={(e) => {
+                      // Logo yüklenemezse avatar göster
+                      setStoreLogo(null);
+                    }}
+                  />
+                ) : (
+                  <div
+                    className="w-12 h-12 flex items-center justify-center bg-gradient-to-br from-emerald-500 to-teal-600 text-white rounded-full font-extrabold text-lg shadow-xl border-2 border-white/30 hover:scale-110 transition-transform duration-300 cursor-pointer"
+                    title={user?.email || ""}
+                  >
+                    {initials}
+                  </div>
+                )}
               </div>
             </>
           )}
