@@ -1,25 +1,23 @@
 import React, { useEffect, useState, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   addProductToStore,
 } from "@/api/sellerStoreService";
 import { useProductCache } from "@/contexts/ProductCacheContext";
 import ProductDatabaseTable from "@/components/storeProducts/ProductDatabaseTable";
-import ProductRequestForm from "@/components/storeProducts/ProductRequestForm";
 import Pagination from "@/components/ui/Pagination";
 import { 
-  Database, 
-  Search, 
-  Package, 
-  Sparkles, 
-  TrendingUp,
-  CheckCircle,
-  ListFilter,
-  RefreshCw
+  Search,
+  Tag,
+  ShoppingCart,
+  List,
+  ArrowRight,
 } from "lucide-react";
 
 const ITEMS_PER_PAGE = 10;
 
 const ProductDatabasePage = () => {
+  const navigate = useNavigate();
   const { getProductDatabase, getMyStoreProducts } = useProductCache();
   const [products, setProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -28,7 +26,6 @@ const ProductDatabasePage = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [addedProductNames, setAddedProductNames] = useState([]);
   const [addingId, setAddingId] = useState(null);
-  const [showForm, setShowForm] = useState(false);
 
   const loadProducts = async (forceRefresh = false) => {
     const isLoadingState = forceRefresh ? setRefreshing : setLoading;
@@ -74,6 +71,11 @@ const ProductDatabasePage = () => {
     }
   };
 
+  const handleSearch = () => {
+    // Arama işlemi zaten searchTerm state'i ile otomatik yapılıyor
+    setCurrentPage(1);
+  };
+
   useEffect(() => {
     loadProducts();
   }, []);
@@ -96,138 +98,97 @@ const ProductDatabasePage = () => {
     startIdx + ITEMS_PER_PAGE
   );
 
-  // Calculate stats
-  const stats = useMemo(() => {
-    const total = products.length;
-    const added = addedProductNames.length;
-    const available = total - added;
-    
-    return { total, added, available };
-  }, [products.length, addedProductNames.length]);
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-emerald-50/30 px-4 sm:px-6 lg:px-8 py-8">
+    <div className="min-h-screen bg-[#F8F8F8] px-4 sm:px-6 lg:px-8 py-8">
       <div className="max-w-7xl mx-auto">
-        {/* Hero Header */}
-        <header className="mb-8 relative bg-gradient-to-r from-emerald-600 via-teal-600 to-green-600 rounded-3xl shadow-2xl px-8 py-12 text-center overflow-hidden">
-          {/* Dekoratif Arka Plan */}
-          <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent pointer-events-none"></div>
-          <div className="absolute top-10 right-10 w-32 h-32 bg-white/10 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-10 left-10 w-40 h-40 bg-emerald-400/20 rounded-full blur-3xl"></div>
-          
-          <div className="relative z-10">
-            <div className="flex items-center justify-between mb-4 flex-wrap gap-4">
-              <div className="flex items-center justify-center gap-3 mx-auto sm:mx-0">
-                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center shadow-xl animate-pulse">
-                  <Database className="w-8 h-8 text-white" />
+        {/* Hero/Search Card */}
+        <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
+          <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+            <div className="flex-1">
+              <h1 className="text-2xl font-bold text-gray-900 mb-3">
+                Ürün girmek ve satışa açmak çok kolay!
+              </h1>
+              <p className="text-gray-700 text-base mb-6">
+                Tedarika kataloğunda ürünleri arayıp satışa açabilir, ürününüz katalogda yok ise "Ürün Ekle" butonu ile yeni ürün girebilirsiniz.
+              </p>
+
+              {/* Search Input and Button */}
+              <div className="flex gap-3">
+                <div className="relative flex-1">
+                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                  <input
+                    type="text"
+                    placeholder="Ürün numarasını, barkodunu veya ürün adını ara"
+                    value={searchTerm}
+                    onChange={(e) => {
+                      setSearchTerm(e.target.value);
+                      setCurrentPage(1);
+                    }}
+                    onKeyPress={(e) => {
+                      if (e.key === "Enter") {
+                        handleSearch();
+                      }
+                    }}
+                    className="w-full pl-12 pr-4 py-3 rounded-lg border border-gray-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 transition-all text-gray-800"
+                  />
                 </div>
-                <h1 className="text-5xl font-extrabold text-white tracking-tight">
-                  Ürün Veritabanı
-                </h1>
-                <Sparkles className="w-8 h-8 text-yellow-300 animate-pulse" />
+                <button
+                  onClick={handleSearch}
+                  className="bg-orange-500 hover:bg-orange-600 text-white font-bold px-6 py-3 rounded-lg transition-colors shadow-md hover:shadow-lg"
+                >
+                  Ara
+                </button>
               </div>
-              <button
-                onClick={handleRefresh}
-                disabled={loading || refreshing}
-                className="bg-white/20 hover:bg-white/30 backdrop-blur-md border border-white/30 rounded-2xl px-6 py-3 text-white font-medium transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-lg hover:shadow-xl mx-auto sm:mx-0"
-                title="Ürünleri yenile"
-              >
-                <RefreshCw 
-                  size={20} 
-                  className={refreshing ? "animate-spin" : ""} 
-                />
-                <span className="hidden sm:inline">Yenile</span>
-              </button>
             </div>
-            <p className="text-emerald-100 text-lg font-medium">
-              Binlerce ürün arasından seçim yapın ve mağazanıza ekleyin
-            </p>
-          </div>
-        </header>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
-          <StatCard
-            icon={Database}
-            label="Toplam Ürün"
-            value={stats.total}
-            gradient="from-blue-500 to-indigo-500"
-            bgGradient="from-blue-50 to-indigo-50"
-          />
-          <StatCard
-            icon={CheckCircle}
-            label="Mağazamda"
-            value={stats.added}
-            gradient="from-green-500 to-emerald-500"
-            bgGradient="from-green-50 to-emerald-50"
-          />
-          <StatCard
-            icon={Package}
-            label="Eklenebilir"
-            value={stats.available}
-            gradient="from-purple-500 to-pink-500"
-            bgGradient="from-purple-50 to-pink-50"
-          />
-        </div>
-
-        {/* Search Bar */}
-        <div className="mb-6 bg-white rounded-2xl shadow-lg p-5 border-2 border-gray-200">
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="relative flex-1">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-              <input
-                type="text"
-                placeholder="Ürün, marka, kategori, barkod ara..."
-                value={searchTerm}
-                onChange={(e) => {
-                  setSearchTerm(e.target.value);
-                  setCurrentPage(1);
-                }}
-                className="w-full pl-12 pr-4 py-3 rounded-xl border-2 border-gray-200 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 transition-all duration-300 text-gray-800"
-              />
-            </div>
-            <div className="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-xl border-2 border-emerald-200">
-              <ListFilter className="w-5 h-5 text-emerald-600" />
-              <span className="text-sm font-bold text-emerald-800 whitespace-nowrap">
-                {filteredProducts.length} ürün bulundu
-              </span>
+            {/* Illustration */}
+            <div className="hidden lg:block flex-shrink-0 ml-8">
+              <RunningPersonIllustration />
             </div>
           </div>
         </div>
 
-        {showForm && (
-          <div className="mb-6">
-            <ProductRequestForm
-              onSuccess={() => {
-                alert("Başvurunuz başarıyla gönderildi.");
-                setShowForm(false);
-              }}
-              onCancel={() => setShowForm(false)}
-            />
-          </div>
-        )}
+        {/* Action Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <ActionCard
+            icon={Tag}
+            title="Kendi ürününüzü ekleyin"
+            description="Tedarika kataloğunda bulunmayan ürününüzü ekleyin."
+            linkText="Ürün ekle"
+            onClick={() => navigate("/seller/products/draft/upload")}
+            iconColor="text-purple-500"
+          />
+          <ActionCard
+            icon={ShoppingCart}
+            title="Kendi ürününüzü toplu ekleyin"
+            description="Tedarika kataloğunda bulunmayan ürünlerinizi toplu bir şekilde ekleyin."
+            linkText="Toplu ekle"
+            onClick={() => navigate("/seller/products/draft/upload")}
+            iconColor="text-purple-500"
+          />
+        </div>
 
-        {/* Content */}
+        {/* Products Table */}
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-20 bg-white rounded-3xl shadow-lg">
-            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-xl animate-pulse mb-4">
-              <Database className="w-8 h-8 text-white" />
+          <div className="flex flex-col items-center justify-center py-20 bg-white rounded-2xl shadow-lg">
+            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-xl animate-pulse mb-4">
+              <Search className="w-8 h-8 text-white" />
             </div>
             <p className="text-gray-500 text-lg font-medium">Ürünler yükleniyor...</p>
           </div>
-        ) : filteredProducts.length === 0 ? (
-          <div className="bg-gradient-to-br from-white to-gray-50 rounded-3xl shadow-lg p-12 text-center border-2 border-gray-200">
-            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-gray-300 to-gray-400 flex items-center justify-center mx-auto mb-6 shadow-lg">
-              <Package className="w-10 h-10 text-white" />
+        ) : filteredProducts.length === 0 && searchTerm ? (
+          <div className="bg-white rounded-2xl shadow-lg p-12 text-center border border-gray-200">
+            <div className="w-20 h-20 rounded-full bg-gray-200 flex items-center justify-center mx-auto mb-6">
+              <Search className="w-10 h-10 text-gray-400" />
             </div>
             <h3 className="text-2xl font-bold text-gray-800 mb-2">Ürün Bulunamadı</h3>
             <p className="text-gray-600">
               Aradığınız kriterlere uygun ürün bulunamadı.
             </p>
           </div>
-        ) : (
+        ) : filteredProducts.length > 0 ? (
           <>
-            <div className="bg-white rounded-3xl shadow-2xl overflow-hidden border-2 border-gray-200">
+            <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-200">
               <ProductDatabaseTable
                 products={visibleProducts}
                 startIndex={startIdx}
@@ -254,25 +215,107 @@ const ProductDatabasePage = () => {
               </div>
             )}
           </>
-        )}
+        ) : null}
       </div>
     </div>
   );
 };
 
-// Stat Card Component
-const StatCard = ({ icon: Icon, label, value, gradient, bgGradient }) => (
-  <div className={`bg-gradient-to-br ${bgGradient} rounded-2xl p-6 border-2 border-gray-200 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105`}>
-    <div className="flex items-center justify-between">
-      <div>
-        <p className="text-gray-600 text-sm font-semibold mb-2">{label}</p>
-        <p className="text-4xl font-extrabold text-gray-900">{value}</p>
+// Action Card Component
+const ActionCard = ({ icon: Icon, title, description, linkText, onClick, iconColor }) => (
+  <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-200 hover:shadow-xl transition-shadow">
+    <div className="flex flex-col items-start">
+      <div className={`w-12 h-12 rounded-xl bg-gray-50 flex items-center justify-center mb-4 ${iconColor}`}>
+        <Icon className="w-6 h-6" />
       </div>
-      <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${gradient} flex items-center justify-center shadow-lg`}>
-        <Icon className="w-7 h-7 text-white" />
-      </div>
+      <h3 className="text-lg font-bold text-gray-900 mb-2">{title}</h3>
+      <p className="text-gray-600 text-sm mb-4">{description}</p>
+      <button
+        onClick={onClick}
+        className="text-orange-500 font-semibold hover:text-orange-600 transition-colors flex items-center gap-1 group"
+      >
+        {linkText}
+        <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+      </button>
     </div>
   </div>
+);
+
+// Running Person Illustration Component
+const RunningPersonIllustration = () => (
+  <svg
+    width="200"
+    height="200"
+    viewBox="0 0 200 200"
+    className="text-gray-400"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    {/* Cloud shapes */}
+    <ellipse cx="50" cy="40" rx="25" ry="15" fill="#E5E7EB" opacity="0.6" />
+    <ellipse cx="80" cy="35" rx="20" ry="12" fill="#E5E7EB" opacity="0.6" />
+    <ellipse cx="30" cy="50" rx="18" ry="10" fill="#E5E7EB" opacity="0.6" />
+    
+    {/* Ground line */}
+    <path
+      d="M 10 180 Q 50 175, 100 180 T 190 180"
+      stroke="#E5E7EB"
+      strokeWidth="2"
+      fill="none"
+    />
+    
+    {/* Running person */}
+    {/* Head */}
+    <circle cx="100" cy="100" r="12" fill="#4B5563" />
+    
+    {/* Hair */}
+    <path
+      d="M 88 95 Q 85 85, 90 80 Q 95 75, 100 80 Q 105 75, 110 80 Q 115 85, 112 95"
+      fill="#374151"
+    />
+    
+    {/* Body */}
+    <ellipse cx="100" cy="125" rx="8" ry="20" fill="#6B7280" />
+    
+    {/* Arms */}
+    <path
+      d="M 92 115 Q 85 110, 88 120"
+      stroke="#6B7280"
+      strokeWidth="3"
+      fill="none"
+      strokeLinecap="round"
+    />
+    <path
+      d="M 108 115 Q 115 110, 112 120"
+      stroke="#6B7280"
+      strokeWidth="3"
+      fill="none"
+      strokeLinecap="round"
+    />
+    
+    {/* Legs */}
+    <path
+      d="M 95 145 L 95 165 L 90 170"
+      stroke="#6B7280"
+      strokeWidth="4"
+      fill="none"
+      strokeLinecap="round"
+    />
+    <path
+      d="M 105 145 L 105 165 L 110 170"
+      stroke="#6B7280"
+      strokeWidth="4"
+      fill="none"
+      strokeLinecap="round"
+    />
+    
+    {/* Shoes */}
+    <ellipse cx="90" cy="170" rx="5" ry="3" fill="#F97316" />
+    <ellipse cx="110" cy="170" rx="5" ry="3" fill="#F97316" />
+    
+    {/* Belt */}
+    <rect x="92" y="130" width="16" height="4" fill="#F97316" />
+  </svg>
 );
 
 export default ProductDatabasePage;

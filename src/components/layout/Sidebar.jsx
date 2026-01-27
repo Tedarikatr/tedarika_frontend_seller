@@ -92,8 +92,8 @@ const Sidebar = ({ isOpen, onClose }) => {
           <SidebarLink to="/seller/products/database" icon={<ChevronRight size={14} />} collapsed={collapsed} onClick={onClose}>
             Ürün Kataloğu
           </SidebarLink>
-          <SidebarLink to="/seller/products/drafts" icon={<FileText size={18} />} collapsed={collapsed} onClick={onClose}>
-            Toplu Yükleme
+          <SidebarLink to="/seller/products/draft/upload" icon={<Upload size={18} />} collapsed={collapsed} onClick={onClose}>
+            Ürün Yükleme
           </SidebarLink>
 
           <SectionTitle title="İŞLEMLER" collapsed={collapsed} />

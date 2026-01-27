@@ -29,7 +29,7 @@ import {
   FaComments,
   FaStore,
 } from "react-icons/fa";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, Upload } from "lucide-react";
 import { useNavigate, Link } from "react-router-dom";
 
 const COLORS = ["#10B981", "#F59E0B", "#EF4444"];
@@ -213,6 +213,7 @@ const DashboardPage = () => {
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-5">
           {[
             { to: "/seller/products/my-store", icon: <FaBox />, label: "Ürünlerim", color: "from-blue-500 to-indigo-600" },
+            { to: "/seller/products/draft/upload", icon: <Upload />, label: "Ürün Yükleme", color: "from-green-500 to-emerald-600" },
             { to: "/seller/orders", icon: <FaShoppingCart />, label: "Siparişlerim", color: "from-emerald-500 to-teal-600" },
             { to: "/seller/quotations", icon: <FaHandshake />, label: "Teklifler", color: "from-purple-500 to-violet-600" },
             { to: "/seller/campaigns", icon: <FaBullhorn />, label: "Kampanyalar", color: "from-orange-500 to-amber-600" },

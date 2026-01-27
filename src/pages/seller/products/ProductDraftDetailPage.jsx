@@ -324,7 +324,7 @@ const ProductDraftDetailPage = () => {
                     <div className="space-y-4">
                       {selectedProduct.stores.map((store, index) => (
                         <div key={store.id || index} className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
                             <div>
                               <p className="text-sm text-gray-500">Birim Türü</p>
                               <p className="font-bold text-gray-900">{store.unitType || "—"}</p>
@@ -338,13 +338,97 @@ const ProductDraftDetailPage = () => {
                               <p className="font-bold text-gray-900">{store.minOrderQuantity || "—"}</p>
                             </div>
                             <div>
+                              <p className="text-sm text-gray-500">Max. Sipariş</p>
+                              <p className="font-bold text-gray-900">{store.maxOrderQuantity || "—"}</p>
+                            </div>
+                            <div>
                               <p className="text-sm text-gray-500">Birim Fiyat</p>
                               <p className="font-bold text-gray-900">
                                 {store.unitPrice !== undefined ? `${store.unitPrice} ${store.currencyCode || "TRY"}` : "—"}
                               </p>
                             </div>
                           </div>
+                          
+                          {/* Yeni Alanlar: Ana Ürün Kodu, Stok Kodu, Kritik Stok */}
+                          {(store.mainProductCode || store.stockCode || store.criticalStock !== undefined) && (
+                            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4 pt-4 border-t border-gray-300">
+                              {store.mainProductCode && (
+                                <div>
+                                  <p className="text-sm text-gray-500">Ana Ürün Kodu</p>
+                                  <p className="font-bold text-gray-900">{store.mainProductCode}</p>
+                                </div>
+                              )}
+                              {store.stockCode && (
+                                <div>
+                                  <p className="text-sm text-gray-500">Stok Kodu</p>
+                                  <p className="font-bold text-gray-900">{store.stockCode}</p>
+                                </div>
+                              )}
+                              {store.criticalStock !== undefined && store.criticalStock !== null && (
+                                <div>
+                                  <p className="text-sm text-gray-500">Kritik Stok Seviyesi</p>
+                                  <p className="font-bold text-gray-900">{store.criticalStock}</p>
+                                </div>
+                              )}
+                            </div>
+                          )}
+
+                          {/* Paket Boyutları */}
+                          {(store.width !== undefined || store.length !== undefined || store.height !== undefined || store.weight !== undefined || store.volumeWeight !== undefined) && (
+                            <div className="pt-4 border-t border-gray-300">
+                              <h4 className="text-sm font-semibold text-gray-700 mb-3">Paket Boyutları</h4>
+                              <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                                {store.width !== undefined && store.width !== null && (
+                                  <div>
+                                    <p className="text-sm text-gray-500">En (cm)</p>
+                                    <p className="font-bold text-gray-900">{store.width}</p>
+                                  </div>
+                                )}
+                                {store.length !== undefined && store.length !== null && (
+                                  <div>
+                                    <p className="text-sm text-gray-500">Boy (cm)</p>
+                                    <p className="font-bold text-gray-900">{store.length}</p>
+                                  </div>
+                                )}
+                                {store.height !== undefined && store.height !== null && (
+                                  <div>
+                                    <p className="text-sm text-gray-500">Yükseklik (cm)</p>
+                                    <p className="font-bold text-gray-900">{store.height}</p>
+                                  </div>
+                                )}
+                                {store.weight !== undefined && store.weight !== null && (
+                                  <div>
+                                    <p className="text-sm text-gray-500">Ağırlık (kg)</p>
+                                    <p className="font-bold text-gray-900">{store.weight}</p>
+                                  </div>
+                                )}
+                                {store.volumeWeight !== undefined && store.volumeWeight !== null && (
+                                  <div>
+                                    <p className="text-sm text-gray-500">Desi</p>
+                                    <p className="font-bold text-gray-900">{store.volumeWeight}</p>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          )}
                         </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Color Variants */}
+                {selectedProduct.colorVariants && selectedProduct.colorVariants.length > 0 && (
+                  <div>
+                    <h3 className="font-bold text-gray-900 mb-3">Renk Varyantları</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedProduct.colorVariants.map((variant, index) => (
+                        <span
+                          key={index}
+                          className="px-3 py-1 bg-gradient-to-r from-purple-100 to-pink-100 text-purple-800 rounded-lg text-sm font-medium border border-purple-200"
+                        >
+                          {variant}
+                        </span>
                       ))}
                     </div>
                   </div>
