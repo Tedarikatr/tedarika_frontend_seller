@@ -10,7 +10,6 @@ import {
 } from "@/api/sellerProductDraftService";
 import { useToast } from "@/contexts/ToastContext";
 import {
-  ArrowLeft,
   FileSpreadsheet,
   FileCode,
   Upload,
@@ -25,6 +24,7 @@ import {
   Plus,
   X,
   Package,
+  ChevronRight,
 } from "lucide-react";
 
 const ProductDraftUploadPage = () => {
@@ -415,14 +415,58 @@ const ProductDraftUploadPage = () => {
                 <X className="w-5 h-5" />
               </button>
             </div>
-            <div className="text-center py-8">
-              <button
-                onClick={() => navigate("/seller/products/drafts")}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-medium transition"
-              >
-                Tüm Yüklemeleri Görüntüle
-              </button>
-            </div>
+            {loadingDrafts ? (
+              <div className="text-center py-8">
+                <Loader2 className="w-8 h-8 animate-spin text-emerald-600 mx-auto mb-2" />
+                <p className="text-gray-600 text-sm">Yükleniyor...</p>
+              </div>
+            ) : drafts.length === 0 ? (
+              <div className="text-center py-8">
+                <FileText className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                <p className="text-gray-600 text-sm mb-4">Henüz yükleme yok</p>
+                <button
+                  onClick={() => navigate("/seller/products/drafts")}
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-medium transition"
+                >
+                  Tüm Yüklemeleri Görüntüle
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-3 max-h-96 overflow-y-auto">
+                {drafts.slice(0, 5).map((draft) => (
+                  <div
+                    key={draft.id}
+                    onClick={() => navigate(`/seller/products/drafts/${draft.id}`)}
+                    className="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:border-emerald-300 hover:bg-emerald-50 cursor-pointer transition"
+                  >
+                    <div className="flex items-center gap-3 flex-1">
+                      <FileText className="w-5 h-5 text-gray-600" />
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-sm font-semibold text-gray-900 truncate">
+                          {draft.name || "İsimsiz Yükleme"}
+                        </h3>
+                        <div className="flex items-center gap-3 text-xs text-gray-500 mt-1">
+                          <span>{draft.productCount} ürün</span>
+                          <span>•</span>
+                          <span>{new Date(draft.createdAt).toLocaleDateString("tr-TR")}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <ChevronRight className="w-5 h-5 text-gray-400 flex-shrink-0" />
+                  </div>
+                ))}
+                {drafts.length > 5 && (
+                  <div className="pt-3 border-t">
+                    <button
+                      onClick={() => navigate("/seller/products/drafts")}
+                      className="w-full inline-flex items-center justify-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-medium transition"
+                    >
+                      Tüm Yüklemeleri Görüntüle ({drafts.length})
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         )}
 
