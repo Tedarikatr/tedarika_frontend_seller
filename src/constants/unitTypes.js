@@ -12,7 +12,7 @@ export const UNIT_TYPE_LABELS = {
   8: "Gramaj",
   9: "Karat",
   10: "Kasa",
-  11: "Kg",
+  11: "kg",
   12: "Koli",
   13: "Litre",
   14: "Metre",

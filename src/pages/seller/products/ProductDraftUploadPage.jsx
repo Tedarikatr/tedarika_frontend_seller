@@ -8,6 +8,7 @@ import {
   addProductManual,
   fetchProductDrafts
 } from "@/api/sellerProductDraftService";
+import { UNIT_TYPE_OPTIONS } from "@/constants/unitTypes";
 import { useToast } from "@/contexts/ToastContext";
 import {
   FileSpreadsheet,
@@ -624,13 +625,19 @@ const ProductDraftUploadPage = () => {
                             <label className="block text-sm font-semibold text-gray-700 mb-1">
                               Birim Türü *
                             </label>
-                            <input
-                              type="number"
-                              value={product.store.unitType}
+                            <select
+                              value={product.store.unitType || ""}
                               onChange={(e) => updateProduct(productIndex, "store.unitType", parseInt(e.target.value) || 0)}
-                              className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
+                              className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 bg-white"
                               required
-                            />
+                            >
+                              <option value="">Birim Türü Seçiniz</option>
+                              {UNIT_TYPE_OPTIONS.map((option) => (
+                                <option key={option.id} value={option.id}>
+                                  {option.label}
+                                </option>
+                              ))}
+                            </select>
                           </div>
                           <div>
                             <label className="block text-sm font-semibold text-gray-700 mb-1">
