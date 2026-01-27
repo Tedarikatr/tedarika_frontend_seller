@@ -13,7 +13,7 @@ import {
   MapPin,
   ChevronLeft,
   Gift,
-  MessageCircle,
+  // MessageCircle, // Chat özelliği geçici olarak askıya alındı
   Tags,
   FileText,
   Upload,
@@ -147,9 +147,10 @@ const Sidebar = ({ isOpen, onClose }) => {
             <SidebarLink to="/seller/reviews" icon={<MessageSquare size={18} />} collapsed={collapsed} onClick={onClose}>
               Yorumlar
             </SidebarLink>
-            <SidebarLink to="/seller/chat" icon={<MessageCircle size={18} />} collapsed={collapsed} onClick={onClose}>
+            {/* Chat özelliği geçici olarak askıya alındı */}
+            {/* <SidebarLink to="/seller/chat" icon={<MessageCircle size={18} />} collapsed={collapsed} onClick={onClose}>
               Mesajlar
-            </SidebarLink>
+            </SidebarLink> */}
           </CollapsibleSection>
 
           {/* RAPORLAR */}
