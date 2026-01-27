@@ -265,11 +265,13 @@ const QuotationListPage = () => {
                                 <span className="sm:hidden">→</span>
                               </Link>
                             </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
             </div>
           </div>
         )}
