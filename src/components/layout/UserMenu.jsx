@@ -7,7 +7,7 @@ import {
   ShieldCheck,
   CreditCard,
   Truck,
-  Bell,
+  Mail,
   LogOut,
   ChevronRight,
 } from "lucide-react";
@@ -19,7 +19,7 @@ const MENU_ITEMS = [
   { key: "subscription", label: "Abonelik", icon: ShieldCheck, path: "/seller/profile#subscription" },
   { key: "finance", label: "Ödeme", icon: CreditCard, path: "/seller/profile#finance" },
   { key: "cargo", label: "Kargo Entegrasyonu", icon: Truck, path: "/seller/profile#cargo" },
-  { key: "notifications", label: "Bildirimler", icon: Bell, path: "/seller/profile#notifications" },
+  { key: "notifications", label: "İletişim Tercihleri", icon: Mail, path: "/seller/profile#notifications" },
 ];
 
 export default function UserMenu({ user, storeLogo, initials }) {

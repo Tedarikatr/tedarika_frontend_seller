@@ -9,7 +9,7 @@ import {
   Sparkles,
   Award,
   CheckCircle,
-  Bell,
+  Mail,
   Truck,
 } from "lucide-react";
 
@@ -28,7 +28,7 @@ const TABS = [
   { key: "subscription", label: "Abonelik", icon: <ShieldCheck className="w-5 h-5" /> },
   { key: "finance", label: "Ödeme", icon: <CreditCard className="w-5 h-5" /> },
   { key: "cargo", label: "Kargo Entegrasyonu", icon: <Truck className="w-5 h-5" /> },
-  { key: "notifications", label: "Bildirimler", icon: <Bell className="w-5 h-5" /> },
+  { key: "notifications", label: "İletişim Tercihleri", icon: <Mail className="w-5 h-5" /> },
 ];
 
 const SellerProfilePage = () => {

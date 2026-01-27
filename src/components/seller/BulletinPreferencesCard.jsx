@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { toast } from "react-hot-toast";
-import { Bell, Mail, MessageSquare, Phone, Save, Loader2 } from "lucide-react";
+import { Mail, MessageSquare, Phone, Save, Loader2 } from "lucide-react";
 import { getSellerBulletinPreferences, updateSellerBulletinPreferences } from "@/api/sellerBulletinService";
 
 const BulletinPreferencesCard = () => {
@@ -27,7 +27,7 @@ const BulletinPreferencesCard = () => {
       });
     } catch (error) {
       console.error("Tercihler yüklenemedi:", error);
-      toast.error("Bildirim tercihleri yüklenemedi");
+      toast.error("İletişim tercihleri yüklenemedi");
     } finally {
       setLoading(false);
     }
@@ -44,7 +44,7 @@ const BulletinPreferencesCard = () => {
     try {
       setSaving(true);
       await updateSellerBulletinPreferences(preferences);
-      toast.success("Bildirim tercihleri güncellendi");
+      toast.success("İletişim tercihleri güncellendi");
     } catch (error) {
       console.error("Tercihler kaydedilemedi:", error);
       toast.error("Tercihler kaydedilemedi. Lütfen tekrar deneyin.");
@@ -93,10 +93,10 @@ const BulletinPreferencesCard = () => {
       <div className="p-6 border-b border-gray-200">
         <div className="flex items-center gap-3 mb-2">
           <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-xl flex items-center justify-center shadow-lg">
-            <Bell className="w-6 h-6 text-white" />
+            <Mail className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">Bildirim Tercihleri</h2>
+            <h2 className="text-2xl font-bold text-gray-900">İletişim Tercihleri</h2>
             <p className="text-sm text-gray-600">İletişim kanallarınızı yönetin</p>
           </div>
         </div>
