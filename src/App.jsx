@@ -2,6 +2,7 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { ToastProvider } from "@/contexts/ToastContext";
 import { ProductCacheProvider } from "@/contexts/ProductCacheContext";
+import { NotificationProvider } from "@/contexts/NotificationContext";
 
 // Public seller pages
 import SellerLandingPage from "@/pages/seller/SellerLandingPage";
@@ -63,7 +64,8 @@ function App() {
   return (
     <ToastProvider>
       <ProductCacheProvider>
-        <ScrollToTop />
+        <NotificationProvider>
+          <ScrollToTop />
       <Routes>
       {/* ── Public seller routes ───────────────────────────── */}
       <Route path="/seller/landing" element={<SellerLandingPage />} />
@@ -150,6 +152,7 @@ function App() {
       {/* ── 404 redirect ───────────────────────────── */}
       <Route path="*" element={<Navigate to="/seller/landing" replace />} />
     </Routes>
+        </NotificationProvider>
       </ProductCacheProvider>
     </ToastProvider>
   );

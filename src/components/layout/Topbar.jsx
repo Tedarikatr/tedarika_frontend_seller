@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Menu } from "lucide-react";
+import NotificationDropdown from "@/components/notifications/NotificationDropdown";
 
 const Topbar = ({ onMenuClick }) => {
   const [user, setUser] = useState(null);
@@ -56,7 +57,7 @@ const Topbar = ({ onMenuClick }) => {
         </div>
 
         {/* Sağ Taraf */}
-        <div className="flex items-center gap-5">
+        <div className="flex items-center gap-4">
           {!user?.sellerId && (
             <a
               href="/seller/apply"
@@ -67,22 +68,28 @@ const Topbar = ({ onMenuClick }) => {
           )}
 
           {user && (
-            <div className="flex items-center gap-4">
-              <div className="hidden sm:flex flex-col leading-tight text-right">
-                <span className="font-bold text-white text-base">
-                  {user?.name || "Kullanıcı"}
-                </span>
-                <span className="text-xs text-emerald-200/80 font-medium">
-                  {user?.email || ""}
-                </span>
+            <>
+              {/* Bildirimler */}
+              <NotificationDropdown />
+
+              {/* Kullanıcı Bilgisi */}
+              <div className="flex items-center gap-4">
+                <div className="hidden sm:flex flex-col leading-tight text-right">
+                  <span className="font-bold text-white text-base">
+                    {user?.name || "Kullanıcı"}
+                  </span>
+                  <span className="text-xs text-emerald-200/80 font-medium">
+                    {user?.email || ""}
+                  </span>
+                </div>
+                <div
+                  className="w-12 h-12 flex items-center justify-center bg-gradient-to-br from-emerald-500 to-teal-600 text-white rounded-full font-extrabold text-lg shadow-xl border-2 border-white/30 hover:scale-110 transition-transform duration-300 cursor-pointer"
+                  title={user?.email || ""}
+                >
+                  {initials}
+                </div>
               </div>
-              <div
-                className="w-12 h-12 flex items-center justify-center bg-gradient-to-br from-emerald-500 to-teal-600 text-white rounded-full font-extrabold text-lg shadow-xl border-2 border-white/30 hover:scale-110 transition-transform duration-300 cursor-pointer"
-                title={user?.email || ""}
-              >
-                {initials}
-              </div>
-            </div>
+            </>
           )}
         </div>
       </div>
