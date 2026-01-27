@@ -65,8 +65,8 @@ const Topbar = ({ onMenuClick }) => {
           </button>
 
           <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-            <div className="hidden sm:flex w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 items-center justify-center shadow-lg flex-shrink-0">
-              <span className="text-white font-extrabold text-sm sm:text-lg">T</span>
+            <div className="hidden sm:flex w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 items-center justify-center shadow-lg flex-shrink-0 hover:scale-110 transition-transform duration-300 cursor-pointer group">
+              <span className="text-white font-extrabold text-sm sm:text-lg group-hover:scale-110 transition-transform duration-300">T</span>
             </div>
             <div className="min-w-0">
               <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-extrabold text-white tracking-tight select-none drop-shadow-lg bg-gradient-to-r from-white via-emerald-100 to-white bg-clip-text text-transparent truncate">

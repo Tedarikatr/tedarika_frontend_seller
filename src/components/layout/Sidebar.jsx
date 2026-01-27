@@ -87,7 +87,7 @@ const Sidebar = ({ isOpen, onClose }) => {
         </div>
 
         {/* Menü */}
-        <div className="flex-1 overflow-y-auto px-3 py-6 text-sm custom-scrollbar space-y-1">
+        <div className={`flex-1 overflow-y-auto ${collapsed ? "px-2" : "px-3"} py-6 text-sm custom-scrollbar space-y-1`}>
           <SidebarLink to="/seller/dashboard" icon={<Home size={18} />} collapsed={collapsed} onClick={onClose}>
             Anasayfa
           </SidebarLink>
@@ -178,12 +178,13 @@ const Sidebar = ({ isOpen, onClose }) => {
         </div>
 
         {/* Çıkış */}
-        <div className="px-3 py-5 border-t border-white/10">
+        <div className={`${collapsed ? "px-2" : "px-3"} py-5 border-t border-white/10`}>
           <button
             onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-red-400 hover:text-white hover:bg-red-500/20 text-sm transition-all"
+            className={`w-full flex items-center ${collapsed ? "justify-center" : ""} gap-3 ${collapsed ? "px-2" : "px-3"} py-2 rounded-lg text-red-400 hover:text-white hover:bg-red-500/20 text-sm transition-all`}
+            title={collapsed ? "Çıkış" : undefined}
           >
-            <LogOut size={18} />
+            <LogOut size={18} className="flex-shrink-0" />
             {!collapsed && <span>Çıkış</span>}
           </button>
         </div>
@@ -198,24 +199,31 @@ const SidebarLink = ({ to, icon, children, onClick, collapsed }) => (
     to={to}
     onClick={onClick}
     className={({ isActive }) =>
-      `flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-all group ${
+      `flex items-center ${collapsed ? "justify-center" : ""} ${collapsed ? "gap-0" : "gap-3"} ${collapsed ? "px-2" : "px-3"} py-2 rounded-lg font-medium transition-all group ${
         isActive
           ? "bg-white/20 text-white shadow-inner"
           : "text-white/80 hover:text-white hover:bg-white/10"
       }`
     }
+    title={collapsed ? children : undefined}
   >
-    <span className="group-hover:scale-110 transition-transform">{icon}</span>
+    <span className="group-hover:scale-110 transition-transform flex-shrink-0">{icon}</span>
     {!collapsed && <span>{children}</span>}
   </NavLink>
 );
 
 // 🔠 Açılır Kapanır Bölüm Bileşeni
 const CollapsibleSection = ({ title, isOpen, onToggle, collapsed, children }) => {
+  // Collapsed durumunda sadece alt menü öğelerini göster (ikonlar)
   if (collapsed) {
-    return null;
+    return (
+      <div className="mt-2 space-y-1">
+        {children}
+      </div>
+    );
   }
 
+  // Normal durumda başlık ve alt menüler
   return (
     <div className="mt-4">
       <button

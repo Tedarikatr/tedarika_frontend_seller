@@ -218,7 +218,7 @@ const DashboardPage = () => {
             { to: "/seller/quotations", icon: <FaHandshake />, label: "Teklifler", color: "from-purple-500 to-violet-600" },
             { to: "/seller/campaigns", icon: <FaBullhorn />, label: "Kampanyalar", color: "from-orange-500 to-amber-600" },
             { to: "/seller/chat", icon: <FaComments />, label: "Mesajlar", color: "from-pink-500 to-rose-600" },
-            { to: "/seller/store/update", icon: <FaStore />, label: "Mağazam", color: "from-cyan-500 to-blue-600" },
+            { to: "/seller/profile#store", icon: <FaStore />, label: "Mağazam", color: "from-cyan-500 to-blue-600" },
           ].map((item, idx) => (
             <motion.div
               key={idx}
