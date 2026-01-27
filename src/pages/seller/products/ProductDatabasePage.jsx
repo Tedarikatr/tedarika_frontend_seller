@@ -5,7 +5,6 @@ import {
 } from "@/api/sellerStoreService";
 import { useProductCache } from "@/contexts/ProductCacheContext";
 import ProductDatabaseTable from "@/components/storeProducts/ProductDatabaseTable";
-import ProductRequestForm from "@/components/storeProducts/ProductRequestForm";
 import Pagination from "@/components/ui/Pagination";
 import { 
   Search,
@@ -27,8 +26,6 @@ const ProductDatabasePage = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [addedProductNames, setAddedProductNames] = useState([]);
   const [addingId, setAddingId] = useState(null);
-  const [showForm, setShowForm] = useState(false);
-  const [searchType, setSearchType] = useState("single"); // "single" or "bulk"
 
   const loadProducts = async (forceRefresh = false) => {
     const isLoadingState = forceRefresh ? setRefreshing : setLoading;
@@ -112,37 +109,8 @@ const ProductDatabasePage = () => {
                 Ürün girmek ve satışa açmak çok kolay!
               </h1>
               <p className="text-gray-700 text-base mb-6">
-                Hepsiburada kataloğunda ürünleri arayıp satışa açabilir, ürününüz katalogda yok ise "Ürün Ekle" butonu ile yeni ürün girebilirsiniz.
+                Tedarika kataloğunda ürünleri arayıp satışa açabilir, ürününüz katalogda yok ise "Ürün Ekle" butonu ile yeni ürün girebilirsiniz.
               </p>
-
-              {/* Radio Buttons */}
-              <div className="flex items-center gap-6 mb-6">
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="searchType"
-                    value="single"
-                    checked={searchType === "single"}
-                    onChange={(e) => setSearchType(e.target.value)}
-                    className="w-4 h-4 text-orange-500 focus:ring-orange-500"
-                  />
-                  <span className="text-gray-700 font-medium">Ürün Ara</span>
-                </label>
-                <label className="flex items-center gap-2 cursor-pointer relative">
-                  <input
-                    type="radio"
-                    name="searchType"
-                    value="bulk"
-                    checked={searchType === "bulk"}
-                    onChange={(e) => setSearchType(e.target.value)}
-                    className="w-4 h-4 text-orange-500 focus:ring-orange-500"
-                  />
-                  <span className="text-gray-700 font-medium">Toplu Ara</span>
-                  <span className="bg-orange-500 text-white text-xs font-bold px-2 py-0.5 rounded ml-2">
-                    Yeni
-                  </span>
-                </label>
-              </div>
 
               {/* Search Input and Button */}
               <div className="flex gap-3">
@@ -185,44 +153,20 @@ const ProductDatabasePage = () => {
           <ActionCard
             icon={Tag}
             title="Kendi ürününüzü ekleyin"
-            description="Hepsiburada kataloğunda bulunmayan ürününüzü ekleyin."
+            description="Tedarika kataloğunda bulunmayan ürününüzü ekleyin."
             linkText="Ürün ekle"
-            onClick={() => setShowForm(true)}
+            onClick={() => navigate("/seller/products/draft/upload")}
             iconColor="text-purple-500"
           />
           <ActionCard
             icon={ShoppingCart}
             title="Kendi ürününüzü toplu ekleyin"
-            description="Hepsiburada kataloğunda bulunmayan ürünlerinizi toplu bir şekilde ekleyin."
+            description="Tedarika kataloğunda bulunmayan ürünlerinizi toplu bir şekilde ekleyin."
             linkText="Toplu ekle"
             onClick={() => navigate("/seller/products/draft/upload")}
             iconColor="text-purple-500"
           />
-          <ActionCard
-            icon={List}
-            title="Çok sayıda ürünü arayın"
-            description="Hepsiburada kataloğundan birden fazla ürünü toplu olarak arayın."
-            linkText="Toplu ara"
-            onClick={() => {
-              setSearchType("bulk");
-              // Toplu arama için özel bir sayfa veya modal açılabilir
-            }}
-            iconColor="text-purple-500"
-          />
         </div>
-
-        {/* Product Request Form Modal */}
-        {showForm && (
-          <div className="mb-6">
-            <ProductRequestForm
-              onSuccess={() => {
-                alert("Başvurunuz başarıyla gönderildi.");
-                setShowForm(false);
-              }}
-              onCancel={() => setShowForm(false)}
-            />
-          </div>
-        )}
 
         {/* Products Table */}
         {loading ? (
