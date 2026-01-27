@@ -19,8 +19,6 @@ import {
   Plus,
   FileSpreadsheet,
   TrendingUp,
-  Package,
-  Users,
   BarChart3,
   Loader2,
   Mail,
@@ -34,19 +32,21 @@ const SalesReportsPage = () => {
   const toast = useToast();
 
   // Export Form State
-  const [reportType, setReportType] = useState("DailySales");
-  const [format, setFormat] = useState("Pdf");
+  const [reportType, setReportType] = useState("StandardSalesReport");
+  const [format, setFormat] = useState(0); // 0 = Pdf, 1 = Xlsx
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [loading, setLoading] = useState(false);
 
   // Schedule Form State
   const [showScheduleModal, setShowScheduleModal] = useState(false);
-  const [scheduleReportType, setScheduleReportType] = useState("DailySales");
-  const [scheduleFormat, setScheduleFormat] = useState("Pdf");
+  const [scheduleReportType, setScheduleReportType] = useState("StandardSalesReport");
+  const [scheduleFormat, setScheduleFormat] = useState(0); // 0 = Pdf, 1 = Xlsx
   const [scheduleEmail, setScheduleEmail] = useState("");
-  const [scheduleCron, setScheduleCron] = useState("0 9 * * 1"); // Her pazartesi 09:00
+  const [scheduleCron, setScheduleCron] = useState("0 8 * * *"); // Her gün 08:00
   const [scheduleTimezone, setScheduleTimezone] = useState("Europe/Istanbul");
+  const [scheduleStartDate, setScheduleStartDate] = useState("");
+  const [scheduleEndDate, setScheduleEndDate] = useState("");
 
   // Lists
   const [exportHistory, setExportHistory] = useState([]);
@@ -90,57 +90,64 @@ const SalesReportsPage = () => {
   };
 
   const handleExport = async () => {
-    if (!startDate || !endDate) {
-      toast.error("Lütfen tarih aralığı seçin");
-      return;
-    }
-
     setLoading(true);
     try {
-      const blob = await exportSalesReport({
+      const requestBody = {
         reportType,
         format,
-        filter: {
+      };
+
+      // Tarih filtresi opsiyonel - varsa ekle
+      if (startDate && endDate) {
+        requestBody.filter = {
           startDate: new Date(startDate).toISOString(),
           endDate: new Date(endDate).toISOString(),
-        },
-      });
+        };
+      }
 
-      // Dosyayı indir
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `sales-report-${reportType}-${startDate}-${endDate}.${format.toLowerCase()}`;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
+      const report = await exportSalesReport(requestBody);
 
-      toast.success("Rapor başarıyla indirildi");
+      // storagePath üzerinden raporu aç
+      if (report?.storagePath) {
+        window.open(report.storagePath, "_blank");
+        toast.success("Rapor başarıyla oluşturuldu ve açıldı");
+      } else {
+        toast.error("Rapor oluşturuldu ancak indirme linki bulunamadı");
+      }
+
       loadExportHistory();
     } catch (err) {
       console.error("Rapor oluşturulamadı:", err);
-      toast.error("Rapor oluşturulamadı");
+      const errorMessage = err?.response?.data?.message || err?.message || "Rapor oluşturulamadı";
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
   };
 
   const handleCreateSchedule = async () => {
-    if (!scheduleEmail) {
-      toast.error("Lütfen e-posta adresi girin");
-      return;
-    }
-
     try {
-      await createReportSchedule({
+      const requestBody = {
         reportType: scheduleReportType,
         format: scheduleFormat,
-        email: scheduleEmail,
         cronExpression: scheduleCron,
         timezone: scheduleTimezone,
-        parameters: {},
-      });
+      };
+
+      // Email opsiyonel - varsa ekle
+      if (scheduleEmail.trim()) {
+        requestBody.email = scheduleEmail.trim();
+      }
+
+      // Tarih parametreleri opsiyonel - varsa ekle
+      if (scheduleStartDate && scheduleEndDate) {
+        requestBody.parameters = {
+          StartDate: new Date(scheduleStartDate).toISOString(),
+          EndDate: new Date(scheduleEndDate).toISOString(),
+        };
+      }
+
+      await createReportSchedule(requestBody);
 
       toast.success("Zamanlanmış rapor oluşturuldu");
       setShowScheduleModal(false);
@@ -148,9 +155,12 @@ const SalesReportsPage = () => {
       
       // Form'u temizle
       setScheduleEmail("");
+      setScheduleStartDate("");
+      setScheduleEndDate("");
     } catch (err) {
       console.error("Zamanlama oluşturulamadı:", err);
-      toast.error("Zamanlama oluşturulamadı");
+      const errorMessage = err?.response?.data?.message || err?.message || "Zamanlama oluşturulamadı";
+      toast.error(errorMessage);
     }
   };
 
@@ -171,16 +181,10 @@ const SalesReportsPage = () => {
 
   const getReportTypeIcon = (type) => {
     switch (type) {
-      case "DailySales":
-        return <Calendar className="w-5 h-5" />;
-      case "MonthlySales":
+      case "StandardSalesReport":
         return <BarChart3 className="w-5 h-5" />;
-      case "ProductSales":
-        return <Package className="w-5 h-5" />;
-      case "CategorySales":
+      case "TopProductSalesReport":
         return <TrendingUp className="w-5 h-5" />;
-      case "CustomerSales":
-        return <Users className="w-5 h-5" />;
       default:
         return <FileText className="w-5 h-5" />;
     }
@@ -188,22 +192,46 @@ const SalesReportsPage = () => {
 
   const getReportTypeLabel = (type) => {
     const labels = {
-      DailySales: "Günlük Satışlar",
-      MonthlySales: "Aylık Satışlar",
-      ProductSales: "Ürün Bazlı",
-      CategorySales: "Kategori Bazlı",
-      CustomerSales: "Müşteri Bazlı",
+      StandardSalesReport: "Standart Satış Raporu",
+      TopProductSalesReport: "En Çok Satılan Ürünler Raporu",
     };
     return labels[type] || type;
+  };
+
+  const getFormatLabel = (formatValue) => {
+    return formatValue === 0 ? "PDF" : "Excel";
+  };
+
+  const getFormatIcon = (formatValue) => {
+    return formatValue === 0 ? <FileText className="w-5 h-5" /> : <FileSpreadsheet className="w-5 h-5" />;
+  };
+
+  const getStatusBadge = (status) => {
+    const statusConfig = {
+      completed: { label: "Tamamlandı", color: "bg-green-100 text-green-700" },
+      pending: { label: "Beklemede", color: "bg-yellow-100 text-yellow-700" },
+      processing: { label: "İşleniyor", color: "bg-blue-100 text-blue-700" },
+      failed: { label: "Başarısız", color: "bg-red-100 text-red-700" },
+    };
+    const config = statusConfig[status] || { label: status, color: "bg-gray-100 text-gray-700" };
+    return (
+      <span className={`px-3 py-1 rounded-full text-xs font-semibold ${config.color}`}>
+        {config.label}
+      </span>
+    );
   };
 
   const getCronDescription = (cron) => {
     // Basit cron açıklamaları
     const descriptions = {
+      "0 8 * * *": "Her Gün 08:00",
+      "0 8 * * 1": "Her Pazartesi 08:00",
       "0 9 * * 1": "Her Pazartesi 09:00",
       "0 9 * * *": "Her Gün 09:00",
       "0 9 1 * *": "Her Ayın 1'i 09:00",
+      "0 10 * * 1": "Her Pazartesi 10:00",
       "0 0 * * 0": "Her Pazar 00:00",
+      "0 */6 * * *": "Her 6 Saatte Bir",
     };
     return descriptions[cron] || cron;
   };
@@ -244,11 +272,8 @@ const SalesReportsPage = () => {
                 </label>
                 <div className="grid grid-cols-1 gap-2">
                   {[
-                    { value: "DailySales", label: "Günlük Satışlar", icon: <Calendar className="w-5 h-5" /> },
-                    { value: "MonthlySales", label: "Aylık Satışlar", icon: <BarChart3 className="w-5 h-5" /> },
-                    { value: "ProductSales", label: "Ürün Bazlı", icon: <Package className="w-5 h-5" /> },
-                    { value: "CategorySales", label: "Kategori Bazlı", icon: <TrendingUp className="w-5 h-5" /> },
-                    { value: "CustomerSales", label: "Müşteri Bazlı", icon: <Users className="w-5 h-5" /> },
+                    { value: "StandardSalesReport", label: "Standart Satış Raporu", icon: <BarChart3 className="w-5 h-5" /> },
+                    { value: "TopProductSalesReport", label: "En Çok Satılan Ürünler Raporu", icon: <TrendingUp className="w-5 h-5" /> },
                   ].map((type) => (
                     <button
                       key={type.value}
@@ -280,48 +305,48 @@ const SalesReportsPage = () => {
                 </label>
                 <div className="grid grid-cols-2 gap-3">
                   <button
-                    onClick={() => setFormat("Pdf")}
+                    onClick={() => setFormat(0)}
                     className={`flex flex-col items-center justify-center gap-2 px-4 py-4 rounded-xl border-2 transition-all ${
-                      format === "Pdf"
+                      format === 0
                         ? "border-emerald-600 bg-gradient-to-br from-emerald-50 to-teal-50 text-emerald-700 shadow-md"
                         : "border-gray-200 bg-white text-gray-700 hover:border-emerald-300 hover:shadow"
                     }`}
                   >
                     <div className={`p-3 rounded-xl ${
-                      format === "Pdf" ? "bg-emerald-100" : "bg-gray-100"
+                      format === 0 ? "bg-emerald-100" : "bg-gray-100"
                     }`}>
                       <FileText className="w-6 h-6" />
                     </div>
                     <span className="font-bold">PDF</span>
-                    {format === "Pdf" && (
+                    {format === 0 && (
                       <CheckCircle className="w-4 h-4 text-emerald-600" />
                     )}
                   </button>
                   <button
-                    onClick={() => setFormat("Xlsx")}
+                    onClick={() => setFormat(1)}
                     className={`flex flex-col items-center justify-center gap-2 px-4 py-4 rounded-xl border-2 transition-all ${
-                      format === "Xlsx"
+                      format === 1
                         ? "border-emerald-600 bg-gradient-to-br from-emerald-50 to-teal-50 text-emerald-700 shadow-md"
                         : "border-gray-200 bg-white text-gray-700 hover:border-emerald-300 hover:shadow"
                     }`}
                   >
                     <div className={`p-3 rounded-xl ${
-                      format === "Xlsx" ? "bg-emerald-100" : "bg-gray-100"
+                      format === 1 ? "bg-emerald-100" : "bg-gray-100"
                     }`}>
                       <FileSpreadsheet className="w-6 h-6" />
                     </div>
                     <span className="font-bold">Excel</span>
-                    {format === "Xlsx" && (
+                    {format === 1 && (
                       <CheckCircle className="w-4 h-4 text-emerald-600" />
                     )}
                   </button>
                 </div>
               </div>
 
-              {/* Tarih Aralığı */}
+              {/* Tarih Aralığı (Opsiyonel) */}
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-3">
-                  Tarih Aralığı
+                  Tarih Aralığı <span className="text-gray-400 font-normal text-xs">(Opsiyonel)</span>
                 </label>
                 <div className="grid grid-cols-2 gap-3">
                   <div className="relative">
@@ -403,25 +428,45 @@ const SalesReportsPage = () => {
                     className="p-4 border border-gray-200 rounded-lg hover:border-emerald-300 transition"
                   >
                     <div className="flex items-start justify-between">
-                      <div className="flex items-start gap-3">
+                      <div className="flex items-start gap-3 flex-1">
                         {getReportTypeIcon(schedule.reportType)}
-                        <div>
-                          <p className="font-bold text-gray-900">
-                            {getReportTypeLabel(schedule.reportType)}
-                          </p>
-                          <p className="text-sm text-gray-600 flex items-center gap-2 mt-1">
-                            <Mail className="w-4 h-4" />
-                            {schedule.email}
-                          </p>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <p className="font-bold text-gray-900">
+                              {getReportTypeLabel(schedule.reportType)}
+                            </p>
+                            {schedule.isActive ? (
+                              <span className="px-2 py-0.5 bg-green-100 text-green-700 rounded-full text-xs font-semibold">
+                                Aktif
+                              </span>
+                            ) : (
+                              <span className="px-2 py-0.5 bg-gray-100 text-gray-700 rounded-full text-xs font-semibold">
+                                Pasif
+                              </span>
+                            )}
+                          </div>
+                          {schedule.email && (
+                            <p className="text-sm text-gray-600 flex items-center gap-2 mt-1">
+                              <Mail className="w-4 h-4" />
+                              {schedule.email}
+                            </p>
+                          )}
                           <p className="text-xs text-gray-500 flex items-center gap-2 mt-1">
                             <RefreshCw className="w-3 h-3" />
                             {getCronDescription(schedule.cronExpression)}
                           </p>
+                          {schedule.nextRunAt && (
+                            <p className="text-xs text-gray-500 flex items-center gap-2 mt-1">
+                              <Clock className="w-3 h-3" />
+                              Sonraki: {new Date(schedule.nextRunAt).toLocaleString("tr-TR")}
+                            </p>
+                          )}
                         </div>
                       </div>
                       <button
                         onClick={() => handleDeleteSchedule(schedule.id)}
-                        className="text-red-600 hover:text-red-700 transition"
+                        className="text-red-600 hover:text-red-700 transition ml-2"
+                        title="Sil"
                       >
                         <Trash2 className="w-5 h-5" />
                       </button>
@@ -461,16 +506,19 @@ const SalesReportsPage = () => {
                       Format
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-bold text-emerald-800 uppercase">
-                      Tarih Aralığı
+                      Durum
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-bold text-emerald-800 uppercase">
-                      İndirilme Tarihi
+                      Son Kullanma
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-bold text-emerald-800 uppercase">
+                      İşlem
                     </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
-                  {exportHistory.map((item, index) => (
-                    <tr key={index} className="hover:bg-emerald-50 transition">
+                  {exportHistory.map((item) => (
+                    <tr key={item.id} className="hover:bg-emerald-50 transition">
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-2">
                           {getReportTypeIcon(item.reportType)}
@@ -481,23 +529,30 @@ const SalesReportsPage = () => {
                       </td>
                       <td className="px-6 py-4">
                         <span className="inline-flex items-center gap-2 px-3 py-1 bg-gray-100 text-gray-700 rounded-lg text-sm font-semibold">
-                          {item.format === "Pdf" ? (
-                            <FileText className="w-4 h-4" />
-                          ) : (
-                            <FileSpreadsheet className="w-4 h-4" />
-                          )}
-                          {item.format}
+                          {getFormatIcon(item.format)}
+                          {getFormatLabel(item.format)}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-600">
-                        {item.startDate && item.endDate
-                          ? `${new Date(item.startDate).toLocaleDateString("tr-TR")} - ${new Date(item.endDate).toLocaleDateString("tr-TR")}`
-                          : "—"}
+                      <td className="px-6 py-4">
+                        {getStatusBadge(item.status)}
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-600">
-                        {item.createdAt
-                          ? new Date(item.createdAt).toLocaleString("tr-TR")
+                        {item.expiresAt
+                          ? new Date(item.expiresAt).toLocaleString("tr-TR")
                           : "—"}
+                      </td>
+                      <td className="px-6 py-4">
+                        {item.storagePath && item.status === "completed" ? (
+                          <button
+                            onClick={() => window.open(item.storagePath, "_blank")}
+                            className="flex items-center gap-2 px-3 py-1.5 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition text-sm font-semibold"
+                          >
+                            <Download className="w-4 h-4" />
+                            İndir
+                          </button>
+                        ) : (
+                          <span className="text-gray-400 text-sm">—</span>
+                        )}
                       </td>
                     </tr>
                   ))}
@@ -534,13 +589,10 @@ const SalesReportsPage = () => {
                   <label className="block text-sm font-semibold text-gray-700 mb-3">
                     Rapor Türü
                   </label>
-                  <div className="grid grid-cols-1 gap-2 max-h-64 overflow-y-auto">
+                  <div className="grid grid-cols-1 gap-2">
                     {[
-                      { value: "DailySales", label: "Günlük Satışlar", icon: <Calendar className="w-4 h-4" /> },
-                      { value: "MonthlySales", label: "Aylık Satışlar", icon: <BarChart3 className="w-4 h-4" /> },
-                      { value: "ProductSales", label: "Ürün Bazlı", icon: <Package className="w-4 h-4" /> },
-                      { value: "CategorySales", label: "Kategori Bazlı", icon: <TrendingUp className="w-4 h-4" /> },
-                      { value: "CustomerSales", label: "Müşteri Bazlı", icon: <Users className="w-4 h-4" /> },
+                      { value: "StandardSalesReport", label: "Standart Satış Raporu", icon: <BarChart3 className="w-4 h-4" /> },
+                      { value: "TopProductSalesReport", label: "En Çok Satılan Ürünler Raporu", icon: <TrendingUp className="w-4 h-4" /> },
                     ].map((type) => (
                       <button
                         key={type.value}
@@ -567,9 +619,9 @@ const SalesReportsPage = () => {
                   </label>
                   <div className="grid grid-cols-2 gap-3">
                     <button
-                      onClick={() => setScheduleFormat("Pdf")}
+                      onClick={() => setScheduleFormat(0)}
                       className={`flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 transition-all ${
-                        scheduleFormat === "Pdf"
+                        scheduleFormat === 0
                           ? "border-emerald-600 bg-emerald-50 text-emerald-700"
                           : "border-gray-200 bg-white text-gray-700 hover:border-emerald-300"
                       }`}
@@ -578,9 +630,9 @@ const SalesReportsPage = () => {
                       <span className="font-semibold">PDF</span>
                     </button>
                     <button
-                      onClick={() => setScheduleFormat("Xlsx")}
+                      onClick={() => setScheduleFormat(1)}
                       className={`flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 transition-all ${
-                        scheduleFormat === "Xlsx"
+                        scheduleFormat === 1
                           ? "border-emerald-600 bg-emerald-50 text-emerald-700"
                           : "border-gray-200 bg-white text-gray-700 hover:border-emerald-300"
                       }`}
@@ -593,7 +645,7 @@ const SalesReportsPage = () => {
 
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-3">
-                    E-posta Adresi
+                    E-posta Adresi <span className="text-gray-400 font-normal text-xs">(Opsiyonel)</span>
                   </label>
                   <div className="relative">
                     <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
@@ -615,10 +667,10 @@ const SalesReportsPage = () => {
                   </label>
                   <div className="grid grid-cols-1 gap-2">
                     {[
-                      { value: "0 9 * * 1", label: "Her Pazartesi 09:00" },
-                      { value: "0 9 * * *", label: "Her Gün 09:00" },
+                      { value: "0 8 * * *", label: "Her Gün 08:00" },
+                      { value: "0 8 * * 1", label: "Her Pazartesi 08:00" },
+                      { value: "0 10 * * 1", label: "Her Pazartesi 10:00" },
                       { value: "0 9 1 * *", label: "Her Ayın 1'i 09:00" },
-                      { value: "0 0 * * 0", label: "Her Pazar 00:00" },
                     ].map((cron) => (
                       <button
                         key={cron.value}
@@ -636,6 +688,36 @@ const SalesReportsPage = () => {
                         )}
                       </button>
                     ))}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-3">
+                    Tarih Aralığı <span className="text-gray-400 font-normal text-xs">(Opsiyonel)</span>
+                  </label>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="relative">
+                      <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                        <Calendar className="w-4 h-4" />
+                      </div>
+                      <input
+                        type="date"
+                        value={scheduleStartDate}
+                        onChange={(e) => setScheduleStartDate(e.target.value)}
+                        className="w-full pl-10 pr-3 py-2 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition text-sm"
+                      />
+                    </div>
+                    <div className="relative">
+                      <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                        <Calendar className="w-4 h-4" />
+                      </div>
+                      <input
+                        type="date"
+                        value={scheduleEndDate}
+                        onChange={(e) => setScheduleEndDate(e.target.value)}
+                        className="w-full pl-10 pr-3 py-2 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition text-sm"
+                      />
+                    </div>
                   </div>
                 </div>
 
