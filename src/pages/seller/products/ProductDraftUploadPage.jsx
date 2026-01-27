@@ -4,7 +4,8 @@ import {
   addProductJson, 
   addProductExcel, 
   addProductXml, 
-  addProductXmlFromUrl 
+  addProductXmlFromUrl,
+  addProductManual
 } from "@/api/sellerProductDraftService";
 import { useToast } from "@/contexts/ToastContext";
 import {
@@ -20,12 +21,15 @@ import {
   Sparkles,
   Download,
   Eye,
+  Plus,
+  X,
+  Package,
 } from "lucide-react";
 
 const ProductDraftUploadPage = () => {
   const navigate = useNavigate();
   const toast = useToast();
-  const [activeTab, setActiveTab] = useState("excel"); // excel, json, xml, xml-url
+  const [activeTab, setActiveTab] = useState("excel"); // excel, json, xml, xml-url, manual
   const [loading, setLoading] = useState(false);
   const [showTemplatePreview, setShowTemplatePreview] = useState(false);
 
@@ -45,6 +49,42 @@ const ProductDraftUploadPage = () => {
   const [xmlUrlUploadName, setXmlUrlUploadName] = useState("");
   const [xmlUsername, setXmlUsername] = useState("");
   const [xmlPassword, setXmlPassword] = useState("");
+
+  // Manual State
+  const [draftName, setDraftName] = useState("");
+  const [products, setProducts] = useState([
+    {
+      name: "",
+      sku: "",
+      ean: "",
+      brandId: "",
+      brandName: "",
+      categoryId: "",
+      categorySubId: "",
+      gtip: "",
+      description: "",
+      preparationTime: "",
+      expirationDate: "",
+      store: {
+        unitType: 0,
+        stockQuantity: 0,
+        minOrderQuantity: 1,
+        maxOrderQuantity: "",
+        unitPrice: 0,
+        currencyCode: "TRY",
+        mainProductCode: "",
+        stockCode: "",
+        criticalStock: "",
+        width: "",
+        length: "",
+        height: "",
+        weight: "",
+        volumeWeight: "",
+      },
+      imageUrls: [],
+      colorVariants: [],
+    },
+  ]);
 
   const handleExcelUpload = async () => {
     if (!excelFile) {
@@ -142,11 +182,169 @@ const ProductDraftUploadPage = () => {
     }
   };
 
+  const handleManualUpload = async () => {
+    // Validate products
+    const validProducts = products.filter(
+      (p) => p.name && p.sku && p.store.stockQuantity > 0 && p.store.unitPrice > 0
+    );
+
+    if (validProducts.length === 0) {
+      toast.error("En az bir geçerli ürün bilgisi gereklidir.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      // Clean up empty fields
+      const cleanedProducts = validProducts.map((product) => {
+        const cleaned = { ...product };
+        
+        // Clean store object
+        const cleanedStore = { ...cleaned.store };
+        if (cleanedStore.maxOrderQuantity === "") delete cleanedStore.maxOrderQuantity;
+        if (cleanedStore.mainProductCode === "") delete cleanedStore.mainProductCode;
+        if (cleanedStore.stockCode === "") delete cleanedStore.stockCode;
+        if (cleanedStore.criticalStock === "") delete cleanedStore.criticalStock;
+        if (cleanedStore.width === "") delete cleanedStore.width;
+        if (cleanedStore.length === "") delete cleanedStore.length;
+        if (cleanedStore.height === "") delete cleanedStore.height;
+        if (cleanedStore.weight === "") delete cleanedStore.weight;
+        if (cleanedStore.volumeWeight === "") delete cleanedStore.volumeWeight;
+        
+        cleaned.store = cleanedStore;
+        
+        // Remove empty optional fields
+        if (!cleaned.ean) delete cleaned.ean;
+        if (!cleaned.brandId) delete cleaned.brandId;
+        if (!cleaned.brandName) delete cleaned.brandName;
+        if (!cleaned.categoryId) delete cleaned.categoryId;
+        if (!cleaned.categorySubId) delete cleaned.categorySubId;
+        if (!cleaned.gtip) delete cleaned.gtip;
+        if (!cleaned.description) delete cleaned.description;
+        if (!cleaned.preparationTime) delete cleaned.preparationTime;
+        if (!cleaned.expirationDate) delete cleaned.expirationDate;
+        if (!cleaned.imageUrls || cleaned.imageUrls.length === 0) delete cleaned.imageUrls;
+        if (!cleaned.colorVariants || cleaned.colorVariants.length === 0) delete cleaned.colorVariants;
+        
+        return cleaned;
+      });
+
+      const payload = {
+        ...(draftName && { draftName }),
+        products: cleanedProducts,
+      };
+
+      await addProductManual(payload);
+      toast.success("Ürünler başarıyla yüklendi!");
+      navigate("/seller/products/drafts");
+    } catch (err) {
+      console.error("Manuel yükleme başarısız:", err);
+      toast.error(`Ürünler yüklenemedi: ${err.message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const addProduct = () => {
+    setProducts([
+      ...products,
+      {
+        name: "",
+        sku: "",
+        ean: "",
+        brandId: "",
+        brandName: "",
+        categoryId: "",
+        categorySubId: "",
+        gtip: "",
+        description: "",
+        preparationTime: "",
+        expirationDate: "",
+        store: {
+          unitType: 0,
+          stockQuantity: 0,
+          minOrderQuantity: 1,
+          maxOrderQuantity: "",
+          unitPrice: 0,
+          currencyCode: "TRY",
+          mainProductCode: "",
+          stockCode: "",
+          criticalStock: "",
+          width: "",
+          length: "",
+          height: "",
+          weight: "",
+          volumeWeight: "",
+        },
+        imageUrls: [],
+        colorVariants: [],
+      },
+    ]);
+  };
+
+  const removeProduct = (index) => {
+    setProducts(products.filter((_, i) => i !== index));
+  };
+
+  const updateProduct = (index, field, value) => {
+    const updated = [...products];
+    if (field.startsWith("store.")) {
+      const storeField = field.replace("store.", "");
+      updated[index].store[storeField] = value;
+    } else {
+      updated[index][field] = value;
+    }
+    setProducts(updated);
+  };
+
+  const addImageUrl = (productIndex) => {
+    const updated = [...products];
+    if (!updated[productIndex].imageUrls) {
+      updated[productIndex].imageUrls = [];
+    }
+    updated[productIndex].imageUrls.push("");
+    setProducts(updated);
+  };
+
+  const updateImageUrl = (productIndex, imageIndex, value) => {
+    const updated = [...products];
+    updated[productIndex].imageUrls[imageIndex] = value;
+    setProducts(updated);
+  };
+
+  const removeImageUrl = (productIndex, imageIndex) => {
+    const updated = [...products];
+    updated[productIndex].imageUrls = updated[productIndex].imageUrls.filter((_, i) => i !== imageIndex);
+    setProducts(updated);
+  };
+
+  const addColorVariant = (productIndex) => {
+    const updated = [...products];
+    if (!updated[productIndex].colorVariants) {
+      updated[productIndex].colorVariants = [];
+    }
+    updated[productIndex].colorVariants.push("");
+    setProducts(updated);
+  };
+
+  const updateColorVariant = (productIndex, variantIndex, value) => {
+    const updated = [...products];
+    updated[productIndex].colorVariants[variantIndex] = value;
+    setProducts(updated);
+  };
+
+  const removeColorVariant = (productIndex, variantIndex) => {
+    const updated = [...products];
+    updated[productIndex].colorVariants = updated[productIndex].colorVariants.filter((_, i) => i !== variantIndex);
+    setProducts(updated);
+  };
+
   const tabs = [
     { key: "excel", label: "Excel", icon: FileSpreadsheet, color: "green" },
     { key: "json", label: "JSON", icon: FileCode, color: "blue" },
     { key: "xml", label: "XML Dosya", icon: FileText, color: "purple" },
     { key: "xml-url", label: "XML URL", icon: LinkIcon, color: "orange" },
+    { key: "manual", label: "Manuel", icon: Package, color: "emerald" },
   ];
 
   return (
@@ -505,6 +703,387 @@ const ProductDraftUploadPage = () => {
                   <>
                     <Upload className="w-5 h-5" />
                     XML URL İşle
+                  </>
+                )}
+              </button>
+            </div>
+          )}
+
+          {/* Manual Upload */}
+          {activeTab === "manual" && (
+            <div className="space-y-6">
+              <div className="text-center mb-6">
+                <Package className="w-20 h-20 mx-auto text-emerald-600 mb-4" />
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">Manuel Ürün Yükleme</h2>
+                <p className="text-gray-600">
+                  Excel, JSON veya XML olmadan doğrudan ürün bilgilerinizi girin
+                </p>
+              </div>
+
+              {/* Draft Name */}
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-2">
+                  Taslak Adı (Opsiyonel)
+                </label>
+                <input
+                  type="text"
+                  value={draftName}
+                  onChange={(e) => setDraftName(e.target.value)}
+                  placeholder="Örn: Manuel Ürün Yükleme - 2024"
+                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 transition-all"
+                />
+              </div>
+
+              {/* Products */}
+              <div className="space-y-6">
+                {products.map((product, productIndex) => (
+                  <div key={productIndex} className="border-2 border-gray-200 rounded-xl p-6 bg-gray-50">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-lg font-bold text-gray-900">Ürün {productIndex + 1}</h3>
+                      {products.length > 1 && (
+                        <button
+                          onClick={() => removeProduct(productIndex)}
+                          className="text-red-600 hover:text-red-700 transition-colors"
+                        >
+                          <X className="w-5 h-5" />
+                        </button>
+                      )}
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {/* Basic Info */}
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-1">
+                          Ürün Adı *
+                        </label>
+                        <input
+                          type="text"
+                          value={product.name}
+                          onChange={(e) => updateProduct(productIndex, "name", e.target.value)}
+                          placeholder="Ürün adı"
+                          className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-1">
+                          SKU *
+                        </label>
+                        <input
+                          type="text"
+                          value={product.sku}
+                          onChange={(e) => updateProduct(productIndex, "sku", e.target.value)}
+                          placeholder="SKU-001"
+                          className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-1">
+                          EAN
+                        </label>
+                        <input
+                          type="text"
+                          value={product.ean}
+                          onChange={(e) => updateProduct(productIndex, "ean", e.target.value)}
+                          placeholder="1234567890123"
+                          className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-1">
+                          Marka Adı
+                        </label>
+                        <input
+                          type="text"
+                          value={product.brandName}
+                          onChange={(e) => updateProduct(productIndex, "brandName", e.target.value)}
+                          placeholder="Marka adı"
+                          className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-1">
+                          Açıklama
+                        </label>
+                        <textarea
+                          value={product.description}
+                          onChange={(e) => updateProduct(productIndex, "description", e.target.value)}
+                          placeholder="Ürün açıklaması"
+                          rows={2}
+                          className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
+                        />
+                      </div>
+
+                      {/* Store Info */}
+                      <div className="md:col-span-2 border-t pt-4 mt-4">
+                        <h4 className="font-semibold text-gray-900 mb-3">Mağaza Bilgileri</h4>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                          <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-1">
+                              Birim Türü *
+                            </label>
+                            <input
+                              type="number"
+                              value={product.store.unitType}
+                              onChange={(e) => updateProduct(productIndex, "store.unitType", parseInt(e.target.value) || 0)}
+                              className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
+                              required
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-1">
+                              Stok Miktarı *
+                            </label>
+                            <input
+                              type="number"
+                              value={product.store.stockQuantity}
+                              onChange={(e) => updateProduct(productIndex, "store.stockQuantity", parseInt(e.target.value) || 0)}
+                              className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
+                              required
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-1">
+                              Min. Sipariş *
+                            </label>
+                            <input
+                              type="number"
+                              value={product.store.minOrderQuantity}
+                              onChange={(e) => updateProduct(productIndex, "store.minOrderQuantity", parseInt(e.target.value) || 1)}
+                              className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
+                              required
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-1">
+                              Birim Fiyat *
+                            </label>
+                            <input
+                              type="number"
+                              step="0.01"
+                              value={product.store.unitPrice}
+                              onChange={(e) => updateProduct(productIndex, "store.unitPrice", parseFloat(e.target.value) || 0)}
+                              className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
+                              required
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-1">
+                              Para Birimi *
+                            </label>
+                            <input
+                              type="text"
+                              value={product.store.currencyCode}
+                              onChange={(e) => updateProduct(productIndex, "store.currencyCode", e.target.value)}
+                              placeholder="TRY"
+                              className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
+                              required
+                            />
+                          </div>
+                        </div>
+
+                        {/* Yeni Alanlar */}
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4">
+                          <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-1">
+                              Ana Ürün Kodu
+                            </label>
+                            <input
+                              type="text"
+                              value={product.store.mainProductCode}
+                              onChange={(e) => updateProduct(productIndex, "store.mainProductCode", e.target.value)}
+                              placeholder="MAIN-001"
+                              className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-1">
+                              Stok Kodu
+                            </label>
+                            <input
+                              type="text"
+                              value={product.store.stockCode}
+                              onChange={(e) => updateProduct(productIndex, "store.stockCode", e.target.value)}
+                              placeholder="STOCK-001"
+                              className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-1">
+                              Kritik Stok
+                            </label>
+                            <input
+                              type="number"
+                              value={product.store.criticalStock}
+                              onChange={(e) => updateProduct(productIndex, "store.criticalStock", e.target.value ? parseInt(e.target.value) : "")}
+                              placeholder="20"
+                              className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
+                            />
+                          </div>
+                        </div>
+
+                        {/* Paket Boyutları */}
+                        <div className="mt-4">
+                          <h5 className="text-sm font-semibold text-gray-700 mb-2">Paket Boyutları</h5>
+                          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                            <div>
+                              <label className="block text-xs text-gray-600 mb-1">En (cm)</label>
+                              <input
+                                type="number"
+                                step="0.1"
+                                value={product.store.width}
+                                onChange={(e) => updateProduct(productIndex, "store.width", e.target.value ? parseFloat(e.target.value) : "")}
+                                placeholder="30.5"
+                                className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-xs text-gray-600 mb-1">Boy (cm)</label>
+                              <input
+                                type="number"
+                                step="0.1"
+                                value={product.store.length}
+                                onChange={(e) => updateProduct(productIndex, "store.length", e.target.value ? parseFloat(e.target.value) : "")}
+                                placeholder="40.0"
+                                className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-xs text-gray-600 mb-1">Yükseklik (cm)</label>
+                              <input
+                                type="number"
+                                step="0.1"
+                                value={product.store.height}
+                                onChange={(e) => updateProduct(productIndex, "store.height", e.target.value ? parseFloat(e.target.value) : "")}
+                                placeholder="25.0"
+                                className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-xs text-gray-600 mb-1">Ağırlık (kg)</label>
+                              <input
+                                type="number"
+                                step="0.1"
+                                value={product.store.weight}
+                                onChange={(e) => updateProduct(productIndex, "store.weight", e.target.value ? parseFloat(e.target.value) : "")}
+                                placeholder="2.5"
+                                className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-xs text-gray-600 mb-1">Desi</label>
+                              <input
+                                type="number"
+                                step="0.1"
+                                value={product.store.volumeWeight}
+                                onChange={(e) => updateProduct(productIndex, "store.volumeWeight", e.target.value ? parseFloat(e.target.value) : "")}
+                                placeholder="3.2"
+                                className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Image URLs */}
+                      <div className="md:col-span-2">
+                        <div className="flex items-center justify-between mb-2">
+                          <label className="block text-sm font-semibold text-gray-700">
+                            Görsel URL'leri
+                          </label>
+                          <button
+                            type="button"
+                            onClick={() => addImageUrl(productIndex)}
+                            className="text-sm text-emerald-600 hover:text-emerald-700 flex items-center gap-1"
+                          >
+                            <Plus className="w-4 h-4" />
+                            Ekle
+                          </button>
+                        </div>
+                        {product.imageUrls && product.imageUrls.map((url, urlIndex) => (
+                          <div key={urlIndex} className="flex gap-2 mb-2">
+                            <input
+                              type="url"
+                              value={url}
+                              onChange={(e) => updateImageUrl(productIndex, urlIndex, e.target.value)}
+                              placeholder="https://example.com/image.jpg"
+                              className="flex-1 px-3 py-2 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => removeImageUrl(productIndex, urlIndex)}
+                              className="text-red-600 hover:text-red-700"
+                            >
+                              <X className="w-5 h-5" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Color Variants */}
+                      <div className="md:col-span-2">
+                        <div className="flex items-center justify-between mb-2">
+                          <label className="block text-sm font-semibold text-gray-700">
+                            Renk Varyantları
+                          </label>
+                          <button
+                            type="button"
+                            onClick={() => addColorVariant(productIndex)}
+                            className="text-sm text-emerald-600 hover:text-emerald-700 flex items-center gap-1"
+                          >
+                            <Plus className="w-4 h-4" />
+                            Ekle
+                          </button>
+                        </div>
+                        {product.colorVariants && product.colorVariants.map((variant, variantIndex) => (
+                          <div key={variantIndex} className="flex gap-2 mb-2">
+                            <input
+                              type="text"
+                              value={variant}
+                              onChange={(e) => updateColorVariant(productIndex, variantIndex, e.target.value)}
+                              placeholder="Renk Beyaz"
+                              className="flex-1 px-3 py-2 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => removeColorVariant(productIndex, variantIndex)}
+                              className="text-red-600 hover:text-red-700"
+                            >
+                              <X className="w-5 h-5" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Add Product Button */}
+              <button
+                onClick={addProduct}
+                className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-gray-100 hover:bg-gray-200 rounded-xl font-semibold text-gray-700 transition"
+              >
+                <Plus className="w-5 h-5" />
+                Yeni Ürün Ekle
+              </button>
+
+              {/* Submit Button */}
+              <button
+                onClick={handleManualUpload}
+                disabled={loading || products.length === 0}
+                className="w-full inline-flex items-center justify-center gap-2 px-6 py-4 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-lg font-bold hover:shadow-lg hover:scale-105 transition-all disabled:opacity-50 disabled:hover:scale-100"
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    Yükleniyor...
+                  </>
+                ) : (
+                  <>
+                    <Upload className="w-5 h-5" />
+                    Ürünleri Yükle
                   </>
                 )}
               </button>
