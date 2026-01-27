@@ -83,14 +83,14 @@ export default function UserMenu({ user, storeLogo, initials }) {
       {/* Avatar/Logo Butonu */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="relative focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2 focus:ring-offset-[#003131] rounded-full"
+        className="relative focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2 focus:ring-offset-[#003131] rounded-full flex-shrink-0"
         aria-label="Kullanıcı menüsü"
       >
         {storeLogo ? (
           <img
             src={storeLogo}
             alt="Mağaza Logosu"
-            className="w-12 h-12 rounded-full object-cover shadow-xl border-2 border-white/30 hover:scale-110 transition-transform duration-300 cursor-pointer"
+            className="w-9 h-9 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-full object-cover shadow-xl border-2 border-white/30 hover:scale-110 transition-transform duration-300 cursor-pointer"
             title={user?.email || ""}
             onError={(e) => {
               e.target.style.display = "none";
@@ -98,7 +98,7 @@ export default function UserMenu({ user, storeLogo, initials }) {
           />
         ) : (
           <div
-            className="w-12 h-12 flex items-center justify-center bg-gradient-to-br from-emerald-500 to-teal-600 text-white rounded-full font-extrabold text-lg shadow-xl border-2 border-white/30 hover:scale-110 transition-transform duration-300 cursor-pointer"
+            className="w-9 h-9 sm:w-10 sm:h-10 md:w-12 md:h-12 flex items-center justify-center bg-gradient-to-br from-emerald-500 to-teal-600 text-white rounded-full font-extrabold text-sm sm:text-base md:text-lg shadow-xl border-2 border-white/30 hover:scale-110 transition-transform duration-300 cursor-pointer"
             title={user?.email || ""}
           >
             {initials}
@@ -108,29 +108,29 @@ export default function UserMenu({ user, storeLogo, initials }) {
 
       {/* Dropdown Menü */}
       {isOpen && (
-        <div className="absolute right-0 top-full mt-2 w-72 bg-white rounded-2xl shadow-2xl border-2 border-gray-200 overflow-hidden z-50 animate-slide-down">
+        <div className="absolute right-0 top-full mt-2 w-[calc(100vw-2rem)] sm:w-64 md:w-72 max-w-xs bg-white rounded-xl sm:rounded-2xl shadow-2xl border-2 border-gray-200 overflow-hidden z-50 animate-slide-down">
           {/* Header */}
-          <div className="bg-gradient-to-r from-emerald-600 to-teal-600 px-5 py-4 border-b border-white/20">
-            <div className="flex items-center gap-3">
+          <div className="bg-gradient-to-r from-emerald-600 to-teal-600 px-4 sm:px-5 py-3 sm:py-4 border-b border-white/20">
+            <div className="flex items-center gap-2 sm:gap-3">
               {storeLogo ? (
                 <img
                   src={storeLogo}
                   alt="Mağaza Logosu"
-                  className="w-10 h-10 rounded-full object-cover border-2 border-white/30"
+                  className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover border-2 border-white/30 flex-shrink-0"
                   onError={(e) => {
                     e.target.style.display = "none";
                   }}
                 />
               ) : (
-                <div className="w-10 h-10 flex items-center justify-center bg-white/20 rounded-full font-extrabold text-white">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center bg-white/20 rounded-full font-extrabold text-white text-sm sm:text-base flex-shrink-0">
                   {initials}
                 </div>
               )}
               <div className="flex-1 min-w-0">
-                <p className="text-white font-bold text-sm truncate">
+                <p className="text-white font-bold text-xs sm:text-sm truncate">
                   {user?.name || "Kullanıcı"}
                 </p>
-                <p className="text-emerald-100 text-xs truncate">
+                <p className="text-emerald-100 text-[10px] sm:text-xs truncate">
                   {user?.email || ""}
                 </p>
               </div>
@@ -138,7 +138,7 @@ export default function UserMenu({ user, storeLogo, initials }) {
           </div>
 
           {/* Menü Öğeleri */}
-          <div className="py-2">
+          <div className="py-1 sm:py-2">
             {MENU_ITEMS.map((item) => {
               const Icon = item.icon;
               // Aktif tab kontrolü
@@ -152,15 +152,15 @@ export default function UserMenu({ user, storeLogo, initials }) {
                 <button
                   key={item.key}
                   onClick={() => handleMenuClick(item)}
-                  className={`w-full flex items-center gap-3 px-5 py-3 text-left hover:bg-gray-50 transition-colors ${
+                  className={`w-full flex items-center gap-2 sm:gap-3 px-3 sm:px-4 md:px-5 py-2 sm:py-2.5 md:py-3 text-left hover:bg-gray-50 transition-colors ${
                     isActive ? "bg-emerald-50 border-l-4 border-emerald-600" : ""
                   }`}
                 >
-                  <Icon className={`w-5 h-5 ${isActive ? "text-emerald-600" : "text-gray-600"}`} />
-                  <span className={`flex-1 font-medium text-sm ${isActive ? "text-emerald-700 font-semibold" : "text-gray-700"}`}>
+                  <Icon className={`w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0 ${isActive ? "text-emerald-600" : "text-gray-600"}`} />
+                  <span className={`flex-1 font-medium text-xs sm:text-sm ${isActive ? "text-emerald-700 font-semibold" : "text-gray-700"}`}>
                     {item.label}
                   </span>
-                  <ChevronRight className={`w-4 h-4 ${isActive ? "text-emerald-600" : "text-gray-400"}`} />
+                  <ChevronRight className={`w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0 ${isActive ? "text-emerald-600" : "text-gray-400"}`} />
                 </button>
               );
             })}
@@ -170,13 +170,13 @@ export default function UserMenu({ user, storeLogo, initials }) {
           <div className="border-t border-gray-200"></div>
 
           {/* Çıkış */}
-          <div className="py-2">
+          <div className="py-1 sm:py-2">
             <button
               onClick={handleLogout}
-              className="w-full flex items-center gap-3 px-5 py-3 text-left hover:bg-red-50 transition-colors text-red-600"
+              className="w-full flex items-center gap-2 sm:gap-3 px-3 sm:px-4 md:px-5 py-2 sm:py-2.5 md:py-3 text-left hover:bg-red-50 transition-colors text-red-600"
             >
-              <LogOut className="w-5 h-5" />
-              <span className="flex-1 font-medium text-sm">Çıkış Yap</span>
+              <LogOut className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
+              <span className="flex-1 font-medium text-xs sm:text-sm">Çıkış Yap</span>
             </button>
           </div>
         </div>

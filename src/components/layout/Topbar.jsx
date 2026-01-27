@@ -53,22 +53,23 @@ const Topbar = ({ onMenuClick }) => {
 
   return (
     <header className="sticky top-0 z-50 w-full bg-gradient-to-r from-[#003131] via-[#004040] to-[#003131] border-b-2 border-emerald-500/30 shadow-2xl backdrop-blur-md">
-      <div className="flex items-center justify-between w-full px-5 py-4">
+      <div className="flex items-center justify-between w-full px-3 sm:px-4 md:px-5 py-2.5 sm:py-3 md:py-4">
         {/* Sol Menü Butonu */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 sm:gap-3 md:gap-4 min-w-0 flex-1">
           <button
             onClick={onMenuClick}
-            className="md:hidden text-white/90 hover:text-white hover:bg-white/15 p-2.5 rounded-xl transition-all duration-300 hover:scale-110"
+            className="md:hidden text-white/90 hover:text-white hover:bg-white/15 p-2 rounded-lg transition-all duration-300 hover:scale-110 flex-shrink-0"
+            aria-label="Menü"
           >
-            <Menu className="w-6 h-6" />
+            <Menu className="w-5 h-5 sm:w-6 sm:h-6" />
           </button>
 
-          <div className="flex items-center gap-3">
-            <div className="hidden md:flex w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 items-center justify-center shadow-lg">
-              <span className="text-white font-extrabold text-lg">T</span>
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+            <div className="hidden sm:flex w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 items-center justify-center shadow-lg flex-shrink-0">
+              <span className="text-white font-extrabold text-sm sm:text-lg">T</span>
             </div>
-            <div>
-              <h1 className="text-2xl md:text-3xl font-extrabold text-white tracking-tight select-none drop-shadow-lg bg-gradient-to-r from-white via-emerald-100 to-white bg-clip-text text-transparent">
+            <div className="min-w-0">
+              <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-extrabold text-white tracking-tight select-none drop-shadow-lg bg-gradient-to-r from-white via-emerald-100 to-white bg-clip-text text-transparent truncate">
                 Satıcı Paneli
               </h1>
               <p className="hidden md:block text-xs text-emerald-200/80 font-medium mt-0.5">
@@ -79,11 +80,11 @@ const Topbar = ({ onMenuClick }) => {
         </div>
 
         {/* Sağ Taraf */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 sm:gap-3 md:gap-4 flex-shrink-0">
           {!user?.sellerId && (
             <a
               href="/seller/apply"
-              className="text-sm bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-bold px-5 py-2.5 rounded-xl hover:from-emerald-600 hover:to-teal-700 transition-all shadow-lg hover:shadow-xl hover:scale-105"
+              className="text-xs sm:text-sm bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-bold px-3 sm:px-4 md:px-5 py-1.5 sm:py-2 md:py-2.5 rounded-lg sm:rounded-xl hover:from-emerald-600 hover:to-teal-700 transition-all shadow-lg hover:shadow-xl hover:scale-105 whitespace-nowrap"
             >
               Başvuru Yap
             </a>
@@ -92,12 +93,14 @@ const Topbar = ({ onMenuClick }) => {
           {user && (
             <>
               {/* Bildirimler */}
-              <NotificationDropdown />
+              <div className="flex-shrink-0">
+                <NotificationDropdown />
+              </div>
 
               {/* Kullanıcı Bilgisi */}
-              <div className="flex items-center gap-4">
-                <div className="hidden sm:flex flex-col leading-tight text-right">
-                  <span className="font-bold text-white text-base">
+              <div className="flex items-center gap-2 sm:gap-3 md:gap-4">
+                <div className="hidden lg:flex flex-col leading-tight text-right">
+                  <span className="font-bold text-white text-sm md:text-base">
                     {user?.name || "Kullanıcı"}
                   </span>
                   <span className="text-xs text-emerald-200/80 font-medium">
@@ -105,7 +108,9 @@ const Topbar = ({ onMenuClick }) => {
                   </span>
                 </div>
                 {/* User Menu */}
-                <UserMenu user={user} storeLogo={storeLogo} initials={initials} />
+                <div className="flex-shrink-0">
+                  <UserMenu user={user} storeLogo={storeLogo} initials={initials} />
+                </div>
               </div>
             </>
           )}
