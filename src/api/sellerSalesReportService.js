@@ -1,64 +1,47 @@
 import { apiRequest } from "./apiRequest";
 
 /**
- * Satış raporu formatları
+ * Satış raporu formatları (enum değerleri)
  */
 export const SALES_REPORT_FORMAT = {
-  Pdf: "Pdf",
-  Xlsx: "Xlsx",
+  Pdf: 0,
+  Xlsx: 1,
 };
 
 /**
  * Rapor türleri
  */
 export const SALES_REPORT_TYPES = {
-  DAILY_SALES: "DailySales",
-  MONTHLY_SALES: "MonthlySales",
-  PRODUCT_SALES: "ProductSales",
-  CATEGORY_SALES: "CategorySales",
-  CUSTOMER_SALES: "CustomerSales",
+  STANDARD_SALES_REPORT: "StandardSalesReport",
+  TOP_PRODUCT_SALES_REPORT: "TopProductSalesReport",
 };
 
 /**
  * Satış raporu export et
  * @param {Object} exportRequest
- * @param {string} exportRequest.reportType - Rapor türü
- * @param {string} exportRequest.format - Rapor formatı (Pdf/Xlsx)
- * @param {Object} exportRequest.filter - Tarih filtresi
- * @param {string} exportRequest.filter.startDate - Başlangıç tarihi (ISO format)
- * @param {string} exportRequest.filter.endDate - Bitiş tarihi (ISO format)
- * @returns {Promise<Blob>} - Dosya blob'u
+ * @param {string} exportRequest.reportType - Rapor türü ("StandardSalesReport" | "TopProductSalesReport")
+ * @param {number} exportRequest.format - Rapor formatı (0 = Pdf, 1 = Xlsx)
+ * @param {Object} [exportRequest.filter] - Tarih filtresi (opsiyonel)
+ * @param {string} [exportRequest.filter.startDate] - Başlangıç tarihi (ISO format)
+ * @param {string} [exportRequest.filter.endDate] - Bitiş tarihi (ISO format)
+ * @returns {Promise<Object>} - Rapor bilgisi { id, reportType, format, storagePath, expiresAt, status }
  */
 export const exportSalesReport = async (exportRequest) => {
-  const response = await fetch(
-    `${import.meta.env.VITE_API_URL}/api/SellerSalesReport/export`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("sellerToken")}`,
-      },
-      body: JSON.stringify(exportRequest),
-    }
-  );
-
-  if (!response.ok) {
-    throw new Error("Rapor oluşturulamadı");
-  }
-
-  return await response.blob();
+  return await apiRequest("/api/SellerSalesReport/export", "POST", exportRequest, true);
 };
 
 /**
  * Planlanmış rapor oluştur (cron job)
  * @param {Object} scheduleRequest
- * @param {string} scheduleRequest.reportType - Rapor türü
- * @param {string} scheduleRequest.format - Rapor formatı (Pdf/Xlsx)
- * @param {string} scheduleRequest.email - Raporun gönderileceği email
- * @param {string} scheduleRequest.cronExpression - Cron ifadesi (örn: "0 9 * * 1" her pazartesi saat 9)
- * @param {string} scheduleRequest.timezone - Zaman dilimi (örn: "Europe/Istanbul")
- * @param {Object} [scheduleRequest.parameters] - Ek parametreler
- * @returns {Promise<Object>} - Schedule bilgisi
+ * @param {string} scheduleRequest.reportType - Rapor türü ("StandardSalesReport" | "TopProductSalesReport")
+ * @param {number} scheduleRequest.format - Rapor formatı (0 = Pdf, 1 = Xlsx)
+ * @param {string} [scheduleRequest.email] - Raporun gönderileceği email (opsiyonel)
+ * @param {string} [scheduleRequest.cronExpression] - Cron ifadesi (örn: "0 8 * * *" her gün saat 8)
+ * @param {string} [scheduleRequest.timezone] - Zaman dilimi (örn: "Europe/Istanbul", default: UTC)
+ * @param {Object} [scheduleRequest.parameters] - Rapor parametreleri
+ * @param {string} [scheduleRequest.parameters.StartDate] - Başlangıç tarihi (ISO format)
+ * @param {string} [scheduleRequest.parameters.EndDate] - Bitiş tarihi (ISO format)
+ * @returns {Promise<Object>} - Schedule bilgisi { id, reportType, format, email, isActive, lastRunAt, nextRunAt, cronExpression, timezone }
  */
 export const createReportSchedule = async (scheduleRequest) => {
   return await apiRequest("/api/SellerSalesReport/schedules", "POST", scheduleRequest, true);

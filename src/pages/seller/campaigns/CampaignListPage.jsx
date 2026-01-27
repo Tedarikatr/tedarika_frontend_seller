@@ -43,7 +43,7 @@ export default function CampaignListPage() {
   // 🕒 Yükleniyor
   if (loading) {
     return (
-      <div className="p-10 text-center text-gray-500 text-lg animate-pulse">
+      <div className="p-8 sm:p-10 text-center text-gray-500 text-base sm:text-lg animate-pulse">
         Yükleniyor...
       </div>
     );
@@ -52,20 +52,20 @@ export default function CampaignListPage() {
   // ⚠️ Mağaza Yoksa
   if (!hasStore) {
     return (
-      <div className="min-h-[70vh] flex flex-col items-center justify-center text-center bg-gradient-to-br from-[#e6f4f1] via-[#f1f9f7] to-[#f9fdfc] px-6">
-        <div className="bg-white border border-[#00a99d]/30 shadow-xl rounded-2xl px-8 py-6 max-w-lg flex flex-col items-center gap-3">
-          <div className="flex items-center justify-center w-12 h-12 bg-[#00a99d]/10 text-[#00a99d] rounded-full">
-            <AlertCircle className="w-6 h-6" />
+      <div className="min-h-[70vh] flex flex-col items-center justify-center text-center bg-gradient-to-br from-[#e6f4f1] via-[#f1f9f7] to-[#f9fdfc] px-4 sm:px-6">
+        <div className="bg-white border border-[#00a99d]/30 shadow-xl rounded-xl sm:rounded-2xl px-6 sm:px-8 py-5 sm:py-6 max-w-lg flex flex-col items-center gap-3">
+          <div className="flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 bg-[#00a99d]/10 text-[#00a99d] rounded-full">
+            <AlertCircle className="w-5 h-5 sm:w-6 sm:h-6" />
           </div>
-          <h2 className="text-xl font-semibold text-[#003636]">
+          <h2 className="text-lg sm:text-xl font-semibold text-[#003636]">
             Henüz bir mağazanız yok
           </h2>
-          <p className="text-sm text-gray-600">
+          <p className="text-xs sm:text-sm text-gray-600">
             Kampanyaları yönetebilmek için önce bir mağaza oluşturmalısınız.
           </p>
           <button
             onClick={() => navigate("/seller/store/create")}
-            className="mt-3 bg-[#00a99d] hover:bg-[#007a71] text-white text-sm font-semibold px-5 py-2 rounded-lg transition"
+            className="mt-3 bg-[#00a99d] hover:bg-[#007a71] text-white text-xs sm:text-sm font-semibold px-4 sm:px-5 py-2 rounded-lg transition"
           >
             Mağaza Oluştur
           </button>
@@ -76,28 +76,31 @@ export default function CampaignListPage() {
 
   // ✅ Mağaza varsa normal liste
   return (
-    <div className="w-full max-w-6xl mx-auto px-8 py-10 space-y-10 animate-fadeIn">
+    <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-10 space-y-6 sm:space-y-8 lg:space-y-10 animate-fadeIn">
       {/* ÜST BAŞLIK */}
       <div className="flex flex-col md:flex-row justify-between md:items-center gap-6">
-        <div>
-          <h1 className="text-3xl font-bold text-[#003636]">Kampanyalarım</h1>
-          <p className="text-sm text-gray-500 mt-1">
+        <div className="min-w-0 flex-1">
+          <h1 className="text-2xl sm:text-3xl font-bold text-[#003636]">Kampanyalarım</h1>
+          <p className="text-xs sm:text-sm text-gray-500 mt-1">
             Aktif, taslak ve geçmiş kampanyalarınızı buradan yönetebilirsiniz.
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
           <button
             onClick={fetchCampaigns}
-            className="flex items-center gap-2 border border-[#00a99d] text-[#00a99d] px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#00a99d]/10 transition"
+            className="flex items-center gap-1.5 sm:gap-2 border border-[#00a99d] text-[#00a99d] px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium hover:bg-[#00a99d]/10 transition"
           >
-            <RefreshCw size={16} /> Yenile
+            <RefreshCw size={14} className="sm:w-4 sm:h-4" />
+            <span className="hidden sm:inline">Yenile</span>
           </button>
           <Link
             to="/seller/campaigns/new"
-            className="flex items-center gap-2 bg-[#00a99d] hover:bg-[#007a71] text-white px-5 py-2.5 rounded-lg text-sm font-semibold shadow transition"
+            className="flex items-center gap-1.5 sm:gap-2 bg-[#00a99d] hover:bg-[#007a71] text-white px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg text-xs sm:text-sm font-semibold shadow transition"
           >
-            <PlusCircle size={18} /> Yeni Kampanya
+            <PlusCircle size={16} className="sm:w-[18px] sm:h-[18px]" />
+            <span className="hidden sm:inline">Yeni Kampanya</span>
+            <span className="sm:hidden">Yeni</span>
           </Link>
         </div>
       </div>
@@ -113,7 +116,7 @@ export default function CampaignListPage() {
           placeholder="Kampanya adıyla ara..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="w-full border border-gray-300 rounded-lg pl-10 pr-4 py-2 text-sm focus:ring-2 focus:ring-[#00a99d] outline-none transition"
+          className="w-full border border-gray-300 rounded-lg pl-9 sm:pl-10 pr-3 sm:pr-4 py-2 text-xs sm:text-sm focus:ring-2 focus:ring-[#00a99d] outline-none transition"
         />
       </div>
 
@@ -139,18 +142,18 @@ export default function CampaignListPage() {
               <Link
                 key={c.id}
                 to={`/seller/campaigns/${c.id}`}
-                className="flex flex-col md:flex-row justify-between md:items-center p-6 hover:bg-[#e8f5f3] transition"
+                className="flex flex-col md:flex-row justify-between md:items-center p-4 sm:p-6 hover:bg-[#e8f5f3] transition"
               >
                 {/* SOL ALAN */}
-                <div className="space-y-1">
-                  <div className="font-semibold text-[#003636] text-lg">
+                <div className="space-y-1 min-w-0 flex-1">
+                  <div className="font-semibold text-[#003636] text-base sm:text-lg truncate">
                     {c.name || "İsimsiz Kampanya"}
                   </div>
                   <div className="flex items-center flex-wrap gap-2 text-xs text-gray-500">
                     <StatusBadge status={c.status} />
-                    <span>{c.kind}</span>
+                    <span className="truncate">{c.kind}</span>
                     {c.requiresCoupon && (
-                      <span className="bg-[#00a99d]/10 text-[#00a99d] px-2 py-0.5 rounded-full text-[11px] font-medium">
+                      <span className="bg-[#00a99d]/10 text-[#00a99d] px-2 py-0.5 rounded-full text-[11px] font-medium whitespace-nowrap">
                         Kuponlu
                       </span>
                     )}
@@ -158,10 +161,10 @@ export default function CampaignListPage() {
                 </div>
 
                 {/* SAĞ ALAN */}
-                <div className="flex flex-col md:flex-row md:items-center gap-2 text-sm text-gray-600 mt-3 md:mt-0">
+                <div className="flex flex-col md:flex-row md:items-center gap-2 text-xs sm:text-sm text-gray-600 mt-3 md:mt-0">
                   <div className="flex items-center gap-2">
-                    <Calendar size={15} className="text-gray-400" />
-                    <span>
+                    <Calendar size={14} className="sm:w-[15px] sm:h-[15px] text-gray-400 flex-shrink-0" />
+                    <span className="truncate">
                       {formatDate(c.startsAt)} — {formatDate(c.endsAt)}
                     </span>
                   </div>

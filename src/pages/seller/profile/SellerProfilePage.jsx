@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import {
-  AlertTriangle,
-  FileWarning,
   UserCircle,
   Building2,
   Store,
@@ -11,12 +9,9 @@ import {
   Sparkles,
   Award,
   CheckCircle,
-  Bell,
+  Mail,
   Truck,
 } from "lucide-react";
-
-import useSellerSetupStatus from "@/hooks/useSellerSetupStatus";
-import { DOC_LABELS } from "@/constants/companyDocuments";
 
 import SellerInfoCard from "@/components/seller/SellerInfoCard";
 import StoreInfoCard from "@/components/seller/StoreInfoCard";
@@ -33,18 +28,40 @@ const TABS = [
   { key: "subscription", label: "Abonelik", icon: <ShieldCheck className="w-5 h-5" /> },
   { key: "finance", label: "Ödeme", icon: <CreditCard className="w-5 h-5" /> },
   { key: "cargo", label: "Kargo Entegrasyonu", icon: <Truck className="w-5 h-5" /> },
-  { key: "notifications", label: "Bildirimler", icon: <Bell className="w-5 h-5" /> },
+  { key: "notifications", label: "İletişim Tercihleri", icon: <Mail className="w-5 h-5" /> },
 ];
 
 const SellerProfilePage = () => {
-  const nav = useNavigate();
-  const { loading, hasExtraInfo, missingDocs } = useSellerSetupStatus();
+  const location = useLocation();
   const isSubscribed =
     localStorage.getItem("sellerSubscriptionActive") === "true";
 
   const [activeTab, setActiveTab] = useState(
     isSubscribed ? "seller" : "subscription"
   );
+
+  // Hash'ten tab belirleme
+  useEffect(() => {
+    const hash = location.hash.replace("#", "");
+    if (hash && TABS.some((tab) => tab.key === hash)) {
+      setActiveTab(hash);
+    }
+  }, [location.hash]);
+
+  // Custom event ile tab değiştirme (UserMenu'den gelen)
+  useEffect(() => {
+    const handleTabChange = (event) => {
+      const tab = event.detail?.tab;
+      if (tab && TABS.some((t) => t.key === tab)) {
+        setActiveTab(tab);
+      }
+    };
+
+    window.addEventListener("profile-tab-change", handleTabChange);
+    return () => {
+      window.removeEventListener("profile-tab-change", handleTabChange);
+    };
+  }, []);
 
   const renderActiveCard = () => {
     switch (activeTab) {
@@ -68,77 +85,37 @@ const SellerProfilePage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#f9fafa] px-4 sm:px-6 lg:px-16 py-10">
-      {/* Uyarılar */}
-      <div className="max-w-6xl mx-auto space-y-4 mb-8">
-        {!loading && !hasExtraInfo && (
-          <div className="flex items-start gap-4 p-5 rounded-2xl border-2 border-amber-300 bg-gradient-to-r from-amber-50 to-yellow-50 shadow-lg hover:shadow-xl transition-all duration-300">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center text-white shadow-lg flex-shrink-0">
-              <AlertTriangle className="w-6 h-6" />
-            </div>
-            <div className="flex-1 pt-1">
-              <div className="font-bold text-amber-900 text-lg mb-1">Ekstra Bilgiler Eksik</div>
-              <p className="text-sm text-amber-800">
-                KEP adresi, yetkili kişi ve yetkili telefon bilgilerini
-                eklemeniz gerekir.
-              </p>
-            </div>
-            <button
-              onClick={() => nav("/seller/profile/extra-info")}
-              className="shrink-0 px-5 py-3 rounded-xl bg-gradient-to-r from-amber-600 to-amber-700 text-white text-sm font-semibold hover:shadow-lg hover:scale-105 transition-all duration-300"
-            >
-              Bilgileri Ekle
-            </button>
-          </div>
-        )}
-
-        {!loading && missingDocs.length > 0 && (
-          <div className="flex items-start gap-4 p-5 rounded-2xl border-2 border-rose-300 bg-gradient-to-r from-rose-50 to-pink-50 shadow-lg hover:shadow-xl transition-all duration-300">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-rose-500 to-rose-600 flex items-center justify-center text-white shadow-lg flex-shrink-0">
-              <FileWarning className="w-6 h-6" />
-            </div>
-            <div className="flex-1 pt-1">
-              <div className="font-bold text-rose-900 text-lg mb-1">Zorunlu Belgeler Eksik</div>
-              <p className="text-sm text-rose-800">
-                Eksikler: {missingDocs.map((t) => DOC_LABELS[t] || t).join(", ")}
-              </p>
-            </div>
-            <button
-              onClick={() => nav("/seller/company-documents")}
-              className="shrink-0 px-5 py-3 rounded-xl bg-gradient-to-r from-rose-600 to-rose-700 text-white text-sm font-semibold hover:shadow-lg hover:scale-105 transition-all duration-300"
-            >
-              Belge Yükle
-            </button>
-          </div>
-        )}
-      </div>
-
+    <div className="min-h-screen bg-[#f9fafa] px-4 sm:px-6 lg:px-8 xl:px-16 py-6 sm:py-8 lg:py-10">
       {/* Hero Başlık */}
-      <header className="mb-8 relative bg-gradient-to-r from-emerald-600 via-teal-600 to-green-600 rounded-3xl shadow-2xl px-8 py-12 sm:px-12 text-center overflow-hidden">
+      <header className="mb-6 sm:mb-8 relative bg-gradient-to-r from-emerald-600 via-teal-600 to-green-600 rounded-2xl sm:rounded-3xl shadow-2xl px-4 sm:px-6 lg:px-8 xl:px-12 py-8 sm:py-10 lg:py-12 text-center overflow-hidden">
         {/* Dekoratif Arka Plan */}
         <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent pointer-events-none"></div>
-        <div className="absolute top-10 right-10 w-32 h-32 bg-white/10 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-10 left-10 w-40 h-40 bg-purple-400/20 rounded-full blur-3xl"></div>
+        <div className="absolute top-10 right-10 w-32 h-32 bg-white/10 rounded-full blur-3xl hidden sm:block"></div>
+        <div className="absolute bottom-10 left-10 w-40 h-40 bg-purple-400/20 rounded-full blur-3xl hidden sm:block"></div>
         
         <div className="relative z-10">
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center shadow-xl animate-pulse">
-              <Award className="w-8 h-8 text-white" />
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3 mb-4">
+            <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center shadow-xl animate-pulse">
+              <Award className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
             </div>
-            <h1 className="text-5xl font-extrabold text-white tracking-tight">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-extrabold text-white tracking-tight">
               Satıcı Profil Paneli
             </h1>
-            <Sparkles className="w-8 h-8 text-yellow-300 animate-pulse" />
+            <Sparkles className="w-6 h-6 sm:w-8 sm:h-8 text-yellow-300 animate-pulse hidden sm:block" />
             </div>
-            <p className="text-emerald-100 text-lg max-w-2xl mx-auto font-medium">
+            <p className="text-emerald-100 text-sm sm:text-base lg:text-lg max-w-2xl mx-auto font-medium px-2">
               Tedarika satıcı hesabınıza ait tüm bilgileri modern ve sezgisel bir arayüzle görüntüleyin.
             </p>          {/* Modern Tab Navigation */}
-          <nav className="mt-10 flex justify-center flex-wrap gap-3">
+          <nav className="mt-6 sm:mt-8 lg:mt-10 flex justify-center flex-wrap gap-2 sm:gap-3">
             {TABS.map((tab) => (
               <button
                 key={tab.key}
-                onClick={() => setActiveTab(tab.key)}
-                className={`group flex items-center gap-2 px-6 py-3 rounded-2xl text-sm font-bold transition-all duration-300 transform
+                onClick={() => {
+                  setActiveTab(tab.key);
+                  // Hash'i güncelle
+                  window.history.replaceState(null, "", `/seller/profile#${tab.key}`);
+                }}
+                className={`group flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 lg:px-6 py-2 sm:py-2.5 lg:py-3 rounded-xl sm:rounded-2xl text-xs sm:text-sm font-bold transition-all duration-300 transform
                   ${
                     activeTab === tab.key
                       ? "bg-white text-emerald-700 shadow-xl scale-105"
@@ -148,9 +125,10 @@ const SellerProfilePage = () => {
                 <div className={`transition-transform duration-300 ${activeTab === tab.key ? 'scale-110' : 'group-hover:scale-110'}`}>
                   {tab.icon}
                 </div>
-                {tab.label}
+                <span className="hidden sm:inline">{tab.label}</span>
+                <span className="sm:hidden">{tab.label.split(' ')[0]}</span>
                 {activeTab === tab.key && (
-                  <CheckCircle className="w-4 h-4 ml-1" />
+                  <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 ml-1" />
                 )}
               </button>
             ))}

@@ -54,7 +54,7 @@ const colorMap = {
 
 const StatCard = ({ title, value, icon, delay }) => (
   <motion.div
-    className="relative bg-gradient-to-br from-white to-gray-50 border-2 border-gray-200 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 p-6 overflow-hidden group"
+    className="relative bg-gradient-to-br from-white to-gray-50 border-2 border-gray-200 rounded-xl sm:rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 p-4 sm:p-6 overflow-hidden group"
     whileHover={{ scale: 1.03, y: -4 }}
     initial={{ opacity: 0, y: 20 }}
     animate={{ opacity: 1, y: 0 }}
@@ -63,14 +63,14 @@ const StatCard = ({ title, value, icon, delay }) => (
     {/* Background Gradient on Hover */}
     <div className={`absolute inset-0 bg-gradient-to-br ${colorMap[title]} opacity-0 group-hover:opacity-5 transition-opacity duration-300`} />
 
-    <div className="relative z-10 flex flex-col gap-3">
+    <div className="relative z-10 flex flex-col gap-2 sm:gap-3">
       <div className="flex justify-between items-start">
-        <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide">{title}</p>
-        <div className="p-2 bg-gray-100 rounded-xl group-hover:scale-110 transition-transform duration-300">
+        <p className="text-xs sm:text-sm font-semibold text-gray-600 uppercase tracking-wide">{title}</p>
+        <div className="p-1.5 sm:p-2 bg-gray-100 rounded-lg sm:rounded-xl group-hover:scale-110 transition-transform duration-300">
           {icon}
         </div>
       </div>
-      <p className="text-3xl font-bold text-gray-900 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-emerald-600 group-hover:to-teal-600 transition-all duration-300">
+      <p className="text-2xl sm:text-3xl font-bold text-gray-900 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-emerald-600 group-hover:to-teal-600 transition-all duration-300">
         {value}
       </p>
     </div>
@@ -172,22 +172,22 @@ const DashboardPage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50 px-6 py-8 font-sans">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50 px-4 sm:px-6 lg:px-8 py-6 sm:py-8 font-sans">
       {/* Başlık */}
       <motion.div
-        className="mb-10"
+        className="mb-6 sm:mb-10"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <h1 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-emerald-600 via-teal-600 to-green-600 bg-clip-text text-transparent mb-2">
+        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-emerald-600 via-teal-600 to-green-600 bg-clip-text text-transparent mb-2">
           Satıcı Paneli
         </h1>
-        <p className="text-gray-600 text-lg">Mağazanızın genel durumunu buradan takip edebilirsiniz</p>
+        <p className="text-gray-600 text-sm sm:text-base lg:text-lg">Mağazanızın genel durumunu buradan takip edebilirsiniz</p>
       </motion.div>
 
       {/* Özet Kartlar */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-10">
         {stats.map((stat, idx) => (
           <StatCard
             key={stat.title}
@@ -201,16 +201,16 @@ const DashboardPage = () => {
 
       {/* 🔗 Hızlı Kısayollar */}
       <motion.div
-        className="mb-10"
+        className="mb-6 sm:mb-10"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
       >
-        <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
-          <span className="w-1 h-8 bg-gradient-to-b from-emerald-600 to-teal-600 rounded-full"></span>
+        <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4 sm:mb-6 flex items-center gap-2">
+          <span className="w-1 h-6 sm:h-8 bg-gradient-to-b from-emerald-600 to-teal-600 rounded-full"></span>
           Hızlı Erişim
         </h2>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-5">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 lg:gap-5">
           {[
             { to: "/seller/products/my-store", icon: <FaBox />, label: "Ürünlerim", color: "from-blue-500 to-indigo-600" },
             { to: "/seller/products/draft/upload", icon: <Upload />, label: "Ürün Yükleme", color: "from-green-500 to-emerald-600" },
@@ -218,7 +218,7 @@ const DashboardPage = () => {
             { to: "/seller/quotations", icon: <FaHandshake />, label: "Teklifler", color: "from-purple-500 to-violet-600" },
             { to: "/seller/campaigns", icon: <FaBullhorn />, label: "Kampanyalar", color: "from-orange-500 to-amber-600" },
             { to: "/seller/chat", icon: <FaComments />, label: "Mesajlar", color: "from-pink-500 to-rose-600" },
-            { to: "/seller/store/update", icon: <FaStore />, label: "Mağazam", color: "from-cyan-500 to-blue-600" },
+            { to: "/seller/profile#store", icon: <FaStore />, label: "Mağazam", color: "from-cyan-500 to-blue-600" },
           ].map((item, idx) => (
             <motion.div
               key={idx}
@@ -228,16 +228,16 @@ const DashboardPage = () => {
             >
               <Link
                 to={item.to}
-                className="group relative bg-white hover:bg-gradient-to-br hover:from-white hover:to-gray-50 border-2 border-gray-200 hover:border-gray-300 rounded-2xl flex flex-col items-center justify-center p-6 transition-all shadow-md hover:shadow-xl overflow-hidden"
+                className="group relative bg-white hover:bg-gradient-to-br hover:from-white hover:to-gray-50 border-2 border-gray-200 hover:border-gray-300 rounded-xl sm:rounded-2xl flex flex-col items-center justify-center p-4 sm:p-6 transition-all shadow-md hover:shadow-xl overflow-hidden"
               >
                 {/* Gradient overlay on hover */}
                 <div className={`absolute inset-0 bg-gradient-to-br ${item.color} opacity-0 group-hover:opacity-10 transition-opacity duration-300`} />
 
-                <div className="relative z-10 flex flex-col items-center gap-3">
-                  <div className={`p-4 bg-gradient-to-br ${item.color} rounded-xl text-white text-2xl shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+                <div className="relative z-10 flex flex-col items-center gap-2 sm:gap-3">
+                  <div className={`p-3 sm:p-4 bg-gradient-to-br ${item.color} rounded-lg sm:rounded-xl text-white text-xl sm:text-2xl shadow-lg group-hover:scale-110 transition-transform duration-300`}>
                     {item.icon}
                   </div>
-                  <span className="text-sm font-semibold text-gray-700 group-hover:text-gray-900 transition-colors">
+                  <span className="text-xs sm:text-sm font-semibold text-gray-700 group-hover:text-gray-900 transition-colors text-center">
                     {item.label}
                   </span>
                 </div>
@@ -249,7 +249,7 @@ const DashboardPage = () => {
 
       {/* Grafikler */}
       <motion.div
-        className="grid grid-cols-1 lg:grid-cols-3 gap-6"
+        className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6"
         initial="hidden"
         animate="visible"
         variants={{
@@ -259,15 +259,15 @@ const DashboardPage = () => {
       >
         {/* Line Chart */}
         <motion.div
-          className="col-span-2 bg-gradient-to-br from-white to-gray-50 border-2 border-gray-200 rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-shadow duration-300"
+          className="col-span-1 lg:col-span-2 bg-gradient-to-br from-white to-gray-50 border-2 border-gray-200 rounded-xl sm:rounded-2xl p-4 sm:p-6 lg:p-8 shadow-xl hover:shadow-2xl transition-shadow duration-300"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
         >
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-1 h-8 bg-gradient-to-b from-emerald-600 to-teal-600 rounded-full"></div>
-            <h3 className="text-xl font-bold text-gray-800">Haftalık Satış Grafiği</h3>
+          <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
+            <div className="w-1 h-6 sm:h-8 bg-gradient-to-b from-emerald-600 to-teal-600 rounded-full"></div>
+            <h3 className="text-lg sm:text-xl font-bold text-gray-800">Haftalık Satış Grafiği</h3>
           </div>
-          <ResponsiveContainer width="100%" height={260}>
+          <ResponsiveContainer width="100%" height={240}>
             <LineChart data={weeklyChart}>
               <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
               <XAxis dataKey="name" stroke="#6B7280" style={{ fontSize: '14px', fontWeight: '500' }} />
@@ -305,15 +305,15 @@ const DashboardPage = () => {
 
         {/* Pie Chart */}
         <motion.div
-          className="bg-gradient-to-br from-white to-gray-50 border-2 border-gray-200 rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-shadow duration-300"
+          className="bg-gradient-to-br from-white to-gray-50 border-2 border-gray-200 rounded-xl sm:rounded-2xl p-4 sm:p-6 lg:p-8 shadow-xl hover:shadow-2xl transition-shadow duration-300"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
         >
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-1 h-8 bg-gradient-to-b from-blue-600 to-indigo-600 rounded-full"></div>
-            <h3 className="text-xl font-bold text-gray-800">Sipariş Durumu</h3>
+          <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
+            <div className="w-1 h-6 sm:h-8 bg-gradient-to-b from-blue-600 to-indigo-600 rounded-full"></div>
+            <h3 className="text-lg sm:text-xl font-bold text-gray-800">Sipariş Durumu</h3>
           </div>
-          <ResponsiveContainer width="100%" height={260}>
+          <ResponsiveContainer width="100%" height={240}>
             <PieChart>
               <Pie
                 data={[

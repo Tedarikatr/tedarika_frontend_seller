@@ -3,10 +3,12 @@ import {
   getBrandList,
   getBrandOwnership,
   getOwnedBrands,
-  requestBrandOwnership,
 } from "@/api/brandservice";
 import OwnedBrandsSection from "@/components/Brand/OwnedBrandsSection";
 import BrandList from "@/components/Brand/BrandList";
+import OwnershipStatusSection from "@/components/Brand/OwnershipStatusSection";
+import CreateBrandModal from "@/components/Brand/CreateBrandModal";
+import OwnershipRequestModal from "@/components/Brand/OwnershipRequestModal";
 import Pagination from "@/components/ui/Pagination";
 import Toast from "@/components/ui/Toast";
 import {
@@ -15,7 +17,8 @@ import {
   Search,
   CheckCircle,
   Package,
-  TrendingUp
+  TrendingUp,
+  Plus
 } from "lucide-react";
 
 export default function SellerBrandPage() {
@@ -23,11 +26,15 @@ export default function SellerBrandPage() {
   const [ownerships, setOwnerships] = useState([]);
   const [ownedBrands, setOwnedBrands] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [sending, setSending] = useState(false);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [pageSize] = useState(10);
   const [activeTab, setActiveTab] = useState("owned");
+
+  // Modal states
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showRequestModal, setShowRequestModal] = useState(false);
+  const [selectedBrand, setSelectedBrand] = useState({ id: null, name: "" });
 
   const [toast, setToast] = useState({ show: false, message: "", type: "success" });
   const showToast = (message, type = "success") => setToast({ show: true, message, type });
@@ -67,23 +74,19 @@ export default function SellerBrandPage() {
     return filteredBrands.slice(start, start + pageSize);
   }, [filteredBrands, page, pageSize]);
 
-  const handleOwnershipRequest = async (brandId, type = "Owner") => {
-    const payload = {
-      brandId,
-      ownershipType: type,
-      expiryDate: new Date(new Date().setFullYear(new Date().getFullYear() + 1)),
-      notes: "Marka sahipliği başvurusu",
-    };
-    setSending(true);
-    try {
-      await requestBrandOwnership(payload);
-      await fetchData();
-      showToast("Başvuru başarıyla gönderildi!", "success");
-    } catch (err) {
-      showToast("Başvuru hatası: " + err.message, "error");
-    } finally {
-      setSending(false);
-    }
+  const handleOwnershipRequest = (brandId, brandName) => {
+    setSelectedBrand({ id: brandId, name: brandName });
+    setShowRequestModal(true);
+  };
+
+  const handleRequestSuccess = (result) => {
+    fetchData();
+    showToast(result?.message || "Başvuru başarıyla gönderildi!", "success");
+  };
+
+  const handleCreateSuccess = (result) => {
+    fetchData();
+    showToast("Marka başarıyla oluşturuldu! Admin onayı bekleniyor.", "success");
   };
 
   // Stats
@@ -146,18 +149,36 @@ export default function SellerBrandPage() {
           />
         </div>
 
+        {/* Action Buttons */}
+        <div className="mb-6 flex flex-col sm:flex-row gap-4">
+          <button
+            onClick={() => setShowCreateModal(true)}
+            className="flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-bold hover:shadow-lg transition-all duration-300 hover:scale-105"
+          >
+            <Plus className="w-5 h-5" />
+            Yeni Marka Oluştur
+          </button>
+        </div>
+
         {/* Tabs */}
         <div className="flex gap-4 mb-6 bg-white rounded-2xl p-2 shadow-lg border-2 border-gray-200">
-          {["owned", "all"].map((tab) => (
+          {["owned", "status", "all"].map((tab) => (
             <button
               key={tab}
-              onClick={() => setActiveTab(tab)}
+              onClick={() => {
+                setActiveTab(tab);
+                setPage(1);
+              }}
               className={`flex-1 px-6 py-3 rounded-xl font-bold text-sm transition-all duration-300 ${activeTab === tab
                 ? "bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-lg scale-105"
                 : "text-gray-600 hover:bg-gray-100"
                 }`}
             >
-              {tab === "owned" ? "Sahip Olduklarım" : "Tüm Markalar"}
+              {tab === "owned" 
+                ? "Sahip Olduklarım" 
+                : tab === "status"
+                ? "Başvuru Durumları"
+                : "Tüm Markalar"}
             </button>
           ))}
         </div>
@@ -172,6 +193,8 @@ export default function SellerBrandPage() {
           </div>
         ) : activeTab === "owned" ? (
           <OwnedBrandsSection ownedBrands={ownedBrands} />
+        ) : activeTab === "status" ? (
+          <OwnershipStatusSection ownerships={ownerships} />
         ) : (
           <>
             {/* Search Bar */}
@@ -195,7 +218,7 @@ export default function SellerBrandPage() {
             <BrandList
               brands={visibleBrands}
               ownerships={ownerships}
-              sending={sending}
+              sending={false}
               onOwnershipRequest={handleOwnershipRequest}
             />
 
@@ -212,6 +235,24 @@ export default function SellerBrandPage() {
             )}
           </>
         )}
+
+        {/* Modals */}
+        <CreateBrandModal
+          isOpen={showCreateModal}
+          onClose={() => setShowCreateModal(false)}
+          onSuccess={handleCreateSuccess}
+        />
+
+        <OwnershipRequestModal
+          isOpen={showRequestModal}
+          onClose={() => {
+            setShowRequestModal(false);
+            setSelectedBrand({ id: null, name: "" });
+          }}
+          brandId={selectedBrand.id}
+          brandName={selectedBrand.name}
+          onSuccess={handleRequestSuccess}
+        />
 
         {toast.show && (
           <Toast

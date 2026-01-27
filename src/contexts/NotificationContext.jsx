@@ -1,0 +1,165 @@
+import { createContext, useContext, useState, useEffect, useCallback } from "react";
+
+const NotificationContext = createContext(null);
+
+export const useNotification = () => {
+  const context = useContext(NotificationContext);
+  if (!context) {
+    throw new Error("useNotification must be used within NotificationProvider");
+  }
+  return context;
+};
+
+const STORAGE_KEY = "seller_notifications";
+
+// Bildirim tipleri
+export const NOTIFICATION_TYPES = {
+  WARNING: "warning",
+  ERROR: "error",
+  INFO: "info",
+  SUCCESS: "success",
+};
+
+// Varsayılan bildirimler
+const getDefaultNotifications = () => [
+  {
+    id: "extra-info-missing",
+    type: NOTIFICATION_TYPES.WARNING,
+    title: "Ekstra Bilgiler Eksik",
+    message: "KEP adresi, yetkili kişi ve yetkili telefon bilgilerini eklemeniz gerekir.",
+    actionLabel: "Bilgileri Ekle",
+    actionUrl: "/seller/profile/extra-info",
+    read: false,
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: "required-documents-missing",
+    type: NOTIFICATION_TYPES.ERROR,
+    title: "Zorunlu Belgeler Eksik",
+    message: "Eksikler: Vergi Levhası, Ticaret Sicil Kaydı, Kuruluş Sicil Gazetesi",
+    actionLabel: "Belge Yükle",
+    actionUrl: "/seller/profile",
+    read: false,
+    createdAt: new Date().toISOString(),
+  },
+];
+
+export const NotificationProvider = ({ children }) => {
+  const [notifications, setNotifications] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // localStorage'dan bildirimleri yükle
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        setNotifications(parsed);
+      } else {
+        // İlk yüklemede varsayılan bildirimleri ekle
+        setNotifications(getDefaultNotifications());
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(getDefaultNotifications()));
+      }
+    } catch (error) {
+      console.error("Bildirimler yüklenirken hata:", error);
+      setNotifications(getDefaultNotifications());
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  // localStorage'a kaydet
+  const saveToStorage = useCallback((newNotifications) => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(newNotifications));
+    } catch (error) {
+      console.error("Bildirimler kaydedilirken hata:", error);
+    }
+  }, []);
+
+  // Bildirim ekle
+  const addNotification = useCallback(
+    (notification) => {
+      const newNotification = {
+        id: notification.id || `notif-${Date.now()}-${Math.random()}`,
+        type: notification.type || NOTIFICATION_TYPES.INFO,
+        title: notification.title,
+        message: notification.message,
+        actionLabel: notification.actionLabel,
+        actionUrl: notification.actionUrl,
+        read: false,
+        createdAt: notification.createdAt || new Date().toISOString(),
+      };
+
+      setNotifications((prev) => {
+        const updated = [newNotification, ...prev];
+        saveToStorage(updated);
+        return updated;
+      });
+
+      return newNotification.id;
+    },
+    [saveToStorage]
+  );
+
+  // Bildirimi okundu olarak işaretle
+  const markAsRead = useCallback(
+    (id) => {
+      setNotifications((prev) => {
+        const updated = prev.map((notif) =>
+          notif.id === id ? { ...notif, read: true } : notif
+        );
+        saveToStorage(updated);
+        return updated;
+      });
+    },
+    [saveToStorage]
+  );
+
+  // Tüm bildirimleri okundu olarak işaretle
+  const markAllAsRead = useCallback(() => {
+    setNotifications((prev) => {
+      const updated = prev.map((notif) => ({ ...notif, read: true }));
+      saveToStorage(updated);
+      return updated;
+    });
+  }, [saveToStorage]);
+
+  // Bildirimi sil
+  const removeNotification = useCallback(
+    (id) => {
+      setNotifications((prev) => {
+        const updated = prev.filter((notif) => notif.id !== id);
+        saveToStorage(updated);
+        return updated;
+      });
+    },
+    [saveToStorage]
+  );
+
+  // Tüm bildirimleri temizle
+  const clearAll = useCallback(() => {
+    setNotifications([]);
+    localStorage.removeItem(STORAGE_KEY);
+  }, []);
+
+  // Okunmamış bildirim sayısı
+  const unreadCount = notifications.filter((n) => !n.read).length;
+
+  const value = {
+    notifications,
+    isLoading,
+    unreadCount,
+    addNotification,
+    markAsRead,
+    markAllAsRead,
+    removeNotification,
+    clearAll,
+  };
+
+  return (
+    <NotificationContext.Provider value={value}>
+      {children}
+    </NotificationContext.Provider>
+  );
+};

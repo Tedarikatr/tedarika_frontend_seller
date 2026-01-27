@@ -19,3 +19,8 @@ export async function getBrandOwnership() {
 export async function requestBrandOwnership(data) {
   return await apiRequest("SellerBrand/ownership-request", "POST", data, true);
 }
+
+// ✅ Yeni marka oluşturma
+export async function createBrand(formData) {
+  return await apiRequest("SellerBrand/create", "POST", formData, true);
+}

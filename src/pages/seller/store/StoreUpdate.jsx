@@ -124,52 +124,52 @@ const StoreUpdate = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-emerald-50 py-12 px-4 sm:px-6 lg:px-12">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-emerald-50 py-6 sm:py-8 lg:py-12 px-4 sm:px-6 lg:px-8 xl:px-12">
       <div className="max-w-5xl mx-auto">
         {/* Hero Header */}
         <motion.div 
-          className="relative bg-gradient-to-br from-emerald-600 via-teal-600 to-green-600 rounded-3xl shadow-2xl p-12 mb-8 overflow-hidden"
+          className="relative bg-gradient-to-br from-emerald-600 via-teal-600 to-green-600 rounded-2xl sm:rounded-3xl shadow-2xl p-6 sm:p-8 lg:p-12 mb-6 sm:mb-8 overflow-hidden"
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
           {/* Decorative elements */}
-          <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl" />
-          <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/10 rounded-full blur-3xl" />
+          <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl hidden sm:block" />
+          <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/10 rounded-full blur-3xl hidden sm:block" />
           
           <div className="relative z-10">
-            <div className="flex items-center gap-4 mb-6">
+            <div className="flex items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
               <motion.div 
-                className="bg-white/20 backdrop-blur-sm text-white p-4 rounded-2xl shadow-lg"
+                className="bg-white/20 backdrop-blur-sm text-white p-3 sm:p-4 rounded-xl sm:rounded-2xl shadow-lg flex-shrink-0"
                 whileHover={{ scale: 1.1, rotate: 5 }}
                 transition={{ duration: 0.3 }}
               >
-                <Store size={32} />
+                <Store size={24} className="sm:w-8 sm:h-8" />
               </motion.div>
-              <div className="flex-1">
-                <h1 className="text-4xl sm:text-5xl font-bold text-white mb-2 flex items-center gap-3">
-                  Mağaza Bilgilerini Güncelle
-                  <Sparkles className="w-8 h-8 text-yellow-300 animate-pulse" />
+              <div className="flex-1 min-w-0">
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold text-white mb-2 flex flex-wrap items-center gap-2 sm:gap-3">
+                  <span>Mağaza Bilgilerini Güncelle</span>
+                  <Sparkles className="w-6 h-6 sm:w-8 sm:h-8 text-yellow-300 animate-pulse flex-shrink-0" />
                 </h1>
-                <p className="text-emerald-50 text-lg">
+                <p className="text-emerald-50 text-sm sm:text-base lg:text-lg">
                   Mağazanızı daha çekici hale getirin ve müşterilerinizle güçlü bir bağ kurun
                 </p>
               </div>
             </div>
             
             {/* Stats */}
-            <div className="grid grid-cols-3 gap-4 mt-8">
-              <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center">
-                <div className="text-3xl font-bold text-white">24/7</div>
-                <div className="text-sm text-emerald-100">Görünürlük</div>
+            <div className="grid grid-cols-3 gap-2 sm:gap-4 mt-4 sm:mt-8">
+              <div className="bg-white/10 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 text-center">
+                <div className="text-2xl sm:text-3xl font-bold text-white">24/7</div>
+                <div className="text-xs sm:text-sm text-emerald-100">Görünürlük</div>
               </div>
-              <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center">
-                <div className="text-3xl font-bold text-white">∞</div>
-                <div className="text-sm text-emerald-100">Potansiyel Müşteri</div>
+              <div className="bg-white/10 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 text-center">
+                <div className="text-2xl sm:text-3xl font-bold text-white">∞</div>
+                <div className="text-xs sm:text-sm text-emerald-100">Potansiyel Müşteri</div>
               </div>
-              <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center">
-                <div className="text-3xl font-bold text-white">%100</div>
-                <div className="text-sm text-emerald-100">Profesyonel</div>
+              <div className="bg-white/10 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 text-center">
+                <div className="text-2xl sm:text-3xl font-bold text-white">%100</div>
+                <div className="text-xs sm:text-sm text-emerald-100">Profesyonel</div>
               </div>
             </div>
           </div>
@@ -177,17 +177,17 @@ const StoreUpdate = () => {
 
         {/* Form Card */}
         <motion.div 
-          className="bg-white border-2 border-gray-200 shadow-2xl rounded-3xl p-10"
+          className="bg-white border-2 border-gray-200 shadow-2xl rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-10"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
         >
-          <form onSubmit={handleSubmit} className="space-y-8">
+          <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8">
             {/* Store Name & Description */}
-            <div className="grid grid-cols-1 gap-6">
+            <div className="grid grid-cols-1 gap-4 sm:gap-6">
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
-                  <Store className="w-4 h-4 text-emerald-600" />
+                <label className="block text-xs sm:text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
+                  <Store className="w-3 h-3 sm:w-4 sm:h-4 text-emerald-600" />
                   Mağaza Adı *
                 </label>
                 <input
@@ -195,13 +195,13 @@ const StoreUpdate = () => {
                   value={form.storeName}
                   onChange={handleChange}
                   placeholder="Mağazanızın adını girin"
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 transition-all text-gray-900 placeholder-gray-400"
+                  className="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base border-2 border-gray-200 rounded-lg sm:rounded-xl focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 transition-all text-gray-900 placeholder-gray-400"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-emerald-600" />
+                <label className="block text-xs sm:text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
+                  <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 text-emerald-600" />
                   Mağaza Açıklaması
                 </label>
                 <textarea
@@ -210,26 +210,26 @@ const StoreUpdate = () => {
                   onChange={handleChange}
                   placeholder="Mağazanızı tanıtın, müşterilerinize kendinizi anlatan bir metin yazın..."
                   rows={4}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 transition-all text-gray-900 placeholder-gray-400"
+                  className="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base border-2 border-gray-200 rounded-lg sm:rounded-xl focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 transition-all text-gray-900 placeholder-gray-400 resize-none"
                 />
               </div>
             </div>
 
             {/* Logo */}
-            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-2xl p-6">
-              <label className="block text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-                <ImageIcon className="w-5 h-5 text-blue-600" />
+            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-xl sm:rounded-2xl p-4 sm:p-6">
+              <label className="block text-base sm:text-lg font-bold text-gray-800 mb-3 sm:mb-4 flex items-center gap-2">
+                <ImageIcon className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
                 Mağaza Logosu
               </label>
               
               {currentLogoUrl && !form.logoFile && (
-                <div className="mb-4 flex items-center gap-4">
+                <div className="mb-3 sm:mb-4 flex items-center gap-3 sm:gap-4">
                   <img
                     src={currentLogoUrl}
                     alt="Mevcut Logo"
-                    className="h-20 w-20 rounded-xl border-2 border-white object-cover shadow-md"
+                    className="h-16 w-16 sm:h-20 sm:w-20 rounded-lg sm:rounded-xl border-2 border-white object-cover shadow-md flex-shrink-0"
                   />
-                  <div className="text-sm text-gray-600">
+                  <div className="text-xs sm:text-sm text-gray-600 min-w-0 flex-1">
                     <p className="font-semibold">Mevcut Logo</p>
                     <p className="text-xs">Yeni bir dosya seçerek değiştirebilirsiniz</p>
                   </div>
@@ -246,38 +246,38 @@ const StoreUpdate = () => {
                 />
                 <label
                   htmlFor="logoFile"
-                  className="flex items-center justify-center gap-3 px-6 py-4 bg-white border-2 border-dashed border-blue-300 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-all cursor-pointer group"
+                  className="flex items-center justify-center gap-2 sm:gap-3 px-4 sm:px-6 py-3 sm:py-4 bg-white border-2 border-dashed border-blue-300 rounded-lg sm:rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-all cursor-pointer group"
                 >
-                  <Upload className="w-5 h-5 text-blue-600 group-hover:scale-110 transition-transform" />
-                  <span className="font-semibold text-gray-700">
-                    {form.logoFile ? form.logoFile.name : "Logo Dosyası Seç"}
+                  <Upload className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 group-hover:scale-110 transition-transform" />
+                  <span className="font-semibold text-gray-700 text-sm sm:text-base text-center truncate">
+                    {form.logoFile ? (form.logoFile.name.length > 20 ? form.logoFile.name.substring(0, 20) + '...' : form.logoFile.name) : "Logo Dosyası Seç"}
                   </span>
                 </label>
               </div>
               
               {form.logoFile && (
-                <div className="mt-3 flex items-center gap-2 text-sm text-green-600">
-                  <CheckCircle className="w-4 h-4" />
-                  <span>Yeni logo yüklenecek: {form.logoFile.name}</span>
+                <div className="mt-3 flex items-center gap-2 text-xs sm:text-sm text-green-600">
+                  <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <span className="truncate">Yeni logo yüklenecek: {form.logoFile.name}</span>
                 </div>
               )}
             </div>
 
             {/* Banner */}
-            <div className="bg-gradient-to-br from-purple-50 to-pink-50 border-2 border-purple-200 rounded-2xl p-6">
-              <label className="block text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-                <ImageIcon className="w-5 h-5 text-purple-600" />
+            <div className="bg-gradient-to-br from-purple-50 to-pink-50 border-2 border-purple-200 rounded-xl sm:rounded-2xl p-4 sm:p-6">
+              <label className="block text-base sm:text-lg font-bold text-gray-800 mb-3 sm:mb-4 flex items-center gap-2">
+                <ImageIcon className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600" />
                 Mağaza Banner Görseli
               </label>
               
               {currentBannerUrl && !form.bannerFile && (
-                <div className="mb-4">
+                <div className="mb-3 sm:mb-4">
                   <img
                     src={currentBannerUrl}
                     alt="Mevcut Banner"
-                    className="w-full h-32 rounded-xl border-2 border-white object-cover shadow-md"
+                    className="w-full h-24 sm:h-32 rounded-lg sm:rounded-xl border-2 border-white object-cover shadow-md"
                   />
-                  <p className="text-sm text-gray-600 mt-2">Mevcut banner görseliniz</p>
+                  <p className="text-xs sm:text-sm text-gray-600 mt-2">Mevcut banner görseliniz</p>
                 </div>
               )}
               
@@ -291,37 +291,37 @@ const StoreUpdate = () => {
                 />
                 <label
                   htmlFor="bannerFile"
-                  className="flex items-center justify-center gap-3 px-6 py-4 bg-white border-2 border-dashed border-purple-300 rounded-xl hover:border-purple-500 hover:bg-purple-50 transition-all cursor-pointer group"
+                  className="flex items-center justify-center gap-2 sm:gap-3 px-4 sm:px-6 py-3 sm:py-4 bg-white border-2 border-dashed border-purple-300 rounded-lg sm:rounded-xl hover:border-purple-500 hover:bg-purple-50 transition-all cursor-pointer group"
                 >
-                  <Upload className="w-5 h-5 text-purple-600 group-hover:scale-110 transition-transform" />
-                  <span className="font-semibold text-gray-700">
-                    {form.bannerFile ? form.bannerFile.name : "Banner Dosyası Seç"}
+                  <Upload className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600 group-hover:scale-110 transition-transform" />
+                  <span className="font-semibold text-gray-700 text-sm sm:text-base text-center truncate">
+                    {form.bannerFile ? (form.bannerFile.name.length > 20 ? form.bannerFile.name.substring(0, 20) + '...' : form.bannerFile.name) : "Banner Dosyası Seç"}
                   </span>
                 </label>
               </div>
               
               {form.bannerFile && (
-                <div className="mt-3 flex items-center gap-2 text-sm text-green-600">
-                  <CheckCircle className="w-4 h-4" />
-                  <span>Yeni banner yüklenecek: {form.bannerFile.name}</span>
+                <div className="mt-3 flex items-center gap-2 text-xs sm:text-sm text-green-600">
+                  <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <span className="truncate">Yeni banner yüklenecek: {form.bannerFile.name}</span>
                 </div>
               )}
             </div>
 
             {/* Kategoriler */}
             <div>
-              <label className="block text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-orange-600" />
+              <label className="block text-base sm:text-lg font-bold text-gray-800 mb-3 sm:mb-4 flex items-center gap-2">
+                <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-orange-600" />
                 Mağaza Kategorileri *
               </label>
-              <p className="text-sm text-gray-600 mb-4">Mağazanızın faaliyet gösterdiği kategorileri seçin</p>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              <p className="text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4">Mağazanızın faaliyet gösterdiği kategorileri seçin</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3">
               {categories.map((cat) => {
                 const selected = form.categoryIds.includes(cat.id);
                 return (
                   <motion.label
                     key={cat.id}
-                    className={`flex items-center gap-3 px-4 py-3 border-2 rounded-xl text-sm transition-all cursor-pointer ${
+                    className={`flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-3 border-2 rounded-lg sm:rounded-xl text-xs sm:text-sm transition-all cursor-pointer ${
                       selected
                         ? "bg-gradient-to-br from-emerald-50 to-teal-50 border-emerald-500 text-emerald-800 font-bold shadow-md"
                         : "bg-white border-gray-200 hover:border-emerald-300 hover:shadow-sm"
@@ -333,12 +333,12 @@ const StoreUpdate = () => {
                       type="checkbox"
                       checked={selected}
                       onChange={() => toggleCategory(cat.id)}
-                      className="w-5 h-5 accent-emerald-600 cursor-pointer"
+                      className="w-4 h-4 sm:w-5 sm:h-5 accent-emerald-600 cursor-pointer flex-shrink-0"
                     />
-                    <span className={selected ? "text-emerald-900" : "text-gray-700"}>
+                    <span className={`${selected ? "text-emerald-900" : "text-gray-700"} truncate flex-1`}>
                       {cat.name}
                     </span>
-                    {selected && <CheckCircle className="w-4 h-4 text-emerald-600 ml-auto" />}
+                    {selected && <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-emerald-600 ml-auto flex-shrink-0" />}
                   </motion.label>
                 );
               })}
@@ -346,22 +346,23 @@ const StoreUpdate = () => {
             </div>
 
             {/* Submit Button */}
-            <div className="pt-6">
+            <div className="pt-4 sm:pt-6">
               <motion.button
                 type="submit"
                 disabled={submitting}
-                className="w-full bg-gradient-to-r from-emerald-600 via-teal-600 to-green-600 text-white font-bold py-4 rounded-xl shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all disabled:opacity-50 disabled:hover:scale-100 disabled:cursor-not-allowed text-lg"
+                className="w-full bg-gradient-to-r from-emerald-600 via-teal-600 to-green-600 text-white font-bold py-3 sm:py-4 rounded-lg sm:rounded-xl shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all disabled:opacity-50 disabled:hover:scale-100 disabled:cursor-not-allowed text-sm sm:text-base lg:text-lg"
                 whileHover={{ scale: submitting ? 1 : 1.02 }}
                 whileTap={{ scale: submitting ? 1 : 0.98 }}
               >
                 {submitting ? (
                   <span className="flex items-center justify-center gap-2">
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    Güncelleniyor...
+                    <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <span className="hidden sm:inline">Güncelleniyor...</span>
+                    <span className="sm:hidden">Yükleniyor...</span>
                   </span>
                 ) : (
                   <span className="flex items-center justify-center gap-2">
-                    <CheckCircle className="w-5 h-5" />
+                    <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5" />
                     Mağazayı Güncelle
                   </span>
                 )}
@@ -373,7 +374,7 @@ const StoreUpdate = () => {
               <motion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className={`p-4 rounded-xl text-center font-semibold ${
+                className={`p-3 sm:p-4 rounded-lg sm:rounded-xl text-center font-semibold text-xs sm:text-sm ${
                   message.includes("✅")
                     ? "bg-green-100 text-green-800 border-2 border-green-300"
                     : "bg-red-100 text-red-800 border-2 border-red-300"

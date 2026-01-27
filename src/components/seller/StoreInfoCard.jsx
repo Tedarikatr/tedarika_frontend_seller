@@ -68,6 +68,9 @@ const StoreInfoCard = () => {
     );
   }
 
+  const logoUrl = store.logoUrl || store.LogoUrl || "";
+  const bannerUrl = store.bannerImageUrl || store.BannerImageUrl || "";
+
   return (
     <div className="bg-white shadow-sm border border-gray-200 rounded-2xl p-6 w-full">
       <div className="mb-6 border-b pb-4 flex justify-between items-center">
@@ -79,22 +82,43 @@ const StoreInfoCard = () => {
         </div>
         <button
           onClick={() => navigate("/seller/store/update")}
-          className="bg-gradient-to-r from-[#003636] to-[#006666] hover:brightness-110 text-white font-semibold text-sm py-2 px-5 rounded-lg shadow-md transition"
+          className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-semibold text-sm py-2.5 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
         >
           Bilgileri Güncelle
         </button>
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-6">
-        {/* Görsel varsa göster (şu an API'de yok) */}
-        {store.imageUrl && (
+      {/* Banner Görseli */}
+      {bannerUrl && (
+        <div className="mb-6 rounded-2xl overflow-hidden border-2 border-gray-200 shadow-lg">
           <img
-            src={store.imageUrl}
-            alt="Mağaza Görseli"
-            className="w-36 h-36 object-cover rounded-lg border"
+            src={bannerUrl}
+            alt="Mağaza Banner"
+            className="w-full h-48 sm:h-64 object-cover"
           />
+        </div>
+      )}
+
+      <div className="flex flex-col lg:flex-row gap-6">
+        {/* Logo Görseli */}
+        {logoUrl && (
+          <div className="flex-shrink-0">
+            <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-2xl p-4 border-2 border-emerald-200 shadow-lg">
+              <label className="block text-xs font-semibold text-emerald-700 uppercase tracking-wide mb-3">
+                Mağaza Logosu
+              </label>
+              <div className="flex items-center justify-center bg-white rounded-xl p-4 border-2 border-emerald-200">
+                <img
+                  src={logoUrl}
+                  alt="Mağaza Logosu"
+                  className="w-32 h-32 sm:w-40 sm:h-40 object-contain rounded-xl"
+                />
+              </div>
+            </div>
+          </div>
         )}
 
+        {/* Bilgiler */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-5 gap-x-10 text-sm text-gray-700 flex-1">
           <Field label="Mağaza Adı" value={store.storeName} />
           <Field label="Mağaza Açıklaması" value={store.storeDescription} />

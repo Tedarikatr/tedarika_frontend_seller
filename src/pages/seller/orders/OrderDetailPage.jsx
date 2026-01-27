@@ -321,12 +321,12 @@ const OrderDetailPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 flex items-center justify-center px-4">
         <div className="text-center">
-          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 mb-4 animate-pulse shadow-xl">
-            <Package size={40} className="text-white" />
+          <div className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 mb-4 animate-pulse shadow-xl">
+            <Package size={32} className="sm:w-10 sm:h-10 text-white" />
           </div>
-          <p className="text-gray-600 font-medium text-lg">Yükleniyor...</p>
+          <p className="text-gray-600 font-medium text-base sm:text-lg">Yükleniyor...</p>
         </div>
       </div>
     );
@@ -334,15 +334,15 @@ const OrderDetailPage = () => {
 
   if (!order) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 flex items-center justify-center px-4">
         <div className="text-center">
-          <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-gradient-to-br from-red-100 to-red-200 mb-4 shadow-lg">
-            <XCircle size={48} className="text-red-600" />
+          <div className="inline-flex items-center justify-center w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gradient-to-br from-red-100 to-red-200 mb-4 shadow-lg">
+            <XCircle size={40} className="sm:w-12 sm:h-12 text-red-600" />
           </div>
-          <h3 className="text-xl font-bold text-gray-700 mb-2">Sipariş Bulunamadı</h3>
+          <h3 className="text-lg sm:text-xl font-bold text-gray-700 mb-2">Sipariş Bulunamadı</h3>
           <button
             onClick={() => navigate("/seller/orders")}
-            className="mt-4 px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all"
+            className="mt-4 px-5 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all text-sm sm:text-base"
           >
             Siparişlere Dön
           </button>
@@ -354,33 +354,38 @@ const OrderDetailPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
       {/* Hero Header */}
-      <div className="bg-gradient-to-r from-emerald-600 via-teal-600 to-green-600 text-white shadow-xl">
-        <div className="max-w-7xl mx-auto px-6 py-8">
+      <div className="bg-gradient-to-r from-emerald-600 via-teal-600 to-green-600 text-white shadow-xl relative overflow-hidden">
+        {/* Dekoratif arka plan */}
+        <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent pointer-events-none"></div>
+        <div className="absolute top-10 right-10 w-32 h-32 bg-white/10 rounded-full blur-3xl hidden sm:block"></div>
+        
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8 relative z-10">
           <button
             onClick={() => navigate("/seller/orders")}
-            className="mb-4 inline-flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl transition-all backdrop-blur-sm"
+            className="mb-4 inline-flex items-center gap-2 px-3 sm:px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl transition-all backdrop-blur-sm text-sm sm:text-base"
           >
-            <ArrowLeft size={20} />
-            Geri Dön
+            <ArrowLeft size={18} className="sm:w-5 sm:h-5" />
+            <span className="hidden sm:inline">Geri Dön</span>
+            <span className="sm:hidden">Geri</span>
           </button>
 
-          <div className="flex items-center justify-between flex-wrap gap-4">
-            <div className="flex items-center gap-4">
-              <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center shadow-lg">
-                <FileText size={32} />
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-3 sm:gap-4 min-w-0 flex-1">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center shadow-lg flex-shrink-0">
+                <FileText size={24} className="sm:w-8 sm:h-8" />
               </div>
-              <div>
-                <h1 className="text-3xl font-bold mb-1 flex items-center gap-2">
-                  Sipariş Detayı
-                  <Sparkles size={24} className="text-yellow-300" />
+              <div className="min-w-0 flex-1">
+                <h1 className="text-2xl sm:text-3xl font-bold mb-1 flex items-center gap-2">
+                  <span className="truncate">Sipariş Detayı</span>
+                  <Sparkles size={20} className="sm:w-6 sm:h-6 text-yellow-300 flex-shrink-0" />
                 </h1>
-                <p className="text-emerald-100 text-sm">
+                <p className="text-emerald-100 text-xs sm:text-sm">
                   Sipariş No: <span className="font-bold">{order.orderNumber}</span>
                 </p>
               </div>
             </div>
 
-            <div className="flex flex-wrap items-center gap-3">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3 w-full sm:w-auto">
               <StatusBadge status={order.status} />
 
               {/* Sipariş İşlemleri */}
@@ -389,14 +394,15 @@ const OrderDetailPage = () => {
                   <button
                     onClick={handleUpdateStatus}
                     disabled={statusLoading}
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white rounded-xl font-semibold transition-all disabled:opacity-50 border border-white/30"
+                    className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white rounded-lg sm:rounded-xl font-semibold transition-all disabled:opacity-50 border border-white/30 text-xs sm:text-sm"
                   >
                     {statusLoading ? (
-                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <Loader2 className="w-3 h-3 sm:w-4 sm:h-4 animate-spin" />
                     ) : (
-                      <CheckCircle className="w-4 h-4" />
+                      <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4" />
                     )}
-                    Onayla
+                    <span className="hidden sm:inline">Onayla</span>
+                    <span className="sm:hidden">Onayla</span>
                   </button>
                 )}
 
@@ -404,38 +410,42 @@ const OrderDetailPage = () => {
                   <>
                     <button
                       onClick={() => setShowCarrierModal(true)}
-                      className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white rounded-xl font-semibold transition-all border border-white/30"
+                      className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white rounded-lg sm:rounded-xl font-semibold transition-all border border-white/30 text-xs sm:text-sm"
                     >
-                      <Truck className="w-4 h-4" />
-                      Kargo Bilgisi
+                      <Truck className="w-3 h-3 sm:w-4 sm:h-4" />
+                      <span className="hidden sm:inline">Kargo Bilgisi</span>
+                      <span className="sm:hidden">Kargo</span>
                     </button>
 
                     {geliverTracking?.fileUrl && (
                       <button
                         onClick={handleViewLabel}
                         disabled={labelLoading}
-                        className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white rounded-xl font-semibold transition-all disabled:opacity-50 border border-white/30"
+                        className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white rounded-lg sm:rounded-xl font-semibold transition-all disabled:opacity-50 border border-white/30 text-xs sm:text-sm"
                       >
                         {labelLoading ? (
-                          <Loader2 className="w-4 h-4 animate-spin" />
+                          <Loader2 className="w-3 h-3 sm:w-4 sm:h-4 animate-spin" />
                         ) : (
-                          <FileText className="w-4 h-4" />
+                          <FileText className="w-3 h-3 sm:w-4 sm:h-4" />
                         )}
-                        Kargo Etiketi Görüntüle
+                        <span className="hidden lg:inline">Kargo Etiketi Görüntüle</span>
+                        <span className="hidden sm:inline lg:hidden">Etiket</span>
+                        <span className="sm:hidden">Etiket</span>
                       </button>
                     )}
 
                     <button
                       onClick={handleCancelOrder}
                       disabled={cancelLoading}
-                      className="inline-flex items-center gap-2 px-4 py-2 bg-red-500/20 hover:bg-red-500/30 backdrop-blur-sm text-white rounded-xl font-semibold transition-all disabled:opacity-50 border border-red-300/30"
+                      className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-red-500/20 hover:bg-red-500/30 backdrop-blur-sm text-white rounded-lg sm:rounded-xl font-semibold transition-all disabled:opacity-50 border border-red-300/30 text-xs sm:text-sm"
                     >
                       {cancelLoading ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <Loader2 className="w-3 h-3 sm:w-4 sm:h-4 animate-spin" />
                       ) : (
-                        <Ban className="w-4 h-4" />
+                        <Ban className="w-3 h-3 sm:w-4 sm:h-4" />
                       )}
-                      İptal Et
+                      <span className="hidden sm:inline">İptal Et</span>
+                      <span className="sm:hidden">İptal</span>
                     </button>
                   </>
                 )}
@@ -446,10 +456,10 @@ const OrderDetailPage = () => {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-6 py-8 space-y-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-4 sm:space-y-6">
 
         {/* Genel Bilgiler Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
           <InfoCard
             icon={Store}
             label="Mağaza"
@@ -487,32 +497,32 @@ const OrderDetailPage = () => {
 
         {/* Kargo Takip Durumu ve Webhook Timeline */}
         {geliverTracking && (
-          <div className="bg-white rounded-3xl shadow-2xl border border-gray-200 overflow-hidden">
-            <div className="bg-gradient-to-r from-indigo-50 to-purple-50 px-6 py-4 border-b border-indigo-100 flex items-center justify-between flex-wrap gap-3">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-lg">
-                  <Activity size={20} />
+          <div className="bg-white rounded-xl sm:rounded-2xl lg:rounded-3xl shadow-2xl border border-gray-200 overflow-hidden">
+            <div className="bg-gradient-to-r from-indigo-50 to-purple-50 px-4 sm:px-6 py-3 sm:py-4 border-b border-indigo-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+              <div className="flex items-center gap-2 sm:gap-3">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-lg flex-shrink-0">
+                  <Activity size={18} className="sm:w-5 sm:h-5" />
                 </div>
                 <div>
-                  <h2 className="text-lg font-bold text-gray-800">Kargo Takip Durumu</h2>
+                  <h2 className="text-base sm:text-lg font-bold text-gray-800">Kargo Takip Durumu</h2>
                   <p className="text-xs text-gray-500">Webhook ile otomatik güncellenir</p>
                 </div>
               </div>
               <button
                 onClick={loadGeliverTracking}
                 disabled={geliverLoading}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-indigo-200 text-indigo-700 text-sm font-semibold rounded-xl shadow-sm hover:shadow transition disabled:opacity-50"
+                className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-white border border-indigo-200 text-indigo-700 text-xs sm:text-sm font-semibold rounded-lg sm:rounded-xl shadow-sm hover:shadow transition disabled:opacity-50 w-full sm:w-auto justify-center"
               >
-                {geliverLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
+                {geliverLoading ? <Loader2 className="w-3 h-3 sm:w-4 sm:h-4 animate-spin" /> : <RefreshCw className="w-3 h-3 sm:w-4 sm:h-4" />}
                 Yenile
               </button>
             </div>
 
-            <div className="p-6">
+            <div className="p-4 sm:p-6">
               {/* Tracking Status Timeline */}
-              <div className="mb-6">
-                <h3 className="text-sm font-semibold text-gray-700 mb-4 flex items-center gap-2">
-                  <Navigation className="w-4 h-4" />
+              <div className="mb-4 sm:mb-6">
+                <h3 className="text-xs sm:text-sm font-semibold text-gray-700 mb-3 sm:mb-4 flex items-center gap-2">
+                  <Navigation className="w-3 h-3 sm:w-4 sm:h-4" />
                   Takip Durumu Timeline
                 </h3>
                 <TrackingTimeline
@@ -523,7 +533,7 @@ const OrderDetailPage = () => {
               </div>
 
               {/* Tracking Bilgileri */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-4">
                 <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl p-4 border border-blue-200">
                   <p className="text-xs text-blue-600 mb-1">Tracking Status</p>
                   <p className="font-bold text-gray-800">

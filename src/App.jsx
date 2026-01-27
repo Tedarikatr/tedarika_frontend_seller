@@ -2,6 +2,7 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { ToastProvider } from "@/contexts/ToastContext";
 import { ProductCacheProvider } from "@/contexts/ProductCacheContext";
+import { NotificationProvider } from "@/contexts/NotificationContext";
 
 // Public seller pages
 import SellerLandingPage from "@/pages/seller/SellerLandingPage";
@@ -48,8 +49,8 @@ import ProductImagesPage from "@/pages/seller/products/ProductImagesPage";
 import CampaignListPage from "@/pages/seller/campaigns/CampaignListPage";
 import CampaignCreatePage from "@/pages/seller/campaigns/CampaignCreatePage";
 import CampaignDetailPage from "@/pages/seller/campaigns/CampaignDetailPage";
-import ChatPage from "@/pages/seller/chat/ChatPage";
-import ChatDebug from "@/pages/seller/chat/ChatDebug";
+// import ChatPage from "@/pages/seller/chat/ChatPage";
+// import ChatDebug from "@/pages/seller/chat/ChatDebug";
 import SalesReportsPage from "@/pages/seller/reports/SalesReportsPage";
 import SellerLayout from "@/components/layout/SellerLayout";
 import PrivateRoute from "@/routes/PrivateRoute";
@@ -63,7 +64,8 @@ function App() {
   return (
     <ToastProvider>
       <ProductCacheProvider>
-        <ScrollToTop />
+        <NotificationProvider>
+          <ScrollToTop />
       <Routes>
       {/* ── Public seller routes ───────────────────────────── */}
       <Route path="/seller/landing" element={<SellerLandingPage />} />
@@ -136,8 +138,9 @@ function App() {
         <Route path="campaigns" element={<CampaignListPage />} />
         <Route path="campaigns/new" element={<CampaignCreatePage />} />
         <Route path="campaigns/:id" element={<CampaignDetailPage />} />
-        <Route path="chat" element={<ChatPage />} />
-        <Route path="chat/debug" element={<ChatDebug />} />
+        {/* Chat özelliği geçici olarak askıya alındı */}
+        {/* <Route path="chat" element={<ChatPage />} /> */}
+        {/* <Route path="chat/debug" element={<ChatDebug />} /> */}
 
         {/* Raporlar */}
         <Route path="reports/sales" element={<SalesReportsPage />} />
@@ -150,6 +153,7 @@ function App() {
       {/* ── 404 redirect ───────────────────────────── */}
       <Route path="*" element={<Navigate to="/seller/landing" replace />} />
     </Routes>
+        </NotificationProvider>
       </ProductCacheProvider>
     </ToastProvider>
   );

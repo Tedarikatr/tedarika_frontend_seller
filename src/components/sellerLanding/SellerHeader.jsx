@@ -34,10 +34,10 @@ const SellerHeader = () => {
         <div className="flex items-center justify-between gap-4 py-1">
           <a
             href="/seller/landing"
-            className="flex items-center gap-3"
+            className="flex items-center gap-3 group"
             aria-label="Tedarika Satıcı Paneli"
           >
-            <img src={Logo} alt="Tedarika Logo" className="h-32 sm:h-40 -my-8" />
+            <img src={Logo} alt="Tedarika Logo" className="h-32 sm:h-40 -my-8 group-hover:scale-110 transition-transform duration-300" />
           </a>
 
           <nav

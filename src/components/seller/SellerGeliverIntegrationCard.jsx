@@ -23,6 +23,7 @@ import {
   LogIn,
   UserPlus,
 } from "lucide-react";
+import CargoAgreementsAccordion from "./CargoAgreementsAccordion";
 
 const STATUS_META = {
   0: {
@@ -715,6 +716,9 @@ export default function SellerGeliverIntegrationCard() {
           Not: Otomatik kayıt çalışmazsa manuel entegrasyon bilgileri ile devam edebilirsiniz.
         </span>
       </div>
+
+      {/* Tedarika Anlaşmalı Kargo Fiyatları */}
+      <CargoAgreementsAccordion />
     </div>
   );
 }

@@ -101,32 +101,36 @@ const MyStoreProductsPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
       {/* Hero Header Section */}
-      <div className="bg-gradient-to-r from-emerald-600 via-emerald-700 to-teal-700 text-white shadow-xl">
-        <div className="max-w-7xl mx-auto px-6 py-8">
-          <div className="flex items-center justify-between flex-wrap gap-4">
-            <div className="flex items-center gap-4">
-              <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center shadow-lg">
-                <ShoppingBag size={32} className="animate-pulse" />
+      <div className="bg-gradient-to-r from-emerald-600 via-emerald-700 to-teal-700 text-white shadow-xl relative overflow-hidden">
+        {/* Dekoratif arka plan */}
+        <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent pointer-events-none"></div>
+        <div className="absolute top-10 right-10 w-32 h-32 bg-white/10 rounded-full blur-3xl hidden sm:block"></div>
+        
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8 relative z-10">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-3 sm:gap-4 min-w-0 flex-1">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center shadow-lg flex-shrink-0">
+                <ShoppingBag size={24} className="sm:w-8 sm:h-8 animate-pulse" />
               </div>
-              <div>
-                <h1 className="text-3xl font-bold mb-1 flex items-center gap-2">
-                  Mağaza Ürünlerim
-                  <Sparkles size={24} className="text-yellow-300" />
+              <div className="min-w-0 flex-1">
+                <h1 className="text-2xl sm:text-3xl font-bold mb-1 flex items-center gap-2">
+                  <span className="truncate">Mağaza Ürünlerim</span>
+                  <Sparkles size={20} className="sm:w-6 sm:h-6 text-yellow-300 flex-shrink-0" />
                 </h1>
-                <p className="text-emerald-100 text-sm">
+                <p className="text-emerald-100 text-xs sm:text-sm">
                   Tüm ürünlerinizi buradan yönetin ve düzenleyin
                 </p>
               </div>
             </div>
             
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
               {!loading && (
-                <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl px-6 py-3">
-                  <div className="flex items-center gap-3">
-                    <Package size={24} />
+                <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-xl sm:rounded-2xl px-4 sm:px-6 py-2 sm:py-3 flex-1 sm:flex-none">
+                  <div className="flex items-center gap-2 sm:gap-3">
+                    <Package size={20} className="sm:w-6 sm:h-6" />
                     <div>
                       <div className="text-xs text-emerald-100">Toplam Ürün</div>
-                      <div className="text-2xl font-bold">{products.length}</div>
+                      <div className="text-xl sm:text-2xl font-bold">{products.length}</div>
                     </div>
                   </div>
                 </div>
@@ -134,12 +138,12 @@ const MyStoreProductsPage = () => {
               <button
                 onClick={handleRefresh}
                 disabled={loading || refreshing}
-                className="bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 rounded-2xl px-6 py-3 text-white font-medium transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-lg hover:shadow-xl"
+                className="bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 rounded-xl sm:rounded-2xl px-4 sm:px-6 py-2 sm:py-3 text-white font-medium transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-lg hover:shadow-xl text-sm sm:text-base"
                 title="Ürünleri yenile"
               >
                 <RefreshCw 
-                  size={20} 
-                  className={refreshing ? "animate-spin" : ""} 
+                  size={18} 
+                  className={`sm:w-5 sm:h-5 ${refreshing ? "animate-spin" : ""}`}
                 />
                 <span className="hidden sm:inline">Yenile</span>
               </button>
@@ -149,49 +153,49 @@ const MyStoreProductsPage = () => {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-6 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
         {/* Stats Cards */}
         {!loading && products.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mb-6 sm:mb-8">
             {/* Aktif Ürünler */}
-            <div className="bg-gradient-to-br from-emerald-50 to-green-50 rounded-2xl p-5 border-2 border-emerald-200 shadow-lg hover:shadow-xl transition-all">
+            <div className="bg-gradient-to-br from-emerald-50 to-green-50 rounded-xl sm:rounded-2xl p-4 sm:p-5 border-2 border-emerald-200 shadow-lg hover:shadow-xl transition-all">
               <div className="flex items-center justify-between">
-                <div>
+                <div className="min-w-0 flex-1">
                   <p className="text-xs font-semibold text-emerald-700 mb-1">Satışta</p>
-                  <p className="text-3xl font-bold text-emerald-800">
+                  <p className="text-2xl sm:text-3xl font-bold text-emerald-800">
                     {products.filter(p => p.isOnSale).length}
                   </p>
                 </div>
-                <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center text-white shadow-lg">
-                  <TrendingUp size={28} />
+                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-lg sm:rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center text-white shadow-lg flex-shrink-0">
+                  <TrendingUp size={24} className="sm:w-7 sm:h-7" />
                 </div>
               </div>
             </div>
 
             {/* Pasif Ürünler */}
-            <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl p-5 border-2 border-amber-200 shadow-lg hover:shadow-xl transition-all">
+            <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl sm:rounded-2xl p-4 sm:p-5 border-2 border-amber-200 shadow-lg hover:shadow-xl transition-all">
               <div className="flex items-center justify-between">
-                <div>
+                <div className="min-w-0 flex-1">
                   <p className="text-xs font-semibold text-amber-700 mb-1">Pasif</p>
-                  <p className="text-3xl font-bold text-amber-800">
+                  <p className="text-2xl sm:text-3xl font-bold text-amber-800">
                     {products.filter(p => !p.isOnSale).length}
                   </p>
                 </div>
-                <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center text-white shadow-lg">
-                  <AlertCircle size={28} />
+                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-lg sm:rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center text-white shadow-lg flex-shrink-0">
+                  <AlertCircle size={24} className="sm:w-7 sm:h-7" />
                 </div>
               </div>
             </div>
 
             {/* Toplam */}
-            <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-2xl p-5 border-2 border-blue-200 shadow-lg hover:shadow-xl transition-all">
+            <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl sm:rounded-2xl p-4 sm:p-5 border-2 border-blue-200 shadow-lg hover:shadow-xl transition-all">
               <div className="flex items-center justify-between">
-                <div>
+                <div className="min-w-0 flex-1">
                   <p className="text-xs font-semibold text-blue-700 mb-1">Toplam Ürün</p>
-                  <p className="text-3xl font-bold text-blue-800">{products.length}</p>
+                  <p className="text-2xl sm:text-3xl font-bold text-blue-800">{products.length}</p>
                 </div>
-                <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-600 flex items-center justify-center text-white shadow-lg">
-                  <Package size={28} />
+                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-lg sm:rounded-xl bg-gradient-to-br from-blue-500 to-cyan-600 flex items-center justify-center text-white shadow-lg flex-shrink-0">
+                  <Package size={24} className="sm:w-7 sm:h-7" />
                 </div>
               </div>
             </div>
