@@ -240,14 +240,14 @@ const SalesReportsPage = () => {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
       {/* Header */}
       <div className="bg-gradient-to-r from-emerald-600 via-teal-600 to-green-600 text-white shadow-xl">
-        <div className="max-w-7xl mx-auto px-6 py-8">
-          <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center shadow-lg">
-              <BarChart3 size={32} />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+          <div className="flex items-center gap-3 sm:gap-4">
+            <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center shadow-lg flex-shrink-0">
+              <BarChart3 size={24} className="sm:w-8 sm:h-8" />
             </div>
-            <div>
-              <h1 className="text-3xl font-bold mb-1">Satış Raporları</h1>
-              <p className="text-emerald-100 text-sm">
+            <div className="min-w-0">
+              <h1 className="text-2xl sm:text-3xl font-bold mb-1">Satış Raporları</h1>
+              <p className="text-emerald-100 text-xs sm:text-sm">
                 Raporlarınızı oluşturun ve zamanlayın
               </p>
             </div>
@@ -255,16 +255,16 @@ const SalesReportsPage = () => {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
           {/* Export Form */}
-          <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-100">
-            <div className="flex items-center gap-3 mb-6">
-              <Download className="w-6 h-6 text-emerald-600" />
-              <h2 className="text-xl font-bold text-gray-900">Rapor İndir</h2>
+          <div className="bg-white rounded-xl sm:rounded-2xl shadow-xl p-4 sm:p-6 border border-gray-100">
+            <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
+              <Download className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-600" />
+              <h2 className="text-lg sm:text-xl font-bold text-gray-900">Rapor İndir</h2>
             </div>
 
-            <div className="space-y-6">
+            <div className="space-y-4 sm:space-y-6">
               {/* Rapor Türü */}
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-3">
@@ -345,30 +345,30 @@ const SalesReportsPage = () => {
 
               {/* Tarih Aralığı (Opsiyonel) */}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-3">
+                <label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2 sm:mb-3">
                   Tarih Aralığı <span className="text-gray-400 font-normal text-xs">(Opsiyonel)</span>
                 </label>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
                   <div className="relative">
                     <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-                      <Calendar className="w-5 h-5" />
+                      <Calendar className="w-4 h-4 sm:w-5 sm:h-5" />
                     </div>
                     <input
                       type="date"
                       value={startDate}
                       onChange={(e) => setStartDate(e.target.value)}
-                      className="w-full pl-11 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition"
+                      className="w-full pl-10 sm:pl-11 pr-3 sm:pr-4 py-2 sm:py-3 text-sm border-2 border-gray-200 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition"
                     />
                   </div>
                   <div className="relative">
                     <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-                      <Calendar className="w-5 h-5" />
+                      <Calendar className="w-4 h-4 sm:w-5 sm:h-5" />
                     </div>
                     <input
                       type="date"
                       value={endDate}
                       onChange={(e) => setEndDate(e.target.value)}
-                      className="w-full pl-11 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition"
+                      className="w-full pl-10 sm:pl-11 pr-3 sm:pr-4 py-2 sm:py-3 text-sm border-2 border-gray-200 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition"
                     />
                   </div>
                 </div>
@@ -396,18 +396,18 @@ const SalesReportsPage = () => {
           </div>
 
           {/* Schedule Form */}
-          <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-100">
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-3">
-                <Clock className="w-6 h-6 text-emerald-600" />
-                <h2 className="text-xl font-bold text-gray-900">Zamanlanmış Raporlar</h2>
+          <div className="bg-white rounded-xl sm:rounded-2xl shadow-xl p-4 sm:p-6 border border-gray-100">
+            <div className="flex items-center justify-between mb-4 sm:mb-6 flex-wrap gap-2">
+              <div className="flex items-center gap-2 sm:gap-3">
+                <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-600" />
+                <h2 className="text-lg sm:text-xl font-bold text-gray-900">Zamanlanmış Raporlar</h2>
               </div>
               <button
                 onClick={() => setShowScheduleModal(true)}
-                className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition"
+                className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition text-sm sm:text-base"
               >
                 <Plus className="w-4 h-4" />
-                Yeni
+                <span className="hidden sm:inline">Yeni</span>
               </button>
             </div>
 
@@ -479,10 +479,10 @@ const SalesReportsPage = () => {
         </div>
 
         {/* Export History */}
-        <div className="mt-6 bg-white rounded-2xl shadow-xl p-6 border border-gray-100">
-          <div className="flex items-center gap-3 mb-6">
-            <FileText className="w-6 h-6 text-emerald-600" />
-            <h2 className="text-xl font-bold text-gray-900">İndirme Geçmişi</h2>
+        <div className="mt-4 sm:mt-6 bg-white rounded-xl sm:rounded-2xl shadow-xl p-4 sm:p-6 border border-gray-100">
+          <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
+            <FileText className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-600" />
+            <h2 className="text-lg sm:text-xl font-bold text-gray-900">İndirme Geçmişi</h2>
           </div>
 
           {loadingHistory ? (
@@ -495,69 +495,84 @@ const SalesReportsPage = () => {
               <p className="text-gray-500">Henüz rapor indirilmedi</p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-gradient-to-r from-emerald-50 to-teal-50 border-b-2 border-emerald-200">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-bold text-emerald-800 uppercase">
-                      Rapor Türü
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-bold text-emerald-800 uppercase">
-                      Format
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-bold text-emerald-800 uppercase">
-                      Durum
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-bold text-emerald-800 uppercase">
-                      Son Kullanma
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-bold text-emerald-800 uppercase">
-                      İşlem
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100">
-                  {exportHistory.map((item) => (
-                    <tr key={item.id} className="hover:bg-emerald-50 transition">
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-2">
-                          {getReportTypeIcon(item.reportType)}
-                          <span className="font-semibold text-gray-900">
-                            {getReportTypeLabel(item.reportType)}
-                          </span>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <span className="inline-flex items-center gap-2 px-3 py-1 bg-gray-100 text-gray-700 rounded-lg text-sm font-semibold">
-                          {getFormatIcon(item.format)}
-                          {getFormatLabel(item.format)}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4">
-                        {getStatusBadge(item.status)}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-600">
-                        {item.expiresAt
-                          ? new Date(item.expiresAt).toLocaleString("tr-TR")
-                          : "—"}
-                      </td>
-                      <td className="px-6 py-4">
-                        {item.storagePath && item.status === "completed" ? (
-                          <button
-                            onClick={() => window.open(item.storagePath, "_blank")}
-                            className="flex items-center gap-2 px-3 py-1.5 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition text-sm font-semibold"
-                          >
-                            <Download className="w-4 h-4" />
-                            İndir
-                          </button>
-                        ) : (
-                          <span className="text-gray-400 text-sm">—</span>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            <div className="overflow-x-auto -mx-4 sm:mx-0">
+              <div className="inline-block min-w-full align-middle">
+                <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
+                  <table className="min-w-full divide-y divide-gray-300">
+                    <thead className="bg-gradient-to-r from-emerald-50 to-teal-50">
+                      <tr>
+                        <th className="px-3 sm:px-6 py-3 text-left text-xs font-bold text-emerald-800 uppercase">
+                          Rapor Türü
+                        </th>
+                        <th className="px-3 sm:px-6 py-3 text-left text-xs font-bold text-emerald-800 uppercase hidden sm:table-cell">
+                          Format
+                        </th>
+                        <th className="px-3 sm:px-6 py-3 text-left text-xs font-bold text-emerald-800 uppercase hidden md:table-cell">
+                          Durum
+                        </th>
+                        <th className="px-3 sm:px-6 py-3 text-left text-xs font-bold text-emerald-800 uppercase hidden lg:table-cell">
+                          Son Kullanma
+                        </th>
+                        <th className="px-3 sm:px-6 py-3 text-left text-xs font-bold text-emerald-800 uppercase">
+                          İşlem
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-200 bg-white">
+                      {exportHistory.map((item) => (
+                        <tr key={item.id} className="hover:bg-emerald-50 transition">
+                          <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
+                            <div className="flex items-center gap-2">
+                              {getReportTypeIcon(item.reportType)}
+                              <div className="min-w-0">
+                                <span className="font-semibold text-gray-900 text-sm">
+                                  {getReportTypeLabel(item.reportType)}
+                                </span>
+                                <div className="sm:hidden mt-1">
+                                  <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-gray-100 text-gray-700 rounded text-xs font-semibold">
+                                    {getFormatIcon(item.format)}
+                                    {getFormatLabel(item.format)}
+                                  </span>
+                                </div>
+                                <div className="md:hidden mt-1">
+                                  {getStatusBadge(item.status)}
+                                </div>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap hidden sm:table-cell">
+                            <span className="inline-flex items-center gap-2 px-3 py-1 bg-gray-100 text-gray-700 rounded-lg text-sm font-semibold">
+                              {getFormatIcon(item.format)}
+                              {getFormatLabel(item.format)}
+                            </span>
+                          </td>
+                          <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap hidden md:table-cell">
+                            {getStatusBadge(item.status)}
+                          </td>
+                          <td className="px-3 sm:px-6 py-3 sm:py-4 text-sm text-gray-600 whitespace-nowrap hidden lg:table-cell">
+                            {item.expiresAt
+                              ? new Date(item.expiresAt).toLocaleString("tr-TR")
+                              : "—"}
+                          </td>
+                          <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
+                            {item.storagePath && item.status === "completed" ? (
+                              <button
+                                onClick={() => window.open(item.storagePath, "_blank")}
+                                className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1 sm:py-1.5 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition text-xs sm:text-sm font-semibold"
+                              >
+                                <Download className="w-3 h-3 sm:w-4 sm:h-4" />
+                                <span className="hidden sm:inline">İndir</span>
+                              </button>
+                            ) : (
+                              <span className="text-gray-400 text-xs sm:text-sm">—</span>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
             </div>
           )}
         </div>
@@ -578,13 +593,13 @@ const SalesReportsPage = () => {
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.9, y: 20 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6"
+              className="bg-white rounded-xl sm:rounded-2xl shadow-2xl max-w-md w-full mx-4 p-4 sm:p-6 max-h-[90vh] overflow-y-auto"
             >
-              <h3 className="text-xl font-bold text-gray-900 mb-6">
+              <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-4 sm:mb-6">
                 Zamanlanmış Rapor Oluştur
               </h3>
 
-              <div className="space-y-5">
+              <div className="space-y-4 sm:space-y-5">
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-3">
                     Rapor Türü
