@@ -69,6 +69,7 @@ const ProductDraftUploadPage = () => {
       name: "",
       sku: "",
       ean: "",
+      brandId: "",
       brandName: "",
       categoryId: "",
       categorySubId: "",
@@ -195,92 +196,159 @@ const ProductDraftUploadPage = () => {
 
   const handleManualUpload = async () => {
     // Validate products
-    const validProducts = products.filter(
-      (p) => p.name && p.sku && p.store.stockQuantity && p.store.stockQuantity > 0 && p.store.unitPrice && p.store.unitPrice > 0
-    );
+    const validProducts = products.filter((p) => {
+      // API dokümantasyonuna göre zorunlu alanlar: Name, Store.UnitType, Store.StockQuantity, Store.MinOrderQuantity, Store.UnitPrice, Store.CurrencyCode
+      return (
+        p.name?.trim() &&
+        p.store.unitType &&
+        p.store.unitType > 0 &&
+        p.store.stockQuantity &&
+        p.store.stockQuantity > 0 &&
+        p.store.minOrderQuantity &&
+        p.store.minOrderQuantity > 0 &&
+        p.store.unitPrice &&
+        p.store.unitPrice > 0 &&
+        p.store.currencyCode?.trim()
+      );
+    });
 
     if (validProducts.length === 0) {
-      toast.error("En az bir geçerli ürün bilgisi gereklidir.");
+      toast.error("En az bir geçerli ürün bilgisi gereklidir. Zorunlu alanları kontrol edin.");
       return;
+    }
+
+    // Görsel validasyonu (en fazla 10 görsel, max 10MB/dosya)
+    for (const product of validProducts) {
+      if (product.images && product.images.length > 10) {
+        toast.error(`Ürün "${product.name}" için en fazla 10 görsel gönderebilirsiniz.`);
+        return;
+      }
+      if (product.images) {
+        for (const imageFile of product.images) {
+          const maxSize = 10 * 1024 * 1024; // 10 MB
+          if (imageFile.size > maxSize) {
+            toast.error(`Görsel "${imageFile.name}" 10 MB limitini aşıyor.`);
+            return;
+          }
+          // Format kontrolü
+          const allowedExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
+          const fileName = imageFile.name.toLowerCase();
+          const hasValidExtension = allowedExtensions.some(ext => fileName.endsWith(ext));
+          if (!hasValidExtension) {
+            toast.error(`Görsel "${imageFile.name}" desteklenmiyor. İzin verilen: .jpg, .jpeg, .png, .gif, .webp`);
+            return;
+          }
+        }
+      }
     }
 
     setLoading(true);
     try {
-      // FormData oluştur
-      const formData = new FormData();
+      // API dokümantasyonuna göre her ürün ayrı ayrı gönderilmeli (tek ürün endpoint'i)
+      // Ancak kullanıcı deneyimi için tüm ürünleri sırayla gönderelim
+      let successCount = 0;
+      let errorCount = 0;
 
-      // DraftName ekle
-      if (draftName) {
-        formData.append("DraftName", draftName);
+      for (const product of validProducts) {
+        try {
+          // Her ürün için ayrı FormData oluştur
+          const formData = new FormData();
+
+          // DraftName ekle (sadece ilk ürün için veya her ürün için aynı isim)
+          if (draftName) {
+            formData.append("DraftName", draftName);
+          }
+
+          // Temel ürün bilgileri (API dokümantasyonuna göre prefix'siz veya product. prefix'li)
+          formData.append("Name", product.name.trim());
+          if (product.sku?.trim()) formData.append("Sku", product.sku.trim());
+          if (product.ean?.trim()) formData.append("Ean", product.ean.trim());
+          if (product.brandId?.trim()) formData.append("BrandId", product.brandId.trim());
+          if (product.brandName?.trim()) formData.append("BrandName", product.brandName.trim());
+          if (product.categoryId) formData.append("CategoryId", product.categoryId.toString());
+          if (product.categorySubId) formData.append("CategorySubId", product.categorySubId.toString());
+          if (product.gtip?.trim()) formData.append("Gtip", product.gtip.trim());
+          if (product.description?.trim()) formData.append("Description", product.description.trim());
+          if (product.preparationTime) {
+            // ISO formatına çevir
+            const prepTime = new Date(product.preparationTime).toISOString();
+            formData.append("PreparationTime", prepTime);
+          }
+          if (product.expirationDate) {
+            // ISO formatına çevir
+            const expDate = new Date(product.expirationDate).toISOString();
+            formData.append("ExpirationDate", expDate);
+          }
+
+          // Mağaza bilgileri
+          formData.append("Store.UnitType", product.store.unitType.toString());
+          formData.append("Store.StockQuantity", product.store.stockQuantity.toString());
+          formData.append("Store.MinOrderQuantity", product.store.minOrderQuantity.toString());
+          if (product.store.maxOrderQuantity && product.store.maxOrderQuantity !== "") {
+            formData.append("Store.MaxOrderQuantity", product.store.maxOrderQuantity.toString());
+          }
+          formData.append("Store.UnitPrice", product.store.unitPrice.toString());
+          formData.append("Store.CurrencyCode", product.store.currencyCode.trim());
+          if (product.store.mainProductCode?.trim()) {
+            formData.append("Store.MainProductCode", product.store.mainProductCode.trim());
+          }
+          if (product.store.stockCode?.trim()) {
+            formData.append("Store.StockCode", product.store.stockCode.trim());
+          }
+          if (product.store.criticalStock && product.store.criticalStock !== "") {
+            formData.append("Store.CriticalStock", product.store.criticalStock.toString());
+          }
+          if (product.store.width && product.store.width !== "") {
+            formData.append("Store.Width", product.store.width.toString());
+          }
+          if (product.store.length && product.store.length !== "") {
+            formData.append("Store.Length", product.store.length.toString());
+          }
+          if (product.store.height && product.store.height !== "") {
+            formData.append("Store.Height", product.store.height.toString());
+          }
+          if (product.store.weight && product.store.weight !== "") {
+            formData.append("Store.Weight", product.store.weight.toString());
+          }
+          if (product.store.volumeWeight && product.store.volumeWeight !== "") {
+            formData.append("Store.VolumeWeight", product.store.volumeWeight.toString());
+          }
+
+          // Görselleri ekle (Files olarak - API dokümantasyonuna göre)
+          if (product.images && product.images.length > 0) {
+            product.images.forEach((imageFile) => {
+              formData.append("Files", imageFile);
+            });
+          }
+
+          // Renk varyantları
+          if (product.colorVariants && product.colorVariants.length > 0) {
+            product.colorVariants.forEach((color, colorIndex) => {
+              if (color?.trim()) {
+                formData.append(`ColorVariants[${colorIndex}]`, color.trim());
+              }
+            });
+          }
+
+          await addProductManual(formData);
+          successCount++;
+        } catch (err) {
+          console.error(`Ürün "${product.name}" yüklenemedi:`, err);
+          errorCount++;
+          // Hata mesajını göster ama devam et
+          toast.error(`Ürün "${product.name}" yüklenemedi: ${err.message || err}`);
+        }
       }
 
-      // Her ürün için form data oluştur
-      validProducts.forEach((product, productIndex) => {
-        const prefix = `Products[${productIndex}]`;
-
-        // Temel ürün bilgileri
-        formData.append(`${prefix}.Name`, product.name);
-        if (product.sku) formData.append(`${prefix}.Sku`, product.sku);
-        if (product.ean) formData.append(`${prefix}.Ean`, product.ean);
-        if (product.brandName) formData.append(`${prefix}.BrandName`, product.brandName);
-        if (product.categoryId) formData.append(`${prefix}.CategoryId`, product.categoryId.toString());
-        if (product.categorySubId) formData.append(`${prefix}.CategorySubId`, product.categorySubId.toString());
-        if (product.gtip) formData.append(`${prefix}.Gtip`, product.gtip);
-        if (product.description) formData.append(`${prefix}.Description`, product.description);
-        if (product.preparationTime) formData.append(`${prefix}.PreparationTime`, product.preparationTime);
-        if (product.expirationDate) formData.append(`${prefix}.ExpirationDate`, product.expirationDate);
-
-        // Mağaza bilgileri
-        formData.append(`${prefix}.Store.UnitType`, product.store.unitType.toString());
-        formData.append(`${prefix}.Store.StockQuantity`, product.store.stockQuantity.toString());
-        formData.append(`${prefix}.Store.MinOrderQuantity`, (product.store.minOrderQuantity || 1).toString());
-        if (product.store.maxOrderQuantity && product.store.maxOrderQuantity !== "") {
-          formData.append(`${prefix}.Store.MaxOrderQuantity`, product.store.maxOrderQuantity.toString());
-        }
-        formData.append(`${prefix}.Store.UnitPrice`, product.store.unitPrice.toString());
-        formData.append(`${prefix}.Store.CurrencyCode`, product.store.currencyCode || "TRY");
-        if (product.store.mainProductCode) formData.append(`${prefix}.Store.MainProductCode`, product.store.mainProductCode);
-        if (product.store.stockCode) formData.append(`${prefix}.Store.StockCode`, product.store.stockCode);
-        if (product.store.criticalStock && product.store.criticalStock !== "") {
-          formData.append(`${prefix}.Store.CriticalStock`, product.store.criticalStock.toString());
-        }
-        if (product.store.width && product.store.width !== "") {
-          formData.append(`${prefix}.Store.Width`, product.store.width.toString());
-        }
-        if (product.store.length && product.store.length !== "") {
-          formData.append(`${prefix}.Store.Length`, product.store.length.toString());
-        }
-        if (product.store.height && product.store.height !== "") {
-          formData.append(`${prefix}.Store.Height`, product.store.height.toString());
-        }
-        if (product.store.weight && product.store.weight !== "") {
-          formData.append(`${prefix}.Store.Weight`, product.store.weight.toString());
-        }
-        if (product.store.volumeWeight && product.store.volumeWeight !== "") {
-          formData.append(`${prefix}.Store.VolumeWeight`, product.store.volumeWeight.toString());
-        }
-
-        // Görselleri ekle (File array)
-        if (product.images && product.images.length > 0) {
-          product.images.forEach((imageFile, imageIndex) => {
-            formData.append(`${prefix}.Images[${imageIndex}]`, imageFile);
-          });
-        }
-
-        // Renk varyantları
-        if (product.colorVariants && product.colorVariants.length > 0) {
-          product.colorVariants.forEach((color, colorIndex) => {
-            formData.append(`${prefix}.ColorVariants[${colorIndex}]`, color);
-          });
-        }
-      });
-
-      await addProductManual(formData);
-      toast.success("Ürünler başarıyla yüklendi!");
-      navigate("/seller/products/drafts");
+      if (successCount > 0) {
+        toast.success(`${successCount} ürün başarıyla yüklendi!${errorCount > 0 ? ` ${errorCount} ürün yüklenemedi.` : ""}`);
+        navigate("/seller/products/drafts");
+      } else {
+        toast.error("Hiçbir ürün yüklenemedi.");
+      }
     } catch (err) {
       console.error("Manuel yükleme başarısız:", err);
-      toast.error(`Ürünler yüklenemedi: ${err.message}`);
+      toast.error(`Ürünler yüklenemedi: ${err.message || err}`);
     } finally {
       setLoading(false);
     }
@@ -293,6 +361,7 @@ const ProductDraftUploadPage = () => {
         name: "",
         sku: "",
         ean: "",
+        brandId: "",
         brandName: "",
         categoryId: "",
         categorySubId: "",
@@ -632,7 +701,7 @@ const ProductDraftUploadPage = () => {
                       </div>
                       <div>
                         <label className="block text-sm font-semibold text-gray-700 mb-1">
-                          SKU *
+                          SKU
                         </label>
                         <input
                           type="text"
@@ -640,7 +709,6 @@ const ProductDraftUploadPage = () => {
                           onChange={(e) => updateProduct(productIndex, "sku", e.target.value)}
                           placeholder="SKU-001"
                           className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
-                          required
                         />
                       </div>
                       <div>
@@ -652,6 +720,18 @@ const ProductDraftUploadPage = () => {
                           value={product.ean}
                           onChange={(e) => updateProduct(productIndex, "ean", e.target.value)}
                           placeholder="1234567890123"
+                          className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-1">
+                          Marka ID (GUID)
+                        </label>
+                        <input
+                          type="text"
+                          value={product.brandId}
+                          onChange={(e) => updateProduct(productIndex, "brandId", e.target.value)}
+                          placeholder="3fa85f64-5717-4562-b3fc-2c963f66afa6"
                           className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
                         />
                       </div>
@@ -1007,7 +1087,7 @@ const ProductDraftUploadPage = () => {
                             />
                           </label>
                           <p className="text-xs text-gray-400 mt-2">
-                            JPG, PNG, GIF, WebP formatları desteklenir
+                            JPG, PNG, GIF, WebP formatları desteklenir. En fazla 10 görsel, her biri max 10 MB.
                           </p>
                         </div>
 
