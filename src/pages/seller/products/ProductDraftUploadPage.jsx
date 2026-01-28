@@ -9,6 +9,7 @@ import {
   fetchProductDrafts
 } from "@/api/sellerProductDraftService";
 import { getCategoriesWithSubCategories } from "@/api/categoryService";
+import { getBrandList } from "@/api/brandservice";
 import { UNIT_TYPE_OPTIONS } from "@/constants/unitTypes";
 import { useToast } from "@/contexts/ToastContext";
 import {
@@ -44,6 +45,10 @@ const ProductDraftUploadPage = () => {
   // Category State
   const [categories, setCategories] = useState([]);
   const [loadingCategories, setLoadingCategories] = useState(false);
+
+  // Brand State
+  const [brands, setBrands] = useState([]);
+  const [loadingBrands, setLoadingBrands] = useState(false);
 
   // Excel State
   const [excelFile, setExcelFile] = useState(null);
@@ -516,6 +521,24 @@ const ProductDraftUploadPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Load brands on mount
+  useEffect(() => {
+    const loadBrands = async () => {
+      setLoadingBrands(true);
+      try {
+        const data = await getBrandList();
+        setBrands(data || []);
+      } catch (err) {
+        console.error("Markalar yüklenemedi:", err);
+        toast.error("Markalar yüklenemedi");
+      } finally {
+        setLoadingBrands(false);
+      }
+    };
+    loadBrands();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const tabs = [
     { key: "manual", label: "Manuel", icon: Package, color: "emerald" },
     { key: "excel", label: "Excel", icon: FileSpreadsheet, color: "green" },
@@ -747,15 +770,34 @@ const ProductDraftUploadPage = () => {
                       </div>
                       <div>
                         <label className="block text-sm font-semibold text-gray-700 mb-1">
-                          Marka ID (GUID)
+                          Marka
                         </label>
-                        <input
-                          type="text"
-                          value={product.brandId}
-                          onChange={(e) => updateProduct(productIndex, "brandId", e.target.value)}
-                          placeholder="3fa85f64-5717-4562-b3fc-2c963f66afa6"
-                          className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
-                        />
+                        <select
+                          value={product.brandId || ""}
+                          onChange={(e) => {
+                            const selectedBrandId = e.target.value;
+                            const selectedBrand = brands.find(b => b.id === selectedBrandId);
+                            updateProduct(productIndex, "brandId", selectedBrandId || "");
+                            // Marka seçildiğinde marka adını otomatik doldur
+                            if (selectedBrand) {
+                              updateProduct(productIndex, "brandName", selectedBrand.name || "");
+                            } else {
+                              updateProduct(productIndex, "brandName", "");
+                            }
+                          }}
+                          className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 bg-white"
+                          disabled={loadingBrands}
+                        >
+                          <option value="">Marka Seçiniz</option>
+                          {brands.map((brand) => (
+                            <option key={brand.id} value={brand.id}>
+                              {brand.name}
+                            </option>
+                          ))}
+                        </select>
+                        {loadingBrands && (
+                          <p className="text-xs text-gray-500 mt-1">Markalar yükleniyor...</p>
+                        )}
                       </div>
                       <div>
                         <label className="block text-sm font-semibold text-gray-700 mb-1">
@@ -764,8 +806,18 @@ const ProductDraftUploadPage = () => {
                         <input
                           type="text"
                           value={product.brandName}
-                          onChange={(e) => updateProduct(productIndex, "brandName", e.target.value)}
-                          placeholder="Marka adı"
+                          onChange={(e) => {
+                            const brandName = e.target.value;
+                            updateProduct(productIndex, "brandName", brandName);
+                            // Manuel marka adı girildiğinde marka ID'yi temizle (yeni marka oluşturuluyor olabilir)
+                            if (brandName && product.brandId) {
+                              const selectedBrand = brands.find(b => b.id === product.brandId);
+                              if (selectedBrand && selectedBrand.name !== brandName) {
+                                updateProduct(productIndex, "brandId", "");
+                              }
+                            }
+                          }}
+                          placeholder="Markanız yoksa markanızı buraya yazınız"
                           className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
                         />
                       </div>
