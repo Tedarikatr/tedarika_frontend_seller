@@ -33,10 +33,28 @@ const LoginPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Email/Phone validation
+    const trimmedEmailOrPhone = formData.emailOrPhone?.trim();
+    if (!trimmedEmailOrPhone || trimmedEmailOrPhone.length === 0) {
+      toast.error("E-posta veya telefon numarası giriniz.");
+      return;
+    }
+
+    // Password validation
+    const trimmedPassword = formData.password?.trim();
+    if (!trimmedPassword || trimmedPassword.length === 0) {
+      toast.error("Şifre giriniz.");
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
-      const result = await loginSeller(formData);
+      const result = await loginSeller({
+        emailOrPhone: trimmedEmailOrPhone,
+        password: trimmedPassword
+      });
 
       if (typeof result?.token === "string") {
         // Temel bilgiler

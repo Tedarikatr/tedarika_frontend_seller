@@ -8,6 +8,8 @@ import {
   addProductManual,
   fetchProductDrafts
 } from "@/api/sellerProductDraftService";
+import { getCategoriesWithSubCategories } from "@/api/categoryService";
+import { getBrandList } from "@/api/brandservice";
 import { UNIT_TYPE_OPTIONS } from "@/constants/unitTypes";
 import { useToast } from "@/contexts/ToastContext";
 import {
@@ -26,6 +28,8 @@ import {
   X,
   Package,
   ChevronRight,
+  Image as ImageIcon,
+  Trash2,
 } from "lucide-react";
 
 const ProductDraftUploadPage = () => {
@@ -37,6 +41,14 @@ const ProductDraftUploadPage = () => {
   const [loadingDrafts, setLoadingDrafts] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showTemplatePreview, setShowTemplatePreview] = useState(false);
+  
+  // Category State
+  const [categories, setCategories] = useState([]);
+  const [loadingCategories, setLoadingCategories] = useState(false);
+
+  // Brand State
+  const [brands, setBrands] = useState([]);
+  const [loadingBrands, setLoadingBrands] = useState(false);
 
   // Excel State
   const [excelFile, setExcelFile] = useState(null);
@@ -72,10 +84,10 @@ const ProductDraftUploadPage = () => {
       expirationDate: "",
       store: {
         unitType: 0,
-        stockQuantity: 0,
-        minOrderQuantity: 1,
+        stockQuantity: "",
+        minOrderQuantity: "",
         maxOrderQuantity: "",
-        unitPrice: 0,
+        unitPrice: "",
         currencyCode: "TRY",
         mainProductCode: "",
         stockCode: "",
@@ -86,7 +98,7 @@ const ProductDraftUploadPage = () => {
         weight: "",
         volumeWeight: "",
       },
-      imageUrls: [],
+      images: [], // File array - görseller dosya olarak yüklenecek
       colorVariants: [],
     },
   ]);
@@ -105,6 +117,10 @@ const ProductDraftUploadPage = () => {
 
       await addProductExcel(formData);
       toast.success("Excel dosyası başarıyla yüklendi!");
+      // Ek uyarı mesajı
+      setTimeout(() => {
+        toast.info("Ürünleriniz onaya gönderildi. İnceleme sonrası onaylandıktan sonra otomatik olarak mağazanıza aktarılacaktır.", 6000);
+      }, 500);
       navigate("/seller/products/drafts");
     } catch (err) {
       console.error("Excel yüklenemedi:", err);
@@ -127,6 +143,10 @@ const ProductDraftUploadPage = () => {
 
       await addProductJson(parsedJson);
       toast.success("JSON başarıyla gönderildi!");
+      // Ek uyarı mesajı
+      setTimeout(() => {
+        toast.info("Ürünleriniz onaya gönderildi. İnceleme sonrası onaylandıktan sonra otomatik olarak mağazanıza aktarılacaktır.", 6000);
+      }, 500);
       navigate("/seller/products/drafts");
     } catch (err) {
       console.error("JSON gönderilemedi:", err);
@@ -154,6 +174,10 @@ const ProductDraftUploadPage = () => {
 
       await addProductXml(formData);
       toast.success("XML dosyası başarıyla yüklendi!");
+      // Ek uyarı mesajı
+      setTimeout(() => {
+        toast.info("Ürünleriniz onaya gönderildi. İnceleme sonrası onaylandıktan sonra otomatik olarak mağazanıza aktarılacaktır.", 6000);
+      }, 500);
       navigate("/seller/products/drafts");
     } catch (err) {
       console.error("XML yüklenemedi:", err);
@@ -178,6 +202,10 @@ const ProductDraftUploadPage = () => {
         password: xmlPassword || undefined,
       });
       toast.success("XML URL başarıyla işlendi!");
+      // Ek uyarı mesajı
+      setTimeout(() => {
+        toast.info("Ürünleriniz onaya gönderildi. İnceleme sonrası onaylandıktan sonra otomatik olarak mağazanıza aktarılacaktır.", 6000);
+      }, 500);
       navigate("/seller/products/drafts");
     } catch (err) {
       console.error("XML URL işlenemedi:", err);
@@ -189,62 +217,165 @@ const ProductDraftUploadPage = () => {
 
   const handleManualUpload = async () => {
     // Validate products
-    const validProducts = products.filter(
-      (p) => p.name && p.sku && p.store.stockQuantity > 0 && p.store.unitPrice > 0
-    );
+    const validProducts = products.filter((p) => {
+      // API dokümantasyonuna göre zorunlu alanlar: Name, Store.UnitType, Store.StockQuantity, Store.MinOrderQuantity, Store.UnitPrice, Store.CurrencyCode
+      return (
+        p.name?.trim() &&
+        p.store.unitType &&
+        p.store.unitType > 0 &&
+        p.store.stockQuantity &&
+        p.store.stockQuantity > 0 &&
+        p.store.minOrderQuantity !== "" &&
+        p.store.minOrderQuantity !== null &&
+        p.store.minOrderQuantity !== undefined &&
+        p.store.minOrderQuantity >= 0 &&
+        p.store.unitPrice &&
+        p.store.unitPrice > 0 &&
+        p.store.currencyCode?.trim()
+      );
+    });
 
     if (validProducts.length === 0) {
-      toast.error("En az bir geçerli ürün bilgisi gereklidir.");
+      toast.error("En az bir geçerli ürün bilgisi gereklidir. Zorunlu alanları kontrol edin.");
       return;
+    }
+
+    // Görsel validasyonu (en fazla 10 görsel, max 10MB/dosya)
+    for (const product of validProducts) {
+      if (product.images && product.images.length > 10) {
+        toast.error(`Ürün "${product.name}" için en fazla 10 görsel gönderebilirsiniz.`);
+        return;
+      }
+      if (product.images) {
+        for (const imageFile of product.images) {
+          const maxSize = 10 * 1024 * 1024; // 10 MB
+          if (imageFile.size > maxSize) {
+            toast.error(`Görsel "${imageFile.name}" 10 MB limitini aşıyor.`);
+            return;
+          }
+          // Format kontrolü
+          const allowedExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
+          const fileName = imageFile.name.toLowerCase();
+          const hasValidExtension = allowedExtensions.some(ext => fileName.endsWith(ext));
+          if (!hasValidExtension) {
+            toast.error(`Görsel "${imageFile.name}" desteklenmiyor. İzin verilen: .jpg, .jpeg, .png, .gif, .webp`);
+            return;
+          }
+        }
+      }
     }
 
     setLoading(true);
     try {
-      // Clean up empty fields
-      const cleanedProducts = validProducts.map((product) => {
-        const cleaned = { ...product };
-        
-        // Clean store object
-        const cleanedStore = { ...cleaned.store };
-        if (cleanedStore.maxOrderQuantity === "") delete cleanedStore.maxOrderQuantity;
-        if (cleanedStore.mainProductCode === "") delete cleanedStore.mainProductCode;
-        if (cleanedStore.stockCode === "") delete cleanedStore.stockCode;
-        if (cleanedStore.criticalStock === "") delete cleanedStore.criticalStock;
-        if (cleanedStore.width === "") delete cleanedStore.width;
-        if (cleanedStore.length === "") delete cleanedStore.length;
-        if (cleanedStore.height === "") delete cleanedStore.height;
-        if (cleanedStore.weight === "") delete cleanedStore.weight;
-        if (cleanedStore.volumeWeight === "") delete cleanedStore.volumeWeight;
-        
-        cleaned.store = cleanedStore;
-        
-        // Remove empty optional fields
-        if (!cleaned.ean) delete cleaned.ean;
-        if (!cleaned.brandId) delete cleaned.brandId;
-        if (!cleaned.brandName) delete cleaned.brandName;
-        if (!cleaned.categoryId) delete cleaned.categoryId;
-        if (!cleaned.categorySubId) delete cleaned.categorySubId;
-        if (!cleaned.gtip) delete cleaned.gtip;
-        if (!cleaned.description) delete cleaned.description;
-        if (!cleaned.preparationTime) delete cleaned.preparationTime;
-        if (!cleaned.expirationDate) delete cleaned.expirationDate;
-        if (!cleaned.imageUrls || cleaned.imageUrls.length === 0) delete cleaned.imageUrls;
-        if (!cleaned.colorVariants || cleaned.colorVariants.length === 0) delete cleaned.colorVariants;
-        
-        return cleaned;
-      });
+      // API dokümantasyonuna göre her ürün ayrı ayrı gönderilmeli (tek ürün endpoint'i)
+      // Ancak kullanıcı deneyimi için tüm ürünleri sırayla gönderelim
+      let successCount = 0;
+      let errorCount = 0;
 
-      const payload = {
-        ...(draftName && { draftName }),
-        products: cleanedProducts,
-      };
+      for (const product of validProducts) {
+        try {
+          // Her ürün için ayrı FormData oluştur
+          const formData = new FormData();
 
-      await addProductManual(payload);
-      toast.success("Ürünler başarıyla yüklendi!");
-      navigate("/seller/products/drafts");
+          // DraftName ekle (sadece ilk ürün için veya her ürün için aynı isim)
+          if (draftName) {
+            formData.append("DraftName", draftName);
+          }
+
+          // Temel ürün bilgileri (API dokümantasyonuna göre prefix'siz veya product. prefix'li)
+          formData.append("Name", product.name.trim());
+          if (product.sku?.trim()) formData.append("Sku", product.sku.trim());
+          if (product.ean?.trim()) formData.append("Ean", product.ean.trim());
+          if (product.brandId?.trim()) formData.append("BrandId", product.brandId.trim());
+          if (product.brandName?.trim()) formData.append("BrandName", product.brandName.trim());
+          if (product.categoryId) formData.append("CategoryId", product.categoryId.toString());
+          if (product.categorySubId) formData.append("CategorySubId", product.categorySubId.toString());
+          if (product.gtip?.trim()) formData.append("Gtip", product.gtip.trim());
+          if (product.description?.trim()) formData.append("Description", product.description.trim());
+          if (product.preparationTime) {
+            // ISO formatına çevir
+            const prepTime = new Date(product.preparationTime).toISOString();
+            formData.append("PreparationTime", prepTime);
+          }
+          if (product.expirationDate) {
+            // ISO formatına çevir
+            const expDate = new Date(product.expirationDate).toISOString();
+            formData.append("ExpirationDate", expDate);
+          }
+
+          // Mağaza bilgileri
+          formData.append("Store.UnitType", product.store.unitType.toString());
+          formData.append("Store.StockQuantity", product.store.stockQuantity.toString());
+          formData.append("Store.MinOrderQuantity", product.store.minOrderQuantity.toString());
+          if (product.store.maxOrderQuantity && product.store.maxOrderQuantity !== "") {
+            formData.append("Store.MaxOrderQuantity", product.store.maxOrderQuantity.toString());
+          }
+          formData.append("Store.UnitPrice", product.store.unitPrice.toString());
+          formData.append("Store.CurrencyCode", product.store.currencyCode.trim());
+          if (product.store.mainProductCode?.trim()) {
+            formData.append("Store.MainProductCode", product.store.mainProductCode.trim());
+          }
+          if (product.store.stockCode?.trim()) {
+            formData.append("Store.StockCode", product.store.stockCode.trim());
+          }
+          if (product.store.criticalStock && product.store.criticalStock !== "") {
+            formData.append("Store.CriticalStock", product.store.criticalStock.toString());
+          }
+          if (product.store.width && product.store.width !== "") {
+            formData.append("Store.Width", product.store.width.toString());
+          }
+          if (product.store.length && product.store.length !== "") {
+            formData.append("Store.Length", product.store.length.toString());
+          }
+          if (product.store.height && product.store.height !== "") {
+            formData.append("Store.Height", product.store.height.toString());
+          }
+          if (product.store.weight && product.store.weight !== "") {
+            formData.append("Store.Weight", product.store.weight.toString());
+          }
+          if (product.store.volumeWeight && product.store.volumeWeight !== "") {
+            formData.append("Store.VolumeWeight", product.store.volumeWeight.toString());
+          }
+
+          // Görselleri ekle (Files olarak - API dokümantasyonuna göre)
+          if (product.images && product.images.length > 0) {
+            product.images.forEach((imageFile) => {
+              formData.append("Files", imageFile);
+            });
+          }
+
+          // Renk varyantları
+          if (product.colorVariants && product.colorVariants.length > 0) {
+            product.colorVariants.forEach((color, colorIndex) => {
+              if (color?.trim()) {
+                formData.append(`ColorVariants[${colorIndex}]`, color.trim());
+              }
+            });
+          }
+
+          await addProductManual(formData);
+          successCount++;
+        } catch (err) {
+          console.error(`Ürün "${product.name}" yüklenemedi:`, err);
+          errorCount++;
+          // Hata mesajını göster ama devam et
+          toast.error(`Ürün "${product.name}" yüklenemedi: ${err.message || err}`);
+        }
+      }
+
+      if (successCount > 0) {
+        toast.success(`${successCount} ürün başarıyla yüklendi!${errorCount > 0 ? ` ${errorCount} ürün yüklenemedi.` : ""}`);
+        // Ek uyarı mesajı
+        setTimeout(() => {
+          toast.info("Ürünleriniz onaya gönderildi. İnceleme sonrası onaylandıktan sonra otomatik olarak mağazanıza aktarılacaktır.", 6000);
+        }, 500);
+        navigate("/seller/products/drafts");
+      } else {
+        toast.error("Hiçbir ürün yüklenemedi.");
+      }
     } catch (err) {
       console.error("Manuel yükleme başarısız:", err);
-      toast.error(`Ürünler yüklenemedi: ${err.message}`);
+      toast.error(`Ürünler yüklenemedi: ${err.message || err}`);
     } finally {
       setLoading(false);
     }
@@ -267,10 +398,10 @@ const ProductDraftUploadPage = () => {
         expirationDate: "",
         store: {
           unitType: 0,
-          stockQuantity: 0,
-          minOrderQuantity: 1,
+          stockQuantity: "",
+          minOrderQuantity: "",
           maxOrderQuantity: "",
-          unitPrice: 0,
+          unitPrice: "",
           currencyCode: "TRY",
           mainProductCode: "",
           stockCode: "",
@@ -281,7 +412,7 @@ const ProductDraftUploadPage = () => {
           weight: "",
           volumeWeight: "",
         },
-        imageUrls: [],
+        images: [],
         colorVariants: [],
       },
     ]);
@@ -302,24 +433,34 @@ const ProductDraftUploadPage = () => {
     setProducts(updated);
   };
 
-  const addImageUrl = (productIndex) => {
+  const handleImageChange = (productIndex, event) => {
+    const files = Array.from(event.target.files || []);
+    if (files.length === 0) return;
+
     const updated = [...products];
-    if (!updated[productIndex].imageUrls) {
-      updated[productIndex].imageUrls = [];
+    if (!updated[productIndex].images) {
+      updated[productIndex].images = [];
     }
-    updated[productIndex].imageUrls.push("");
+    updated[productIndex].images = [...updated[productIndex].images, ...files];
     setProducts(updated);
   };
 
-  const updateImageUrl = (productIndex, imageIndex, value) => {
+  const removeImage = (productIndex, imageIndex) => {
     const updated = [...products];
-    updated[productIndex].imageUrls[imageIndex] = value;
+    updated[productIndex].images = updated[productIndex].images.filter((_, i) => i !== imageIndex);
     setProducts(updated);
   };
 
-  const removeImageUrl = (productIndex, imageIndex) => {
+  const handleImageDrop = (productIndex, event) => {
+    event.preventDefault();
+    const files = Array.from(event.dataTransfer.files || []).filter((f) => f.type.startsWith("image/"));
+    if (files.length === 0) return;
+
     const updated = [...products];
-    updated[productIndex].imageUrls = updated[productIndex].imageUrls.filter((_, i) => i !== imageIndex);
+    if (!updated[productIndex].images) {
+      updated[productIndex].images = [];
+    }
+    updated[productIndex].images = [...updated[productIndex].images, ...files];
     setProducts(updated);
   };
 
@@ -361,6 +502,42 @@ const ProductDraftUploadPage = () => {
       loadDrafts();
     }
   }, [showHistory]);
+
+  // Load categories on mount
+  useEffect(() => {
+    const loadCategories = async () => {
+      setLoadingCategories(true);
+      try {
+        const data = await getCategoriesWithSubCategories();
+        setCategories(data || []);
+      } catch (err) {
+        console.error("Kategoriler yüklenemedi:", err);
+        toast.error("Kategoriler yüklenemedi");
+      } finally {
+        setLoadingCategories(false);
+      }
+    };
+    loadCategories();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Load brands on mount
+  useEffect(() => {
+    const loadBrands = async () => {
+      setLoadingBrands(true);
+      try {
+        const data = await getBrandList();
+        setBrands(data || []);
+      } catch (err) {
+        console.error("Markalar yüklenemedi:", err);
+        toast.error("Markalar yüklenemedi");
+      } finally {
+        setLoadingBrands(false);
+      }
+    };
+    loadBrands();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const tabs = [
     { key: "manual", label: "Manuel", icon: Package, color: "emerald" },
@@ -569,7 +746,7 @@ const ProductDraftUploadPage = () => {
                       </div>
                       <div>
                         <label className="block text-sm font-semibold text-gray-700 mb-1">
-                          SKU *
+                          SKU
                         </label>
                         <input
                           type="text"
@@ -577,7 +754,6 @@ const ProductDraftUploadPage = () => {
                           onChange={(e) => updateProduct(productIndex, "sku", e.target.value)}
                           placeholder="SKU-001"
                           className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
-                          required
                         />
                       </div>
                       <div>
@@ -594,25 +770,151 @@ const ProductDraftUploadPage = () => {
                       </div>
                       <div>
                         <label className="block text-sm font-semibold text-gray-700 mb-1">
+                          Marka
+                        </label>
+                        <select
+                          value={product.brandId || ""}
+                          onChange={(e) => {
+                            const selectedBrandId = e.target.value;
+                            const selectedBrand = brands.find(b => b.id === selectedBrandId);
+                            updateProduct(productIndex, "brandId", selectedBrandId || "");
+                            // Marka seçildiğinde marka adını otomatik doldur
+                            if (selectedBrand) {
+                              updateProduct(productIndex, "brandName", selectedBrand.name || "");
+                            } else {
+                              updateProduct(productIndex, "brandName", "");
+                            }
+                          }}
+                          className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 bg-white"
+                          disabled={loadingBrands}
+                        >
+                          <option value="">Marka Seçiniz</option>
+                          {brands.map((brand) => (
+                            <option key={brand.id} value={brand.id}>
+                              {brand.name}
+                            </option>
+                          ))}
+                        </select>
+                        {loadingBrands && (
+                          <p className="text-xs text-gray-500 mt-1">Markalar yükleniyor...</p>
+                        )}
+                      </div>
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-1">
                           Marka Adı
                         </label>
                         <input
                           type="text"
                           value={product.brandName}
-                          onChange={(e) => updateProduct(productIndex, "brandName", e.target.value)}
-                          placeholder="Marka adı"
+                          onChange={(e) => {
+                            const brandName = e.target.value;
+                            updateProduct(productIndex, "brandName", brandName);
+                            // Manuel marka adı girildiğinde marka ID'yi temizle (yeni marka oluşturuluyor olabilir)
+                            if (brandName && product.brandId) {
+                              const selectedBrand = brands.find(b => b.id === product.brandId);
+                              if (selectedBrand && selectedBrand.name !== brandName) {
+                                updateProduct(productIndex, "brandId", "");
+                              }
+                            }
+                          }}
+                          placeholder="Markanız yoksa markanızı buraya yazınız"
                           className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
                         />
                       </div>
-                      <div>
+                      <div className="md:col-span-2">
                         <label className="block text-sm font-semibold text-gray-700 mb-1">
                           Açıklama
                         </label>
                         <textarea
                           value={product.description}
                           onChange={(e) => updateProduct(productIndex, "description", e.target.value)}
-                          placeholder="Ürün açıklaması"
-                          rows={2}
+                          placeholder="Ürün açıklaması (detaylı bilgi, özellikler, kullanım alanları vb.)"
+                          rows={3}
+                          className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-1">
+                          Ana Kategori
+                        </label>
+                        <select
+                          value={product.categoryId || ""}
+                          onChange={(e) => {
+                            const selectedCategoryId = e.target.value ? parseInt(e.target.value) : "";
+                            updateProduct(productIndex, "categoryId", selectedCategoryId);
+                            // Ana kategori değiştiğinde alt kategoriyi sıfırla
+                            if (selectedCategoryId !== product.categoryId) {
+                              updateProduct(productIndex, "categorySubId", "");
+                            }
+                          }}
+                          className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 bg-white"
+                          disabled={loadingCategories}
+                        >
+                          <option value="">Kategori Seçiniz</option>
+                          {categories.map((category) => (
+                            <option key={category.id} value={category.id}>
+                              {category.name}
+                            </option>
+                          ))}
+                        </select>
+                        {loadingCategories && (
+                          <p className="text-xs text-gray-500 mt-1">Kategoriler yükleniyor...</p>
+                        )}
+                      </div>
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-1">
+                          Alt Kategori
+                        </label>
+                        <select
+                          value={product.categorySubId || ""}
+                          onChange={(e) => updateProduct(productIndex, "categorySubId", e.target.value ? parseInt(e.target.value) : "")}
+                          className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 bg-white"
+                          disabled={!product.categoryId || loadingCategories}
+                        >
+                          <option value="">Alt Kategori Seçiniz</option>
+                          {product.categoryId && categories
+                            .find((cat) => cat.id === parseInt(product.categoryId))
+                            ?.subCategories?.map((subCategory) => (
+                              <option key={subCategory.id} value={subCategory.id}>
+                                {subCategory.name}
+                              </option>
+                            ))}
+                        </select>
+                        {!product.categoryId && (
+                          <p className="text-xs text-gray-500 mt-1">Önce ana kategori seçiniz</p>
+                        )}
+                      </div>
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-1">
+                          GTIP Kodu
+                        </label>
+                        <input
+                          type="text"
+                          value={product.gtip}
+                          onChange={(e) => updateProduct(productIndex, "gtip", e.target.value)}
+                          placeholder="GTIP kodu (gümrük tarife kodu)"
+                          className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-1">
+                          Hazırlık Tarihi
+                        </label>
+                        <input
+                          type="datetime-local"
+                          value={product.preparationTime}
+                          onChange={(e) => updateProduct(productIndex, "preparationTime", e.target.value)}
+                          className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-1">
+                          Son Kullanma Tarihi
+                        </label>
+                        <input
+                          type="datetime-local"
+                          value={product.expirationDate}
+                          onChange={(e) => updateProduct(productIndex, "expirationDate", e.target.value)}
                           className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
                         />
                       </div>
@@ -645,8 +947,12 @@ const ProductDraftUploadPage = () => {
                             </label>
                             <input
                               type="number"
-                              value={product.store.stockQuantity}
-                              onChange={(e) => updateProduct(productIndex, "store.stockQuantity", parseInt(e.target.value) || 0)}
+                              value={product.store.stockQuantity === 0 ? "" : product.store.stockQuantity || ""}
+                              onChange={(e) => {
+                                const value = e.target.value;
+                                updateProduct(productIndex, "store.stockQuantity", value === "" ? "" : parseInt(value) || "");
+                              }}
+                              placeholder="Stok miktarı"
                               className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
                               required
                             />
@@ -657,10 +963,34 @@ const ProductDraftUploadPage = () => {
                             </label>
                             <input
                               type="number"
-                              value={product.store.minOrderQuantity}
-                              onChange={(e) => updateProduct(productIndex, "store.minOrderQuantity", parseInt(e.target.value) || 1)}
+                              min="0"
+                              value={product.store.minOrderQuantity === "" ? "" : (product.store.minOrderQuantity ?? "")}
+                              onChange={(e) => {
+                                const value = e.target.value;
+                                if (value === "") {
+                                  updateProduct(productIndex, "store.minOrderQuantity", "");
+                                } else {
+                                  const numValue = parseInt(value, 10);
+                                  if (!isNaN(numValue) && numValue >= 0) {
+                                    updateProduct(productIndex, "store.minOrderQuantity", numValue);
+                                  }
+                                }
+                              }}
+                              placeholder="Minimum sipariş miktarı"
                               className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
                               required
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-1">
+                              Max. Sipariş
+                            </label>
+                            <input
+                              type="number"
+                              value={product.store.maxOrderQuantity}
+                              onChange={(e) => updateProduct(productIndex, "store.maxOrderQuantity", e.target.value ? parseInt(e.target.value) : "")}
+                              placeholder="Maksimum sipariş miktarı"
+                              className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
                             />
                           </div>
                           <div>
@@ -670,8 +1000,12 @@ const ProductDraftUploadPage = () => {
                             <input
                               type="number"
                               step="0.01"
-                              value={product.store.unitPrice}
-                              onChange={(e) => updateProduct(productIndex, "store.unitPrice", parseFloat(e.target.value) || 0)}
+                              value={product.store.unitPrice === 0 ? "" : product.store.unitPrice || ""}
+                              onChange={(e) => {
+                                const value = e.target.value;
+                                updateProduct(productIndex, "store.unitPrice", value === "" ? "" : parseFloat(value) || "");
+                              }}
+                              placeholder="Birim fiyat"
                               className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
                               required
                             />
@@ -689,42 +1023,182 @@ const ProductDraftUploadPage = () => {
                               required
                             />
                           </div>
+                          <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-1">
+                              Ana Ürün Kodu
+                            </label>
+                            <input
+                              type="text"
+                              value={product.store.mainProductCode}
+                              onChange={(e) => updateProduct(productIndex, "store.mainProductCode", e.target.value)}
+                              placeholder="Ana ürün kodu"
+                              className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-1">
+                              Stok Kodu
+                            </label>
+                            <input
+                              type="text"
+                              value={product.store.stockCode}
+                              onChange={(e) => updateProduct(productIndex, "store.stockCode", e.target.value)}
+                              placeholder="Stok kodu"
+                              className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-1">
+                              Kritik Stok
+                            </label>
+                            <input
+                              type="number"
+                              value={product.store.criticalStock}
+                              onChange={(e) => updateProduct(productIndex, "store.criticalStock", e.target.value ? parseInt(e.target.value) : "")}
+                              placeholder="Kritik stok seviyesi"
+                              className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
+                            />
+                          </div>
                         </div>
                       </div>
 
-                      {/* Image URLs */}
-                      <div className="md:col-span-2">
-                        <div className="flex items-center justify-between mb-2">
-                          <label className="block text-sm font-semibold text-gray-700">
-                            Görsel URL'leri
-                          </label>
-                          <button
-                            type="button"
-                            onClick={() => addImageUrl(productIndex)}
-                            className="text-sm text-emerald-600 hover:text-emerald-700 flex items-center gap-1"
-                          >
-                            <Plus className="w-4 h-4" />
-                            Ekle
-                          </button>
-                        </div>
-                        {product.imageUrls && product.imageUrls.map((url, urlIndex) => (
-                          <div key={urlIndex} className="flex gap-2 mb-2">
+                      {/* Boyut ve Ağırlık Bilgileri */}
+                      <div className="md:col-span-2 border-t pt-4 mt-4">
+                        <h4 className="font-semibold text-gray-900 mb-3">Boyut ve Ağırlık Bilgileri</h4>
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                          <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-1">
+                              Genişlik (cm)
+                            </label>
                             <input
-                              type="url"
-                              value={url}
-                              onChange={(e) => updateImageUrl(productIndex, urlIndex, e.target.value)}
-                              placeholder="https://example.com/image.jpg"
-                              className="flex-1 px-3 py-2 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
+                              type="number"
+                              step="0.01"
+                              value={product.store.width}
+                              onChange={(e) => updateProduct(productIndex, "store.width", e.target.value ? parseFloat(e.target.value) : "")}
+                              placeholder="Genişlik"
+                              className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
                             />
-                            <button
-                              type="button"
-                              onClick={() => removeImageUrl(productIndex, urlIndex)}
-                              className="text-red-600 hover:text-red-700"
-                            >
-                              <X className="w-5 h-5" />
-                            </button>
                           </div>
-                        ))}
+                          <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-1">
+                              Uzunluk (cm)
+                            </label>
+                            <input
+                              type="number"
+                              step="0.01"
+                              value={product.store.length}
+                              onChange={(e) => updateProduct(productIndex, "store.length", e.target.value ? parseFloat(e.target.value) : "")}
+                              placeholder="Uzunluk"
+                              className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-1">
+                              Yükseklik (cm)
+                            </label>
+                            <input
+                              type="number"
+                              step="0.01"
+                              value={product.store.height}
+                              onChange={(e) => updateProduct(productIndex, "store.height", e.target.value ? parseFloat(e.target.value) : "")}
+                              placeholder="Yükseklik"
+                              className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-1">
+                              Ağırlık (kg)
+                            </label>
+                            <input
+                              type="number"
+                              step="0.01"
+                              value={product.store.weight}
+                              onChange={(e) => updateProduct(productIndex, "store.weight", e.target.value ? parseFloat(e.target.value) : "")}
+                              placeholder="Ağırlık"
+                              className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-1">
+                              Hacim Ağırlığı (kg)
+                            </label>
+                            <input
+                              type="number"
+                              step="0.01"
+                              value={product.store.volumeWeight}
+                              onChange={(e) => updateProduct(productIndex, "store.volumeWeight", e.target.value ? parseFloat(e.target.value) : "")}
+                              placeholder="Hacim ağırlığı"
+                              className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Image Files */}
+                      <div className="md:col-span-2 border-t pt-4 mt-4">
+                        <div className="flex items-center justify-between mb-3">
+                          <label className="block text-sm font-semibold text-gray-700">
+                            Ürün Görselleri
+                          </label>
+                          <span className="text-xs text-gray-500">
+                            {product.images?.length || 0} görsel seçildi
+                          </span>
+                        </div>
+                        
+                        {/* Drag & Drop Area */}
+                        <div
+                          onDrop={(e) => handleImageDrop(productIndex, e)}
+                          onDragOver={(e) => e.preventDefault()}
+                          onDragLeave={(e) => e.preventDefault()}
+                          className="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center hover:border-emerald-400 transition-colors bg-gray-50"
+                        >
+                          <ImageIcon className="w-12 h-12 mx-auto text-gray-400 mb-3" />
+                          <p className="text-sm font-medium text-gray-700 mb-1">
+                            Görselleri buraya sürükle-bırak
+                          </p>
+                          <p className="text-xs text-gray-500 mb-3">veya</p>
+                          <label className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 cursor-pointer transition-colors">
+                            <Upload className="w-4 h-4" />
+                            Dosya Seç
+                            <input
+                              type="file"
+                              multiple
+                              accept="image/*"
+                              onChange={(e) => handleImageChange(productIndex, e)}
+                              className="hidden"
+                            />
+                          </label>
+                          <p className="text-xs text-gray-400 mt-2">
+                            JPG, PNG, GIF, WebP formatları desteklenir. En fazla 10 görsel, her biri max 10 MB.
+                          </p>
+                        </div>
+
+                        {/* Image Preview Grid */}
+                        {product.images && product.images.length > 0 && (
+                          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4">
+                            {product.images.map((imageFile, imageIndex) => (
+                              <div key={imageIndex} className="relative group">
+                                <div className="aspect-square rounded-lg overflow-hidden border-2 border-gray-200 bg-gray-100">
+                                  <img
+                                    src={URL.createObjectURL(imageFile)}
+                                    alt={`Preview ${imageIndex + 1}`}
+                                    className="w-full h-full object-cover"
+                                  />
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={() => removeImage(productIndex, imageIndex)}
+                                  className="absolute top-1 right-1 p-1.5 bg-red-600 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-700"
+                                >
+                                  <Trash2 className="w-3 h-3" />
+                                </button>
+                                <p className="text-xs text-gray-600 mt-1 truncate" title={imageFile.name}>
+                                  {imageFile.name}
+                                </p>
+                              </div>
+                            ))}
+                          </div>
+                        )}
                       </div>
 
                       {/* Color Variants */}

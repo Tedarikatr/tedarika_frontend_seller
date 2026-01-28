@@ -1,0 +1,39 @@
+{
+  "name": "Samsung Galaxy S24 Ultra 256GB",
+  "sku": "SGS24U-256-BLK",
+  "ean": "8806094567890",
+  "brandId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+  "brandName": "Samsung",
+  "categoryId": 1,
+  "categorySubId": 5,
+  "gtip": "8517120000",
+  "description": "6.8 inç Dynamic AMOLED 2X ekran, Snapdragon 8 Gen 3 işlemci, 256GB dahili depolama, 12GB RAM, 200MP kamera, 5000mAh batarya, IP68 su ve toz direnci",
+  "preparationTime": "2026-01-28T10:22:17.956Z",
+  "expirationDate": "2027-01-28T10:22:17.956Z",
+  "store": {
+    "unitType": "Adet",
+    "stockQuantity": 150,
+    "minOrderQuantity": 1,
+    "maxOrderQuantity": 10,
+    "unitPrice": 45999.99,
+    "currencyCode": "TRY",
+    "mainProductCode": "MAIN-SGS24U-256",
+    "stockCode": "STK-SGS24U-256",
+    "criticalStock": 20,
+    "width": 8.2,
+    "length": 16.2,
+    "height": 0.9,
+    "weight": 0.233,
+    "volumeWeight": 0.25
+  },
+  "images": [
+    "https://example.com/images/samsung-s24-ultra-1.jpg",
+    "https://example.com/images/samsung-s24-ultra-2.jpg",
+    "https://example.com/images/samsung-s24-ultra-3.jpg"
+  ],
+  "colorVariants": [
+    "Siyah",
+    "Mor",
+    "Gümüş"
+  ]
+}

@@ -219,11 +219,18 @@ const ProductManagementPanel = ({
   };
 
   return (
-    <div className="fixed inset-0 flex justify-end z-50 bg-black/40 backdrop-blur-md transition-all">
-      <div className="w-full sm:w-[580px] bg-gradient-to-br from-gray-50 to-white h-full shadow-2xl overflow-y-auto relative animate-[slideIn_0.35s_ease-out]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      {/* Backdrop - Fixed blur overlay */}
+      <div 
+        className="fixed inset-0 bg-black/40 backdrop-blur-md transition-all"
+        onClick={onClose}
+      />
+      
+      {/* Panel - Centered and scrollable */}
+      <div className="relative w-full max-w-2xl max-h-[90vh] bg-gradient-to-br from-gray-50 to-white rounded-2xl shadow-2xl overflow-hidden animate-[slideIn_0.35s_ease-out] flex flex-col">
         
         {/* ============ Ultra Modern Header ============ */}
-        <div className="sticky top-0 z-10 bg-gradient-to-r from-emerald-600 via-emerald-700 to-teal-700 text-white p-6 shadow-xl">
+        <div className="sticky top-0 z-10 bg-gradient-to-r from-emerald-600 via-emerald-700 to-teal-700 text-white p-6 shadow-xl flex-shrink-0">
           <button
             onClick={onClose}
             className="absolute top-4 right-4 p-2 hover:bg-white/20 rounded-xl transition-all duration-200 hover:rotate-90"
@@ -231,7 +238,7 @@ const ProductManagementPanel = ({
             <X size={20} />
           </button>
           
-          <div className="flex items-center gap-3 mb-4">
+          <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
               <Sparkles size={24} className="animate-pulse" />
             </div>
@@ -240,41 +247,12 @@ const ProductManagementPanel = ({
               <p className="text-emerald-100 text-sm">Detaylı düzenleme ve ayarlar</p>
             </div>
           </div>
-
-          {/* Ürün Bilgi Kartı */}
-          <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/20">
-            <div className="flex items-center gap-4">
-              <div className="relative">
-                <img
-                  src={
-                    product.storeProductImageUrl ||
-                    product.imageUrl ||
-                    "/placeholder.png"
-                  }
-                  alt={product?.name || "Ürün görseli"}
-                  className="w-20 h-20 rounded-xl object-cover border-2 border-white/30 shadow-lg"
-                />
-                <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-white rounded-full flex items-center justify-center shadow-lg">
-                  <Package size={14} className="text-emerald-600" />
-                </div>
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="font-bold text-lg text-white truncate mb-1">
-                  {product.name}
-                </div>
-                <div className="text-emerald-100 text-xs font-mono mb-2">
-                  ID: {storeProductId.split('-')[0]}...
-                </div>
-                <Badge variant={isOnSale ? "success" : "warning"} size="sm">
-                  {isOnSale ? "🟢 Satışta" : "⚫ Pasif"}
-                </Badge>
-              </div>
-            </div>
-          </div>
         </div>
 
         {/* ============ Main Content ============ */}
-        <div className="p-6 space-y-5">
+        <div className="p-6 space-y-5 overflow-y-auto flex-1">
+          
+          {/* ============ FİYAT İŞLEMLERİ ============ */}
           
           {/* 💰 Para Birimi Fiyatları */}
           <SectionCard 
@@ -394,6 +372,13 @@ const ProductManagementPanel = ({
             </div>
           </SectionCard>
 
+          {/* 🧮 Fiyat Merdivenleri */}
+          <ProductPriceTiers
+            storeProductId={storeProductId}
+            productPrices={productPrices}
+            onFeedback={onFeedback}
+          />
+
           {/* 📦 Birim Tipi */}
           <SectionCard title="Birim Tipi" icon={Box}>
             <div className="space-y-3">
@@ -430,82 +415,83 @@ const ProductManagementPanel = ({
             </div>
           </SectionCard>
 
-          {/* 🔢 Sipariş Limitleri & Stok */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            {/* Limitler */}
-            <SectionCard title="Sipariş Limitleri" icon={Layers}>
-              <div className="space-y-3">
-                <div>
-                  <label className="text-xs font-semibold text-gray-700 block mb-2">
-                    Minimum Adet
-                  </label>
-                  <Input
-                    type="number"
-                    value={minQty}
-                    onChange={(e) => setMinQty(e.target.value)}
-                    placeholder="Min"
-                  />
-                </div>
-                <div>
-                  <label className="text-xs font-semibold text-gray-700 block mb-2">
-                    Maksimum Adet
-                  </label>
-                  <Input
-                    type="number"
-                    value={maxQty}
-                    onChange={(e) => setMaxQty(e.target.value)}
-                    placeholder="Max"
-                  />
-                </div>
-                <Button
-                  variant="primary"
-                  className="w-full"
-                  onClick={() =>
-                    handleAction(
-                      () =>
-                        updateProductQuantityLimits(
-                          storeProductId,
-                          minQty,
-                          maxQty
-                        ),
-                      "✅ Limitler güncellendi!"
-                    )
-                  }
-                  icon={Save}
-                >
-                  Kaydet
-                </Button>
-              </div>
-            </SectionCard>
-
-            {/* Stok */}
-            <SectionCard title="Stok Miktarı" icon={Package}>
-              <div className="space-y-3">
-                <label className="text-xs font-semibold text-gray-700 block">
-                  Mevcut stok adedi
+          {/* ============ SİPARİŞ İŞLEMLERİ ============ */}
+          
+          {/* 🔢 Sipariş Limitleri */}
+          <SectionCard title="Sipariş Limitleri" icon={Layers}>
+            <div className="space-y-3">
+              <div>
+                <label className="text-xs font-semibold text-gray-700 block mb-2">
+                  Minimum Adet
                 </label>
                 <Input
                   type="number"
-                  value={stock}
-                  onChange={(e) => setStock(e.target.value)}
-                  placeholder="Stok"
+                  value={minQty}
+                  onChange={(e) => setMinQty(e.target.value)}
+                  placeholder="Min"
                 />
-                <Button
-                  variant="primary"
-                  className="w-full"
-                  onClick={() =>
-                    handleAction(
-                      () => updateProductStock(storeProductId, stock),
-                      "✅ Stok güncellendi!"
-                    )
-                  }
-                  icon={Save}
-                >
-                  Kaydet
-                </Button>
               </div>
-            </SectionCard>
-          </div>
+              <div>
+                <label className="text-xs font-semibold text-gray-700 block mb-2">
+                  Maksimum Adet
+                </label>
+                <Input
+                  type="number"
+                  value={maxQty}
+                  onChange={(e) => setMaxQty(e.target.value)}
+                  placeholder="Max"
+                />
+              </div>
+              <Button
+                variant="primary"
+                className="w-full"
+                onClick={() =>
+                  handleAction(
+                    () =>
+                      updateProductQuantityLimits(
+                        storeProductId,
+                        minQty,
+                        maxQty
+                      ),
+                    "✅ Limitler güncellendi!"
+                  )
+                }
+                icon={Save}
+              >
+                Kaydet
+              </Button>
+            </div>
+          </SectionCard>
+
+          {/* ============ STOK İŞLEMLERİ ============ */}
+          
+          {/* Stok */}
+          <SectionCard title="Stok Miktarı" icon={Package}>
+            <div className="space-y-3">
+              <label className="text-xs font-semibold text-gray-700 block">
+                Mevcut stok adedi
+              </label>
+              <Input
+                type="number"
+                value={stock}
+                onChange={(e) => setStock(e.target.value)}
+                placeholder="Stok"
+              />
+              <Button
+                variant="primary"
+                className="w-full"
+                onClick={() =>
+                  handleAction(
+                    () => updateProductStock(storeProductId, stock),
+                    "✅ Stok güncellendi!"
+                  )
+                }
+                icon={Save}
+              >
+                Kaydet
+              </Button>
+            </div>
+          </SectionCard>
 
           {/* 📸 Ürün Görselleri */}
           <SectionCard title="Ürün Görselleri" icon={Images}>
@@ -604,19 +590,13 @@ const ProductManagementPanel = ({
             )}
           </SectionCard>
 
-          {/* 🧮 Fiyat Merdivenleri */}
-          <ProductPriceTiers
-            storeProductId={storeProductId}
-            productPrices={productPrices}
-            onFeedback={onFeedback}
-          />
         </div>
       </div>
 
       <style>{`
         @keyframes slideIn {
-          from { transform: translateX(100%); opacity: 0.4; }
-          to { transform: translateX(0); opacity: 1; }
+          from { transform: scale(0.95) translateY(-20px); opacity: 0; }
+          to { transform: scale(1) translateY(0); opacity: 1; }
         }
       `}</style>
     </div>
