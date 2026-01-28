@@ -66,9 +66,11 @@ export const addProductXmlFromUrl = async (data) => {
 
 /**
  * Manuel olarak ürün taslakları oluştur (Excel, JSON, XML gerektirmez)
- * @param {Object} data - { draftName?: string, products: Array<DraftProductManualCreate> }
+ * @param {FormData} formData - FormData object containing products and images
  * @returns {Promise<Array>} Oluşturulan draft product'ların listesi
  */
-export const addProductManual = async (data) => {
-  return await apiRequest("/SellerProductDraft/add-product-manual", "POST", data, true);
+export const addProductManual = async (formData) => {
+  return await apiRequest("/SellerProductDraft/add-product-manual", "POST", formData, true, {
+    timeoutMs: 10 * 60 * 1000, // 10 dakika timeout (görsel yükleme için)
+  });
 };
