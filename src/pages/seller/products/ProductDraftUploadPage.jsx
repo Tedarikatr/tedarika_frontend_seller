@@ -112,6 +112,10 @@ const ProductDraftUploadPage = () => {
 
       await addProductExcel(formData);
       toast.success("Excel dosyası başarıyla yüklendi!");
+      // Ek uyarı mesajı
+      setTimeout(() => {
+        toast.info("Ürünleriniz onaya gönderildi. İnceleme sonrası onaylandıktan sonra otomatik olarak mağazanıza aktarılacaktır.", 6000);
+      }, 500);
       navigate("/seller/products/drafts");
     } catch (err) {
       console.error("Excel yüklenemedi:", err);
@@ -134,6 +138,10 @@ const ProductDraftUploadPage = () => {
 
       await addProductJson(parsedJson);
       toast.success("JSON başarıyla gönderildi!");
+      // Ek uyarı mesajı
+      setTimeout(() => {
+        toast.info("Ürünleriniz onaya gönderildi. İnceleme sonrası onaylandıktan sonra otomatik olarak mağazanıza aktarılacaktır.", 6000);
+      }, 500);
       navigate("/seller/products/drafts");
     } catch (err) {
       console.error("JSON gönderilemedi:", err);
@@ -161,6 +169,10 @@ const ProductDraftUploadPage = () => {
 
       await addProductXml(formData);
       toast.success("XML dosyası başarıyla yüklendi!");
+      // Ek uyarı mesajı
+      setTimeout(() => {
+        toast.info("Ürünleriniz onaya gönderildi. İnceleme sonrası onaylandıktan sonra otomatik olarak mağazanıza aktarılacaktır.", 6000);
+      }, 500);
       navigate("/seller/products/drafts");
     } catch (err) {
       console.error("XML yüklenemedi:", err);
@@ -185,6 +197,10 @@ const ProductDraftUploadPage = () => {
         password: xmlPassword || undefined,
       });
       toast.success("XML URL başarıyla işlendi!");
+      // Ek uyarı mesajı
+      setTimeout(() => {
+        toast.info("Ürünleriniz onaya gönderildi. İnceleme sonrası onaylandıktan sonra otomatik olarak mağazanıza aktarılacaktır.", 6000);
+      }, 500);
       navigate("/seller/products/drafts");
     } catch (err) {
       console.error("XML URL işlenemedi:", err);
@@ -204,8 +220,10 @@ const ProductDraftUploadPage = () => {
         p.store.unitType > 0 &&
         p.store.stockQuantity &&
         p.store.stockQuantity > 0 &&
-        p.store.minOrderQuantity &&
-        p.store.minOrderQuantity > 0 &&
+        p.store.minOrderQuantity !== "" &&
+        p.store.minOrderQuantity !== null &&
+        p.store.minOrderQuantity !== undefined &&
+        p.store.minOrderQuantity >= 0 &&
         p.store.unitPrice &&
         p.store.unitPrice > 0 &&
         p.store.currencyCode?.trim()
@@ -342,6 +360,10 @@ const ProductDraftUploadPage = () => {
 
       if (successCount > 0) {
         toast.success(`${successCount} ürün başarıyla yüklendi!${errorCount > 0 ? ` ${errorCount} ürün yüklenemedi.` : ""}`);
+        // Ek uyarı mesajı
+        setTimeout(() => {
+          toast.info("Ürünleriniz onaya gönderildi. İnceleme sonrası onaylandıktan sonra otomatik olarak mağazanıza aktarılacaktır.", 6000);
+        }, 500);
         navigate("/seller/products/drafts");
       } else {
         toast.error("Hiçbir ürün yüklenemedi.");
@@ -889,10 +911,18 @@ const ProductDraftUploadPage = () => {
                             </label>
                             <input
                               type="number"
-                              value={product.store.minOrderQuantity === 1 ? "" : product.store.minOrderQuantity || ""}
+                              min="0"
+                              value={product.store.minOrderQuantity === "" ? "" : (product.store.minOrderQuantity ?? "")}
                               onChange={(e) => {
                                 const value = e.target.value;
-                                updateProduct(productIndex, "store.minOrderQuantity", value === "" ? "" : parseInt(value) || "");
+                                if (value === "") {
+                                  updateProduct(productIndex, "store.minOrderQuantity", "");
+                                } else {
+                                  const numValue = parseInt(value, 10);
+                                  if (!isNaN(numValue) && numValue >= 0) {
+                                    updateProduct(productIndex, "store.minOrderQuantity", numValue);
+                                  }
+                                }
                               }}
                               placeholder="Minimum sipariş miktarı"
                               className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
