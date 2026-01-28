@@ -16,12 +16,13 @@ const CODE_REGEX = /^\d{6}$/;
 const PASSWORD_MIN = 8;
 
 function isValidPassword(p) {
-  if (!p || p.length < PASSWORD_MIN) return false;
+  const trimmed = p?.trim();
+  if (!trimmed || trimmed.length === 0 || trimmed.length < PASSWORD_MIN) return false;
   return (
-    /[a-z]/.test(p) &&
-    /[A-Z]/.test(p) &&
-    /\d/.test(p) &&
-    /[^A-Za-z0-9]/.test(p)
+    /[a-z]/.test(trimmed) &&
+    /[A-Z]/.test(trimmed) &&
+    /\d/.test(trimmed) &&
+    /[^A-Za-z0-9]/.test(trimmed)
   );
 }
 
@@ -45,17 +46,18 @@ const ForgotPasswordPage = () => {
 
   const handleStep1 = async (e) => {
     e.preventDefault();
-    if (!email.trim()) {
+    const trimmedEmail = email?.trim();
+    if (!trimmedEmail || trimmedEmail.length === 0 || trimmedEmail.includes(' ')) {
       toast.error("Geçerli bir e-posta adresi giriniz.");
       return;
     }
-    if (!EMAIL_REGEX.test(email.trim())) {
+    if (!EMAIL_REGEX.test(trimmedEmail)) {
       toast.error("Geçerli bir e-posta adresi giriniz.");
       return;
     }
     setIsSubmitting(true);
     try {
-      await requestForgetPasswordReset(email.trim());
+      await requestForgetPasswordReset(trimmedEmail);
       toast.success("Doğrulama kodu e-posta adresinize gönderildi.");
       setStep(2);
     } catch (err) {
@@ -71,13 +73,21 @@ const ForgotPasswordPage = () => {
       toast.error("Doğrulama kodu 6 haneli olmalıdır.");
       return;
     }
-    if (!isValidPassword(newPassword)) {
+    const trimmedNewPassword = newPassword?.trim();
+    const trimmedNewPasswordConfirm = newPasswordConfirm?.trim();
+    
+    if (!trimmedNewPassword || trimmedNewPassword.length === 0) {
+      toast.error("Şifre giriniz.");
+      return;
+    }
+    
+    if (!isValidPassword(trimmedNewPassword)) {
       toast.error(
         "Şifre en az 8 karakter, büyük/küçük harf, rakam ve özel karakter içermelidir."
       );
       return;
     }
-    if (newPassword !== newPasswordConfirm) {
+    if (trimmedNewPassword !== trimmedNewPasswordConfirm) {
       toast.error("Yeni şifre tekrar, yeni şifre ile aynı olmalıdır.");
       return;
     }
@@ -86,8 +96,8 @@ const ForgotPasswordPage = () => {
       await forgetPassword({
         email: email.trim(),
         code,
-        newPassword,
-        newPasswordConfirm,
+        newPassword: trimmedNewPassword,
+        newPasswordConfirm: trimmedNewPasswordConfirm,
       });
       toast.success("Şifre değiştirildi. Giriş sayfasına yönlendiriliyorsunuz...");
       setTimeout(() => navigate("/seller/login"), 1500);

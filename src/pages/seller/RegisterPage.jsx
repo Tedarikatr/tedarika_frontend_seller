@@ -48,7 +48,12 @@ const handleSubmit = async (e) => {
   const phoneRegex = /^5\d{9}$/;
 
   // Email validation
-  if (!formData.email || !emailRegex.test(formData.email)) {
+  const trimmedEmail = formData.email?.trim();
+  if (!trimmedEmail || trimmedEmail.length === 0 || trimmedEmail.includes(' ')) {
+    toast.error("Geçerli bir e-posta adresi giriniz.");
+    return;
+  }
+  if (!emailRegex.test(trimmedEmail)) {
     toast.error("Geçerli bir e-posta adresi giriniz.");
     return;
   }
@@ -60,7 +65,8 @@ const handleSubmit = async (e) => {
   }
 
   // Password validation
-  if (!formData.password || formData.password.length < 8) {
+  const trimmedPassword = formData.password?.trim();
+  if (!trimmedPassword || trimmedPassword.length === 0 || trimmedPassword.length < 8) {
     toast.error("Şifre en az 8 karakter olmalıdır.");
     return;
   }
@@ -87,9 +93,9 @@ const handleSubmit = async (e) => {
   const payload = {
     name: formData.name.trim(),
     lastName: formData.lastName.trim(),
-    email: formData.email.trim(),
+    email: trimmedEmail,
     phone: fullPhone,
-    password: formData.password,
+    password: trimmedPassword,
     city: formData.city,
     country: "Türkiye",
   };
