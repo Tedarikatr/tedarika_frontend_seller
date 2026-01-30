@@ -32,6 +32,7 @@ const MyStoreProductsPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [feedback, setFeedback] = useState(null);
+  const [productsWithoutProductId, setProductsWithoutProductId] = useState([]);
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [hasCoverage, setHasCoverage] = useState(true);
@@ -74,6 +75,18 @@ const MyStoreProductsPage = () => {
   const showFeedback = (message, type = "success") => {
     setFeedback({ message, type });
     setTimeout(() => setFeedback(null), 4000);
+  };
+
+  const handleProductIdMissing = (product) => {
+    setProductsWithoutProductId((prev) => {
+      const exists = prev.some((p) => (p.id ?? p.storeProductId) === (product.id ?? product.storeProductId));
+      if (exists) return prev;
+      return [...prev, product];
+    });
+    showFeedback(
+      `"${product.name}" ürününde productId bilgisi bulunamadı. API'de bu alanın dönmesi gerekiyor.`,
+      "error"
+    );
   };
 
   useEffect(() => {
@@ -229,6 +242,26 @@ const MyStoreProductsPage = () => {
           </div>
         )}
 
+        {/* productId Eksik Ürünler Raporu */}
+        {productsWithoutProductId.length > 0 && (
+          <div className="mb-6 px-6 py-4 rounded-2xl bg-amber-50 border-2 border-amber-300 text-amber-800 shadow-lg">
+            <h3 className="font-bold mb-2 flex items-center gap-2">
+              <AlertCircle size={20} />
+              productId Eksik Ürünler Raporu
+            </h3>
+            <p className="text-sm mb-3">
+              Aşağıdaki ürünlerde <strong>productId</strong> bilgisi bulunmuyor. Düzenleme talebi göndermek için API&apos;de bu alanın dönmesi gerekiyor.
+            </p>
+            <ul className="text-sm space-y-1 list-disc list-inside">
+              {productsWithoutProductId.map((p) => (
+                <li key={p.id ?? p.storeProductId ?? p.name}>
+                  {p.name} {p.sku ? `(SKU: ${p.sku})` : ""}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
         {/* Geri Bildirim */}
         {feedback && (
           <div
@@ -297,6 +330,7 @@ const MyStoreProductsPage = () => {
             <MyStoreProductTable
               products={currentItems}
               onManage={setSelectedProduct}
+              onProductIdMissing={handleProductIdMissing}
             />
           )}
         </div>
