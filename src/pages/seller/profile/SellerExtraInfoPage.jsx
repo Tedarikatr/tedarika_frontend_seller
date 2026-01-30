@@ -27,6 +27,17 @@ const compact = (obj) =>
 const normalizePhone = (val = "") =>
   val.replace(/[^\d+]/g, "").replace(/(?!^)\+/g, ""); // ortadaki +'ları temizle
 
+// Bileşen dışında tanımla - her render'da yeniden oluşturulursa input focus kaybı olur
+const Field = ({ label, required, children, hint }) => (
+  <div className="flex flex-col gap-1">
+    <label className="text-sm font-medium text-gray-700 select-none">
+      {label} {required && <span className="text-rose-600">*</span>}
+    </label>
+    {children}
+    {hint && <p className="text-xs text-gray-500">{hint}</p>}
+  </div>
+);
+
 export default function SellerExtraInfoPage() {
   const [company, setCompany] = useState(null);
   const [existing, setExisting] = useState(null);
@@ -93,17 +104,6 @@ export default function SellerExtraInfoPage() {
 
   const readOnly = !!existing;
   const model = existing || form;
-
-  // Yardımcı UI bileşeni: Etiket + Input kapsayıcısı
-  const Field = ({ label, required, children, hint }) => (
-    <div className="flex flex-col gap-1">
-      <label className="text-sm font-medium text-gray-700 select-none">
-        {label} {required && <span className="text-rose-600">*</span>}
-      </label>
-      {children}
-      {hint && <p className="text-xs text-gray-500">{hint}</p>}
-    </div>
-  );
 
   return (
     <div className="w-full py-6">
