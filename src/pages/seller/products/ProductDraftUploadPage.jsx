@@ -32,6 +32,18 @@ import {
   Trash2,
 } from "lucide-react";
 
+// Tedarika_Urun_Yukleme_Sablon_guncel.xlsx ile birebir aynı sıralama
+const EXCEL_TEMPLATE_HEADERS = [
+  "UrunAdi*", "Sku", "Ean", "Gtip", "Marka", "MarkaAdi", "MarkaId", "Aciklama",
+  "KategoriId", "KategoriSubId", "HazirlamaSuresiGun", "SonKullanmaTarihi",
+  "Gorsel1Url", "Gorsel2Url", "Gorsel3Url", "Gorsel4Url",
+  "BirimTipi", "StokAdedi", "MinSiparisAdedi", "MaxSiparisAdedi",
+  "BirimFiyat", "ParaBirimi", "AnaUrunKodu", "StokKodu", "KritikStok",
+  "Genislik", "Uzunluk", "Yukseklik", "Agirlik", "HacimAgirlik", "RenkVaryantlari"
+];
+
+const EXCEL_TEMPLATE_PATH = "/templates/Tedarika_Urun_Yukleme_Sablon_guncel.xlsx";
+
 const ProductDraftUploadPage = () => {
   const navigate = useNavigate();
   const toast = useToast();
@@ -102,6 +114,19 @@ const ProductDraftUploadPage = () => {
       colorVariants: [],
     },
   ]);
+
+  const handleDownloadCsvTemplate = () => {
+    const BOM = "\uFEFF";
+    const headerRow = EXCEL_TEMPLATE_HEADERS.join("\t");
+    const csvContent = BOM + headerRow + "\n";
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "Tedarika_Urun_Yukleme_Sablon.csv";
+    a.click();
+    URL.revokeObjectURL(url);
+  };
 
   const handleExcelUpload = async () => {
     if (!excelFile) {
@@ -1299,13 +1324,20 @@ const ProductDraftUploadPage = () => {
                         Önizle
                       </button>
                       <a
-                        href="/templates/Tedarika_Urun_Sablon.csv"
-                        download="Tedarika_Urun_Sablon.csv"
+                        href={EXCEL_TEMPLATE_PATH}
+                        download="Tedarika_Urun_Yukleme_Sablon_guncel.xlsx"
                         className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-semibold"
                       >
                         <Download className="w-4 h-4" />
-                        CSV İndir
+                        Excel Şablonu İndir
                       </a>
+                      <button
+                        onClick={handleDownloadCsvTemplate}
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors text-sm font-semibold"
+                      >
+                        <Download className="w-4 h-4" />
+                        CSV Şablonu İndir
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -1315,7 +1347,7 @@ const ProductDraftUploadPage = () => {
                   Güncel başlıklar (sıralama birebir aynı olmalı):
                 </p>
                 <p className="text-xs text-emerald-800 font-mono break-words">
-                  UrunAdi*	Aciklama	SKU*	EAN*	MarkaId	MarkaAdi	KategoriId	AltKategoriId	GTIP	Gorsel1Url	Gorsel2Url	Gorsel3Url	Gorsel4Url	BirimTipi*	StokAdedi*	MinSiparisAdedi	MaxSiparisAdedi	BirimFiyat*	ParaBirimi*
+                  {EXCEL_TEMPLATE_HEADERS.join("\t")}
                 </p>
               </div>
 
@@ -1597,12 +1629,7 @@ const ProductDraftUploadPage = () => {
                   <p className="text-gray-600 mb-4">Şablon aşağıdaki alanları içerir:</p>
                   
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-3 text-left mb-6 max-w-4xl mx-auto">
-                    {[
-                      "UrunAdi*", "Aciklama", "SKU*", "EAN*", "MarkaId", "MarkaAdi",
-                      "KategoriId", "AltKategoriId", "GTIP", "Gorsel1Url", "Gorsel2Url", "Gorsel3Url",
-                      "Gorsel4Url", "BirimTipi*", "StokAdedi*", "MinSiparisAdedi", "MaxSiparisAdedi",
-                      "BirimFiyat*", "ParaBirimi*"
-                    ].map((field, idx) => (
+                    {EXCEL_TEMPLATE_HEADERS.map((field, idx) => (
                       <div key={idx} className="bg-gray-50 px-3 py-2 rounded text-sm text-gray-700 border border-gray-200">
                         ✓ {field}
                       </div>
@@ -1619,21 +1646,30 @@ const ProductDraftUploadPage = () => {
             </div>
 
             {/* Modal Footer */}
-            <div className="bg-gray-50 px-6 py-4 flex items-center justify-between border-t">
+            <div className="bg-gray-50 px-6 py-4 flex flex-wrap items-center justify-between gap-2 border-t">
               <button
                 onClick={() => setShowTemplatePreview(false)}
                 className="px-4 py-2 text-gray-700 hover:bg-gray-200 rounded-lg transition-colors"
               >
                 Kapat
               </button>
-              <a
-                href="/templates/Tedarika_Urun_Sablon.csv"
-                download="Tedarika_Urun_Sablon.csv"
-                className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold"
-              >
-                <Download className="w-4 h-4" />
-                CSV Şablonu İndir
-              </a>
+              <div className="flex flex-wrap gap-2">
+                <a
+                  href={EXCEL_TEMPLATE_PATH}
+                  download="Tedarika_Urun_Yukleme_Sablon_guncel.xlsx"
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold"
+                >
+                  <Download className="w-4 h-4" />
+                  Excel Şablonu İndir
+                </a>
+                <button
+                  onClick={handleDownloadCsvTemplate}
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors font-semibold"
+                >
+                  <Download className="w-4 h-4" />
+                  CSV Şablonu İndir
+                </button>
+              </div>
             </div>
           </div>
         </div>
