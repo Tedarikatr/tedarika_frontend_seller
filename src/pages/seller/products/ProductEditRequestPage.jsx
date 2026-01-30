@@ -38,13 +38,10 @@ const ProductEditRequestPage = () => {
     name: "",
     description: "",
     brandId: "",
-    productNumber: "",
     ean: "",
     sku: "",
     categoryId: "",
     categorySubId: "",
-    isActive: "",
-    requiresManualReview: "",
     gtipCode: "",
   });
 
@@ -89,13 +86,10 @@ const ProductEditRequestPage = () => {
     if (r.name && r.name.trim() !== (o.name || "").trim()) return true;
     if (r.description !== undefined && String(r.description).trim() !== String(o.description || "").trim()) return true;
     if (r.brandId && r.brandId !== (o.brandId || "")) return true;
-    if (r.productNumber !== undefined && String(r.productNumber).trim() !== String(o.productNumber || "").trim()) return true;
     if (r.ean !== undefined && String(r.ean).trim() !== String(o.ean || "").trim()) return true;
     if (r.sku !== undefined && String(r.sku).trim() !== String(o.sku || "").trim()) return true;
     if (r.categoryId && Number(r.categoryId) !== Number(o.categoryId || 0)) return true;
     if (r.categorySubId && Number(r.categorySubId) !== Number(o.categorySubId || 0)) return true;
-    if (r.isActive !== "" && (r.isActive === "true") !== (o.isActive ?? true)) return true;
-    if (r.requiresManualReview !== "" && (r.requiresManualReview === "true") !== (o.requiresManualReview ?? false)) return true;
     if (r.gtipCode !== undefined && String(r.gtipCode).trim() !== String(o.gtipCode || "").trim()) return true;
     return false;
   };
@@ -108,13 +102,10 @@ const ProductEditRequestPage = () => {
     if (r.name && r.name.trim() !== (o.name || "").trim()) payload.name = r.name.trim();
     if (r.description !== undefined && String(r.description).trim() !== String(o.description || "").trim()) payload.description = r.description.trim();
     if (r.brandId && r.brandId !== (o.brandId || "")) payload.brandId = r.brandId;
-    if (r.productNumber !== undefined && String(r.productNumber).trim() !== String(o.productNumber || "").trim()) payload.productNumber = r.productNumber.trim();
     if (r.ean !== undefined && String(r.ean).trim() !== String(o.ean || "").trim()) payload.ean = r.ean.trim();
     if (r.sku !== undefined && String(r.sku).trim() !== String(o.sku || "").trim()) payload.sku = r.sku.trim();
     if (r.categoryId && Number(r.categoryId) !== Number(o.categoryId || 0)) payload.categoryId = Number(r.categoryId);
     if (r.categorySubId && Number(r.categorySubId) !== Number(o.categorySubId || 0)) payload.categorySubId = Number(r.categorySubId);
-    if (r.isActive !== "" && (r.isActive === "true") !== (o.isActive ?? true)) payload.isActive = r.isActive === "true";
-    if (r.requiresManualReview !== "" && (r.requiresManualReview === "true") !== (o.requiresManualReview ?? false)) payload.requiresManualReview = r.requiresManualReview === "true";
     if (r.gtipCode !== undefined && String(r.gtipCode).trim() !== String(o.gtipCode || "").trim()) {
       const gtip = r.gtipCode.trim();
       if (GTIP_REGEX.test(gtip)) payload.gtipCode = gtip;
@@ -264,13 +255,10 @@ const ProductEditRequestPage = () => {
                 <FieldRow label="Ürün Adı" value={original.name} />
                 <FieldRow label="Açıklama" value={original.description} multiline />
                 <FieldRow label="Marka" value={original.brandName} />
-                <FieldRow label="Ürün No" value={original.productNumber} />
                 <FieldRow label="EAN" value={original.ean} />
                 <FieldRow label="SKU" value={original.sku} />
                 <FieldRow label="Kategori" value={original.categoryName} />
                 <FieldRow label="Alt Kategori" value={original.categorySubName} />
-                <FieldRow label="Aktif" value={original.isActive ? "Evet" : "Hayır"} />
-                <FieldRow label="Manuel İnceleme" value={original.requiresManualReview ? "Evet" : "Hayır"} />
                 <FieldRow label="GTIP Kodu" value={original.gtipCode} />
               </div>
             </div>
@@ -307,12 +295,6 @@ const ProductEditRequestPage = () => {
                   placeholder={original.brandName}
                 />
                 <InputField
-                  label="Ürün No"
-                  value={requested.productNumber}
-                  onChange={(v) => updateRequested("productNumber", v)}
-                  placeholder={original.productNumber}
-                />
-                <InputField
                   label="EAN (13 hane)"
                   value={requested.ean}
                   onChange={(v) => updateRequested("ean", v)}
@@ -342,26 +324,6 @@ const ProductEditRequestPage = () => {
                   options={subCategories.map((s) => ({ value: s.id, label: s.name }))}
                   placeholder={original.categorySubName}
                   disabled={!requested.categoryId}
-                />
-                <SelectField
-                  label="Aktif"
-                  value={requested.isActive}
-                  onChange={(v) => updateRequested("isActive", v)}
-                  options={[
-                    { value: "", label: "Değiştirme" },
-                    { value: "true", label: "Evet" },
-                    { value: "false", label: "Hayır" },
-                  ]}
-                />
-                <SelectField
-                  label="Manuel İnceleme"
-                  value={requested.requiresManualReview}
-                  onChange={(v) => updateRequested("requiresManualReview", v)}
-                  options={[
-                    { value: "", label: "Değiştirme" },
-                    { value: "true", label: "Evet" },
-                    { value: "false", label: "Hayır" },
-                  ]}
                 />
                 <InputField
                   label="GTIP Kodu (6-12 hane)"
