@@ -2,11 +2,22 @@
 // MyStoreProductTable.jsx
 // =============================
 import React, { useState } from "react";
-import { Settings, Image as ImageIcon, TrendingUp, List } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Settings, Image as ImageIcon, TrendingUp, List, FileEdit } from "lucide-react";
 import ProductAttributesModal from "./ProductAttributesModal";
 
-const MyStoreProductTable = ({ products, onManage }) => {
+const MyStoreProductTable = ({ products, onManage, onProductIdMissing }) => {
+  const navigate = useNavigate();
   const [selectedProductForAttributes, setSelectedProductForAttributes] = useState(null);
+
+  const handleEditRequest = (product) => {
+    const productId = product.productId ?? product.id;
+    if (!productId) {
+      onProductIdMissing?.(product);
+      return;
+    }
+    navigate(`/seller/products/edit-request/${productId}`);
+  };
   if (!products?.length) {
     return (
       <div className="p-10 text-center">
@@ -86,7 +97,15 @@ const MyStoreProductTable = ({ products, onManage }) => {
                     )}
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap text-center">
-                    <div className="flex items-center justify-center gap-2">
+                    <div className="flex items-center justify-center gap-2 flex-wrap">
+                      <button
+                        type="button"
+                        onClick={() => handleEditRequest(product)}
+                        className="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm font-bold hover:shadow-lg hover:scale-105 transition-all duration-300"
+                      >
+                        <FileEdit className="w-4 h-4" />
+                        Düzenleme Talebi
+                      </button>
                       <button
                         onClick={() => setSelectedProductForAttributes(product)}
                         className="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-sm font-bold hover:shadow-lg hover:scale-105 transition-all duration-300"
@@ -155,6 +174,14 @@ const MyStoreProductTable = ({ products, onManage }) => {
 
               {/* Action Buttons */}
               <div className="p-4 space-y-2">
+                <button
+                  type="button"
+                  onClick={() => handleEditRequest(product)}
+                  className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm font-bold hover:shadow-lg hover:scale-105 transition-all duration-300"
+                >
+                  <FileEdit className="w-4 h-4" />
+                  Düzenleme Talebi Gönder
+                </button>
                 <button
                   onClick={() => setSelectedProductForAttributes(product)}
                   className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-sm font-bold hover:shadow-lg hover:scale-105 transition-all duration-300"

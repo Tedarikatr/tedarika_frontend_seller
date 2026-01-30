@@ -31,6 +31,7 @@ import StoreCoveragePage from "@/pages/seller/location/StoreCoveragePage";
 import MyStoreProductsPage from "@/pages/seller/products/MyStoreProductsPage";
 import ProductDatabasePage from "@/pages/seller/products/ProductDatabasePage";
 import ProductRequestListPage from "@/pages/seller/products/ProductRequestListPage";
+import ProductEditRequestPage from "@/pages/seller/products/ProductEditRequestPage";
 import ProductDraftsPage from "@/pages/seller/products/ProductDraftsPage";
 import ProductDraftListPage from "@/pages/seller/products/ProductDraftListPage";
 import ProductDraftDetailPage from "@/pages/seller/products/ProductDraftDetailPage";
@@ -121,6 +122,7 @@ function App() {
 
         {/* Ürünler */}
         <Route path="products/my-store" element={<MyStoreProductsPage />} />
+        <Route path="products/edit-request/:productId" element={<ProductEditRequestPage />} />
         <Route path="products/database" element={<ProductDatabasePage />} />
         <Route path="products/requests" element={<ProductRequestListPage />} />
         <Route path="products/drafts" element={<ProductDraftListPage />} />
