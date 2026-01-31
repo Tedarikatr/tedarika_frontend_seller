@@ -54,9 +54,12 @@ const ProductDraftUploadPage = () => {
   const [showHistory, setShowHistory] = useState(false);
   const [drafts, setDrafts] = useState([]);
   const [loadingDrafts, setLoadingDrafts] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [loadingType, setLoadingType] = useState(null); // 'excel' | 'xml' | 'xml-url' | null
   const [showTemplatePreview, setShowTemplatePreview] = useState(false);
+  // Ortak yükleme state - tek state ile progress bar ve buton kontrolü
+  const [uploadState, setUploadState] = useState({ active: false, type: null }); // type: 'excel'|'xml'|'json'|'xml-url'|null
+  const isUploading = uploadState.active;
+  const uploadType = uploadState.type;
+  const [loadingManual, setLoadingManual] = useState(false);
 
   useEffect(() => () => { mountedRef.current = false; }, []);
   
@@ -136,143 +139,105 @@ const ProductDraftUploadPage = () => {
     URL.revokeObjectURL(url);
   };
 
-  const handleExcelUpload = async () => {
+  // Ortak yükleme handler - Excel, XML, JSON, XML URL için tek yapı
+  const runBulkUpload = async ({ type, apiCall, onErrorReset }) => {
+    setUploadState({ active: true, type });
+    if (type !== "json") toast.info(BG_UPLOAD_MSG, 8000);
+
+    try {
+      await apiCall();
+      toast.success(
+        type === "excel" ? "Excel dosyası başarıyla yüklendi!" :
+        type === "xml" ? "XML dosyası başarıyla yüklendi!" :
+        type === "xml-url" ? "XML URL başarıyla işlendi!" :
+        "JSON başarıyla gönderildi!"
+      );
+      toast.info("Ürünleriniz onaya gönderildi. İnceleme sonrası onaylandıktan sonra otomatik olarak mağazanıza aktarılacaktır.", 6000);
+      if (mountedRef.current) navigate("/seller/products/drafts");
+    } catch (err) {
+      setUploadState({ active: false, type: null });
+      if (onErrorReset) onErrorReset();
+      const msg = err?.message || "Beklenmeyen hata";
+      if (type === "excel") toast.error(`Excel yüklenemedi: ${msg}`);
+      else if (type === "xml") toast.error(`XML yüklenemedi: ${msg}`);
+      else if (type === "xml-url") toast.error(`XML URL işlenemedi: ${msg}`);
+      else if (type === "json") toast.error(err instanceof SyntaxError ? "Geçersiz JSON formatı" : `JSON gönderilemedi: ${msg}`);
+      console.error(`${type} yükleme hatası:`, err);
+    } finally {
+      setUploadState({ active: false, type: null });
+    }
+  };
+
+  const handleExcelUpload = () => {
     if (!excelFile) {
       toast.error("Lütfen bir Excel dosyası seçin");
       return;
     }
-
-    setLoading(true);
-    setLoadingType("excel");
-    toast.info(BG_UPLOAD_MSG, 8000);
-
-    try {
-      const formData = new FormData();
-      formData.append("ExcelFile", excelFile);
-      if (excelUploadName) formData.append("UploadName", excelUploadName);
-
-      await addProductExcel(formData);
-      toast.success("Excel dosyası başarıyla yüklendi!");
-      toast.info("Ürünleriniz onaya gönderildi. İnceleme sonrası onaylandıktan sonra otomatik olarak mağazanıza aktarılacaktır.", 6000);
-      if (mountedRef.current) navigate("/seller/products/drafts");
-    } catch (err) {
-      console.error("Excel yüklenemedi:", err);
-      toast.error(`Excel yüklenemedi: ${err.message}`);
-      if (mountedRef.current) {
-        setLoading(false);
-        setLoadingType(null);
+    runBulkUpload({
+      type: "excel",
+      apiCall: async () => {
+        const formData = new FormData();
+        formData.append("ExcelFile", excelFile);
+        if (excelUploadName) formData.append("UploadName", excelUploadName);
+        return addProductExcel(formData);
+      },
+      onErrorReset: () => {
         setExcelFile(null);
         setExcelUploadName("");
         setExcelResetKey((k) => k + 1);
-      }
-    } finally {
-      if (mountedRef.current) {
-        setLoading(false);
-        setLoadingType(null);
-      }
-    }
+      },
+    });
   };
 
-  const handleJsonUpload = async () => {
+  const handleJsonUpload = () => {
     if (!jsonText.trim()) {
       toast.error("Lütfen JSON içeriğini girin");
       return;
     }
-
-    setLoading(true);
-    try {
-      // Validate JSON
-      const parsedJson = JSON.parse(jsonText);
-
-      await addProductJson(parsedJson);
-      toast.success("JSON başarıyla gönderildi!");
-      // Ek uyarı mesajı
-      setTimeout(() => {
-        toast.info("Ürünleriniz onaya gönderildi. İnceleme sonrası onaylandıktan sonra otomatik olarak mağazanıza aktarılacaktır.", 6000);
-      }, 500);
-      navigate("/seller/products/drafts");
-    } catch (err) {
-      console.error("JSON gönderilemedi:", err);
-      if (err instanceof SyntaxError) {
-        toast.error("Geçersiz JSON formatı");
-      } else {
-        toast.error(`JSON gönderilemedi: ${err.message}`);
-      }
-    } finally {
-      setLoading(false);
-    }
+    runBulkUpload({
+      type: "json",
+      apiCall: async () => {
+        const parsedJson = JSON.parse(jsonText);
+        return addProductJson(parsedJson);
+      },
+    });
   };
 
-  const handleXmlUpload = async () => {
+  const handleXmlUpload = () => {
     if (!xmlFile) {
       toast.error("Lütfen bir XML dosyası seçin");
       return;
     }
-
-    setLoading(true);
-    setLoadingType("xml");
-    toast.info(BG_UPLOAD_MSG, 8000);
-
-    try {
-      const formData = new FormData();
-      formData.append("XmlFile", xmlFile);
-      if (xmlUploadName) formData.append("UploadName", xmlUploadName);
-
-      await addProductXml(formData);
-      toast.success("XML dosyası başarıyla yüklendi!");
-      toast.info("Ürünleriniz onaya gönderildi. İnceleme sonrası onaylandıktan sonra otomatik olarak mağazanıza aktarılacaktır.", 6000);
-      if (mountedRef.current) navigate("/seller/products/drafts");
-    } catch (err) {
-      console.error("XML yüklenemedi:", err);
-      toast.error(`XML yüklenemedi: ${err.message}`);
-      if (mountedRef.current) {
-        setLoading(false);
-        setLoadingType(null);
+    runBulkUpload({
+      type: "xml",
+      apiCall: async () => {
+        const formData = new FormData();
+        formData.append("XmlFile", xmlFile);
+        if (xmlUploadName) formData.append("UploadName", xmlUploadName);
+        return addProductXml(formData);
+      },
+      onErrorReset: () => {
         setXmlFile(null);
         setXmlUploadName("");
         setXmlResetKey((k) => k + 1);
-      }
-    } finally {
-      if (mountedRef.current) {
-        setLoading(false);
-        setLoadingType(null);
-      }
-    }
+      },
+    });
   };
 
-  const handleXmlUrlUpload = async () => {
+  const handleXmlUrlUpload = () => {
     if (!xmlUrl.trim()) {
       toast.error("Lütfen XML URL'i girin");
       return;
     }
-
-    setLoading(true);
-    setLoadingType("xml-url");
-    toast.info(BG_UPLOAD_MSG, 8000);
-
-    try {
-      await addProductXmlFromUrl({
+    runBulkUpload({
+      type: "xml-url",
+      apiCall: () => addProductXmlFromUrl({
         xmlUrl,
         uploadName: xmlUrlUploadName || undefined,
         username: xmlUsername || undefined,
         password: xmlPassword || undefined,
-      });
-      toast.success("XML URL başarıyla işlendi!");
-      toast.info("Ürünleriniz onaya gönderildi. İnceleme sonrası onaylandıktan sonra otomatik olarak mağazanıza aktarılacaktır.", 6000);
-      if (mountedRef.current) navigate("/seller/products/drafts");
-    } catch (err) {
-      console.error("XML URL işlenemedi:", err);
-      toast.error(`XML URL işlenemedi: ${err.message}`);
-      if (mountedRef.current) {
-        setLoading(false);
-        setLoadingType(null);
-      }
-    } finally {
-      if (mountedRef.current) {
-        setLoading(false);
-        setLoadingType(null);
-      }
-    }
+      }),
+    });
   };
 
   const handleManualUpload = async () => {
@@ -325,7 +290,7 @@ const ProductDraftUploadPage = () => {
       }
     }
 
-    setLoading(true);
+    setLoadingManual(true);
     try {
       // API dokümantasyonuna göre her ürün ayrı ayrı gönderilmeli (tek ürün endpoint'i)
       // Ancak kullanıcı deneyimi için tüm ürünleri sırayla gönderelim
@@ -437,7 +402,7 @@ const ProductDraftUploadPage = () => {
       console.error("Manuel yükleme başarısız:", err);
       toast.error(`Ürünler yüklenemedi: ${err.message || err}`);
     } finally {
-      setLoading(false);
+      setLoadingManual(false);
     }
   };
 
@@ -1312,10 +1277,10 @@ const ProductDraftUploadPage = () => {
               {/* Submit Button */}
               <button
                 onClick={handleManualUpload}
-                disabled={loading || products.length === 0}
+                disabled={loadingManual || products.length === 0}
                 className="w-full inline-flex items-center justify-center gap-2 px-6 py-4 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-lg font-bold hover:shadow-lg hover:scale-105 transition-all disabled:opacity-50 disabled:hover:scale-100"
               >
-                {loading ? (
+                {loadingManual ? (
                   <>
                     <Loader2 className="w-5 h-5 animate-spin" />
                     Yükleniyor...
@@ -1425,7 +1390,7 @@ const ProductDraftUploadPage = () => {
                 />
               </div>
 
-              {loadingType === "excel" && (
+              {uploadType === "excel" && (
                 <div className="space-y-2">
                   <p className="text-sm text-gray-600 text-center">Sunucudan yanıt bekleniyor...</p>
                   <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
@@ -1436,10 +1401,10 @@ const ProductDraftUploadPage = () => {
 
               <button
                 onClick={handleExcelUpload}
-                disabled={loading || !excelFile}
+                disabled={isUploading || !excelFile}
                 className="w-full inline-flex items-center justify-center gap-2 px-6 py-4 rounded-xl bg-gradient-to-r from-green-600 to-emerald-600 text-white text-lg font-bold hover:shadow-lg hover:scale-105 transition-all disabled:opacity-50 disabled:hover:scale-100"
               >
-                {loading ? (
+                {isUploading ? (
                   <>
                     <Loader2 className="w-5 h-5 animate-spin" />
                     Yükleniyor...
@@ -1478,12 +1443,21 @@ const ProductDraftUploadPage = () => {
                 />
               </div>
 
+              {uploadType === "json" && (
+                <div className="space-y-2">
+                  <p className="text-sm text-gray-600 text-center">Sunucudan yanıt bekleniyor...</p>
+                  <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
+                    <div className="h-full w-full progress-indeterminate bg-gradient-to-r from-blue-500 to-indigo-600" />
+                  </div>
+                </div>
+              )}
+
               <button
                 onClick={handleJsonUpload}
-                disabled={loading || !jsonText.trim()}
+                disabled={isUploading || !jsonText.trim()}
                 className="w-full inline-flex items-center justify-center gap-2 px-6 py-4 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-lg font-bold hover:shadow-lg hover:scale-105 transition-all disabled:opacity-50 disabled:hover:scale-100"
               >
-                {loading ? (
+                {isUploading ? (
                   <>
                     <Loader2 className="w-5 h-5 animate-spin" />
                     Gönderiliyor...
@@ -1548,7 +1522,7 @@ const ProductDraftUploadPage = () => {
                 />
               </div>
 
-              {loadingType === "xml" && (
+              {uploadType === "xml" && (
                 <div className="space-y-2">
                   <p className="text-sm text-gray-600 text-center">Sunucudan yanıt bekleniyor...</p>
                   <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
@@ -1559,10 +1533,10 @@ const ProductDraftUploadPage = () => {
 
               <button
                 onClick={handleXmlUpload}
-                disabled={loading || !xmlFile}
+                disabled={isUploading || !xmlFile}
                 className="w-full inline-flex items-center justify-center gap-2 px-6 py-4 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 text-white text-lg font-bold hover:shadow-lg hover:scale-105 transition-all disabled:opacity-50 disabled:hover:scale-100"
               >
-                {loading ? (
+                {isUploading ? (
                   <>
                     <Loader2 className="w-5 h-5 animate-spin" />
                     Yükleniyor...
@@ -1648,7 +1622,7 @@ const ProductDraftUploadPage = () => {
                 </div>
               </div>
 
-              {loadingType === "xml-url" && (
+              {uploadType === "xml-url" && (
                 <div className="space-y-2">
                   <p className="text-sm text-gray-600 text-center">Sunucudan yanıt bekleniyor...</p>
                   <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
@@ -1659,10 +1633,10 @@ const ProductDraftUploadPage = () => {
 
               <button
                 onClick={handleXmlUrlUpload}
-                disabled={loading || !xmlUrl.trim()}
+                disabled={isUploading || !xmlUrl.trim()}
                 className="w-full inline-flex items-center justify-center gap-2 px-6 py-4 rounded-xl bg-gradient-to-r from-orange-600 to-red-600 text-white text-lg font-bold hover:shadow-lg hover:scale-105 transition-all disabled:opacity-50 disabled:hover:scale-100"
               >
-                {loading ? (
+                {isUploading ? (
                   <>
                     <Loader2 className="w-5 h-5 animate-spin" />
                     İşleniyor...
