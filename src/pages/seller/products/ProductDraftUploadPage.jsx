@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { 
   addProductJson, 
@@ -44,15 +44,21 @@ const EXCEL_TEMPLATE_HEADERS = [
 
 const EXCEL_TEMPLATE_PATH = "/templates/Tedarika_Urun_Yukleme_Sablon_guncel.xlsx";
 
+const BG_UPLOAD_MSG = "İşlem arka planda devam ediyor. Lütfen sayfayı kapatmayın.";
+
 const ProductDraftUploadPage = () => {
   const navigate = useNavigate();
   const toast = useToast();
+  const mountedRef = useRef(true);
   const [activeTab, setActiveTab] = useState("manual"); // manual, excel, json, xml, xml-url
   const [showHistory, setShowHistory] = useState(false);
   const [drafts, setDrafts] = useState([]);
   const [loadingDrafts, setLoadingDrafts] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [loadingType, setLoadingType] = useState(null); // 'excel' | 'xml' | 'xml-url' | null
   const [showTemplatePreview, setShowTemplatePreview] = useState(false);
+
+  useEffect(() => () => { mountedRef.current = false; }, []);
   
   // Category State
   const [categories, setCategories] = useState([]);
@@ -135,6 +141,9 @@ const ProductDraftUploadPage = () => {
     }
 
     setLoading(true);
+    setLoadingType("excel");
+    toast.info(BG_UPLOAD_MSG, 8000);
+
     try {
       const formData = new FormData();
       formData.append("ExcelFile", excelFile);
@@ -142,16 +151,16 @@ const ProductDraftUploadPage = () => {
 
       await addProductExcel(formData);
       toast.success("Excel dosyası başarıyla yüklendi!");
-      // Ek uyarı mesajı
-      setTimeout(() => {
-        toast.info("Ürünleriniz onaya gönderildi. İnceleme sonrası onaylandıktan sonra otomatik olarak mağazanıza aktarılacaktır.", 6000);
-      }, 500);
-      navigate("/seller/products/drafts");
+      toast.info("Ürünleriniz onaya gönderildi. İnceleme sonrası onaylandıktan sonra otomatik olarak mağazanıza aktarılacaktır.", 6000);
+      if (mountedRef.current) navigate("/seller/products/drafts");
     } catch (err) {
       console.error("Excel yüklenemedi:", err);
       toast.error(`Excel yüklenemedi: ${err.message}`);
     } finally {
-      setLoading(false);
+      if (mountedRef.current) {
+        setLoading(false);
+        setLoadingType(null);
+      }
     }
   };
 
@@ -192,6 +201,9 @@ const ProductDraftUploadPage = () => {
     }
 
     setLoading(true);
+    setLoadingType("xml");
+    toast.info(BG_UPLOAD_MSG, 8000);
+
     try {
       const formData = new FormData();
       formData.append("XmlFile", xmlFile);
@@ -199,16 +211,16 @@ const ProductDraftUploadPage = () => {
 
       await addProductXml(formData);
       toast.success("XML dosyası başarıyla yüklendi!");
-      // Ek uyarı mesajı
-      setTimeout(() => {
-        toast.info("Ürünleriniz onaya gönderildi. İnceleme sonrası onaylandıktan sonra otomatik olarak mağazanıza aktarılacaktır.", 6000);
-      }, 500);
-      navigate("/seller/products/drafts");
+      toast.info("Ürünleriniz onaya gönderildi. İnceleme sonrası onaylandıktan sonra otomatik olarak mağazanıza aktarılacaktır.", 6000);
+      if (mountedRef.current) navigate("/seller/products/drafts");
     } catch (err) {
       console.error("XML yüklenemedi:", err);
       toast.error(`XML yüklenemedi: ${err.message}`);
     } finally {
-      setLoading(false);
+      if (mountedRef.current) {
+        setLoading(false);
+        setLoadingType(null);
+      }
     }
   };
 
@@ -219,6 +231,9 @@ const ProductDraftUploadPage = () => {
     }
 
     setLoading(true);
+    setLoadingType("xml-url");
+    toast.info(BG_UPLOAD_MSG, 8000);
+
     try {
       await addProductXmlFromUrl({
         xmlUrl,
@@ -227,16 +242,16 @@ const ProductDraftUploadPage = () => {
         password: xmlPassword || undefined,
       });
       toast.success("XML URL başarıyla işlendi!");
-      // Ek uyarı mesajı
-      setTimeout(() => {
-        toast.info("Ürünleriniz onaya gönderildi. İnceleme sonrası onaylandıktan sonra otomatik olarak mağazanıza aktarılacaktır.", 6000);
-      }, 500);
-      navigate("/seller/products/drafts");
+      toast.info("Ürünleriniz onaya gönderildi. İnceleme sonrası onaylandıktan sonra otomatik olarak mağazanıza aktarılacaktır.", 6000);
+      if (mountedRef.current) navigate("/seller/products/drafts");
     } catch (err) {
       console.error("XML URL işlenemedi:", err);
       toast.error(`XML URL işlenemedi: ${err.message}`);
     } finally {
-      setLoading(false);
+      if (mountedRef.current) {
+        setLoading(false);
+        setLoadingType(null);
+      }
     }
   };
 
@@ -1306,6 +1321,13 @@ const ProductDraftUploadPage = () => {
                 </p>
               </div>
 
+              <div className="flex items-start gap-2 text-amber-800 bg-amber-50 border-2 border-amber-200 rounded-xl p-4">
+                <AlertCircle className="w-5 h-5 mt-0.5 flex-shrink-0" />
+                <p className="text-sm">
+                  <strong>Önemli:</strong> Yükleme işlemi arka planda devam eder. Diğer sayfalara gidebilirsiniz ancak <strong>işlem tamamlanana kadar sayfayı kapatmayın</strong>.
+                </p>
+              </div>
+
               {/* Download Template Button */}
               <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-xl p-4 mb-6">
                 <div className="flex items-start gap-3">
@@ -1382,6 +1404,15 @@ const ProductDraftUploadPage = () => {
                 />
               </div>
 
+              {loadingType === "excel" && (
+                <div className="space-y-2">
+                  <p className="text-sm text-gray-600 text-center">Sunucudan yanıt bekleniyor...</p>
+                  <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
+                    <div className="h-full w-full progress-indeterminate bg-gradient-to-r from-green-500 to-emerald-600" />
+                  </div>
+                </div>
+              )}
+
               <button
                 onClick={handleExcelUpload}
                 disabled={loading || !excelFile}
@@ -1457,6 +1488,13 @@ const ProductDraftUploadPage = () => {
                 </p>
               </div>
 
+              <div className="flex items-start gap-2 text-amber-800 bg-amber-50 border-2 border-amber-200 rounded-xl p-4">
+                <AlertCircle className="w-5 h-5 mt-0.5 flex-shrink-0" />
+                <p className="text-sm">
+                  <strong>Önemli:</strong> Yükleme işlemi arka planda devam eder. Diğer sayfalara gidebilirsiniz ancak <strong>işlem tamamlanana kadar sayfayı kapatmayın</strong>.
+                </p>
+              </div>
+
               <div>
                 <label className="block text-sm font-bold text-gray-700 mb-2">
                   XML Dosyası *
@@ -1488,6 +1526,15 @@ const ProductDraftUploadPage = () => {
                 />
               </div>
 
+              {loadingType === "xml" && (
+                <div className="space-y-2">
+                  <p className="text-sm text-gray-600 text-center">Sunucudan yanıt bekleniyor...</p>
+                  <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
+                    <div className="h-full w-full progress-indeterminate bg-gradient-to-r from-purple-500 to-pink-600" />
+                  </div>
+                </div>
+              )}
+
               <button
                 onClick={handleXmlUpload}
                 disabled={loading || !xmlFile}
@@ -1516,6 +1563,13 @@ const ProductDraftUploadPage = () => {
                 <h2 className="text-2xl font-bold text-gray-900 mb-2">XML URL ile Yükle</h2>
                 <p className="text-gray-600">
                   XML dosyanızın URL'ini girerek yükleyin
+                </p>
+              </div>
+
+              <div className="flex items-start gap-2 text-amber-800 bg-amber-50 border-2 border-amber-200 rounded-xl p-4">
+                <AlertCircle className="w-5 h-5 mt-0.5 flex-shrink-0" />
+                <p className="text-sm">
+                  <strong>Önemli:</strong> Yükleme işlemi arka planda devam eder. Diğer sayfalara gidebilirsiniz ancak <strong>işlem tamamlanana kadar sayfayı kapatmayın</strong>.
                 </p>
               </div>
 
@@ -1571,6 +1625,15 @@ const ProductDraftUploadPage = () => {
                   />
                 </div>
               </div>
+
+              {loadingType === "xml-url" && (
+                <div className="space-y-2">
+                  <p className="text-sm text-gray-600 text-center">Sunucudan yanıt bekleniyor...</p>
+                  <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
+                    <div className="h-full w-full progress-indeterminate bg-gradient-to-r from-orange-500 to-red-600" />
+                  </div>
+                </div>
+              )}
 
               <button
                 onClick={handleXmlUrlUpload}

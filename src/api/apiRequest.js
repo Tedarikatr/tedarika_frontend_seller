@@ -57,6 +57,12 @@ export async function apiRequest(
   let response;
   try {
     response = await fetch(join(BASE_URL, endpoint), config);
+  } catch (err) {
+    if (timeoutId) clearTimeout(timeoutId);
+    if (err?.name === "AbortError") {
+      throw new Error("İşlem zaman aşımına uğradı. Lütfen tekrar deneyin.");
+    }
+    throw err;
   } finally {
     if (timeoutId) clearTimeout(timeoutId);
   }

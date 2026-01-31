@@ -20,3 +20,30 @@
 .animate-fade-in-down {
   animation: fadeInDown 200ms ease-out;
 }
+
+/* Indeterminate progress bar - sunucu yanıtı beklerken */
+@keyframes progressIndeterminate {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(400%);
+  }
+}
+
+.progress-indeterminate {
+  position: relative;
+  overflow: hidden;
+  border-radius: 9999px;
+}
+
+.progress-indeterminate::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 30%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+  animation: progressIndeterminate 1.5s ease-in-out infinite;
+}
