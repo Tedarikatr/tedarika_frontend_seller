@@ -12,6 +12,7 @@ import { getCategoriesWithSubCategories } from "@/api/categoryService";
 import { getBrandList } from "@/api/brandservice";
 import { UNIT_TYPE_OPTIONS } from "@/constants/unitTypes";
 import { useToast } from "@/contexts/ToastContext";
+import { useNotification, NOTIFICATION_TYPES } from "@/contexts/NotificationContext";
 import {
   FileSpreadsheet,
   FileCode,
@@ -49,6 +50,7 @@ const BG_UPLOAD_MSG = "İşlem arka planda devam ediyor. Lütfen sayfayı kapatm
 const ProductDraftUploadPage = () => {
   const navigate = useNavigate();
   const toast = useToast();
+  const { addNotification } = useNotification();
   const mountedRef = useRef(true);
   const [activeTab, setActiveTab] = useState("manual"); // manual, excel, json, xml, xml-url
   const [showHistory, setShowHistory] = useState(false);
@@ -60,6 +62,7 @@ const ProductDraftUploadPage = () => {
   const isUploading = uploadState.active;
   const uploadType = uploadState.type;
   const [loadingManual, setLoadingManual] = useState(false);
+  const [uploadSuccessModal, setUploadSuccessModal] = useState(null); // { type, productCount?, message }
 
   useEffect(() => () => { mountedRef.current = false; }, []);
   
@@ -145,15 +148,25 @@ const ProductDraftUploadPage = () => {
     if (type !== "json") toast.info(BG_UPLOAD_MSG, 8000);
 
     try {
-      await apiCall();
-      toast.success(
-        type === "excel" ? "Excel dosyası başarıyla yüklendi!" :
-        type === "xml" ? "XML dosyası başarıyla yüklendi!" :
-        type === "xml-url" ? "XML URL başarıyla işlendi!" :
-        "JSON başarıyla gönderildi!"
-      );
+      const response = await apiCall();
+      const productCount = response?.productCount ?? response?.processedCount ?? response?.count ?? response?.totalProcessed;
+      const typeLabel = type === "excel" ? "Excel" : type === "xml" ? "XML" : type === "xml-url" ? "XML URL" : "JSON";
+      const successMessage = productCount != null
+        ? `${productCount} ürün başarıyla yüklendi.`
+        : `${typeLabel} yüklemesi tamamlandı.`;
+
+      if (mountedRef.current) {
+        setUploadSuccessModal({ type, productCount, message: successMessage });
+        addNotification({
+          type: NOTIFICATION_TYPES.SUCCESS,
+          title: "Yükleme Tamamlandı",
+          message: successMessage + " Ürünleriniz onaya gönderildi.",
+          actionLabel: "Taslakları Görüntüle",
+          actionUrl: "/seller/products/drafts",
+        });
+      }
+      toast.success(successMessage, 5000);
       toast.info("Ürünleriniz onaya gönderildi. İnceleme sonrası onaylandıktan sonra otomatik olarak mağazanıza aktarılacaktır.", 6000);
-      if (mountedRef.current) navigate("/seller/products/drafts");
     } catch (err) {
       setUploadState({ active: false, type: null });
       if (onErrorReset) onErrorReset();
@@ -1652,6 +1665,46 @@ const ProductDraftUploadPage = () => {
           )}
         </div>
       </div>
+
+      {/* Tamamlandı - Full Screen Success Modal */}
+      {uploadSuccessModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="bg-white rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden animate-[fadeInDown_0.3s_ease-out]">
+            <div className="bg-gradient-to-r from-emerald-600 via-teal-600 to-green-600 px-8 py-10 text-center">
+              <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-white/20 flex items-center justify-center">
+                <CheckCircle className="w-12 h-12 text-white" />
+              </div>
+              <h2 className="text-2xl font-bold text-white mb-2">Tamamlandı</h2>
+              <p className="text-emerald-100 text-lg">{uploadSuccessModal.message}</p>
+              <p className="text-emerald-200 text-sm mt-2">Ürünleriniz onaya gönderildi.</p>
+            </div>
+            <div className="p-6 space-y-4">
+              <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-left">
+                <p className="text-sm text-amber-800">
+                  <strong>Zaman aşımı hakkında:</strong> Çok sayıda ürün (örn. 1700) yüklerken sadece bir kısmı (örn. 307) yüklendiyse, bu genellikle <strong>sunucu tarafı zaman aşımı</strong>ndan kaynaklanır. Frontend 45 dk bekler; sunucu (IIS/Kestrel/nginx) genelde 2-5 dk ile sınırlıdır. Backend timeout ayarlarını artırmanız veya asenkron işleme geçmeniz gerekebilir.
+                </p>
+              </div>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => {
+                    setUploadSuccessModal(null);
+                    navigate("/seller/products/drafts");
+                  }}
+                  className="flex-1 px-6 py-3 rounded-xl font-semibold bg-gradient-to-r from-emerald-600 to-teal-600 text-white hover:shadow-lg transition-all"
+                >
+                  Taslakları Görüntüle
+                </button>
+                <button
+                  onClick={() => setUploadSuccessModal(null)}
+                  className="px-6 py-3 rounded-xl font-semibold border-2 border-gray-200 text-gray-700 hover:bg-gray-50 transition-all"
+                >
+                  Kapat
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Template Preview Modal */}
       {showTemplatePreview && (
