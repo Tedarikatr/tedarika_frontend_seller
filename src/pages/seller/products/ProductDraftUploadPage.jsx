@@ -71,6 +71,7 @@ const ProductDraftUploadPage = () => {
   // Excel State
   const [excelFile, setExcelFile] = useState(null);
   const [excelUploadName, setExcelUploadName] = useState("");
+  const [excelResetKey, setExcelResetKey] = useState(0);
 
   // JSON State
   const [jsonText, setJsonText] = useState("");
@@ -78,6 +79,7 @@ const ProductDraftUploadPage = () => {
   // XML File State
   const [xmlFile, setXmlFile] = useState(null);
   const [xmlUploadName, setXmlUploadName] = useState("");
+  const [xmlResetKey, setXmlResetKey] = useState(0);
 
   // XML URL State
   const [xmlUrl, setXmlUrl] = useState("");
@@ -156,6 +158,13 @@ const ProductDraftUploadPage = () => {
     } catch (err) {
       console.error("Excel yüklenemedi:", err);
       toast.error(`Excel yüklenemedi: ${err.message}`);
+      if (mountedRef.current) {
+        setLoading(false);
+        setLoadingType(null);
+        setExcelFile(null);
+        setExcelUploadName("");
+        setExcelResetKey((k) => k + 1);
+      }
     } finally {
       if (mountedRef.current) {
         setLoading(false);
@@ -216,6 +225,13 @@ const ProductDraftUploadPage = () => {
     } catch (err) {
       console.error("XML yüklenemedi:", err);
       toast.error(`XML yüklenemedi: ${err.message}`);
+      if (mountedRef.current) {
+        setLoading(false);
+        setLoadingType(null);
+        setXmlFile(null);
+        setXmlUploadName("");
+        setXmlResetKey((k) => k + 1);
+      }
     } finally {
       if (mountedRef.current) {
         setLoading(false);
@@ -247,6 +263,10 @@ const ProductDraftUploadPage = () => {
     } catch (err) {
       console.error("XML URL işlenemedi:", err);
       toast.error(`XML URL işlenemedi: ${err.message}`);
+      if (mountedRef.current) {
+        setLoading(false);
+        setLoadingType(null);
+      }
     } finally {
       if (mountedRef.current) {
         setLoading(false);
@@ -1378,6 +1398,7 @@ const ProductDraftUploadPage = () => {
                   Excel Dosyası *
                 </label>
                 <input
+                  key={excelResetKey}
                   type="file"
                   accept=".xlsx,.xls,.csv"
                   onChange={(e) => setExcelFile(e.target.files[0])}
@@ -1500,6 +1521,7 @@ const ProductDraftUploadPage = () => {
                   XML Dosyası *
                 </label>
                 <input
+                  key={xmlResetKey}
                   type="file"
                   accept=".xml"
                   onChange={(e) => setXmlFile(e.target.files[0])}
