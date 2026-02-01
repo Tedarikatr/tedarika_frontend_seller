@@ -11,6 +11,7 @@ import {
 import { getCategoriesWithSubCategories } from "@/api/categoryService";
 import { getBrandList } from "@/api/brandservice";
 import { UNIT_TYPE_OPTIONS } from "@/constants/unitTypes";
+import { getUploadProgress } from "@/utils/getUploadProgress";
 import { useToast } from "@/contexts/ToastContext";
 import { useNotification, NOTIFICATION_TYPES } from "@/contexts/NotificationContext";
 import {
@@ -47,6 +48,14 @@ const EXCEL_TEMPLATE_PATH = "/templates/Tedarika_Urun_Yukleme_Sablon_guncel.xlsx
 
 const BG_UPLOAD_MSG = "İşlem arka planda devam ediyor. Lütfen sayfayı kapatmayın.";
 
+// API limitleri (SellerProductDraftController dokümantasyonu)
+const EXCEL_MAX_SIZE_MB = 50;
+const EXCEL_ALLOWED_EXT = [".xlsx", ".xls"];
+const EXCEL_FORBIDDEN_EXT = [".xlsm", ".xla"]; // Makro içeren
+const XML_MAX_SIZE_MB = 30;
+const JSON_MAX_CHARS = 2_000_000;
+const JSON_MAX_ROWS = 10_000;
+
 const ProductDraftUploadPage = () => {
   const navigate = useNavigate();
   const toast = useToast();
@@ -59,6 +68,7 @@ const ProductDraftUploadPage = () => {
   const [showTemplatePreview, setShowTemplatePreview] = useState(false);
   // Ortak yükleme state - tek state ile progress bar ve buton kontrolü
   const [uploadState, setUploadState] = useState({ active: false, type: null }); // type: 'excel'|'xml'|'json'|'xml-url'|null
+  const [uploadProgress, setUploadProgress] = useState(0); // 0-100, process bar
   const isUploading = uploadState.active;
   const uploadType = uploadState.type;
   const [loadingManual, setLoadingManual] = useState(false);
@@ -87,11 +97,9 @@ const ProductDraftUploadPage = () => {
   const [xmlUploadName, setXmlUploadName] = useState("");
   const [xmlResetKey, setXmlResetKey] = useState(0);
 
-  // XML URL State
+  // XML URL State (API: sadece xmlUrl ve uploadName)
   const [xmlUrl, setXmlUrl] = useState("");
   const [xmlUrlUploadName, setXmlUrlUploadName] = useState("");
-  const [xmlUsername, setXmlUsername] = useState("");
-  const [xmlPassword, setXmlPassword] = useState("");
 
   // Manual State
   const [draftName, setDraftName] = useState("");
@@ -145,15 +153,16 @@ const ProductDraftUploadPage = () => {
   // Ortak yükleme handler - Excel, XML, JSON, XML URL için tek yapı
   const runBulkUpload = async ({ type, apiCall, onErrorReset }) => {
     setUploadState({ active: true, type });
+    setUploadProgress(getUploadProgress("validating"));
     if (type !== "json") toast.info(BG_UPLOAD_MSG, 8000);
 
     try {
+      setUploadProgress(getUploadProgress("uploading", 50)); // fetch ile gerçek progress yok
       const response = await apiCall();
-      const productCount = response?.productCount ?? response?.processedCount ?? response?.count ?? response?.totalProcessed;
-      const typeLabel = type === "excel" ? "Excel" : type === "xml" ? "XML" : type === "xml-url" ? "XML URL" : "JSON";
-      const successMessage = productCount != null
-        ? `${productCount} ürün başarıyla yüklendi.`
-        : `${typeLabel} yüklemesi tamamlandı.`;
+      setUploadProgress(getUploadProgress("processing"));
+      // API response: { count, message, draftId, approvalStats }
+      const productCount = response?.count ?? response?.productCount ?? response?.processedCount ?? response?.totalProcessed;
+      const successMessage = response?.message ?? (productCount != null ? `${productCount} ürün başarıyla yüklendi.` : "Yükleme tamamlandı.");
 
       if (mountedRef.current) {
         setUploadSuccessModal({ type, productCount, message: successMessage });
@@ -165,9 +174,11 @@ const ProductDraftUploadPage = () => {
           actionUrl: "/seller/products/drafts",
         });
       }
+      setUploadProgress(getUploadProgress("done"));
       toast.success(successMessage, 5000);
       toast.info("Ürünleriniz onaya gönderildi. İnceleme sonrası onaylandıktan sonra otomatik olarak mağazanıza aktarılacaktır.", 6000);
     } catch (err) {
+      setUploadProgress(getUploadProgress("error"));
       setUploadState({ active: false, type: null });
       if (onErrorReset) onErrorReset();
       const msg = err?.message || "Beklenmeyen hata";
@@ -178,12 +189,28 @@ const ProductDraftUploadPage = () => {
       console.error(`${type} yükleme hatası:`, err);
     } finally {
       setUploadState({ active: false, type: null });
+      setUploadProgress(0);
     }
   };
 
   const handleExcelUpload = () => {
     if (!excelFile) {
       toast.error("Lütfen bir Excel dosyası seçin");
+      return;
+    }
+    // API validasyonu: 50MB, sadece .xlsx/.xls, makro (.xlsm/.xla) reddet
+    const maxSize = EXCEL_MAX_SIZE_MB * 1024 * 1024;
+    if (excelFile.size > maxSize) {
+      toast.error(`Excel dosyası boyutu ${EXCEL_MAX_SIZE_MB} MB limitini aşıyor.`);
+      return;
+    }
+    const ext = "." + (excelFile.name.split(".").pop() || "").toLowerCase();
+    if (EXCEL_FORBIDDEN_EXT.includes(ext)) {
+      toast.error("Makro içeren Excel dosyaları kabul edilmiyor.");
+      return;
+    }
+    if (!EXCEL_ALLOWED_EXT.includes(ext)) {
+      toast.error("Desteklenmeyen Excel dosya formatı. İzin verilen: .xlsx, .xls");
       return;
     }
     runBulkUpload({
@@ -207,18 +234,46 @@ const ProductDraftUploadPage = () => {
       toast.error("Lütfen JSON içeriğini girin");
       return;
     }
+    // API validasyonu: 2M karakter, kök dizi, 10000 satır
+    if (jsonText.length > JSON_MAX_CHARS) {
+      toast.error(`JSON gövdesi ${(JSON_MAX_CHARS / 1_000_000).toFixed(0)}.000.000 karakter limitini aşıyor.`);
+      return;
+    }
+    let parsedJson;
+    try {
+      parsedJson = JSON.parse(jsonText);
+    } catch {
+      toast.error("Geçersiz JSON formatı.");
+      return;
+    }
+    if (!Array.isArray(parsedJson)) {
+      toast.error("JSON kökü bir dizi olmalıdır.");
+      return;
+    }
+    if (parsedJson.length > JSON_MAX_ROWS) {
+      toast.error(`Toplu yükleme ${JSON_MAX_ROWS} satır sınırını aşıyor.`);
+      return;
+    }
     runBulkUpload({
       type: "json",
-      apiCall: async () => {
-        const parsedJson = JSON.parse(jsonText);
-        return addProductJson(parsedJson);
-      },
+      apiCall: () => addProductJson(parsedJson),
     });
   };
 
   const handleXmlUpload = () => {
     if (!xmlFile) {
       toast.error("Lütfen bir XML dosyası seçin");
+      return;
+    }
+    // API validasyonu: 30MB, sadece .xml
+    const maxSize = XML_MAX_SIZE_MB * 1024 * 1024;
+    if (xmlFile.size > maxSize) {
+      toast.error(`XML dosyası boyutu ${XML_MAX_SIZE_MB} MB limitini aşıyor.`);
+      return;
+    }
+    const ext = "." + (xmlFile.name.split(".").pop() || "").toLowerCase();
+    if (ext !== ".xml") {
+      toast.error("Yalnızca XML uzantılı dosyalar kabul edilir.");
       return;
     }
     runBulkUpload({
@@ -245,10 +300,8 @@ const ProductDraftUploadPage = () => {
     runBulkUpload({
       type: "xml-url",
       apiCall: () => addProductXmlFromUrl({
-        xmlUrl,
-        uploadName: xmlUrlUploadName || undefined,
-        username: xmlUsername || undefined,
-        password: xmlPassword || undefined,
+        xmlUrl: xmlUrl.trim(),
+        uploadName: xmlUrlUploadName?.trim() || undefined,
       }),
     });
   };
@@ -312,83 +365,45 @@ const ProductDraftUploadPage = () => {
 
       for (const product of validProducts) {
         try {
-          // Her ürün için ayrı FormData oluştur
+          // API 7.3: product JSON serialize edilmiş, Files, DraftName
+          const productPayload = {
+            name: product.name.trim(),
+            store: {
+              unitType: Number(product.store.unitType) || 0,
+              stockQuantity: Number(product.store.stockQuantity) || 0,
+              minOrderQuantity: Number(product.store.minOrderQuantity) ?? 0,
+              maxOrderQuantity: product.store.maxOrderQuantity !== "" && product.store.maxOrderQuantity != null
+                ? Number(product.store.maxOrderQuantity) : undefined,
+              unitPrice: Number(product.store.unitPrice) || 0,
+              currencyCode: (product.store.currencyCode || "TRY").trim(),
+              mainProductCode: product.store.mainProductCode?.trim() || undefined,
+              stockCode: product.store.stockCode?.trim() || undefined,
+              criticalStock: product.store.criticalStock !== "" && product.store.criticalStock != null
+                ? Number(product.store.criticalStock) : undefined,
+              width: product.store.width !== "" && product.store.width != null ? Number(product.store.width) : undefined,
+              length: product.store.length !== "" && product.store.length != null ? Number(product.store.length) : undefined,
+              height: product.store.height !== "" && product.store.height != null ? Number(product.store.height) : undefined,
+              weight: product.store.weight !== "" && product.store.weight != null ? Number(product.store.weight) : undefined,
+              volumeWeight: product.store.volumeWeight !== "" && product.store.volumeWeight != null ? Number(product.store.volumeWeight) : undefined,
+            },
+            sku: product.sku?.trim() || undefined,
+            ean: product.ean?.trim() || undefined,
+            brandId: product.brandId?.trim() || undefined,
+            brandName: product.brandName?.trim() || undefined,
+            categoryId: product.categoryId ? Number(product.categoryId) : undefined,
+            categorySubId: product.categorySubId ? Number(product.categorySubId) : undefined,
+            gtip: product.gtip?.trim() || undefined,
+            description: product.description?.trim() || undefined,
+            preparationTime: product.preparationTime ? new Date(product.preparationTime).toISOString() : undefined,
+            expirationDate: product.expirationDate ? new Date(product.expirationDate).toISOString() : undefined,
+            colorVariants: product.colorVariants?.filter((c) => c?.trim()).length ? product.colorVariants.filter((c) => c?.trim()) : undefined,
+          };
+
           const formData = new FormData();
-
-          // DraftName ekle (sadece ilk ürün için veya her ürün için aynı isim)
-          if (draftName) {
-            formData.append("DraftName", draftName);
-          }
-
-          // Temel ürün bilgileri (API dokümantasyonuna göre prefix'siz veya product. prefix'li)
-          formData.append("Name", product.name.trim());
-          if (product.sku?.trim()) formData.append("Sku", product.sku.trim());
-          if (product.ean?.trim()) formData.append("Ean", product.ean.trim());
-          if (product.brandId?.trim()) formData.append("BrandId", product.brandId.trim());
-          if (product.brandName?.trim()) formData.append("BrandName", product.brandName.trim());
-          if (product.categoryId) formData.append("CategoryId", product.categoryId.toString());
-          if (product.categorySubId) formData.append("CategorySubId", product.categorySubId.toString());
-          if (product.gtip?.trim()) formData.append("Gtip", product.gtip.trim());
-          if (product.description?.trim()) formData.append("Description", product.description.trim());
-          if (product.preparationTime) {
-            // ISO formatına çevir
-            const prepTime = new Date(product.preparationTime).toISOString();
-            formData.append("PreparationTime", prepTime);
-          }
-          if (product.expirationDate) {
-            // ISO formatına çevir
-            const expDate = new Date(product.expirationDate).toISOString();
-            formData.append("ExpirationDate", expDate);
-          }
-
-          // Mağaza bilgileri
-          formData.append("Store.UnitType", product.store.unitType.toString());
-          formData.append("Store.StockQuantity", product.store.stockQuantity.toString());
-          formData.append("Store.MinOrderQuantity", product.store.minOrderQuantity.toString());
-          if (product.store.maxOrderQuantity && product.store.maxOrderQuantity !== "") {
-            formData.append("Store.MaxOrderQuantity", product.store.maxOrderQuantity.toString());
-          }
-          formData.append("Store.UnitPrice", product.store.unitPrice.toString());
-          formData.append("Store.CurrencyCode", product.store.currencyCode.trim());
-          if (product.store.mainProductCode?.trim()) {
-            formData.append("Store.MainProductCode", product.store.mainProductCode.trim());
-          }
-          if (product.store.stockCode?.trim()) {
-            formData.append("Store.StockCode", product.store.stockCode.trim());
-          }
-          if (product.store.criticalStock && product.store.criticalStock !== "") {
-            formData.append("Store.CriticalStock", product.store.criticalStock.toString());
-          }
-          if (product.store.width && product.store.width !== "") {
-            formData.append("Store.Width", product.store.width.toString());
-          }
-          if (product.store.length && product.store.length !== "") {
-            formData.append("Store.Length", product.store.length.toString());
-          }
-          if (product.store.height && product.store.height !== "") {
-            formData.append("Store.Height", product.store.height.toString());
-          }
-          if (product.store.weight && product.store.weight !== "") {
-            formData.append("Store.Weight", product.store.weight.toString());
-          }
-          if (product.store.volumeWeight && product.store.volumeWeight !== "") {
-            formData.append("Store.VolumeWeight", product.store.volumeWeight.toString());
-          }
-
-          // Görselleri ekle (Files olarak - API dokümantasyonuna göre)
-          if (product.images && product.images.length > 0) {
-            product.images.forEach((imageFile) => {
-              formData.append("Files", imageFile);
-            });
-          }
-
-          // Renk varyantları
-          if (product.colorVariants && product.colorVariants.length > 0) {
-            product.colorVariants.forEach((color, colorIndex) => {
-              if (color?.trim()) {
-                formData.append(`ColorVariants[${colorIndex}]`, color.trim());
-              }
-            });
+          formData.append("product", JSON.stringify(productPayload));
+          if (draftName?.trim()) formData.append("DraftName", draftName.trim());
+          if (product.images?.length) {
+            product.images.forEach((f) => formData.append("Files", f));
           }
 
           await addProductManual(formData);
@@ -1315,7 +1330,7 @@ const ProductDraftUploadPage = () => {
                 <FileSpreadsheet className="w-20 h-20 mx-auto text-green-600 mb-4" />
                 <h2 className="text-2xl font-bold text-gray-900 mb-2">Excel Dosyası Yükle</h2>
                 <p className="text-gray-600">
-                  Excel/CSV formatında toplu ürün bilgilerinizi yükleyin
+                  Excel (.xlsx, .xls) formatında toplu ürün bilgilerinizi yükleyin
                 </p>
               </div>
 
@@ -1378,7 +1393,7 @@ const ProductDraftUploadPage = () => {
                 <input
                   key={excelResetKey}
                   type="file"
-                  accept=".xlsx,.xls,.csv"
+                  accept=".xlsx,.xls"
                   onChange={(e) => setExcelFile(e.target.files[0])}
                   className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-green-500 focus:ring-4 focus:ring-green-100 transition-all"
                 />
@@ -1405,9 +1420,14 @@ const ProductDraftUploadPage = () => {
 
               {uploadType === "excel" && (
                 <div className="space-y-2">
-                  <p className="text-sm text-gray-600 text-center">Sunucudan yanıt bekleniyor...</p>
+                  <p className="text-sm text-gray-600 text-center">
+                    {uploadProgress >= 100 ? "Tamamlandı" : "Yükleniyor..."} {uploadProgress > 0 && uploadProgress < 100 && `${Math.round(uploadProgress)}%`}
+                  </p>
                   <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
-                    <div className="h-full w-full progress-indeterminate bg-gradient-to-r from-green-500 to-emerald-600" />
+                    <div
+                      className={`h-full bg-gradient-to-r from-green-500 to-emerald-600 transition-all duration-300 ${uploadProgress > 0 && uploadProgress < 100 ? "" : "progress-indeterminate w-full"}`}
+                      style={uploadProgress > 0 && uploadProgress < 100 ? { width: `${uploadProgress}%` } : {}}
+                    />
                   </div>
                 </div>
               )}
@@ -1458,9 +1478,14 @@ const ProductDraftUploadPage = () => {
 
               {uploadType === "json" && (
                 <div className="space-y-2">
-                  <p className="text-sm text-gray-600 text-center">Sunucudan yanıt bekleniyor...</p>
+                  <p className="text-sm text-gray-600 text-center">
+                    {uploadProgress >= 100 ? "Tamamlandı" : "Gönderiliyor..."} {uploadProgress > 0 && uploadProgress < 100 && `${Math.round(uploadProgress)}%`}
+                  </p>
                   <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
-                    <div className="h-full w-full progress-indeterminate bg-gradient-to-r from-blue-500 to-indigo-600" />
+                    <div
+                      className={`h-full bg-gradient-to-r from-blue-500 to-indigo-600 transition-all duration-300 ${uploadProgress > 0 && uploadProgress < 100 ? "" : "progress-indeterminate w-full"}`}
+                      style={uploadProgress > 0 && uploadProgress < 100 ? { width: `${uploadProgress}%` } : {}}
+                    />
                   </div>
                 </div>
               )}
@@ -1537,9 +1562,14 @@ const ProductDraftUploadPage = () => {
 
               {uploadType === "xml" && (
                 <div className="space-y-2">
-                  <p className="text-sm text-gray-600 text-center">Sunucudan yanıt bekleniyor...</p>
+                  <p className="text-sm text-gray-600 text-center">
+                    {uploadProgress >= 100 ? "Tamamlandı" : "Yükleniyor..."} {uploadProgress > 0 && uploadProgress < 100 && `${Math.round(uploadProgress)}%`}
+                  </p>
                   <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
-                    <div className="h-full w-full progress-indeterminate bg-gradient-to-r from-purple-500 to-pink-600" />
+                    <div
+                      className={`h-full bg-gradient-to-r from-purple-500 to-pink-600 transition-all duration-300 ${uploadProgress > 0 && uploadProgress < 100 ? "" : "progress-indeterminate w-full"}`}
+                      style={uploadProgress > 0 && uploadProgress < 100 ? { width: `${uploadProgress}%` } : {}}
+                    />
                   </div>
                 </div>
               )}
@@ -1608,38 +1638,16 @@ const ProductDraftUploadPage = () => {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-2">
-                    Kullanıcı Adı (Opsiyonel)
-                  </label>
-                  <input
-                    type="text"
-                    value={xmlUsername}
-                    onChange={(e) => setXmlUsername(e.target.value)}
-                    placeholder="Username"
-                    className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-orange-500 focus:ring-4 focus:ring-orange-100 transition-all"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-2">
-                    Şifre (Opsiyonel)
-                  </label>
-                  <input
-                    type="password"
-                    value={xmlPassword}
-                    onChange={(e) => setXmlPassword(e.target.value)}
-                    placeholder="Password"
-                    className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-orange-500 focus:ring-4 focus:ring-orange-100 transition-all"
-                  />
-                </div>
-              </div>
-
               {uploadType === "xml-url" && (
                 <div className="space-y-2">
-                  <p className="text-sm text-gray-600 text-center">Sunucudan yanıt bekleniyor...</p>
+                  <p className="text-sm text-gray-600 text-center">
+                    {uploadProgress >= 100 ? "Tamamlandı" : "İşleniyor..."} {uploadProgress > 0 && uploadProgress < 100 && `${Math.round(uploadProgress)}%`}
+                  </p>
                   <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
-                    <div className="h-full w-full progress-indeterminate bg-gradient-to-r from-orange-500 to-red-600" />
+                    <div
+                      className={`h-full bg-gradient-to-r from-orange-500 to-red-600 transition-all duration-300 ${uploadProgress > 0 && uploadProgress < 100 ? "" : "progress-indeterminate w-full"}`}
+                      style={uploadProgress > 0 && uploadProgress < 100 ? { width: `${uploadProgress}%` } : {}}
+                    />
                   </div>
                 </div>
               )}

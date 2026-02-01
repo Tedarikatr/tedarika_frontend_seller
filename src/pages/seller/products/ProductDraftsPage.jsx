@@ -18,6 +18,7 @@ import {
   Calendar,
   Tag,
   Loader2,
+  SkipForward,
 } from "lucide-react";
 
 const ProductDraftsPage = () => {
@@ -57,6 +58,10 @@ const ProductDraftsPage = () => {
         return <CheckCircle className="w-5 h-5" />;
       case "XCircle":
         return <XCircle className="w-5 h-5" />;
+      case "Loader2":
+        return <Loader2 className="w-5 h-5 animate-spin" />;
+      case "SkipForward":
+        return <SkipForward className="w-5 h-5" />;
       default:
         return <AlertCircle className="w-5 h-5" />;
     }
@@ -88,6 +93,10 @@ const ProductDraftsPage = () => {
         return "bg-green-100 text-green-800 border-green-200";
       case "red":
         return "bg-red-100 text-red-800 border-red-200";
+      case "blue":
+        return "bg-blue-100 text-blue-800 border-blue-200";
+      case "gray":
+        return "bg-gray-100 text-gray-800 border-gray-200";
       default:
         return "bg-gray-100 text-gray-800 border-gray-200";
     }

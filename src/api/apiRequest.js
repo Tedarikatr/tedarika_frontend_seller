@@ -72,9 +72,10 @@ export async function apiRequest(
     let errorMessage = "Sunucu hatası.";
 
     try {
-      const json = errorText ? JSON.parse(errorText) : {};
-      console.error("API JSON Error:", json);
-      errorMessage = json.title || json.message || json.error || errorText || response.statusText;
+      const parsed = errorText ? JSON.parse(errorText) : {};
+      const json = typeof parsed === "object" && parsed !== null ? parsed : {};
+      // API 400: string body veya { message, title, error } object
+      errorMessage = json.title || json.message || json.error || (typeof parsed === "string" ? parsed : errorText) || response.statusText;
     } catch {
       console.error("API Text Error:", errorText);
       errorMessage = errorText || response.statusText;

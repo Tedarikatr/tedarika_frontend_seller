@@ -14,6 +14,7 @@ import {
   Tag,
   Loader2,
   Eye,
+  SkipForward,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -63,6 +64,10 @@ const ProductDraftDetailPage = () => {
         return <CheckCircle className="w-5 h-5" />;
       case "XCircle":
         return <XCircle className="w-5 h-5" />;
+      case "Loader2":
+        return <Loader2 className="w-5 h-5 animate-spin" />;
+      case "SkipForward":
+        return <SkipForward className="w-5 h-5" />;
       default:
         return <AlertCircle className="w-5 h-5" />;
     }
@@ -79,6 +84,10 @@ const ProductDraftDetailPage = () => {
         return "bg-green-100 text-green-800 border-green-200";
       case "red":
         return "bg-red-100 text-red-800 border-red-200";
+      case "blue":
+        return "bg-blue-100 text-blue-800 border-blue-200";
+      case "gray":
+        return "bg-gray-100 text-gray-800 border-gray-200";
       default:
         return "bg-gray-100 text-gray-800 border-gray-200";
     }
@@ -86,17 +95,17 @@ const ProductDraftDetailPage = () => {
 
   const filteredProducts = products.filter((product) => {
     if (filter === "all") return true;
-    if (filter === "pending") return product.status === "Pending";
-    if (filter === "approved") return product.status === "Approved";
-    if (filter === "rejected") return product.status === "Rejected";
+    if (filter === "pending") return product.status === "Pending" || product.status === 0 || product.status === 3; // 3=Processing
+    if (filter === "approved") return product.status === "Approved" || product.status === 1;
+    if (filter === "rejected") return product.status === "Rejected" || product.status === 2 || product.status === 4; // 4=DuplicateEanSkipped
     return true;
   });
 
   const stats = {
     total: products.length,
-    pending: products.filter((p) => p.status === "Pending").length,
-    approved: products.filter((p) => p.status === "Approved").length,
-    rejected: products.filter((p) => p.status === "Rejected").length,
+    pending: products.filter((p) => p.status === "Pending" || p.status === 0 || p.status === 3).length,
+    approved: products.filter((p) => p.status === "Approved" || p.status === 1).length,
+    rejected: products.filter((p) => p.status === "Rejected" || p.status === 2 || p.status === 4).length,
   };
 
   if (loading) {
