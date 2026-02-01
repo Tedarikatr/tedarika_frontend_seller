@@ -37,7 +37,7 @@ const SellerHeader = () => {
             className="flex items-center gap-3 group"
             aria-label="Tedarika Satıcı Paneli"
           >
-            <img src={Logo} alt="Tedarika Logo" className="h-32 sm:h-40 -my-8 group-hover:scale-110 transition-transform duration-300" />
+            <img src={Logo} alt="Tedarika Logo" className="h-12 sm:h-20 md:h-28 -my-2 sm:-my-4 md:-my-6 group-hover:scale-110 transition-transform duration-300" />
           </a>
 
           <nav

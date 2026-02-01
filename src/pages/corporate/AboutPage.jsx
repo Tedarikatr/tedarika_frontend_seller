@@ -106,9 +106,9 @@ const AboutPage = () => {
       <div className="bg-white min-h-screen">
         <SellerHeader />
         
-        <div className="container mx-auto px-4 py-12 max-w-6xl">
+        <div className="container mx-auto px-4 sm:px-6 py-8 sm:py-12 max-w-6xl">
           {/* Hero Header with Gradient */}
-          <div className="bg-gradient-to-r from-emerald-600 via-teal-600 to-green-600 rounded-3xl shadow-2xl p-8 mb-8">
+          <div className="bg-gradient-to-r from-emerald-600 via-teal-600 to-green-600 rounded-2xl sm:rounded-3xl shadow-2xl p-6 sm:p-8 mb-6 sm:mb-8">
             <div className="flex items-center gap-4 mb-4">
               <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center">
                 <Award className="w-8 h-8 text-white" strokeWidth={2.5} />
@@ -125,7 +125,7 @@ const AboutPage = () => {
           </div>
 
           {/* Ana İçerik Bölümü */}
-          <article className="bg-white rounded-3xl shadow-xl p-8 md:p-10 mb-8 border border-gray-100">
+          <article className="bg-white rounded-2xl sm:rounded-3xl shadow-xl p-6 sm:p-8 md:p-10 mb-6 sm:mb-8 border border-gray-100 overflow-hidden">
             <div className="prose prose-lg max-w-none">
               <section className="mb-8">
                 <h2 className="text-2xl font-bold text-gray-900 mb-4">Tedarika Satıcı Platformu Nedir?</h2>
@@ -198,7 +198,7 @@ const AboutPage = () => {
             {sections.map(({ title, content, icon: Icon, iconBg }, idx) => (
               <article
                 key={idx}
-                className="bg-white rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 p-8 border border-gray-100"
+                className="bg-white rounded-2xl sm:rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 p-6 sm:p-8 border border-gray-100 overflow-hidden"
               >
                 <div className="flex items-start gap-4 mb-4">
                   <div className={`relative w-14 h-14 bg-gradient-to-br ${iconBg} rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg`}>

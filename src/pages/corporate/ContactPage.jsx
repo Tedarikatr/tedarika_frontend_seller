@@ -111,9 +111,9 @@ const ContactPage = () => {
       <div className="bg-white min-h-screen">
         <SellerHeader />
         
-        <div className="container mx-auto px-4 py-12 max-w-5xl">
+        <div className="container mx-auto px-4 sm:px-6 py-8 sm:py-12 max-w-5xl">
           {/* Hero Header */}
-          <div className="bg-gradient-to-r from-emerald-600 via-teal-600 to-green-600 rounded-3xl shadow-2xl p-8 mb-8 text-white">
+          <div className="bg-gradient-to-r from-emerald-600 via-teal-600 to-green-600 rounded-2xl sm:rounded-3xl shadow-2xl p-6 sm:p-8 mb-6 sm:mb-8 text-white">
           <div className="flex items-center gap-4 mb-4">
             <div className="bg-white/20 backdrop-blur-sm p-3 rounded-2xl">
               <MessageSquare className="w-8 h-8" />
@@ -125,7 +125,7 @@ const ContactPage = () => {
           </div>
         </div>
 
-        <div className="grid gap-8 md:grid-cols-3 mb-8">
+        <div className="grid gap-4 sm:gap-6 md:gap-8 md:grid-cols-3 mb-6 sm:mb-8">
           {/* Email Card */}
           <div className="bg-white rounded-3xl shadow-xl hover:shadow-2xl transition-shadow p-6">
             <div className="flex items-center gap-3 mb-4">
@@ -174,7 +174,7 @@ const ContactPage = () => {
         {/* Contact Form */}
         <form
           onSubmit={handleSubmit}
-          className="bg-white rounded-3xl shadow-xl p-8 space-y-6"
+          className="bg-white rounded-2xl sm:rounded-3xl shadow-xl p-6 sm:p-8 space-y-5 sm:space-y-6 overflow-hidden"
         >
           <div className="text-center mb-6">
             <h2 className="text-2xl font-bold text-gray-900 mb-2">Mesaj Gönderin</h2>
@@ -202,9 +202,9 @@ const ContactPage = () => {
             />
           </div>
 
-          <div className="flex items-center justify-between bg-gray-50 p-4 rounded-xl border border-gray-200">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-gray-50 p-4 rounded-xl border border-gray-200">
             <span className="text-sm text-gray-700 font-medium">Dosya Ekle (Opsiyonel)</span>
-            <label className="bg-white text-sm font-semibold px-4 py-2 border border-gray-300 rounded-xl hover:bg-gray-50 cursor-pointer transition-colors">
+            <label className="bg-white text-sm font-semibold px-4 py-2 border border-gray-300 rounded-xl hover:bg-gray-50 cursor-pointer transition-colors text-center sm:text-left">
               Dosya Seç
               <input ref={fileRef} type="file" className="hidden" />
             </label>

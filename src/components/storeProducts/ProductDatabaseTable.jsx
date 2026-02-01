@@ -11,7 +11,9 @@ const ProductDatabaseTable = ({
 }) => {
   const [selectedProductForAttributes, setSelectedProductForAttributes] = useState(null);
   return (
-    <div className="w-full overflow-x-auto">
+    <div className="w-full">
+      {/* Desktop Table */}
+      <div className="hidden xl:block overflow-x-auto">
       <table className="min-w-full">
         <thead className="bg-gradient-to-r from-emerald-50 to-teal-50 border-b-2 border-emerald-200">
           <tr>
@@ -117,6 +119,79 @@ const ProductDatabaseTable = ({
           })}
         </tbody>
       </table>
+      </div>
+
+      {/* Tablet & Mobile Cards */}
+      <div className="xl:hidden space-y-4 p-2 sm:p-4">
+        {products.map((prod, index) => {
+          const productId = String(prod.id ?? prod.productId);
+          const isAdded = addedIds.includes(productId);
+          const isAdding = String(addingId) === productId;
+
+          return (
+            <div
+              key={productId}
+              className="bg-gradient-to-br from-white to-gray-50 rounded-2xl border-2 border-gray-200 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden"
+            >
+              <div className="bg-gradient-to-r from-emerald-50 to-teal-50 p-4 border-b-2 border-emerald-200">
+                <div className="flex items-start gap-3">
+                  <Package className="w-10 h-10 text-emerald-600 flex-shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-bold text-gray-900 text-base sm:text-lg line-clamp-2">
+                      {prod.name}
+                    </h3>
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      <span className="text-xs text-gray-600 bg-gray-100 px-2 py-0.5 rounded">
+                        {prod.categoryName}
+                        {prod.categorySubName && ` / ${prod.categorySubName}`}
+                      </span>
+                      <span className="text-xs text-gray-600 bg-gray-100 px-2 py-0.5 rounded">
+                        {prod.brand || "-"}
+                      </span>
+                    </div>
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      <span className="text-xs font-mono bg-gray-200 px-2 py-0.5 rounded">
+                        EAN: {prod.ean ?? prod.barcode ?? "-"}
+                      </span>
+                      <span className="text-xs font-mono bg-gray-200 px-2 py-0.5 rounded">
+                        SKU: {prod.sku ?? "-"}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="p-4 space-y-2">
+                <button
+                  onClick={() => setSelectedProductForAttributes(prod)}
+                  className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 text-white text-sm font-bold hover:shadow-lg transition-all"
+                >
+                  <List className="w-4 h-4" />
+                  Özellikler
+                </button>
+                {isAdded ? (
+                  <span className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-gradient-to-r from-green-100 to-emerald-100 border-2 border-green-300 text-green-800 text-sm font-bold">
+                    <CheckCircle className="w-4 h-4" />
+                    Mağazada Var
+                  </span>
+                ) : (
+                  <button
+                    onClick={() => onAdd(productId)}
+                    disabled={isAdding}
+                    className={`w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-bold transition-all ${
+                      isAdding
+                        ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                        : "bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:shadow-lg"
+                    }`}
+                  >
+                    <Plus className="w-4 h-4" />
+                    {isAdding ? "Ekleniyor..." : "Mağazama Ekle"}
+                  </button>
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
 
       {/* Attributes Modal */}
       {selectedProductForAttributes && (

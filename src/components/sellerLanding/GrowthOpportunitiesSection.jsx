@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 
 const GrowthOpportunitiesSection = () => {
   return (
-    <section className="relative bg-white py-32 px-6 text-center overflow-hidden">
+    <section className="relative bg-white py-12 sm:py-20 md:py-32 px-4 sm:px-6 text-center overflow-hidden">
       {/* Dekoratif blur daireler */}
       <div className="absolute top-0 left-10 w-40 h-40 bg-emerald-300 opacity-30 rounded-full blur-3xl animate-pulse-slow z-0" />
       <div className="absolute bottom-0 right-10 w-56 h-56 bg-indigo-300 opacity-20 rounded-full blur-3xl animate-pulse-slow z-0" />
@@ -19,7 +19,7 @@ const GrowthOpportunitiesSection = () => {
           <div className="hidden md:block w-16 h-16 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-2xl flex items-center justify-center shadow-2xl">
             <Globe className="w-8 h-8 text-white" strokeWidth={2.5} />
           </div>
-          <h2 className="text-5xl md:text-6xl font-extrabold text-black">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-extrabold text-black px-2">
             İhracatla Satışlarınızı Katlamak İçin Fırsatlar
           </h2>
         </motion.div>
@@ -35,10 +35,10 @@ const GrowthOpportunitiesSection = () => {
         </motion.p>
 
         {/* Büyüme Fırsatları Kartları */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
           {/* Kart 1 */}
           <motion.div
-            className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-transform duration-300 hover:-translate-y-1"
+            className="bg-white rounded-2xl p-6 sm:p-8 shadow-lg hover:shadow-xl transition-transform duration-300 hover:-translate-y-1"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, duration: 0.6 }}
@@ -54,7 +54,7 @@ const GrowthOpportunitiesSection = () => {
 
           {/* Kart 2 */}
           <motion.div
-            className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-transform duration-300 hover:-translate-y-1"
+            className="bg-white rounded-2xl p-6 sm:p-8 shadow-lg hover:shadow-xl transition-transform duration-300 hover:-translate-y-1"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4, duration: 0.6 }}
@@ -70,7 +70,7 @@ const GrowthOpportunitiesSection = () => {
 
           {/* Kart 3 */}
           <motion.div
-            className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-transform duration-300 hover:-translate-y-1"
+            className="bg-white rounded-2xl p-6 sm:p-8 shadow-lg hover:shadow-xl transition-transform duration-300 hover:-translate-y-1"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6, duration: 0.6 }}
@@ -86,7 +86,7 @@ const GrowthOpportunitiesSection = () => {
 
           {/* Kart 4 */}
           <motion.div
-            className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-transform duration-300 hover:-translate-y-1"
+            className="bg-white rounded-2xl p-6 sm:p-8 shadow-lg hover:shadow-xl transition-transform duration-300 hover:-translate-y-1"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.8, duration: 0.6 }}

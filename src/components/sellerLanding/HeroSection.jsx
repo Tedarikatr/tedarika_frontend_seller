@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 
 const HeroSection = () => {
   return (
-    <section className="relative bg-white py-32 px-6 text-center overflow-hidden">
+    <section className="relative bg-white py-16 sm:py-24 md:py-32 px-4 sm:px-6 text-center overflow-hidden">
       {/* Dekoratif blur daireler */}
       <div className="absolute top-0 left-10 w-40 h-40 bg-emerald-300 opacity-20 rounded-full blur-3xl animate-pulse-slow z-0" />
       <div className="absolute bottom-0 right-10 w-40 h-40 bg-indigo-300 opacity-20 rounded-full blur-3xl animate-pulse-slow z-0" />
@@ -24,7 +24,7 @@ const HeroSection = () => {
 
         {/* Başlık */}
         <motion.h1
-          className="text-5xl md:text-6xl font-extrabold leading-tight text-[#002222] mb-4 drop-shadow"
+          className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight text-[#002222] mb-4 drop-shadow"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2, duration: 0.8 }}
@@ -38,7 +38,7 @@ const HeroSection = () => {
 
         {/* Alt slogan */}
         <motion.p
-          className="text-lg text-gray-800 mb-10 max-w-2xl mx-auto leading-relaxed"
+          className="text-base sm:text-lg text-gray-800 mb-8 sm:mb-10 max-w-2xl mx-auto leading-relaxed px-2"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3, duration: 0.8 }}
@@ -106,7 +106,7 @@ const HeroSection = () => {
 
       {/* Avantajlar barı */}
       <motion.div
-        className="mt-20 flex flex-wrap justify-center gap-8 max-w-5xl mx-auto text-gray-700"
+        className="mt-12 sm:mt-16 md:mt-20 flex flex-wrap justify-center gap-4 sm:gap-6 md:gap-8 max-w-5xl mx-auto text-gray-700 px-2"
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 1.2, duration: 0.8 }}

@@ -218,7 +218,7 @@ const SssPage = () => {
       <div className="bg-white min-h-screen">
         <SellerHeader />
         
-        <div className="container mx-auto px-4 py-12 max-w-5xl">
+        <div className="container mx-auto px-4 sm:px-6 py-8 sm:py-12 max-w-5xl">
           {/* Hero Header */}
           <div className="bg-gradient-to-r from-emerald-600 via-teal-600 to-green-600 rounded-3xl shadow-2xl p-8 mb-8 text-white">
           <div className="flex items-center gap-4 mb-4">

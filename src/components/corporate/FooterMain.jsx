@@ -129,7 +129,7 @@ const FooterMain = () => {
             </h4>
             <ul className="space-y-3 text-sm">
               {contracts.map((c, i) => (
-                <li key={i}>
+                <li key={i} className="break-words">
                   <a
                     href={c.file}
                     target="_blank"

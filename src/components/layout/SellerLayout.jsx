@@ -156,16 +156,16 @@ const SellerLayout = () => {
 
       {/* 🔔 Mağaza oluşturma uyarısı */}
       {showStoreNotification && !isRestricted && (
-        <div className="fixed top-6 left-1/2 transform -translate-x-1/2 z-[9999] w-[90%] md:w-auto">
-          <div className="bg-white border border-yellow-400 shadow-xl rounded-xl px-6 py-4 flex items-center gap-4 animate-fade-in-down backdrop-blur-lg bg-opacity-90">
+        <div className="fixed top-4 sm:top-6 left-1/2 transform -translate-x-1/2 z-[9999] w-[95%] sm:w-[90%] md:w-auto max-w-lg">
+          <div className="bg-white border border-yellow-400 shadow-xl rounded-xl px-4 sm:px-6 py-3 sm:py-4 flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 animate-fade-in-down backdrop-blur-lg bg-opacity-90">
             <AlertCircle className="w-6 h-6 text-yellow-500" />
-            <div className="text-sm text-gray-800 font-medium">
+            <div className="text-sm text-gray-800 font-medium flex-1">
               Henüz bir mağazanız yok. Satışa başlayabilmek için bir mağaza
               oluşturmalısınız.
             </div>
             <button
               onClick={handleCreateStore}
-              className="ml-auto bg-yellow-500 hover:bg-yellow-600 text-white text-sm px-4 py-1.5 rounded-md font-semibold transition duration-200"
+              className="sm:ml-auto bg-yellow-500 hover:bg-yellow-600 text-white text-sm px-4 py-2 sm:py-1.5 rounded-md font-semibold transition duration-200"
             >
               Mağaza Oluştur
             </button>

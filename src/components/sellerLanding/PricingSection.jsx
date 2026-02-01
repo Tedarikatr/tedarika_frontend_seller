@@ -51,7 +51,7 @@ export default function PricingSection() {
   return (
     <section
       id="pricing"
-      className="py-24 bg-gradient-to-br from-emerald-50 to-teal-50 scroll-mt-24"
+      className="py-12 sm:py-16 md:py-24 bg-gradient-to-br from-emerald-50 to-teal-50 scroll-mt-20 sm:scroll-mt-24 px-4 sm:px-6"
     >
       <div className="max-w-5xl mx-auto px-6 text-center">
         <motion.h2
@@ -59,7 +59,7 @@ export default function PricingSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="text-4xl md:text-5xl font-extrabold mb-6 text-[#002222]"
+          className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-4 sm:mb-6 text-[#002222]"
         >
           Ücretsiz Başlayın
         </motion.h2>
@@ -84,7 +84,7 @@ export default function PricingSection() {
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="bg-white rounded-3xl shadow-2xl p-10 max-w-lg mx-auto border border-emerald-100"
+          className="bg-white rounded-3xl shadow-2xl p-6 sm:p-8 md:p-10 max-w-lg mx-auto border border-emerald-100"
         >
           <div className="mb-6">
             <h3 className="text-3xl font-bold text-emerald-700 mb-2">

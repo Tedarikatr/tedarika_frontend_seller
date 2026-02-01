@@ -26,11 +26,11 @@ const steps = [
 ];
 
 const StepsSection = () => (
-  <section className="bg-white py-24 px-6 relative">
+  <section className="bg-white py-12 sm:py-16 md:py-24 px-4 sm:px-6 relative">
     <div className="max-w-6xl mx-auto">
       {/* Başlık */}
       <motion.h2
-        className="text-4xl font-extrabold text-center text-[#002222] mb-4"
+        className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-center text-[#002222] mb-3 sm:mb-4"
         initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
@@ -38,7 +38,7 @@ const StepsSection = () => (
         3 Basit Adımda Satıcı Olun
       </motion.h2>
       <motion.p
-        className="text-center text-gray-600 mb-16 max-w-2xl mx-auto text-lg"
+        className="text-center text-gray-600 mb-10 sm:mb-16 max-w-2xl mx-auto text-base sm:text-lg px-2"
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2, duration: 0.6 }}
@@ -47,7 +47,7 @@ const StepsSection = () => (
       </motion.p>
 
       {/* Adımlar */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-10 text-center">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 md:gap-10 text-center">
         {steps.map(({ number, title, desc, icon: Icon, bg }, i) => (
           <motion.div
             key={i}
@@ -55,7 +55,7 @@ const StepsSection = () => (
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: i * 0.2 }}
-            className="bg-white border border-emerald-100 rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+            className="bg-white border border-emerald-100 rounded-2xl p-6 sm:p-8 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
           >
             <div
               className={`w-16 h-16 mx-auto mb-5 rounded-full bg-gradient-to-br ${bg} text-white flex items-center justify-center text-2xl font-bold shadow-lg`}
