@@ -12,8 +12,8 @@ import { getCategoriesWithSubCategories } from "@/api/categoryService";
 import { getBrandList } from "@/api/brandservice";
 import { UNIT_TYPE_OPTIONS } from "@/constants/unitTypes";
 import { getUploadProgress } from "@/utils/getUploadProgress";
+import { useProductUploadNotifications } from "@/hooks/useProductUploadNotifications";
 import { useToast } from "@/contexts/ToastContext";
-import { useNotification, NOTIFICATION_TYPES } from "@/contexts/NotificationContext";
 import {
   FileSpreadsheet,
   FileCode,
@@ -58,8 +58,15 @@ const JSON_MAX_ROWS = 10_000;
 
 const ProductDraftUploadPage = () => {
   const navigate = useNavigate();
-  const toast = useToast();
-  const { addNotification } = useNotification();
+  const toast = useToast(); // Sayfa yükleme hataları (kategori, marka) için
+  const {
+    notifySuccess,
+    notifyError,
+    notifyValidationError,
+    notifyInfo,
+    notifyManualResult,
+    notifySingleProductError,
+  } = useProductUploadNotifications();
   const mountedRef = useRef(true);
   const [activeTab, setActiveTab] = useState("manual"); // manual, excel, json, xml, xml-url
   const [showHistory, setShowHistory] = useState(false);
@@ -154,7 +161,7 @@ const ProductDraftUploadPage = () => {
   const runBulkUpload = async ({ type, apiCall, onErrorReset }) => {
     setUploadState({ active: true, type });
     setUploadProgress(getUploadProgress("validating"));
-    if (type !== "json") toast.info(BG_UPLOAD_MSG, 8000);
+    if (type !== "json") notifyInfo({ message: BG_UPLOAD_MSG });
 
     try {
       setUploadProgress(getUploadProgress("uploading", 50)); // fetch ile gerçek progress yok
@@ -166,26 +173,24 @@ const ProductDraftUploadPage = () => {
 
       if (mountedRef.current) {
         setUploadSuccessModal({ type, productCount, message: successMessage });
-        addNotification({
-          type: NOTIFICATION_TYPES.SUCCESS,
-          title: "Yükleme Tamamlandı",
-          message: successMessage + " Ürünleriniz onaya gönderildi.",
-          actionLabel: "Taslakları Görüntüle",
-          actionUrl: "/seller/products/drafts",
+        notifySuccess({
+          message: successMessage,
+          productCount,
+          draftId: response?.draftId,
+          uploadType: type,
         });
       }
       setUploadProgress(getUploadProgress("done"));
-      toast.success(successMessage, 5000);
-      toast.info("Ürünleriniz onaya gönderildi. İnceleme sonrası onaylandıktan sonra otomatik olarak mağazanıza aktarılacaktır.", 6000);
     } catch (err) {
       setUploadProgress(getUploadProgress("error"));
       setUploadState({ active: false, type: null });
       if (onErrorReset) onErrorReset();
       const msg = err?.message || "Beklenmeyen hata";
-      if (type === "excel") toast.error(`Excel yüklenemedi: ${msg}`);
-      else if (type === "xml") toast.error(`XML yüklenemedi: ${msg}`);
-      else if (type === "xml-url") toast.error(`XML URL işlenemedi: ${msg}`);
-      else if (type === "json") toast.error(err instanceof SyntaxError ? "Geçersiz JSON formatı" : `JSON gönderilemedi: ${msg}`);
+      const errorMessage = type === "excel" ? `Excel yüklenemedi: ${msg}` :
+        type === "xml" ? `XML yüklenemedi: ${msg}` :
+        type === "xml-url" ? `XML URL işlenemedi: ${msg}` :
+        err instanceof SyntaxError ? "Geçersiz JSON formatı" : `JSON gönderilemedi: ${msg}`;
+      notifyError({ message: errorMessage, uploadType: type, errorDetail: msg });
       console.error(`${type} yükleme hatası:`, err);
     } finally {
       setUploadState({ active: false, type: null });
@@ -195,22 +200,22 @@ const ProductDraftUploadPage = () => {
 
   const handleExcelUpload = () => {
     if (!excelFile) {
-      toast.error("Lütfen bir Excel dosyası seçin");
+      notifyValidationError({ message: "Lütfen bir Excel dosyası seçin", uploadType: "excel", field: "file" });
       return;
     }
     // API validasyonu: 50MB, sadece .xlsx/.xls, makro (.xlsm/.xla) reddet
     const maxSize = EXCEL_MAX_SIZE_MB * 1024 * 1024;
     if (excelFile.size > maxSize) {
-      toast.error(`Excel dosyası boyutu ${EXCEL_MAX_SIZE_MB} MB limitini aşıyor.`);
+      notifyValidationError({ message: `Excel dosyası boyutu ${EXCEL_MAX_SIZE_MB} MB limitini aşıyor.`, uploadType: "excel", field: "size" });
       return;
     }
     const ext = "." + (excelFile.name.split(".").pop() || "").toLowerCase();
     if (EXCEL_FORBIDDEN_EXT.includes(ext)) {
-      toast.error("Makro içeren Excel dosyaları kabul edilmiyor.");
+      notifyValidationError({ message: "Makro içeren Excel dosyaları kabul edilmiyor.", uploadType: "excel", field: "format" });
       return;
     }
     if (!EXCEL_ALLOWED_EXT.includes(ext)) {
-      toast.error("Desteklenmeyen Excel dosya formatı. İzin verilen: .xlsx, .xls");
+      notifyValidationError({ message: "Desteklenmeyen Excel dosya formatı. İzin verilen: .xlsx, .xls", uploadType: "excel", field: "format" });
       return;
     }
     runBulkUpload({
@@ -231,27 +236,27 @@ const ProductDraftUploadPage = () => {
 
   const handleJsonUpload = () => {
     if (!jsonText.trim()) {
-      toast.error("Lütfen JSON içeriğini girin");
+      notifyValidationError({ message: "Lütfen JSON içeriğini girin", uploadType: "json", field: "content" });
       return;
     }
     // API validasyonu: 2M karakter, kök dizi, 10000 satır
     if (jsonText.length > JSON_MAX_CHARS) {
-      toast.error(`JSON gövdesi ${(JSON_MAX_CHARS / 1_000_000).toFixed(0)}.000.000 karakter limitini aşıyor.`);
+      notifyValidationError({ message: `JSON gövdesi ${(JSON_MAX_CHARS / 1_000_000).toFixed(0)}.000.000 karakter limitini aşıyor.`, uploadType: "json", field: "size" });
       return;
     }
     let parsedJson;
     try {
       parsedJson = JSON.parse(jsonText);
     } catch {
-      toast.error("Geçersiz JSON formatı.");
+      notifyValidationError({ message: "Geçersiz JSON formatı.", uploadType: "json", field: "format" });
       return;
     }
     if (!Array.isArray(parsedJson)) {
-      toast.error("JSON kökü bir dizi olmalıdır.");
+      notifyValidationError({ message: "JSON kökü bir dizi olmalıdır.", uploadType: "json", field: "structure" });
       return;
     }
     if (parsedJson.length > JSON_MAX_ROWS) {
-      toast.error(`Toplu yükleme ${JSON_MAX_ROWS} satır sınırını aşıyor.`);
+      notifyValidationError({ message: `Toplu yükleme ${JSON_MAX_ROWS} satır sınırını aşıyor.`, uploadType: "json", field: "rows" });
       return;
     }
     runBulkUpload({
@@ -262,18 +267,18 @@ const ProductDraftUploadPage = () => {
 
   const handleXmlUpload = () => {
     if (!xmlFile) {
-      toast.error("Lütfen bir XML dosyası seçin");
+      notifyValidationError({ message: "Lütfen bir XML dosyası seçin", uploadType: "xml", field: "file" });
       return;
     }
     // API validasyonu: 30MB, sadece .xml
     const maxSize = XML_MAX_SIZE_MB * 1024 * 1024;
     if (xmlFile.size > maxSize) {
-      toast.error(`XML dosyası boyutu ${XML_MAX_SIZE_MB} MB limitini aşıyor.`);
+      notifyValidationError({ message: `XML dosyası boyutu ${XML_MAX_SIZE_MB} MB limitini aşıyor.`, uploadType: "xml", field: "size" });
       return;
     }
     const ext = "." + (xmlFile.name.split(".").pop() || "").toLowerCase();
     if (ext !== ".xml") {
-      toast.error("Yalnızca XML uzantılı dosyalar kabul edilir.");
+      notifyValidationError({ message: "Yalnızca XML uzantılı dosyalar kabul edilir.", uploadType: "xml", field: "format" });
       return;
     }
     runBulkUpload({
@@ -294,7 +299,7 @@ const ProductDraftUploadPage = () => {
 
   const handleXmlUrlUpload = () => {
     if (!xmlUrl.trim()) {
-      toast.error("Lütfen XML URL'i girin");
+      notifyValidationError({ message: "Lütfen XML URL'i girin", uploadType: "xml-url", field: "url" });
       return;
     }
     runBulkUpload({
@@ -327,21 +332,21 @@ const ProductDraftUploadPage = () => {
     });
 
     if (validProducts.length === 0) {
-      toast.error("En az bir geçerli ürün bilgisi gereklidir. Zorunlu alanları kontrol edin.");
+      notifyValidationError({ message: "En az bir geçerli ürün bilgisi gereklidir. Zorunlu alanları kontrol edin.", uploadType: "manual", field: "products" });
       return;
     }
 
     // Görsel validasyonu (en fazla 10 görsel, max 10MB/dosya)
     for (const product of validProducts) {
       if (product.images && product.images.length > 10) {
-        toast.error(`Ürün "${product.name}" için en fazla 10 görsel gönderebilirsiniz.`);
+        notifyValidationError({ message: `Ürün "${product.name}" için en fazla 10 görsel gönderebilirsiniz.`, uploadType: "manual", field: "images" });
         return;
       }
       if (product.images) {
         for (const imageFile of product.images) {
           const maxSize = 10 * 1024 * 1024; // 10 MB
           if (imageFile.size > maxSize) {
-            toast.error(`Görsel "${imageFile.name}" 10 MB limitini aşıyor.`);
+            notifyValidationError({ message: `Görsel "${imageFile.name}" 10 MB limitini aşıyor.`, uploadType: "manual", field: "imageSize" });
             return;
           }
           // Format kontrolü
@@ -349,7 +354,7 @@ const ProductDraftUploadPage = () => {
           const fileName = imageFile.name.toLowerCase();
           const hasValidExtension = allowedExtensions.some(ext => fileName.endsWith(ext));
           if (!hasValidExtension) {
-            toast.error(`Görsel "${imageFile.name}" desteklenmiyor. İzin verilen: .jpg, .jpeg, .png, .gif, .webp`);
+            notifyValidationError({ message: `Görsel "${imageFile.name}" desteklenmiyor. İzin verilen: .jpg, .jpeg, .png, .gif, .webp`, uploadType: "manual", field: "imageFormat" });
             return;
           }
         }
@@ -411,24 +416,23 @@ const ProductDraftUploadPage = () => {
         } catch (err) {
           console.error(`Ürün "${product.name}" yüklenemedi:`, err);
           errorCount++;
-          // Hata mesajını göster ama devam et
-          toast.error(`Ürün "${product.name}" yüklenemedi: ${err.message || err}`);
+          notifySingleProductError({ productName: product.name, message: err?.message || err });
         }
       }
 
       if (successCount > 0) {
-        toast.success(`${successCount} ürün başarıyla yüklendi!${errorCount > 0 ? ` ${errorCount} ürün yüklenemedi.` : ""}`);
-        // Ek uyarı mesajı
-        setTimeout(() => {
-          toast.info("Ürünleriniz onaya gönderildi. İnceleme sonrası onaylandıktan sonra otomatik olarak mağazanıza aktarılacaktır.", 6000);
-        }, 500);
+        notifyManualResult({
+          successCount,
+          errorCount,
+          message: `${successCount} ürün başarıyla yüklendi!${errorCount > 0 ? ` ${errorCount} ürün yüklenemedi.` : ""}`,
+        });
         navigate("/seller/products/drafts");
       } else {
-        toast.error("Hiçbir ürün yüklenemedi.");
+        notifyManualResult({ successCount: 0, errorCount, message: "Hiçbir ürün yüklenemedi." });
       }
     } catch (err) {
       console.error("Manuel yükleme başarısız:", err);
-      toast.error(`Ürünler yüklenemedi: ${err.message || err}`);
+      notifyError({ message: `Ürünler yüklenemedi: ${err?.message || err}`, uploadType: "manual", errorDetail: err?.message });
     } finally {
       setLoadingManual(false);
     }

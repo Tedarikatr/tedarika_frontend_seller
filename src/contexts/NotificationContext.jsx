@@ -20,6 +20,13 @@ export const NOTIFICATION_TYPES = {
   SUCCESS: "success",
 };
 
+// Bildirim kaynakları (ileride filtreleme için)
+export const NOTIFICATION_SOURCES = {
+  GENERAL: "general",
+  PRODUCT_UPLOAD: "product_upload",
+  // İleride: ORDER, QUOTATION, REFUND, vb.
+};
+
 // Varsayılan bildirimler
 const getDefaultNotifications = () => [
   {
@@ -31,6 +38,8 @@ const getDefaultNotifications = () => [
     actionUrl: "/seller/profile/extra-info",
     read: false,
     createdAt: new Date().toISOString(),
+    source: NOTIFICATION_SOURCES.GENERAL,
+    metadata: {},
   },
   {
     id: "required-documents-missing",
@@ -41,6 +50,8 @@ const getDefaultNotifications = () => [
     actionUrl: "/seller/profile",
     read: false,
     createdAt: new Date().toISOString(),
+    source: NOTIFICATION_SOURCES.GENERAL,
+    metadata: {},
   },
 ];
 
@@ -77,7 +88,7 @@ export const NotificationProvider = ({ children }) => {
     }
   }, []);
 
-  // Bildirim ekle
+  // Bildirim ekle (source, metadata ile genişletilebilir)
   const addNotification = useCallback(
     (notification) => {
       const newNotification = {
@@ -89,6 +100,8 @@ export const NotificationProvider = ({ children }) => {
         actionUrl: notification.actionUrl,
         read: false,
         createdAt: notification.createdAt || new Date().toISOString(),
+        source: notification.source || NOTIFICATION_SOURCES.GENERAL,
+        metadata: notification.metadata || {},
       };
 
       setNotifications((prev) => {
