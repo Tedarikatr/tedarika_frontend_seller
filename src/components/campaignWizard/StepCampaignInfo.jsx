@@ -8,7 +8,7 @@ export default function StepCampaignInfo({ data, setData, next, metadata }) {
   return (
     <div className="w-full space-y-10 animate-fadeIn">
       <div>
-        <h2 className="text-3xl font-bold text-gray-800 mb-2">
+        <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 mb-2">
           Kampanya Bilgileri
         </h2>
         <p className="text-gray-500 text-sm">

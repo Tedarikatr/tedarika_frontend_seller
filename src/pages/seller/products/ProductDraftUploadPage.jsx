@@ -1683,11 +1683,11 @@ const ProductDraftUploadPage = () => {
       {uploadSuccessModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
           <div className="bg-white rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden animate-[fadeInDown_0.3s_ease-out]">
-            <div className="bg-gradient-to-r from-emerald-600 via-teal-600 to-green-600 px-8 py-10 text-center">
+            <div className="bg-gradient-to-r from-emerald-600 via-teal-600 to-green-600 px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-10 text-center">
               <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-white/20 flex items-center justify-center">
                 <CheckCircle className="w-12 h-12 text-white" />
               </div>
-              <h2 className="text-2xl font-bold text-white mb-2">Tamamlandı</h2>
+              <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">Tamamlandı</h2>
               <p className="text-emerald-100 text-lg">{uploadSuccessModal.message}</p>
               <p className="text-emerald-200 text-sm mt-2">Ürünleriniz onaya gönderildi.</p>
             </div>

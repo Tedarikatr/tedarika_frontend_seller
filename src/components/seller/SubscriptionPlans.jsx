@@ -141,12 +141,12 @@ export default function SubscriptionPlans() {
 
   // Abonelik listesi
   return (
-    <section className="py-16 bg-gradient-to-b from-emerald-50 to-white text-gray-800 rounded-2xl">
-      <div className="max-w-6xl mx-auto px-6 text-center">
-        <h2 className="text-4xl font-extrabold mb-4 text-[#003636]">
+    <section className="py-8 sm:py-12 lg:py-16 bg-gradient-to-b from-emerald-50 to-white text-gray-800 rounded-2xl">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 text-center">
+        <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold mb-3 sm:mb-4 text-[#003636]">
           Abonelik Planları
         </h2>
-        <p className="text-gray-500 mb-12">
+        <p className="text-gray-500 mb-8 sm:mb-12">
           İşinizi büyütmek için size en uygun planı seçin.
         </p>
 
@@ -155,7 +155,7 @@ export default function SubscriptionPlans() {
             plans.map((plan) => (
               <div
                 key={plan.id}
-                className={`relative p-8 rounded-2xl border transition duration-300 hover:shadow-2xl bg-white ${
+                className={`relative p-4 sm:p-6 lg:p-8 rounded-xl sm:rounded-2xl border transition duration-300 hover:shadow-2xl bg-white ${
                   plan.isFree
                     ? "border-gray-200 hover:border-emerald-300"
                     : "border-emerald-500 hover:border-emerald-600"
@@ -170,7 +170,7 @@ export default function SubscriptionPlans() {
                 <h3 className="text-2xl font-bold text-emerald-700">
                   {plan.name}
                 </h3>
-                <p className="text-4xl font-extrabold mt-3 text-gray-900">
+                <p className="text-2xl sm:text-3xl lg:text-4xl font-extrabold mt-2 sm:mt-3 text-gray-900">
                   ₺{plan.price ?? 0}
                   <span className="text-base font-medium text-gray-500">
                     /ay

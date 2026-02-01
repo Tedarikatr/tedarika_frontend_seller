@@ -29,11 +29,11 @@ const testimonials = [
 ];
 
 const TestimonialsSection = () => (
-  <section className="bg-gradient-to-b from-white to-emerald-50 py-24 px-6">
+  <section className="bg-gradient-to-b from-white to-emerald-50 py-12 sm:py-16 lg:py-24 px-4 sm:px-6">
     <div className="max-w-6xl mx-auto">
       {/* Başlık */}
       <motion.h2
-        className="text-4xl font-extrabold text-center text-[#002222] mb-4"
+        className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-center text-[#002222] mb-3 sm:mb-4"
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
@@ -41,7 +41,7 @@ const TestimonialsSection = () => (
         Başarı Hikayeleri
       </motion.h2>
       <motion.p
-        className="text-center text-gray-600 mb-16 max-w-2xl mx-auto text-lg"
+        className="text-center text-gray-600 mb-8 sm:mb-12 lg:mb-16 max-w-2xl mx-auto text-base sm:text-lg"
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2, duration: 0.6 }}
@@ -58,7 +58,7 @@ const TestimonialsSection = () => (
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: i * 0.2 }}
             viewport={{ once: true }}
-            className="relative bg-white rounded-2xl border border-emerald-100 shadow-md hover:shadow-xl p-8 transition-all duration-300 hover:-translate-y-1"
+            className="relative bg-white rounded-xl sm:rounded-2xl border border-emerald-100 shadow-md hover:shadow-xl p-4 sm:p-6 lg:p-8 transition-all duration-300 hover:-translate-y-1"
           >
             <Quote className="absolute top-6 right-6 w-10 h-10 text-emerald-200 opacity-50" />
 
@@ -90,20 +90,20 @@ const TestimonialsSection = () => (
         transition={{ delay: 0.6, duration: 0.6 }}
       >
         <div>
-          <p className="text-3xl font-bold text-emerald-600">5.000+</p>
-          <p className="text-sm text-gray-600">Aktif Satıcı</p>
+          <p className="text-2xl sm:text-3xl font-bold text-emerald-600">5.000+</p>
+          <p className="text-xs sm:text-sm text-gray-600">Aktif Satıcı</p>
         </div>
         <div>
-          <p className="text-3xl font-bold text-emerald-600">150+</p>
-          <p className="text-sm text-gray-600">Ülke</p>
+          <p className="text-2xl sm:text-3xl font-bold text-emerald-600">150+</p>
+          <p className="text-xs sm:text-sm text-gray-600">Ülke</p>
         </div>
         <div>
-          <p className="text-3xl font-bold text-emerald-600">1M+</p>
-          <p className="text-sm text-gray-600">Başarılı İşlem</p>
+          <p className="text-2xl sm:text-3xl font-bold text-emerald-600">1M+</p>
+          <p className="text-xs sm:text-sm text-gray-600">Başarılı İşlem</p>
         </div>
         <div>
-          <p className="text-3xl font-bold text-emerald-600">4.8/5</p>
-          <p className="text-sm text-gray-600">Ortalama Puan</p>
+          <p className="text-2xl sm:text-3xl font-bold text-emerald-600">4.8/5</p>
+          <p className="text-xs sm:text-sm text-gray-600">Ortalama Puan</p>
         </div>
       </motion.div>
     </div>
