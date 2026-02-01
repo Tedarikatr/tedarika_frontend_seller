@@ -96,10 +96,10 @@ export default function CampaignCreatePage() {
       : StepPreview;
 
   return (
-    <div className="w-full max-w-6xl mx-auto px-8 py-10 space-y-8 animate-fadeIn">
+    <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-10 space-y-6 sm:space-y-8 animate-fadeIn">
       <Progress steps={steps} activeStep={step} />
 
-      <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-10">
+      <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg border border-gray-200 p-4 sm:p-6 lg:p-10">
         <StepComp
           data={payload}
           setData={setPayload}

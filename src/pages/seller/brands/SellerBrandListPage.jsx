@@ -102,23 +102,23 @@ export default function SellerBrandPage() {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-purple-50/30 px-4 sm:px-6 lg:px-8 py-8">
       <div className="max-w-7xl mx-auto">
         {/* Hero Header */}
-        <header className="mb-8 relative bg-gradient-to-r from-emerald-600 via-teal-600 to-green-600 rounded-3xl shadow-2xl px-8 py-12 text-center overflow-hidden">
+        <header className="mb-6 sm:mb-8 relative bg-gradient-to-r from-emerald-600 via-teal-600 to-green-600 rounded-2xl sm:rounded-3xl shadow-2xl px-4 sm:px-6 lg:px-8 py-8 sm:py-10 lg:py-12 text-center overflow-hidden">
           {/* Dekoratif Arka Plan */}
           <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent pointer-events-none"></div>
-          <div className="absolute top-10 right-10 w-32 h-32 bg-white/10 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-10 left-10 w-40 h-40 bg-purple-400/20 rounded-full blur-3xl"></div>
+          <div className="absolute top-10 right-10 w-32 h-32 bg-white/10 rounded-full blur-3xl hidden sm:block"></div>
+          <div className="absolute bottom-10 left-10 w-40 h-40 bg-purple-400/20 rounded-full blur-3xl hidden sm:block"></div>
 
           <div className="relative z-10">
-            <div className="flex items-center justify-center gap-3 mb-4">
-              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center shadow-xl animate-pulse">
-                <Award className="w-8 h-8 text-white" />
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3 mb-4">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center shadow-xl animate-pulse">
+                <Award className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
               </div>
-              <h1 className="text-5xl font-extrabold text-white tracking-tight">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-extrabold text-white tracking-tight">
                 Markalar Yönetimi
               </h1>
-              <Sparkles className="w-8 h-8 text-yellow-300 animate-pulse" />
+              <Sparkles className="w-6 h-6 sm:w-8 sm:h-8 text-yellow-300 animate-pulse hidden sm:block" />
             </div>
-            <p className="text-emerald-100 text-lg font-medium">
+            <p className="text-emerald-100 text-sm sm:text-base lg:text-lg font-medium">
               Marka sahipliği başvurularınızı yönetin ve markalarınızı görüntüleyin
             </p>
           </div>
@@ -161,7 +161,7 @@ export default function SellerBrandPage() {
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-4 mb-6 bg-white rounded-2xl p-2 shadow-lg border-2 border-gray-200">
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 mb-6 bg-white rounded-2xl p-2 shadow-lg border-2 border-gray-200">
           {["owned", "status", "all"].map((tab) => (
             <button
               key={tab}
@@ -169,7 +169,7 @@ export default function SellerBrandPage() {
                 setActiveTab(tab);
                 setPage(1);
               }}
-              className={`flex-1 px-6 py-3 rounded-xl font-bold text-sm transition-all duration-300 ${activeTab === tab
+              className={`flex-1 px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl font-bold text-xs sm:text-sm transition-all duration-300 ${activeTab === tab
                 ? "bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-lg scale-105"
                 : "text-gray-600 hover:bg-gray-100"
                 }`}
@@ -268,14 +268,14 @@ export default function SellerBrandPage() {
 
 // Stat Card Component
 const StatCard = ({ icon: Icon, label, value, gradient, bgGradient }) => (
-  <div className={`bg-gradient-to-br ${bgGradient} rounded-2xl p-6 border-2 border-gray-200 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105`}>
+  <div className={`bg-gradient-to-br ${bgGradient} rounded-xl sm:rounded-2xl p-4 sm:p-6 border-2 border-gray-200 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105`}>
     <div className="flex items-center justify-between">
       <div>
-        <p className="text-gray-600 text-sm font-semibold mb-2">{label}</p>
-        <p className="text-4xl font-extrabold text-gray-900">{value}</p>
+        <p className="text-gray-600 text-xs sm:text-sm font-semibold mb-1 sm:mb-2">{label}</p>
+        <p className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-gray-900">{value}</p>
       </div>
-      <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${gradient} flex items-center justify-center shadow-lg`}>
-        <Icon className="w-7 h-7 text-white" />
+      <div className={`w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 rounded-lg sm:rounded-xl bg-gradient-to-br ${gradient} flex items-center justify-center shadow-lg`}>
+        <Icon className="w-5 h-5 sm:w-6 sm:h-6 lg:w-7 lg:h-7 text-white" />
       </div>
     </div>
   </div>

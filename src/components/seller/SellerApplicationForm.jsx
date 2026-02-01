@@ -113,8 +113,8 @@ const SellerApplicationForm = () => {
   return (
     <div className="min-h-screen flex flex-col md:flex-row bg-[#002d2f] text-white">
       {/* Sol Tanıtım Alanı */}
-      <div className="w-full md:w-1/2 flex flex-col justify-center items-start px-10 py-20 space-y-8 bg-gradient-to-br from-[#003e3f] via-[#004b49] to-[#005c5a]">
-        <h2 className="text-4xl font-extrabold leading-tight tracking-tight">
+      <div className="w-full md:w-1/2 flex flex-col justify-center items-start px-4 sm:px-6 lg:px-10 py-10 sm:py-16 lg:py-20 space-y-6 sm:space-y-8 bg-gradient-to-br from-[#003e3f] via-[#004b49] to-[#005c5a]">
+        <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold leading-tight tracking-tight">
           Tedarika Satıcı Başvuru
         </h2>
         <p className="text-[#b8dedb] max-w-md text-sm leading-relaxed">
@@ -131,9 +131,9 @@ const SellerApplicationForm = () => {
       </div>
 
       {/* Sağ Başvuru Formu */}
-      <div className="w-full md:w-1/2 bg-white text-[#003636] flex items-center justify-center py-16 px-8">
+      <div className="w-full md:w-1/2 bg-white text-[#003636] flex items-center justify-center py-8 sm:py-12 lg:py-16 px-4 sm:px-6 lg:px-8">
         <form onSubmit={handleSubmit} className="w-full max-w-lg space-y-4">
-          <h3 className="text-3xl font-bold text-center mb-6">Başvuru Formu</h3>
+          <h3 className="text-2xl sm:text-3xl font-bold text-center mb-4 sm:mb-6">Başvuru Formu</h3>
 
           {/* Şirket Bilgileri */}
           <Input name="companyName" value={formData.companyName} onChange={handleChange} placeholder="Şirket Adı *" required />

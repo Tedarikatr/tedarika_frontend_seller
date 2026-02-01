@@ -55,12 +55,12 @@ const StoreCoveragePage = () => {
   if (!hasStore) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 flex items-center justify-center px-6">
-        <div className="bg-white rounded-3xl shadow-2xl border-2 border-amber-200 px-10 py-12 max-w-lg">
+        <div className="bg-white rounded-2xl sm:rounded-3xl shadow-2xl border-2 border-amber-200 px-4 sm:px-6 lg:px-10 py-8 sm:py-12 max-w-lg mx-4 sm:mx-auto">
           <div className="flex flex-col items-center text-center gap-4">
             <div className="w-20 h-20 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-lg">
               <AlertCircle className="w-10 h-10 text-white" />
             </div>
-            <h2 className="text-2xl font-bold text-gray-800">
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-800">
               Henüz Mağaza Bulunmuyor
             </h2>
             <p className="text-gray-600">
@@ -83,17 +83,17 @@ const StoreCoveragePage = () => {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
       {/* Hero Header Section */}
       <div className="bg-gradient-to-r from-emerald-600 via-emerald-700 to-teal-700 text-white shadow-xl">
-        <div className="max-w-7xl mx-auto px-6 py-8">
-          <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center shadow-lg">
-              <Globe size={32} className="animate-pulse" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
+            <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center shadow-lg flex-shrink-0">
+              <Globe className="w-6 h-6 sm:w-8 sm:h-8 animate-pulse" />
             </div>
-            <div>
-              <h1 className="text-3xl font-bold mb-1 flex items-center gap-2">
+            <div className="min-w-0">
+              <h1 className="text-2xl sm:text-3xl font-bold mb-1 flex flex-wrap items-center gap-2">
                 Mağaza Lokasyon Yönetimi
-                <Sparkles size={24} className="text-yellow-300" />
+                <Sparkles size={20} className="sm:w-6 sm:h-6 text-yellow-300 flex-shrink-0" />
               </h1>
-              <p className="text-emerald-100 text-sm">
+              <p className="text-emerald-100 text-xs sm:text-sm">
                 Hizmet vereceğiniz bölgeleri ve ülkeleri yönetin
               </p>
             </div>
@@ -102,7 +102,7 @@ const StoreCoveragePage = () => {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-6 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Form Kartı */}
           <div className="bg-white rounded-3xl shadow-2xl border border-gray-200 overflow-hidden hover:shadow-3xl transition-all duration-300">

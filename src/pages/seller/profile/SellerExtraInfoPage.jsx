@@ -106,22 +106,22 @@ export default function SellerExtraInfoPage() {
   const model = existing || form;
 
   return (
-    <div className="w-full py-6">
+    <div className="w-full py-4 sm:py-6">
       {/* Üst başlık çubuğu - tam genişlik */}
-      <div className="px-6">
+      <div className="px-4 sm:px-6">
         <div className="flex items-center gap-3">
           <div className="p-2 rounded-xl bg-emerald-600/10 text-emerald-700">
             <Shield className="w-5 h-5" />
           </div>
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight">Şirket Ekstra Bilgileri</h1>
+            <h1 className="text-xl sm:text-2xl font-semibold tracking-tight">Şirket Ekstra Bilgileri</h1>
             <p className="text-sm text-gray-600">Bir defaya mahsus doldurulur. Kayıt sonrası kilitlenir.</p>
           </div>
         </div>
       </div>
 
       {/* Bilgi kutusu */}
-      <div className="px-6 mt-4">
+      <div className="px-4 sm:px-6 mt-4">
         {!readOnly ? (
           <div className="flex items-start gap-2 text-amber-800 bg-amber-50 border border-amber-200 rounded-xl p-3">
             <AlertTriangle className="w-5 h-5 mt-0.5" />
@@ -139,7 +139,7 @@ export default function SellerExtraInfoPage() {
       </div>
 
       {/* Form alanı – tam genişlik, kenardan kenara */}
-      <form onSubmit={onSubmit} className="mt-4 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 px-6">
+      <form onSubmit={onSubmit} className="mt-4 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6 px-4 sm:px-6">
         {/* Zorunlu alanlar */}
         <Field label="KEP Adresi" required>
           <input
@@ -230,7 +230,7 @@ export default function SellerExtraInfoPage() {
       </form>
 
       {msg && (
-        <div className="px-6">
+        <div className="px-4 sm:px-6">
           <p className="mt-4 text-sm text-gray-700">{msg}</p>
         </div>
       )}

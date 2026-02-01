@@ -608,18 +608,18 @@ const ProductDraftUploadPage = () => {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
       {/* Hero Header */}
       <div className="bg-gradient-to-r from-emerald-600 via-teal-600 to-green-600 text-white shadow-xl">
-        <div className="max-w-5xl mx-auto px-6 py-8">
-          <div className="flex items-center justify-between flex-wrap gap-4">
-            <div className="flex items-center gap-4">
-              <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center shadow-lg">
-                <Upload size={32} />
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-3 sm:gap-4">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center shadow-lg flex-shrink-0">
+                <Upload className="w-6 h-6 sm:w-8 sm:h-8" />
               </div>
-              <div>
-                <h1 className="text-3xl font-bold mb-1 flex items-center gap-2">
+              <div className="min-w-0">
+                <h1 className="text-2xl sm:text-3xl font-bold mb-1 flex flex-wrap items-center gap-2">
                   Ürün Yükleme
-                  <Sparkles size={24} className="text-yellow-300" />
+                  <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-300 flex-shrink-0" />
                 </h1>
-                <p className="text-emerald-100 text-sm">
+                <p className="text-emerald-100 text-xs sm:text-sm">
                   Excel, JSON, XML veya manuel olarak ürünlerinizi sisteme ekleyin
                 </p>
               </div>
@@ -627,17 +627,18 @@ const ProductDraftUploadPage = () => {
 
             <button
               onClick={() => setShowHistory(!showHistory)}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white rounded-xl font-semibold transition-all border border-white/30"
+              className="inline-flex items-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white rounded-xl font-semibold transition-all border border-white/30 text-sm sm:text-base"
             >
-              <FileText className="w-5 h-5" />
-              Geçmiş Yüklemeler
+              <FileText className="w-4 h-4 sm:w-5 sm:h-5" />
+              <span className="hidden sm:inline">Geçmiş Yüklemeler</span>
+              <span className="sm:hidden">Geçmiş</span>
             </button>
           </div>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="max-w-5xl mx-auto px-6 py-8">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
         {/* Geçmiş Yüklemeler Bölümü */}
         {showHistory && (
           <div className="mb-6 bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
@@ -744,7 +745,7 @@ const ProductDraftUploadPage = () => {
         </div>
 
         {/* Content */}
-        <div className="bg-white rounded-3xl shadow-2xl border-2 border-gray-200 p-8">
+        <div className="bg-white rounded-2xl sm:rounded-3xl shadow-2xl border-2 border-gray-200 p-4 sm:p-6 lg:p-8">
           {/* Manual Upload - İlk sırada */}
           {activeTab === "manual" && (
             <div className="space-y-6">

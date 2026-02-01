@@ -81,7 +81,7 @@ const ProductRequestListPage = () => {
 
   return (
     <div className="p-4 sm:p-6 bg-gray-50 min-h-screen">
-      <h1 className="text-2xl font-bold text-gray-800 mb-6">Ürün Başvurularım</h1>
+      <h1 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4 sm:mb-6">Ürün Başvurularım</h1>
 
       {loading ? (
         <p className="text-sm text-gray-500">Yükleniyor...</p>

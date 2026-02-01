@@ -105,18 +105,18 @@ export default function SubscriptionPage() {
   };
 
   return (
-    <section className="min-h-screen py-20 bg-gradient-to-b from-green-950 to-green-800 text-white">
-      <div className="max-w-6xl mx-auto px-6 text-center">
-        <h2 className="text-4xl font-bold mb-4">Abonelik Planları</h2>
-        <p className="text-lg mb-12 text-green-200">
+    <section className="min-h-screen py-8 sm:py-12 lg:py-20 bg-gradient-to-b from-green-950 to-green-800 text-white">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 text-center">
+        <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-3 sm:mb-4">Abonelik Planları</h2>
+        <p className="text-base sm:text-lg mb-8 sm:mb-12 text-green-200">
           Tedarika ile işinizi büyütmeye bugün başlayın
         </p>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 lg:gap-10">
           {plans.map((plan) => (
             <div
               key={plan.id}
-              className={`relative p-8 rounded-2xl shadow-2xl transform transition duration-300 hover:scale-105 ${
+              className={`relative p-4 sm:p-6 lg:p-8 rounded-xl sm:rounded-2xl shadow-2xl transform transition duration-300 hover:scale-105 ${
                 plan.highlight
                   ? "bg-white text-green-900 border-4 border-green-500"
                   : "bg-green-100 text-gray-900 border"
@@ -128,8 +128,8 @@ export default function SubscriptionPage() {
                 </span>
               )}
 
-              <h3 className="text-xl font-bold text-green-700">{plan.name}</h3>
-              <p className="text-3xl my-4 font-extrabold">{plan.price}</p>
+              <h3 className="text-lg sm:text-xl font-bold text-green-700">{plan.name}</h3>
+              <p className="text-2xl sm:text-3xl my-3 sm:my-4 font-extrabold">{plan.price}</p>
               <p className="mb-6 text-sm text-gray-600">{plan.description}</p>
               <ul className="text-left text-sm space-y-2 text-gray-700">
                 {plan.features.map((feature, i) => (

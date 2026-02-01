@@ -202,10 +202,10 @@ export default function CompanyUpdate() {
         </div>
       </motion.header>
 
-      <main className="max-w-6xl mx-auto px-6 py-10">
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-10">
         <motion.form
           onSubmit={handleSubmit}
-          className="bg-white rounded-3xl shadow-2xl border-2 border-gray-200 p-10"
+          className="bg-white rounded-2xl sm:rounded-3xl shadow-2xl border-2 border-gray-200 p-4 sm:p-6 lg:p-10"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.3 }}

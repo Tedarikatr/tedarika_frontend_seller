@@ -155,10 +155,10 @@ const handleSubmit = async (e) => {
       
     <div className="min-h-screen flex flex-col bg-white">
       <SellerHeader />
-      <div className="flex flex-1 items-center justify-center bg-white py-24 px-4">
-        <form onSubmit={handleSubmit} className="w-full max-w-lg mx-auto bg-white rounded-3xl shadow-2xl p-10 border border-gray-100">
-          <h3 className="text-4xl font-bold text-center mb-12 text-gray-900">Satıcı Kaydı</h3>
-          <div className="space-y-7">
+      <div className="flex flex-1 items-center justify-center bg-white py-12 sm:py-16 md:py-24 px-4 sm:px-6">
+        <form onSubmit={handleSubmit} className="w-full max-w-lg mx-auto bg-white rounded-2xl sm:rounded-3xl shadow-2xl p-6 sm:p-8 md:p-10 border border-gray-100 overflow-hidden">
+          <h3 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-8 sm:mb-10 md:mb-12 text-gray-900">Satıcı Kaydı</h3>
+          <div className="space-y-5 sm:space-y-7">
             <FormInput name="name" value={formData.name} onChange={handleChange} placeholder="Ad" icon={<User size={22} />} inputClassName="text-base" />
             <FormInput name="lastName" value={formData.lastName} onChange={handleChange} placeholder="Soyad" icon={<User size={22} />} inputClassName="text-base" />
             <FormInput name="email" value={formData.email} onChange={handleChange} placeholder="E-posta" icon={<Mail size={22} />} type="email" inputClassName="text-base" />
@@ -170,7 +170,7 @@ const handleSubmit = async (e) => {
           <button
             type="submit"
             disabled={isSubmitting}
-            className={`mt-10 w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-4 rounded-2xl text-lg transition shadow-lg ${
+            className={`mt-8 sm:mt-10 w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 sm:py-4 rounded-xl sm:rounded-2xl text-base sm:text-lg transition shadow-lg ${
               isSubmitting ? "opacity-50 cursor-not-allowed" : ""
             }`}
           >
