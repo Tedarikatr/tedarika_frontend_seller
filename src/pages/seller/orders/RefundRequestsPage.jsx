@@ -173,13 +173,13 @@ const RefundRequestsPage = () => {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
       {/* Header */}
       <div className="bg-gradient-to-r from-emerald-600 via-teal-600 to-green-600 text-white shadow-xl">
-        <div className="max-w-7xl mx-auto px-6 py-8">
-          <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center shadow-lg">
-              <PackageX size={32} />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+          <div className="flex items-center gap-3 sm:gap-4">
+            <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center shadow-lg flex-shrink-0">
+              <PackageX className="w-6 h-6 sm:w-8 sm:h-8" />
             </div>
-            <div>
-              <h1 className="text-3xl font-bold mb-1">İade Talepleri</h1>
+            <div className="min-w-0">
+              <h1 className="text-2xl sm:text-3xl font-bold mb-1">İade Talepleri</h1>
               <p className="text-emerald-100 text-sm">{stats.total} talep</p>
             </div>
           </div>
@@ -187,7 +187,7 @@ const RefundRequestsPage = () => {
       </div>
 
       {/* Filter & Stats */}
-      <div className="max-w-7xl mx-auto px-6 py-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
           {[
             { key: "all", label: "Tümü", count: stats.total, color: "gray" },
@@ -233,8 +233,8 @@ const RefundRequestsPage = () => {
                   animate={{ opacity: 1, y: 0 }}
                   className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 hover:shadow-xl transition"
                 >
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex-1">
+                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-4">
+                    <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-3 mb-2">
                         <h3 className="text-xl font-bold text-gray-900">
                           Sipariş #{request.orderNumber}
@@ -247,13 +247,13 @@ const RefundRequestsPage = () => {
                       <p className="text-sm text-gray-600">{statusConfig?.description}</p>
                     </div>
 
-                    <div className="flex gap-2">
+                    <div className="flex flex-wrap gap-2 w-full sm:w-auto">
                       <button
                         onClick={() => {
                           setSelectedRequest(request);
                           setShowDetailModal(true);
                         }}
-                        className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-semibold transition flex items-center gap-2"
+                        className="w-full sm:w-auto px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-semibold transition flex items-center justify-center gap-2 text-sm"
                       >
                         <Eye className="w-4 h-4" />
                         Detay
@@ -265,7 +265,7 @@ const RefundRequestsPage = () => {
                             setSelectedRequest(request);
                             setShowDecisionModal(true);
                           }}
-                          className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-semibold transition"
+                          className="w-full sm:w-auto px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-semibold transition text-sm"
                         >
                           Karar Ver
                         </button>
@@ -277,7 +277,7 @@ const RefundRequestsPage = () => {
                             setSelectedRequest(request);
                             setShowInspectionModal(true);
                           }}
-                          className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-semibold transition"
+                          className="w-full sm:w-auto px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-semibold transition text-sm"
                         >
                           İncele
                         </button>

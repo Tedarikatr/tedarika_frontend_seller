@@ -111,11 +111,11 @@ export default function CampaignDetailPage() {
     );
 
   return (
-    <div className="w-full max-w-6xl mx-auto px-8 py-10 space-y-10 animate-fadeIn">
+    <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 md:px-8 py-6 sm:py-8 md:py-10 space-y-6 sm:space-y-8 md:space-y-10 animate-fadeIn">
       {/* Üst Başlık */}
       <div className="flex flex-col md:flex-row justify-between md:items-center gap-6">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-800">
+        <div className="min-w-0 flex-1">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 truncate">
             {data?.basics?.name || "Kampanya Detayı"}
           </h1>
           <p className="text-sm text-gray-500 mt-1">
@@ -124,7 +124,7 @@ export default function CampaignDetailPage() {
         </div>
 
         {/* Aksiyon Butonları */}
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2 w-full sm:w-auto">
           <ActionButton
             label="Yayınla"
             color="green"

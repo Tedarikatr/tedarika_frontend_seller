@@ -6,16 +6,16 @@ export default function StepPreview({ data, prev, submit }) {
   const { basics = {}, targeting = {}, criteria = {} } = data;
 
   return (
-    <div className="w-full max-w-6xl mx-auto px-8 py-10 animate-fadeIn">
-      <h2 className="text-3xl font-bold text-gray-800 mb-8 border-b pb-4">
+    <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 md:px-8 py-6 sm:py-8 md:py-10 animate-fadeIn overflow-hidden">
+      <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 mb-6 sm:mb-8 border-b pb-3 sm:pb-4">
         Kampanya Önizleme ve Onay
       </h2>
 
       <div className="bg-white shadow-lg rounded-2xl border border-gray-200 overflow-hidden">
         {/* HEADER */}
-        <div className="bg-gradient-to-r from-orange-500 to-orange-600 text-white px-8 py-6 flex flex-wrap justify-between items-center">
+        <div className="bg-gradient-to-r from-orange-500 to-orange-600 text-white px-4 sm:px-6 md:px-8 py-4 sm:py-6 flex flex-col sm:flex-row flex-wrap justify-between items-start sm:items-center gap-3">
           <div>
-            <h3 className="text-2xl font-semibold">
+            <h3 className="text-lg sm:text-xl md:text-2xl font-semibold line-clamp-2">
               {basics.name || "İsimsiz Kampanya"}
             </h3>
             <p className="text-sm opacity-90 mt-1">
@@ -26,7 +26,7 @@ export default function StepPreview({ data, prev, submit }) {
         </div>
 
         {/* CONTENT */}
-        <div className="p-8 space-y-10 text-gray-800">
+        <div className="p-4 sm:p-6 md:p-8 space-y-6 sm:space-y-8 md:space-y-10 text-gray-800 overflow-x-auto">
           {/* TEMEL BİLGİLER */}
           <Section title="Temel Bilgiler">
             <Grid>
@@ -150,7 +150,7 @@ export default function StepPreview({ data, prev, submit }) {
       </div>
 
       {/* BUTTONS */}
-      <div className="flex flex-col md:flex-row justify-between gap-4 mt-10">
+      <div className="flex flex-col sm:flex-row justify-between gap-3 sm:gap-4 mt-6 sm:mt-8 md:mt-10">
         <button
           onClick={prev}
           className="border border-gray-300 px-8 py-3 rounded-lg text-gray-700 font-medium hover:bg-gray-100 transition"
@@ -177,7 +177,7 @@ const Info = ({ label, value }) => (
 );
 
 const Grid = ({ children }) => (
-  <div className="grid md:grid-cols-3 gap-6">{children}</div>
+  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">{children}</div>
 );
 
 const Section = ({ title, children }) => (

@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { fetchProductReviews, replyToProductReview } from "@/api/sellerReviewService";
 import ProductReviewItem from "@/components/storeProducts/ProductReviewItem";
 import { LoaderCircle, MessageSquare } from "lucide-react";
+import toast from "react-hot-toast";
 
 const ProductReviewsPage = ({ productId: defaultId }) => {
   const params = useParams();
@@ -41,10 +42,10 @@ const ProductReviewsPage = ({ productId: defaultId }) => {
   }, [productId]);
 
   return (
-    <section className="max-w-5xl mx-auto px-4 py-8">
+    <section className="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-8 overflow-hidden">
       {/* Başlık */}
-      <div className="mb-6 text-center">
-        <h1 className="text-3xl font-bold text-[#003333]">Ürün Yorumları</h1>
+      <div className="mb-4 sm:mb-6 text-center">
+        <h1 className="text-2xl sm:text-3xl font-bold text-[#003333]">Ürün Yorumları</h1>
         <p className="text-sm text-gray-500 mt-1">Müşteri geri bildirimlerini görüntüleyin ve yanıtlayın.</p>
       </div>
 
