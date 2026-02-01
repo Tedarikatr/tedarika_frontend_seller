@@ -2,6 +2,7 @@
 // ProductManagementPanel.jsx - Ultra Modern & Beautiful 🎨
 // =============================
 import React, { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import {
   toggleProductOnSale,
   updateProductQuantityLimits,
@@ -101,19 +102,19 @@ const Badge = ({ children, variant = "default", size = "md" }) => {
 
 // Section Card Bileşeni
 const SectionCard = ({ title, icon: Icon, children, action }) => (
-  <div className="bg-gradient-to-br from-white to-gray-50/50 rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden">
-    <div className="bg-gradient-to-r from-gray-50 to-white px-5 py-4 border-b border-gray-100 flex items-center justify-between">
-      <div className="flex items-center gap-3">
+  <div className="bg-gradient-to-br from-white to-gray-50/50 rounded-xl sm:rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden">
+    <div className="bg-gradient-to-r from-gray-50 to-white px-4 sm:px-5 py-3 sm:py-4 border-b border-gray-100 flex items-center justify-between gap-2">
+      <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
         {Icon && (
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center text-white shadow-lg shadow-emerald-500/30">
-            <Icon size={18} />
+          <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center text-white shadow-lg shadow-emerald-500/30 flex-shrink-0">
+            <Icon size={16} />
           </div>
         )}
-        <h3 className="font-bold text-gray-800">{title}</h3>
+        <h3 className="font-bold text-gray-800 text-sm sm:text-base truncate">{title}</h3>
       </div>
       {action}
     </div>
-    <div className="p-5">
+    <div className="p-4 sm:p-5">
       {children}
     </div>
   </div>
@@ -218,39 +219,39 @@ const ProductManagementPanel = ({
     }
   };
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/* Backdrop - Fixed blur overlay */}
+  const panelContent = (
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-3 sm:p-4">
+      {/* Backdrop - Tüm sayfayı kaplayan blur overlay (header dahil) */}
       <div 
-        className="fixed inset-0 bg-black/40 backdrop-blur-md transition-all"
+        className="fixed inset-0 bg-black/60 backdrop-blur-md transition-all"
         onClick={onClose}
       />
       
       {/* Panel - Centered and scrollable */}
-      <div className="relative w-full max-w-2xl max-h-[90vh] bg-gradient-to-br from-gray-50 to-white rounded-2xl shadow-2xl overflow-hidden animate-[slideIn_0.35s_ease-out] flex flex-col">
+      <div className="relative w-full max-w-2xl max-h-[90vh] bg-gradient-to-br from-gray-50 to-white rounded-xl sm:rounded-2xl shadow-2xl overflow-hidden animate-[slideIn_0.35s_ease-out] flex flex-col">
         
         {/* ============ Ultra Modern Header ============ */}
-        <div className="sticky top-0 z-10 bg-gradient-to-r from-emerald-600 via-emerald-700 to-teal-700 text-white p-6 shadow-xl flex-shrink-0">
+        <div className="sticky top-0 z-10 bg-gradient-to-r from-emerald-600 via-emerald-700 to-teal-700 text-white p-4 sm:p-6 shadow-xl flex-shrink-0">
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 p-2 hover:bg-white/20 rounded-xl transition-all duration-200 hover:rotate-90"
+            className="absolute top-3 right-3 sm:top-4 sm:right-4 p-2 hover:bg-white/20 rounded-lg sm:rounded-xl transition-all duration-200 hover:rotate-90"
           >
-            <X size={20} />
+            <X className="w-5 h-5 sm:w-6 sm:h-6" />
           </button>
           
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
-              <Sparkles size={24} className="animate-pulse" />
+          <div className="flex items-center gap-2 sm:gap-3 pr-10 sm:pr-12">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center flex-shrink-0">
+              <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 animate-pulse" />
             </div>
-            <div>
-              <h2 className="text-2xl font-bold">Ürün Yönetimi</h2>
-              <p className="text-emerald-100 text-sm">Detaylı düzenleme ve ayarlar</p>
+            <div className="min-w-0">
+              <h2 className="text-xl sm:text-2xl font-bold truncate">Ürün Yönetimi</h2>
+              <p className="text-emerald-100 text-xs sm:text-sm truncate">Detaylı düzenleme ve ayarlar</p>
             </div>
           </div>
         </div>
 
         {/* ============ Main Content ============ */}
-        <div className="p-6 space-y-5 overflow-y-auto flex-1">
+        <div className="p-4 sm:p-6 space-y-4 sm:space-y-5 overflow-y-auto flex-1">
           
           {/* ============ FİYAT İŞLEMLERİ ============ */}
           
@@ -270,7 +271,7 @@ const ProductManagementPanel = ({
             }
           >
             {showAddPrice && (
-              <div className="bg-gradient-to-br from-emerald-50 to-green-50 border border-emerald-200 rounded-xl p-5 mb-4 space-y-4">
+              <div className="bg-gradient-to-br from-emerald-50 to-green-50 border border-emerald-200 rounded-xl p-4 sm:p-5 mb-4 space-y-4">
                 <div>
                   <label className="text-xs font-semibold text-gray-700 mb-2 block flex items-center gap-2">
                     <DollarSign size={14} className="text-emerald-600" />
@@ -306,7 +307,7 @@ const ProductManagementPanel = ({
                     }
                   />
                 </div>
-                <div className="flex gap-2 pt-2">
+                <div className="flex flex-col sm:flex-row gap-2 pt-2">
                   <Button variant="primary" onClick={handleAddPrice} icon={Save}>
                     Kaydet
                   </Button>
@@ -601,6 +602,8 @@ const ProductManagementPanel = ({
       `}</style>
     </div>
   );
+
+  return createPortal(panelContent, document.body);
 };
 
 export default ProductManagementPanel;
