@@ -109,7 +109,7 @@ const CompanyCreate = () => {
         </div>
 
         {/* Sağ Form Alanı */}
-        <form onSubmit={handleSubmit} className="w-full md:w-1/2 bg-white text-[#003032] p-8 sm:p-10">
+        <form onSubmit={handleSubmit} className="w-full md:w-1/2 bg-white text-[#003032] p-4 sm:p-6 lg:p-8 xl:p-10">
           <div className="flex items-center gap-2 mb-6">
             <Building2 size={26} className="text-[#003636]" />
             <h2 className="text-xl sm:text-2xl font-bold">Şirket Bilgileri</h2>

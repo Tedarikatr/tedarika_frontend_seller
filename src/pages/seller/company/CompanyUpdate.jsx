@@ -145,7 +145,7 @@ export default function CompanyUpdate() {
 
   if (initializing || !form) {
     return (
-      <div className="px-6 py-10">
+      <div className="px-4 sm:px-6 py-6 sm:py-10">
         <div className="max-w-6xl mx-auto bg-white border rounded-2xl p-6 shadow-sm animate-pulse">
           <div className="h-8 w-64 bg-gray-200 rounded mb-6" />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

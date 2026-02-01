@@ -87,7 +87,7 @@ export default function CreateBrandModal({ isOpen, onClose, onSuccess }) {
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="bg-gradient-to-r from-emerald-600 via-teal-600 to-green-600 text-white px-6 py-4 flex items-center justify-between">
+        <div className="bg-gradient-to-r from-emerald-600 via-teal-600 to-green-600 text-white px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
               <Award className="w-5 h-5" />
@@ -110,7 +110,7 @@ export default function CreateBrandModal({ isOpen, onClose, onSuccess }) {
         </div>
 
         {/* Content */}
-        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6">
+        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-4 sm:p-6">
           <div className="space-y-6">
             {/* Marka Adı */}
             <div>

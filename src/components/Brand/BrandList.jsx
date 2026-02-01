@@ -23,11 +23,11 @@ export default function BrandList({ brands, ownerships, sending, onOwnershipRequ
 
   if (brands.length === 0) {
     return (
-      <div className="bg-gradient-to-br from-white to-gray-50 rounded-3xl shadow-lg p-12 text-center border-2 border-gray-200">
-        <div className="w-20 h-20 rounded-full bg-gradient-to-br from-gray-300 to-gray-400 flex items-center justify-center mx-auto mb-6 shadow-lg">
-          <Award className="w-10 h-10 text-white" />
+      <div className="bg-gradient-to-br from-white to-gray-50 rounded-2xl sm:rounded-3xl shadow-lg p-6 sm:p-8 lg:p-12 text-center border-2 border-gray-200">
+        <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br from-gray-300 to-gray-400 flex items-center justify-center mx-auto mb-4 sm:mb-6 shadow-lg">
+          <Award className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
         </div>
-        <h3 className="text-2xl font-bold text-gray-800 mb-2">Marka Bulunamadı</h3>
+        <h3 className="text-xl sm:text-2xl font-bold text-gray-800 mb-2">Marka Bulunamadı</h3>
         <p className="text-gray-600">
           Arama kriterlerinize uygun marka bulunamadı.
         </p>

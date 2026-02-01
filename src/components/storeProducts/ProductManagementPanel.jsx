@@ -497,7 +497,7 @@ const ProductManagementPanel = ({
           <SectionCard title="Ürün Görselleri" icon={Images}>
             <div className="space-y-4">
               {images.length > 0 && (
-                <div className="grid grid-cols-4 gap-3">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                   {images.slice(0, 4).map((url, i) => (
                     <div key={i} className="relative group">
                       <img
@@ -514,7 +514,7 @@ const ProductManagementPanel = ({
               )}
               
               <div className="flex gap-2 flex-wrap">
-                <label className="flex-1 min-w-[150px]">
+                <label className="flex-1 min-w-0 sm:min-w-[150px]">
                   <div className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-medium border-2 border-dashed border-gray-300 text-gray-600 bg-white cursor-pointer hover:border-emerald-500 hover:text-emerald-600 hover:bg-emerald-50 transition-all">
                     <ImagePlus size={16} />
                     {selectedFiles?.length ? `${selectedFiles.length} dosya seçildi` : 'Dosya Seç'}
