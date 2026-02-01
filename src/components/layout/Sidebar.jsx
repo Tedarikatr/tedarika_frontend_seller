@@ -1,4 +1,4 @@
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import {
   Home,
   Package,
@@ -23,9 +23,10 @@ import {
   ChevronUp,
 } from "lucide-react";
 import { useState } from "react";
+import { useLogout } from "@/hooks/useLogout";
 
 const Sidebar = ({ isOpen, onClose }) => {
-  const navigate = useNavigate();
+  const performLogout = useLogout();
   const [collapsed, setCollapsed] = useState(false);
   const [openSections, setOpenSections] = useState({
     store: true,
@@ -43,8 +44,7 @@ const Sidebar = ({ isOpen, onClose }) => {
   };
 
   const handleLogout = () => {
-    localStorage.clear();
-    navigate("/seller/login");
+    performLogout();
   };
 
   return (
