@@ -30,18 +30,28 @@ const ProductUploadModal = ({
   };
   const typeLabel = UPLOAD_TYPE_LABELS[uploadType] || "Ürün";
 
+  useEffect(() => {
+    if (isOpen) {
+      const prevOverflow = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
+      return () => {
+        document.body.style.overflow = prevOverflow;
+      };
+    }
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   const isComplete = status === "success" || status === "error";
   const hasErrors = errors && errors.length > 0;
 
   return (
-    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
-      {/* Blur arka plan */}
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-md" aria-hidden="true" />
+    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 min-h-[100dvh] min-h-screen overflow-hidden overscroll-none">
+      {/* Blur arka plan - tam viewport kaplama */}
+      <div className="absolute inset-0 min-h-[100dvh] min-h-screen bg-black/50 backdrop-blur-md" aria-hidden="true" style={{ minHeight: "100dvh" }} />
 
       {/* Modal içerik */}
-      <div className="relative bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden border-2 border-gray-200 animate-[fadeIn_0.2s_ease-out]">
+      <div className="relative z-10 bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden border-2 border-gray-200 animate-[fadeIn_0.2s_ease-out]">
         {/* Header - Uyarı */}
         <div className="bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 px-6 py-5 text-center">
           <div className="w-14 h-14 mx-auto mb-3 rounded-full bg-white/25 flex items-center justify-center">

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useNavigate, useBlocker } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { 
   addProductJson, 
   addProductExcelWithProgress, 
@@ -84,7 +84,6 @@ const ProductDraftUploadPage = () => {
   const [uploadErrorDisplay, setUploadErrorDisplay] = useState(null); // { errors: string[], type }
 
   const isAnyUploadActive = uploadState.active || loadingManual || uploadErrorDisplay;
-  useBlocker(isAnyUploadActive);
   useEffect(() => {
     const handler = (e) => {
       if (isAnyUploadActive) {
@@ -171,6 +170,18 @@ const ProductDraftUploadPage = () => {
     a.click();
     URL.revokeObjectURL(url);
   };
+
+  // Simüle edilmiş progress - sunucu yanıtı beklerken ilerleme gösterir
+  useEffect(() => {
+    if (!isUploading && !loadingManual) return;
+    const interval = setInterval(() => {
+      setUploadProgress((prev) => {
+        if (prev >= 95) return prev;
+        return Math.min(95, prev + 2);
+      });
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [isUploading, loadingManual]);
 
   // Ortak yükleme handler - Excel, XML, JSON, XML URL için tek yapı
   const runBulkUpload = async ({ type, apiCall, onErrorReset }) => {

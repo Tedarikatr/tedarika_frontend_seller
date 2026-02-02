@@ -34,8 +34,8 @@ export const addProductJson = async (jsonData) => {
   return await apiRequest("/SellerProductDraft/add-product-json", "POST", jsonData, true);
 };
 
-// Arka plan yükleme için uzun timeout (30 dk + buffer)
-const LONG_UPLOAD_TIMEOUT_MS = 45 * 60 * 1000; // 45 dakika
+// Arka plan yükleme için uzun timeout - sunucu işleme süresini beklemek için
+const LONG_UPLOAD_TIMEOUT_MS = 60 * 60 * 1000; // 60 dakika
 
 /**
  * Excel dosyası ile ürün ekle (arka planda, uzun sürebilir)

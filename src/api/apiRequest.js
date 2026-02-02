@@ -109,7 +109,7 @@ export function apiRequestWithUploadProgress(
   endpoint,
   formData,
   onUploadProgress,
-  timeoutMs = 45 * 60 * 1000
+  timeoutMs = 60 * 60 * 1000
 ) {
   return new Promise((resolve, reject) => {
     if (!BASE_URL) {
@@ -121,6 +121,14 @@ export function apiRequestWithUploadProgress(
     const xhr = new XMLHttpRequest();
     const token = localStorage.getItem("sellerToken");
     let timeoutId;
+    let settled = false;
+
+    const settle = (fn) => {
+      if (settled) return;
+      settled = true;
+      if (timeoutId) clearTimeout(timeoutId);
+      fn();
+    };
 
     xhr.upload.addEventListener("progress", (e) => {
       if (e.lengthComputable && typeof onUploadProgress === "function") {
@@ -130,39 +138,38 @@ export function apiRequestWithUploadProgress(
     });
 
     xhr.addEventListener("load", () => {
-      if (timeoutId) clearTimeout(timeoutId);
-      if (xhr.status >= 200 && xhr.status < 300) {
-        try {
-          const ct = xhr.getResponseHeader("content-type") || "";
-          if (ct.includes("application/json")) {
-            resolve(JSON.parse(xhr.responseText || "{}"));
-          } else {
+      settle(() => {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          try {
+            const ct = xhr.getResponseHeader("content-type") || "";
+            if (ct.includes("application/json")) {
+              resolve(JSON.parse(xhr.responseText || "{}"));
+            } else {
+              resolve({ message: xhr.responseText || "" });
+            }
+          } catch (e) {
             resolve({ message: xhr.responseText || "" });
           }
-        } catch (e) {
-          resolve({ message: xhr.responseText || "" });
+        } else {
+          let errorMessage = "Sunucu hatası.";
+          try {
+            const parsed = xhr.responseText ? JSON.parse(xhr.responseText) : {};
+            const json = typeof parsed === "object" && parsed !== null ? parsed : {};
+            errorMessage = json.title || json.message || json.error || (typeof parsed === "string" ? parsed : xhr.responseText) || xhr.statusText;
+          } catch {
+            errorMessage = xhr.responseText || xhr.statusText;
+          }
+          reject(new Error(errorMessage));
         }
-      } else {
-        let errorMessage = "Sunucu hatası.";
-        try {
-          const parsed = xhr.responseText ? JSON.parse(xhr.responseText) : {};
-          const json = typeof parsed === "object" && parsed !== null ? parsed : {};
-          errorMessage = json.title || json.message || json.error || (typeof parsed === "string" ? parsed : xhr.responseText) || xhr.statusText;
-        } catch {
-          errorMessage = xhr.responseText || xhr.statusText;
-        }
-        reject(new Error(errorMessage));
-      }
+      });
     });
 
     xhr.addEventListener("error", () => {
-      if (timeoutId) clearTimeout(timeoutId);
-      reject(new Error("Bağlantı hatası. Lütfen tekrar deneyin."));
+      settle(() => reject(new Error("Bağlantı hatası. Lütfen tekrar deneyin.")));
     });
 
     xhr.addEventListener("abort", () => {
-      if (timeoutId) clearTimeout(timeoutId);
-      reject(new Error("İşlem iptal edildi."));
+      settle(() => reject(new Error("İşlem zaman aşımına uğradı. Sunucudan yanıt gelmedi. Lütfen tekrar deneyin.")));
     });
 
     xhr.open("POST", url);
@@ -171,7 +178,7 @@ export function apiRequestWithUploadProgress(
 
     timeoutId = setTimeout(() => {
       xhr.abort();
-      reject(new Error("İşlem zaman aşımına uğradı. Lütfen tekrar deneyin."));
+      settle(() => reject(new Error("İşlem zaman aşımına uğradı. Sunucudan yanıt gelmedi. Lütfen tekrar deneyin.")));
     }, timeoutMs);
 
     xhr.send(formData);
