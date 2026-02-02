@@ -96,3 +96,84 @@ export async function apiRequest(
   const text = await response.text();
   return { message: text };
 }
+
+/**
+ * FormData ile yükleme - upload progress desteği (XHR)
+ * Excel/XML gibi dosya yüklemelerinde process bar için kullanılır
+ * @param {string} endpoint - API endpoint
+ * @param {FormData} formData - FormData
+ * @param {function(number): void} onUploadProgress - 0-100 arası yüzde callback
+ * @param {number} timeoutMs - Timeout (ms)
+ */
+export function apiRequestWithUploadProgress(
+  endpoint,
+  formData,
+  onUploadProgress,
+  timeoutMs = 45 * 60 * 1000
+) {
+  return new Promise((resolve, reject) => {
+    if (!BASE_URL) {
+      reject(new Error("VITE_API_URL tanımlı değil. .env / Vercel env'i kontrol edin."));
+      return;
+    }
+
+    const url = join(BASE_URL, endpoint);
+    const xhr = new XMLHttpRequest();
+    const token = localStorage.getItem("sellerToken");
+    let timeoutId;
+
+    xhr.upload.addEventListener("progress", (e) => {
+      if (e.lengthComputable && typeof onUploadProgress === "function") {
+        const percent = Math.round((e.loaded / e.total) * 100);
+        onUploadProgress(percent);
+      }
+    });
+
+    xhr.addEventListener("load", () => {
+      if (timeoutId) clearTimeout(timeoutId);
+      if (xhr.status >= 200 && xhr.status < 300) {
+        try {
+          const ct = xhr.getResponseHeader("content-type") || "";
+          if (ct.includes("application/json")) {
+            resolve(JSON.parse(xhr.responseText || "{}"));
+          } else {
+            resolve({ message: xhr.responseText || "" });
+          }
+        } catch (e) {
+          resolve({ message: xhr.responseText || "" });
+        }
+      } else {
+        let errorMessage = "Sunucu hatası.";
+        try {
+          const parsed = xhr.responseText ? JSON.parse(xhr.responseText) : {};
+          const json = typeof parsed === "object" && parsed !== null ? parsed : {};
+          errorMessage = json.title || json.message || json.error || (typeof parsed === "string" ? parsed : xhr.responseText) || xhr.statusText;
+        } catch {
+          errorMessage = xhr.responseText || xhr.statusText;
+        }
+        reject(new Error(errorMessage));
+      }
+    });
+
+    xhr.addEventListener("error", () => {
+      if (timeoutId) clearTimeout(timeoutId);
+      reject(new Error("Bağlantı hatası. Lütfen tekrar deneyin."));
+    });
+
+    xhr.addEventListener("abort", () => {
+      if (timeoutId) clearTimeout(timeoutId);
+      reject(new Error("İşlem iptal edildi."));
+    });
+
+    xhr.open("POST", url);
+    if (token) xhr.setRequestHeader("Authorization", `Bearer ${token}`);
+    xhr.setRequestHeader("Accept", "*/*");
+
+    timeoutId = setTimeout(() => {
+      xhr.abort();
+      reject(new Error("İşlem zaman aşımına uğradı. Lütfen tekrar deneyin."));
+    }, timeoutMs);
+
+    xhr.send(formData);
+  });
+}

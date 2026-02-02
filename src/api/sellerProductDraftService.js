@@ -1,4 +1,4 @@
-import { apiRequest } from "./apiRequest";
+import { apiRequest, apiRequestWithUploadProgress } from "./apiRequest";
 
 /**
  * Draft listesini getir (yeni yapı)
@@ -48,6 +48,20 @@ export const addProductExcel = async (formData) => {
 };
 
 /**
+ * Excel dosyası ile ürün ekle - upload progress callback ile
+ * @param {FormData} formData - ExcelFile, UploadName (opsiyonel)
+ * @param {function(number): void} onUploadProgress - 0-100 yüzde callback
+ */
+export const addProductExcelWithProgress = async (formData, onUploadProgress) => {
+  return await apiRequestWithUploadProgress(
+    "/SellerProductDraft/add-product-excel",
+    formData,
+    onUploadProgress,
+    LONG_UPLOAD_TIMEOUT_MS
+  );
+};
+
+/**
  * XML dosyası ile ürün ekle (arka planda, uzun sürebilir)
  * @param {FormData} formData - XmlFile, UploadName
  */
@@ -55,6 +69,20 @@ export const addProductXml = async (formData) => {
   return await apiRequest("/SellerProductDraft/add-product-xml", "POST", formData, true, {
     timeoutMs: LONG_UPLOAD_TIMEOUT_MS,
   });
+};
+
+/**
+ * XML dosyası ile ürün ekle - upload progress callback ile
+ * @param {FormData} formData - XmlFile, UploadName
+ * @param {function(number): void} onUploadProgress - 0-100 yüzde callback
+ */
+export const addProductXmlWithProgress = async (formData, onUploadProgress) => {
+  return await apiRequestWithUploadProgress(
+    "/SellerProductDraft/add-product-xml",
+    formData,
+    onUploadProgress,
+    LONG_UPLOAD_TIMEOUT_MS
+  );
 };
 
 /**

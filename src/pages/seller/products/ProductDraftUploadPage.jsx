@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useBlocker } from "react-router-dom";
 import { 
   addProductJson, 
-  addProductExcel, 
-  addProductXml, 
+  addProductExcelWithProgress, 
+  addProductXmlWithProgress, 
   addProductXmlFromUrl,
   addProductManual,
   fetchProductDrafts
@@ -14,6 +14,7 @@ import { UNIT_TYPE_OPTIONS } from "@/constants/unitTypes";
 import { getUploadProgress } from "@/utils/getUploadProgress";
 import { useProductUploadNotifications } from "@/hooks/useProductUploadNotifications";
 import { useToast } from "@/contexts/ToastContext";
+import ProductUploadModal from "@/components/seller/ProductUploadModal";
 import {
   FileSpreadsheet,
   FileCode,
@@ -46,7 +47,7 @@ const EXCEL_TEMPLATE_HEADERS = [
 
 const EXCEL_TEMPLATE_PATH = "/templates/Tedarika_Urun_Yukleme_Sablon_guncel.xlsx";
 
-const BG_UPLOAD_MSG = "İşlem arka planda devam ediyor. Lütfen sayfayı kapatmayın.";
+const UPLOAD_MODAL_MSG = "Lütfen bu sayfayı kapatmayınız";
 
 // API limitleri (SellerProductDraftController dokümantasyonu)
 const EXCEL_MAX_SIZE_MB = 50;
@@ -63,7 +64,6 @@ const ProductDraftUploadPage = () => {
     notifySuccess,
     notifyError,
     notifyValidationError,
-    notifyInfo,
     notifyManualResult,
     notifySingleProductError,
   } = useProductUploadNotifications();
@@ -80,6 +80,21 @@ const ProductDraftUploadPage = () => {
   const uploadType = uploadState.type;
   const [loadingManual, setLoadingManual] = useState(false);
   const [uploadSuccessModal, setUploadSuccessModal] = useState(null); // { type, productCount?, message }
+  // Hata durumunda modalda gösterilecek hatalar (açılır menü + bildirim merkezi)
+  const [uploadErrorDisplay, setUploadErrorDisplay] = useState(null); // { errors: string[], type }
+
+  const isAnyUploadActive = uploadState.active || loadingManual || uploadErrorDisplay;
+  useBlocker(isAnyUploadActive);
+  useEffect(() => {
+    const handler = (e) => {
+      if (isAnyUploadActive) {
+        e.preventDefault();
+        e.returnValue = UPLOAD_MODAL_MSG;
+      }
+    };
+    window.addEventListener("beforeunload", handler);
+    return () => window.removeEventListener("beforeunload", handler);
+  }, [isAnyUploadActive]);
 
   useEffect(() => () => { mountedRef.current = false; }, []);
   
@@ -159,13 +174,16 @@ const ProductDraftUploadPage = () => {
 
   // Ortak yükleme handler - Excel, XML, JSON, XML URL için tek yapı
   const runBulkUpload = async ({ type, apiCall, onErrorReset }) => {
+    setUploadErrorDisplay(null);
     setUploadState({ active: true, type });
     setUploadProgress(getUploadProgress("validating"));
-    if (type !== "json") notifyInfo({ message: BG_UPLOAD_MSG });
 
     try {
-      setUploadProgress(getUploadProgress("uploading", 50)); // fetch ile gerçek progress yok
-      const response = await apiCall();
+      const response = await apiCall((uploadPercent) => {
+        if (mountedRef.current) {
+          setUploadProgress(getUploadProgress("uploading", uploadPercent));
+        }
+      });
       setUploadProgress(getUploadProgress("processing"));
       // API response: { count, message, draftId, approvalStats }
       const productCount = response?.count ?? response?.productCount ?? response?.processedCount ?? response?.totalProcessed;
@@ -190,6 +208,7 @@ const ProductDraftUploadPage = () => {
         type === "xml" ? `XML yüklenemedi: ${msg}` :
         type === "xml-url" ? `XML URL işlenemedi: ${msg}` :
         err instanceof SyntaxError ? "Geçersiz JSON formatı" : `JSON gönderilemedi: ${msg}`;
+      setUploadErrorDisplay({ errors: [errorMessage], type });
       notifyError({ message: errorMessage, uploadType: type, errorDetail: msg });
       console.error(`${type} yükleme hatası:`, err);
     } finally {
@@ -220,11 +239,11 @@ const ProductDraftUploadPage = () => {
     }
     runBulkUpload({
       type: "excel",
-      apiCall: async () => {
+      apiCall: (onProgress) => {
         const formData = new FormData();
         formData.append("ExcelFile", excelFile);
         if (excelUploadName) formData.append("UploadName", excelUploadName);
-        return addProductExcel(formData);
+        return addProductExcelWithProgress(formData, onProgress);
       },
       onErrorReset: () => {
         setExcelFile(null);
@@ -261,7 +280,10 @@ const ProductDraftUploadPage = () => {
     }
     runBulkUpload({
       type: "json",
-      apiCall: () => addProductJson(parsedJson),
+      apiCall: (onProgress) => {
+        if (onProgress) onProgress(50); // JSON için gerçek progress yok
+        return addProductJson(parsedJson);
+      },
     });
   };
 
@@ -283,11 +305,11 @@ const ProductDraftUploadPage = () => {
     }
     runBulkUpload({
       type: "xml",
-      apiCall: async () => {
+      apiCall: (onProgress) => {
         const formData = new FormData();
         formData.append("XmlFile", xmlFile);
         if (xmlUploadName) formData.append("UploadName", xmlUploadName);
-        return addProductXml(formData);
+        return addProductXmlWithProgress(formData, onProgress);
       },
       onErrorReset: () => {
         setXmlFile(null);
@@ -304,11 +326,19 @@ const ProductDraftUploadPage = () => {
     }
     runBulkUpload({
       type: "xml-url",
-      apiCall: () => addProductXmlFromUrl({
-        xmlUrl: xmlUrl.trim(),
-        uploadName: xmlUrlUploadName?.trim() || undefined,
-      }),
+      apiCall: (onProgress) => {
+        if (onProgress) onProgress(50);
+        return addProductXmlFromUrl({
+          xmlUrl: xmlUrl.trim(),
+          uploadName: xmlUrlUploadName?.trim() || undefined,
+        });
+      },
     });
+  };
+
+  const handleCloseUploadErrorModal = () => {
+    setUploadErrorDisplay(null);
+    setUploadProgress(0);
   };
 
   const handleManualUpload = async () => {
@@ -361,14 +391,19 @@ const ProductDraftUploadPage = () => {
       }
     }
 
+    setUploadErrorDisplay(null);
     setLoadingManual(true);
+    setUploadProgress(getUploadProgress("validating"));
     try {
       // API dokümantasyonuna göre her ürün ayrı ayrı gönderilmeli (tek ürün endpoint'i)
       // Ancak kullanıcı deneyimi için tüm ürünleri sırayla gönderelim
       let successCount = 0;
       let errorCount = 0;
+      const totalProducts = validProducts.length;
 
-      for (const product of validProducts) {
+      for (let idx = 0; idx < validProducts.length; idx++) {
+        const product = validProducts[idx];
+        setUploadProgress(getUploadProgress("uploading", (idx / totalProducts) * 100));
         try {
           // API 7.3: product JSON serialize edilmiş, Files, DraftName
           const productPayload = {
@@ -416,11 +451,17 @@ const ProductDraftUploadPage = () => {
         } catch (err) {
           console.error(`Ürün "${product.name}" yüklenemedi:`, err);
           errorCount++;
-          notifySingleProductError({ productName: product.name, message: err?.message || err });
+          const errMsg = err?.message || "Bilinmeyen hata";
+          notifySingleProductError({ productName: product.name, message: errMsg });
+          setUploadErrorDisplay((prev) => ({
+            errors: [...(prev?.errors || []), `Ürün "${product.name}": ${errMsg}`],
+            type: "manual",
+          }));
         }
       }
 
       if (successCount > 0) {
+        setUploadProgress(getUploadProgress("done"));
         notifyManualResult({
           successCount,
           errorCount,
@@ -429,10 +470,16 @@ const ProductDraftUploadPage = () => {
         navigate("/seller/products/drafts");
       } else {
         notifyManualResult({ successCount: 0, errorCount, message: "Hiçbir ürün yüklenemedi." });
+        setUploadErrorDisplay((prev) => ({
+          errors: prev?.errors || ["Hiçbir ürün yüklenemedi."],
+          type: "manual",
+        }));
       }
     } catch (err) {
       console.error("Manuel yükleme başarısız:", err);
-      notifyError({ message: `Ürünler yüklenemedi: ${err?.message || err}`, uploadType: "manual", errorDetail: err?.message });
+      const errMsg = err?.message || "Beklenmeyen hata";
+      notifyError({ message: `Ürünler yüklenemedi: ${errMsg}`, uploadType: "manual", errorDetail: errMsg });
+      setUploadErrorDisplay({ errors: [errMsg], type: "manual" });
     } finally {
       setLoadingManual(false);
     }
@@ -604,8 +651,21 @@ const ProductDraftUploadPage = () => {
     { key: "xml-url", label: "XML URL", icon: LinkIcon, color: "orange" },
   ];
 
+  const showUploadModal = isUploading || loadingManual || uploadErrorDisplay;
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
+      {/* Ürün Yükleme Modal - blur, process bar, hata açılır menü */}
+      {showUploadModal && (
+        <ProductUploadModal
+          isOpen={showUploadModal}
+          progress={uploadErrorDisplay ? 0 : uploadProgress}
+          status={uploadErrorDisplay ? "error" : (isUploading || loadingManual ? "uploading" : "success")}
+          uploadType={uploadType || uploadErrorDisplay?.type || "manual"}
+          errors={uploadErrorDisplay?.errors || []}
+          onClose={handleCloseUploadErrorModal}
+        />
+      )}
       {/* Hero Header */}
       <div className="bg-gradient-to-r from-emerald-600 via-teal-600 to-green-600 text-white shadow-xl">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
@@ -1342,7 +1402,7 @@ const ProductDraftUploadPage = () => {
               <div className="flex items-start gap-2 text-amber-800 bg-amber-50 border-2 border-amber-200 rounded-xl p-4">
                 <AlertCircle className="w-5 h-5 mt-0.5 flex-shrink-0" />
                 <p className="text-sm">
-                  <strong>Önemli:</strong> Yükleme işlemi arka planda devam eder. Diğer sayfalara gidebilirsiniz ancak <strong>işlem tamamlanana kadar sayfayı kapatmayın</strong>.
+                  <strong>Önemli:</strong> Yükleme sırasında sayfadan ayrılmayın. İşlem tamamlanana kadar <strong>sayfayı kapatmayınız</strong>.
                 </p>
               </div>
 
@@ -1529,7 +1589,7 @@ const ProductDraftUploadPage = () => {
               <div className="flex items-start gap-2 text-amber-800 bg-amber-50 border-2 border-amber-200 rounded-xl p-4">
                 <AlertCircle className="w-5 h-5 mt-0.5 flex-shrink-0" />
                 <p className="text-sm">
-                  <strong>Önemli:</strong> Yükleme işlemi arka planda devam eder. Diğer sayfalara gidebilirsiniz ancak <strong>işlem tamamlanana kadar sayfayı kapatmayın</strong>.
+                  <strong>Önemli:</strong> Yükleme sırasında sayfadan ayrılmayın. İşlem tamamlanana kadar <strong>sayfayı kapatmayınız</strong>.
                 </p>
               </div>
 
@@ -1613,7 +1673,7 @@ const ProductDraftUploadPage = () => {
               <div className="flex items-start gap-2 text-amber-800 bg-amber-50 border-2 border-amber-200 rounded-xl p-4">
                 <AlertCircle className="w-5 h-5 mt-0.5 flex-shrink-0" />
                 <p className="text-sm">
-                  <strong>Önemli:</strong> Yükleme işlemi arka planda devam eder. Diğer sayfalara gidebilirsiniz ancak <strong>işlem tamamlanana kadar sayfayı kapatmayın</strong>.
+                  <strong>Önemli:</strong> Yükleme sırasında sayfadan ayrılmayın. İşlem tamamlanana kadar <strong>sayfayı kapatmayınız</strong>.
                 </p>
               </div>
 
