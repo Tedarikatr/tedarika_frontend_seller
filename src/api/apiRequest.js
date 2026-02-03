@@ -74,8 +74,8 @@ export async function apiRequest(
     try {
       const parsed = errorText ? JSON.parse(errorText) : {};
       const json = typeof parsed === "object" && parsed !== null ? parsed : {};
-      // API 400: string body veya { message, title, error } object
-      errorMessage = json.title || json.message || json.error || (typeof parsed === "string" ? parsed : errorText) || response.statusText;
+      // API 400: string body veya { message, title, error, errors[] } object
+      errorMessage = json.title || json.message || json.error || (Array.isArray(json.errors) && json.errors[0]) || (typeof parsed === "string" ? parsed : errorText) || response.statusText;
     } catch {
       console.error("API Text Error:", errorText);
       errorMessage = errorText || response.statusText;

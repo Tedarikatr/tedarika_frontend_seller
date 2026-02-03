@@ -100,3 +100,24 @@ export const deleteProductPrice = async (storeProductId, priceId) => {
     true
   );
 };
+
+/**
+ * Toplu fiyat güncelleme
+ * @param {object} body - bulk-update istek gövdesi
+ * @param {string} body.currencyCode - Para birimi (TRY, EUR, USD vb.)
+ * @param {string[]} [body.storeProductIds] - Güncellenecek mağaza ürün ID'leri (opsiyonel)
+ * @param {number} [body.newUnitPrice] - Yeni sabit birim fiyat (percentageChange ile birlikte kullanılamaz)
+ * @param {number} [body.percentageChange] - Yüzde değişim (örn. 10 = %10 artış, -5 = %5 indirim)
+ */
+export const bulkUpdatePrices = (body) =>
+  apiRequest(`${BASE_URL}/prices/bulk-update`, "PUT", body, true);
+
+/**
+ * TRY fiyatlarını hedef para birimine kur çevirimi
+ * @param {object} body - convert-from-try istek gövdesi
+ * @param {string} body.targetCurrencyCode - Hedef para birimi (TRY olamaz)
+ * @param {number} body.rateTryPerUnitTarget - 1 hedef birim = X TRY (örn. 1 EUR = 35 TRY → 35)
+ * @param {string[]} [body.storeProductIds] - Dönüştürülecek mağaza ürün ID'leri (opsiyonel)
+ */
+export const convertFromTry = (body) =>
+  apiRequest(`${BASE_URL}/prices/convert-from-try`, "POST", body, true);
