@@ -2,8 +2,7 @@ import { useState } from "react";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { registerSeller } from "@/api/sellerAuthService";
-import { Mail, Lock, User, Phone, Eye, EyeOff, MapPin } from "lucide-react";
-import { TURKEY_PROVINCES } from "@/constants/turkeyProvinces";
+import { Mail, Lock, User, Phone, Eye, EyeOff } from "lucide-react";
 import { useToast } from "@/contexts/ToastContext";
 import { createSeoMeta } from "@/utils/seo";
 import SellerHeader from "@/components/sellerLanding/SellerHeader";
@@ -25,7 +24,7 @@ const RegisterPage = () => {
     email: "",
     phone: "",
     password: "",
-    city: "",
+    passwordConfirm: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false); // Track submission status
 
@@ -71,6 +70,17 @@ const handleSubmit = async (e) => {
     return;
   }
 
+  // Password confirmation
+  const trimmedPasswordConfirm = formData.passwordConfirm?.trim();
+  if (!trimmedPasswordConfirm) {
+    toast.error("Şifre tekrarı alanı zorunludur.");
+    return;
+  }
+  if (trimmedPassword !== trimmedPasswordConfirm) {
+    toast.error("Şifreler eşleşmiyor.");
+    return;
+  }
+
   // Name validation
   if (!formData.name || !formData.name.trim()) {
     toast.error("Ad alanı zorunludur.");
@@ -82,12 +92,6 @@ const handleSubmit = async (e) => {
     return;
   }
 
-  // City validation
-  if (!formData.city) {
-    toast.error("Lütfen bir şehir seçiniz.");
-    return;
-  }
-  
   const fullPhone = `+90${formData.phone}`;
 
   const payload = {
@@ -96,7 +100,6 @@ const handleSubmit = async (e) => {
     email: trimmedEmail,
     phone: fullPhone,
     password: trimmedPassword,
-    city: formData.city,
     country: "Türkiye",
   };
 
@@ -163,8 +166,8 @@ const handleSubmit = async (e) => {
             <FormInput name="lastName" value={formData.lastName} onChange={handleChange} placeholder="Soyad" icon={<User size={22} />} inputClassName="text-base" />
             <FormInput name="email" value={formData.email} onChange={handleChange} placeholder="E-posta" icon={<Mail size={22} />} type="email" inputClassName="text-base" />
             <PhoneInput name="phone" value={formData.phone} onChange={handleChange} inputClassName="text-base" />
-            <CitySelect name="city" value={formData.city} onChange={handleChange} />
             <FormInputPassword name="password" value={formData.password} onChange={handleChange} placeholder="Şifre" icon={<Lock size={22} />} inputClassName="text-base" />
+            <FormInputPassword name="passwordConfirm" value={formData.passwordConfirm} onChange={handleChange} placeholder="Şifre tekrarı" icon={<Lock size={22} />} inputClassName="text-base" />
           </div>
 
           <button
@@ -218,7 +221,7 @@ const FormInput = ({ name, value, onChange, placeholder, icon, type = "text", in
   </div>
 );
 
-const FormInputPassword = ({ name, value, onChange, placeholder, icon, inputClassName = "" }) => {
+const FormInputPassword = ({ name, value, onChange, placeholder, icon, inputClassName = "", required = true }) => {
   const [showPassword, setShowPassword] = useState(false);
   return (
     <div className="flex items-center gap-3 px-5 py-3 rounded-xl bg-[#f0fdfa] border border-[#bde7e3] focus-within:ring-2 ring-[#00d18c] transition">
@@ -228,7 +231,7 @@ const FormInputPassword = ({ name, value, onChange, placeholder, icon, inputClas
         name={name}
         value={value}
         onChange={onChange}
-        required
+        required={required}
         placeholder={placeholder}
         className={`w-full bg-transparent outline-none text-[#003636] placeholder-[#7aa5a2] ${inputClassName}`}
       />
@@ -261,36 +264,6 @@ const PhoneInput = ({ name, value, onChange, inputClassName = "" }) => (
       required
       className={`w-full bg-transparent outline-none text-[#003636] placeholder-[#7aa5a2] ${inputClassName}`}
     />
-  </div>
-);
-
-const CitySelect = ({ name, value, onChange }) => (
-  <div className="flex items-center gap-3 px-5 py-3 rounded-xl bg-[#f0fdfa] border border-[#bde7e3] focus-within:ring-2 ring-[#00d18c] transition">
-    <MapPin size={22} className="text-[#7aa5a2]" />
-    <select
-      name={name}
-      value={value}
-      onChange={onChange}
-      required
-      className="w-full bg-transparent outline-none text-[#003636] text-base cursor-pointer appearance-none"
-    >
-      <option value="" disabled className="text-[#7aa5a2]">
-        Şehir Seçiniz
-      </option>
-      {TURKEY_PROVINCES.map((province) => (
-        <option key={province.code} value={province.name}>
-          {province.name}
-        </option>
-      ))}
-    </select>
-    <svg
-      className="w-5 h-5 text-[#7aa5a2] pointer-events-none"
-      fill="none"
-      stroke="currentColor"
-      viewBox="0 0 24 24"
-    >
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-    </svg>
   </div>
 );
 
