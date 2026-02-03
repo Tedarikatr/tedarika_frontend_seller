@@ -19,6 +19,7 @@ const formatPrice = (prices) => {
 
 const MyStoreProductTable = ({
   products,
+  startIndex = 0,
   onManage,
   onProductIdMissing,
   selectedIds = new Set(),
@@ -63,30 +64,30 @@ const MyStoreProductTable = ({
     <div className="w-full">
       {/* Desktop Table */}
       <div className="hidden xl:block overflow-x-auto">
-        <table className="min-w-full">
+        <table className="min-w-[900px] w-full">
           <thead className="bg-gradient-to-r from-emerald-50 to-teal-50 border-b-2 border-emerald-200">
             <tr>
               {onSelectionChange && (
-                <th className="px-4 py-4 text-center text-xs font-bold text-emerald-800 uppercase tracking-wider w-12">
+                <th className="px-3 py-3 text-center text-xs font-bold text-emerald-800 uppercase tracking-wider">
                   <span className="sr-only">Seç</span>
                 </th>
               )}
-              <th className="px-4 py-4 text-left text-xs font-bold text-emerald-800 uppercase tracking-wider">
+              <th className="px-3 py-3 text-center text-xs font-bold text-emerald-800 uppercase tracking-wider">
                 #
               </th>
-              <th className="px-4 py-4 text-left text-xs font-bold text-emerald-800 uppercase tracking-wider">
+              <th className="px-3 py-3 text-left text-xs font-bold text-emerald-800 uppercase tracking-wider">
                 Ürün
               </th>
-              <th className="px-4 py-4 text-center text-xs font-bold text-emerald-800 uppercase tracking-wider">
+              <th className="px-3 py-3 text-center text-xs font-bold text-emerald-800 uppercase tracking-wider">
                 Fiyat
               </th>
-              <th className="px-4 py-4 text-center text-xs font-bold text-emerald-800 uppercase tracking-wider">
+              <th className="px-3 py-3 text-center text-xs font-bold text-emerald-800 uppercase tracking-wider">
                 Stok
               </th>
-              <th className="px-4 py-4 text-center text-xs font-bold text-emerald-800 uppercase tracking-wider">
+              <th className="px-3 py-3 text-center text-xs font-bold text-emerald-800 uppercase tracking-wider">
                 Durum
               </th>
-              <th className="px-4 py-4 text-center text-xs font-bold text-emerald-800 uppercase tracking-wider">
+              <th className="px-3 py-3 text-center text-xs font-bold text-emerald-800 uppercase tracking-wider">
                 İşlem
               </th>
             </tr>
@@ -109,7 +110,7 @@ const MyStoreProductTable = ({
                   className={`hover:bg-gradient-to-r hover:from-emerald-50 hover:to-teal-50 transition-all duration-200 ${isSelected ? "bg-emerald-50/80" : ""}`}
                 >
                   {onSelectionChange && (
-                    <td className="px-4 py-4 whitespace-nowrap text-center">
+                    <td className="px-3 py-3 whitespace-nowrap text-center">
                       {storeId && (
                         <button
                           type="button"
@@ -130,73 +131,76 @@ const MyStoreProductTable = ({
                       )}
                     </td>
                   )}
-                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500 font-medium">
-                    {index + 1}
+                  <td className="px-3 py-3 whitespace-nowrap text-sm text-gray-500 font-medium text-center">
+                    {startIndex + index + 1}
                   </td>
-                  <td className="px-4 py-4">
-                    <div className="flex items-center gap-3">
-                      <div className="relative group">
+                  <td className="px-3 py-3">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="relative group flex-shrink-0">
                         <img
                           src={cover}
                           alt={product.name || "Ürün görseli"}
-                          className="w-12 h-12 object-cover rounded-xl border-2 border-gray-200 shadow-sm group-hover:scale-110 transition-transform duration-300"
+                          className="w-11 h-11 object-cover rounded-lg border border-gray-200 shadow-sm group-hover:scale-105 transition-transform duration-200"
                         />
-                        <div className="absolute inset-0 bg-black/40 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                          <ImageIcon className="w-5 h-5 text-white" />
+                        <div className="absolute inset-0 bg-black/40 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                          <ImageIcon className="w-4 h-4 text-white" />
                         </div>
                       </div>
-                      <div className="min-w-0">
-                        <div className="font-bold text-gray-900 truncate">{product.name}</div>
+                      <div className="min-w-0 flex-1">
+                        <div className="font-semibold text-gray-900 text-sm line-clamp-2" title={product.name}>{product.name}</div>
                       </div>
                     </div>
                   </td>
-                  <td className="px-4 py-4 whitespace-nowrap text-center">
-                    <div className="inline-flex items-center gap-1.5 px-2 py-1 rounded-lg bg-gray-100 text-gray-800 text-sm font-medium">
-                      <DollarSign size={14} className="text-emerald-600" />
-                      {formatPrice(product.prices)}
+                  <td className="px-3 py-3 text-center">
+                    <div className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-gray-100 text-gray-800 text-xs font-medium max-w-[120px] truncate" title={formatPrice(product.prices)}>
+                      <DollarSign size={12} className="text-emerald-600 flex-shrink-0" />
+                      <span className="truncate">{formatPrice(product.prices)}</span>
                     </div>
                   </td>
-                  <td className="px-4 py-4 whitespace-nowrap text-center">
-                    <div className="inline-flex items-center gap-1.5 px-2 py-1 rounded-lg bg-blue-50 text-blue-800 text-sm font-medium">
-                      <Package size={14} className="text-blue-600" />
+                  <td className="px-3 py-3 whitespace-nowrap text-center">
+                    <div className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-blue-50 text-blue-800 text-xs font-medium">
+                      <Package size={12} className="text-blue-600 flex-shrink-0" />
                       {product.stockQuantity != null ? product.stockQuantity : "—"}
                     </div>
                   </td>
-                  <td className="px-4 py-4 whitespace-nowrap text-center">
+                  <td className="px-3 py-3 whitespace-nowrap text-center">
                     {product.isOnSale ? (
-                      <span className="inline-flex items-center gap-1 px-3 py-1 rounded-lg bg-gradient-to-r from-green-100 to-emerald-100 border-2 border-green-300 text-green-800 text-xs font-bold shadow-sm">
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-green-100 border border-green-300 text-green-800 text-xs font-bold">
                         <TrendingUp className="w-3 h-3" />
                         Satışta
                       </span>
                     ) : (
-                      <span className="inline-flex items-center gap-1 px-3 py-1 rounded-lg bg-gradient-to-r from-amber-100 to-orange-100 border-2 border-amber-300 text-amber-800 text-xs font-bold shadow-sm">
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-amber-100 border border-amber-300 text-amber-800 text-xs font-bold">
                         Pasif
                       </span>
                     )}
                   </td>
-                  <td className="px-4 py-4 whitespace-nowrap text-center">
-                    <div className="flex items-center justify-center gap-2 flex-wrap">
+                  <td className="px-3 py-3">
+                    <div className="flex items-center justify-center gap-1.5 flex-wrap">
                       <button
                         type="button"
                         onClick={() => handleEditRequest(product)}
-                        className="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm font-bold hover:shadow-lg hover:scale-105 transition-all duration-300"
+                        className="inline-flex items-center gap-1.5 px-2 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold transition-colors"
+                        title="Düzenleme Talebi"
                       >
-                        <FileEdit className="w-4 h-4" />
-                        Düzenleme Talebi
+                        <FileEdit className="w-3.5 h-3.5 flex-shrink-0" />
+                        <span className="hidden 2xl:inline">Düzenleme</span>
                       </button>
                       <button
                         onClick={() => setSelectedProductForAttributes(product)}
-                        className="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-sm font-bold hover:shadow-lg hover:scale-105 transition-all duration-300"
+                        className="inline-flex items-center gap-1.5 px-2 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold transition-colors"
+                        title="Özellikler"
                       >
-                        <List className="w-4 h-4" />
-                        Özellikler
+                        <List className="w-3.5 h-3.5 flex-shrink-0" />
+                        <span className="hidden 2xl:inline">Özellikler</span>
                       </button>
                       <button
                         onClick={() => onManage(product)}
-                        className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-sm font-bold hover:shadow-lg hover:scale-105 transition-all duration-300"
+                        className="inline-flex items-center gap-1.5 px-2 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition-colors"
+                        title="Ürün Yönetimi"
                       >
-                        <Settings className="w-4 h-4" />
-                        Yönet
+                        <Settings className="w-3.5 h-3.5 flex-shrink-0" />
+                        <span className="hidden 2xl:inline">Yönet</span>
                       </button>
                     </div>
                   </td>
@@ -210,6 +214,7 @@ const MyStoreProductTable = ({
       {/* Tablet & Mobile Cards */}
       <div className="xl:hidden space-y-4 p-4">
         {products.map((product, index) => {
+          const itemNo = startIndex + index + 1;
           const cover =
             product.storeProductImagesUrls?.[0] ||
             product.storeProductImageUrl ||
@@ -254,9 +259,12 @@ const MyStoreProductTable = ({
                   />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between gap-2 mb-2">
-                      <h3 className="font-bold text-gray-900 text-lg line-clamp-2">
-                        {product.name}
-                      </h3>
+                      <div className="flex-1 min-w-0">
+                        <span className="text-xs text-gray-500 font-medium">#{itemNo}</span>
+                        <h3 className="font-bold text-gray-900 text-lg line-clamp-2 mt-0.5" title={product.name}>
+                          {product.name}
+                        </h3>
+                      </div>
                       {product.isOnSale ? (
                         <span className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-gradient-to-r from-green-100 to-emerald-100 border border-green-300 text-green-800 text-xs font-bold shadow-sm whitespace-nowrap">
                           <TrendingUp className="w-3 h-3" />

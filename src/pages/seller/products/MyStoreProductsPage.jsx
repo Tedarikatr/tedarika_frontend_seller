@@ -549,6 +549,7 @@ const MyStoreProductsPage = () => {
           ) : (
             <MyStoreProductTable
               products={currentItems}
+              startIndex={(currentPage - 1) * ITEMS_PER_PAGE}
               onManage={setSelectedProduct}
               onProductIdMissing={handleProductIdMissing}
               selectedIds={selectedIds}
