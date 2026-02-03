@@ -11,20 +11,23 @@ import {
   updateProductUnitType,
 } from "@/api/sellerStoreService";
 import { addProductPrice, getAllProductPrices } from "@/api/sellerStoreProductPricesService";
-import { 
-  X, 
-  ImagePlus, 
-  Images, 
-  ChevronRight, 
-  Plus, 
-  Package, 
-  DollarSign, 
-  TrendingUp, 
+import {
+  X,
+  ImagePlus,
+  Images,
+  ChevronRight,
+  ChevronLeft,
+  Plus,
+  Package,
+  DollarSign,
+  TrendingUp,
   Settings,
   Save,
   Sparkles,
   Layers,
-  Box
+  Box,
+  Play,
+  Pause
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import ProductPriceTiers from "@/components/storeProducts/ProductPriceTiers";
@@ -142,6 +145,8 @@ const ProductManagementPanel = ({
       : product.productImageUrls || []
   );
   const [buster, setBuster] = useState(Date.now());
+  const [slideshowIndex, setSlideshowIndex] = useState(0);
+  const [slideshowPlaying, setSlideshowPlaying] = useState(false);
   
   // Yeni fiyat ekleme için state'ler
   const [showAddPrice, setShowAddPrice] = useState(false);
@@ -162,6 +167,25 @@ const ProductManagementPanel = ({
       loadProductPrices();
     }
   }, [storeProductId]);
+
+  // Ürün görselleri product prop ile senkronize
+  useEffect(() => {
+    const urls =
+      product.storeProductImagesUrls?.length
+        ? product.storeProductImagesUrls
+        : product.productImageUrls || [];
+    setImages(urls);
+    setSlideshowIndex((i) => (i >= urls.length ? 0 : i));
+  }, [product.storeProductImagesUrls, product.productImageUrls]);
+
+  // Slayt gösterisi otomatik ilerleme
+  useEffect(() => {
+    if (!slideshowPlaying || images.length <= 1) return;
+    const t = setInterval(() => {
+      setSlideshowIndex((i) => (i + 1) % images.length);
+    }, 3000);
+    return () => clearInterval(t);
+  }, [slideshowPlaying, images.length]);
 
   const loadProductPrices = async () => {
     try {
@@ -494,23 +518,79 @@ const ProductManagementPanel = ({
             </div>
           </SectionCard>
 
-          {/* 📸 Ürün Görselleri */}
+          {/* 📸 Ürün Görselleri - Slayt Gösterisi */}
           <SectionCard title="Ürün Görselleri" icon={Images}>
             <div className="space-y-4">
               {images.length > 0 && (
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                  {images.slice(0, 4).map((url, i) => (
-                    <div key={i} className="relative group">
-                      <img
-                        src={`${url}?v=${buster}`}
-                        alt={`${product?.name || 'Ürün'} görseli ${i + 1}`}
-                        className="w-full aspect-square rounded-xl object-cover border-2 border-gray-200 shadow-sm group-hover:shadow-lg transition-all"
+                <div className="relative overflow-hidden rounded-xl bg-gray-100 border-2 border-gray-200">
+                  {/* Ana slayt alanı */}
+                  <div className="relative aspect-[4/3] sm:aspect-video bg-gradient-to-br from-gray-50 to-gray-100">
+                    <img
+                      src={`${images[slideshowIndex]}?v=${buster}`}
+                      alt={`${product?.name || "Ürün"} görseli ${slideshowIndex + 1}`}
+                      className="w-full h-full object-contain transition-opacity duration-300"
+                    />
+                    {/* Önceki / Sonraki butonları */}
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setSlideshowIndex((i) => (i - 1 + images.length) % images.length)
+                      }
+                      className="absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/90 hover:bg-white shadow-lg flex items-center justify-center text-gray-700 hover:text-emerald-600 transition-all"
+                      aria-label="Önceki"
+                    >
+                      <ChevronLeft size={24} />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setSlideshowIndex((i) => (i + 1) % images.length)
+                      }
+                      className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/90 hover:bg-white shadow-lg flex items-center justify-center text-gray-700 hover:text-emerald-600 transition-all"
+                      aria-label="Sonraki"
+                    >
+                      <ChevronRight size={24} />
+                    </button>
+                    {/* Otomatik oynatma butonu */}
+                    {images.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => setSlideshowPlaying(!slideshowPlaying)}
+                        className="absolute bottom-3 left-1/2 -translate-x-1/2 px-4 py-2 rounded-full bg-black/60 hover:bg-black/80 text-white text-sm font-medium flex items-center gap-2"
+                      >
+                        {slideshowPlaying ? (
+                          <>
+                            <Pause size={16} />
+                            Durdur
+                          </>
+                        ) : (
+                          <>
+                            <Play size={16} />
+                            Slayt Gösterisi
+                          </>
+                        )}
+                      </button>
+                    )}
+                  </div>
+                  {/* Nokta göstergeleri */}
+                  <div className="flex items-center justify-center gap-1.5 py-3 px-2">
+                    {images.map((_, i) => (
+                      <button
+                        key={i}
+                        type="button"
+                        onClick={() => setSlideshowIndex(i)}
+                        className={`w-2.5 h-2.5 rounded-full transition-all ${
+                          i === slideshowIndex
+                            ? "bg-emerald-600 scale-125"
+                            : "bg-gray-300 hover:bg-gray-400"
+                        }`}
+                        aria-label={`Görsel ${i + 1}`}
                       />
-                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 rounded-xl transition-opacity flex items-center justify-center">
-                        <span className="text-white text-xs font-medium">#{i + 1}</span>
-                      </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
+                  <p className="text-center text-xs text-gray-500 pb-2">
+                    {slideshowIndex + 1} / {images.length}
+                  </p>
                 </div>
               )}
               

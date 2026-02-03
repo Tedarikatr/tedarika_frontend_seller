@@ -5,6 +5,7 @@ import React, { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   getStoreCoverage,
+  removeProductsFromStore,
 } from "@/api/sellerStoreService";
 import { useProductCache } from "@/contexts/ProductCacheContext";
 import MyStoreProductTable from "@/components/storeProducts/MyStoreProductTable";
@@ -20,7 +21,10 @@ import {
   AlertCircle,
   RefreshCw,
   Search,
-  ListFilter
+  ListFilter,
+  Trash2,
+  CheckSquare,
+  Square
 } from "lucide-react";
 
 const ITEMS_PER_PAGE = 10;
@@ -39,6 +43,9 @@ const MyStoreProductsPage = () => {
 
   // Panel state
   const [selectedProduct, setSelectedProduct] = useState(null);
+  // Toplu kaldırma için seçili ürün ID'leri (storeProductId)
+  const [selectedIds, setSelectedIds] = useState(new Set());
+  const [bulkRemoving, setBulkRemoving] = useState(false);
 
   const loadProducts = async (forceRefresh = false) => {
     const isLoadingState = forceRefresh ? setRefreshing : setLoading;
@@ -75,6 +82,50 @@ const MyStoreProductsPage = () => {
   const showFeedback = (message, type = "success") => {
     setFeedback({ message, type });
     setTimeout(() => setFeedback(null), 4000);
+  };
+
+  const getStoreProductId = (p) => p.id ?? p.storeProductId;
+
+  const handleSelectionChange = (ids) => {
+    setSelectedIds(ids);
+  };
+
+  const handleSelectAllOnPage = () => {
+    const ids = new Set(currentItems.map(getStoreProductId).filter(Boolean));
+    setSelectedIds(ids);
+  };
+
+  const handleDeselectAll = () => {
+    setSelectedIds(new Set());
+  };
+
+  const handleBulkRemove = async () => {
+    const ids = Array.from(selectedIds);
+    if (ids.length === 0) {
+      showFeedback("Lütfen kaldırılacak ürünleri seçin.", "error");
+      return;
+    }
+    if (!window.confirm(`${ids.length} ürünü mağazanızdan kaldırmak istediğinize emin misiniz?`)) {
+      return;
+    }
+    setBulkRemoving(true);
+    try {
+      const res = await removeProductsFromStore(ids);
+      const success = res?.successCount ?? 0;
+      const fail = res?.failCount ?? 0;
+      await loadProducts(true);
+      setSelectedIds(new Set());
+      if (fail > 0) {
+        showFeedback(`${success} ürün kaldırıldı, ${fail} ürün kaldırılamadı.`, "error");
+      } else {
+        showFeedback(`${success} ürün mağazanızdan kaldırıldı.`, "success");
+      }
+    } catch (err) {
+      console.error("Toplu kaldırma hatası:", err);
+      showFeedback("Ürünler kaldırılırken bir hata oluştu.", "error");
+    } finally {
+      setBulkRemoving(false);
+    }
   };
 
   const handleProductIdMissing = (product) => {
@@ -280,6 +331,49 @@ const MyStoreProductsPage = () => {
           </div>
         )}
 
+        {/* Toplu İşlem Bar */}
+        {!loading && filteredProducts.length > 0 && (
+          <div className="mb-6 bg-white rounded-2xl shadow-lg p-4 sm:p-5 border-2 border-gray-200">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
+              <div className="flex items-center gap-3 flex-wrap">
+                <span className="text-sm font-semibold text-gray-700">
+                  Toplu İşlem
+                </span>
+                <button
+                  type="button"
+                  onClick={handleSelectAllOnPage}
+                  className="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium transition-all"
+                >
+                  <CheckSquare size={16} />
+                  Bu sayfadaki tümünü seç
+                </button>
+                <button
+                  type="button"
+                  onClick={handleDeselectAll}
+                  className="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium transition-all"
+                >
+                  <Square size={16} />
+                  Seçimi temizle
+                </button>
+                {selectedIds.size > 0 && (
+                  <span className="px-3 py-1.5 rounded-lg bg-emerald-100 text-emerald-800 text-sm font-bold">
+                    {selectedIds.size} ürün seçili
+                  </span>
+                )}
+              </div>
+              <button
+                type="button"
+                onClick={handleBulkRemove}
+                disabled={bulkRemoving || selectedIds.size === 0}
+                className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 text-white text-sm font-bold shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-lg"
+              >
+                <Trash2 size={18} />
+                {bulkRemoving ? "Kaldırılıyor..." : "Mağazadan Kaldır"}
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Tablo Container */}
         <div className="bg-white rounded-3xl shadow-2xl border-2 border-gray-200 overflow-hidden">
           {loading ? (
@@ -331,6 +425,9 @@ const MyStoreProductsPage = () => {
               products={currentItems}
               onManage={setSelectedProduct}
               onProductIdMissing={handleProductIdMissing}
+              selectedIds={selectedIds}
+              onSelectionChange={handleSelectionChange}
+              getStoreProductId={getStoreProductId}
             />
           )}
         </div>

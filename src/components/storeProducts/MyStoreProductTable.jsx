@@ -1,14 +1,45 @@
 // =============================
 // MyStoreProductTable.jsx
 // =============================
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { Settings, Image as ImageIcon, TrendingUp, List, FileEdit } from "lucide-react";
+import { Settings, Image as ImageIcon, TrendingUp, List, FileEdit, Package, DollarSign } from "lucide-react";
 import ProductAttributesModal from "./ProductAttributesModal";
+import { CURRENCY_CODES } from "@/constants/currencyCode";
 
-const MyStoreProductTable = ({ products, onManage, onProductIdMissing }) => {
+/** prices dizisinden ilk fiyatı formatla */
+const formatPrice = (prices) => {
+  if (!prices?.length) return "—";
+  const p = prices[0];
+  const val = p?.unitPrice;
+  const code = p?.currencyCode || "TRY";
+  const sym = CURRENCY_CODES[code]?.symbol ?? code;
+  return val != null ? `${Number(val).toLocaleString("tr-TR")} ${sym}` : "—";
+};
+
+const MyStoreProductTable = ({
+  products,
+  onManage,
+  onProductIdMissing,
+  selectedIds = new Set(),
+  onSelectionChange,
+  getStoreProductId = (p) => p.id ?? p.storeProductId,
+}) => {
   const navigate = useNavigate();
   const [selectedProductForAttributes, setSelectedProductForAttributes] = useState(null);
+
+  const toggleSelection = useCallback(
+    (product) => {
+      if (!onSelectionChange) return;
+      const id = getStoreProductId(product);
+      if (!id) return;
+      const next = new Set(selectedIds);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      onSelectionChange(next);
+    },
+    [onSelectionChange, getStoreProductId, selectedIds]
+  );
 
   const handleEditRequest = (product) => {
     const productId = product.productId ?? product.id;
@@ -35,11 +66,22 @@ const MyStoreProductTable = ({ products, onManage, onProductIdMissing }) => {
         <table className="min-w-full">
           <thead className="bg-gradient-to-r from-emerald-50 to-teal-50 border-b-2 border-emerald-200">
             <tr>
+              {onSelectionChange && (
+                <th className="px-4 py-4 text-center text-xs font-bold text-emerald-800 uppercase tracking-wider w-12">
+                  <span className="sr-only">Seç</span>
+                </th>
+              )}
               <th className="px-4 py-4 text-left text-xs font-bold text-emerald-800 uppercase tracking-wider">
                 #
               </th>
               <th className="px-4 py-4 text-left text-xs font-bold text-emerald-800 uppercase tracking-wider">
                 Ürün
+              </th>
+              <th className="px-4 py-4 text-center text-xs font-bold text-emerald-800 uppercase tracking-wider">
+                Fiyat
+              </th>
+              <th className="px-4 py-4 text-center text-xs font-bold text-emerald-800 uppercase tracking-wider">
+                Stok
               </th>
               <th className="px-4 py-4 text-center text-xs font-bold text-emerald-800 uppercase tracking-wider">
                 Durum
@@ -58,12 +100,36 @@ const MyStoreProductTable = ({ products, onManage, onProductIdMissing }) => {
                 product.productImageUrls?.[0] ||
                 product.imageUrl ||
                 "/placeholder.png";
+              const storeId = getStoreProductId(product);
+              const isSelected = storeId && selectedIds.has(storeId);
 
               return (
                 <tr
-                  key={product.id}
-                  className="hover:bg-gradient-to-r hover:from-emerald-50 hover:to-teal-50 transition-all duration-200"
+                  key={product.id ?? storeId ?? index}
+                  className={`hover:bg-gradient-to-r hover:from-emerald-50 hover:to-teal-50 transition-all duration-200 ${isSelected ? "bg-emerald-50/80" : ""}`}
                 >
+                  {onSelectionChange && (
+                    <td className="px-4 py-4 whitespace-nowrap text-center">
+                      {storeId && (
+                        <button
+                          type="button"
+                          onClick={() => toggleSelection(product)}
+                          className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${
+                            isSelected
+                              ? "bg-emerald-600 border-emerald-600 text-white"
+                              : "border-gray-300 hover:border-emerald-500 bg-white"
+                          }`}
+                          aria-label={isSelected ? "Seçimi kaldır" : "Seç"}
+                        >
+                          {isSelected && (
+                            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                            </svg>
+                          )}
+                        </button>
+                      )}
+                    </td>
+                  )}
                   <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500 font-medium">
                     {index + 1}
                   </td>
@@ -82,6 +148,18 @@ const MyStoreProductTable = ({ products, onManage, onProductIdMissing }) => {
                       <div className="min-w-0">
                         <div className="font-bold text-gray-900 truncate">{product.name}</div>
                       </div>
+                    </div>
+                  </td>
+                  <td className="px-4 py-4 whitespace-nowrap text-center">
+                    <div className="inline-flex items-center gap-1.5 px-2 py-1 rounded-lg bg-gray-100 text-gray-800 text-sm font-medium">
+                      <DollarSign size={14} className="text-emerald-600" />
+                      {formatPrice(product.prices)}
+                    </div>
+                  </td>
+                  <td className="px-4 py-4 whitespace-nowrap text-center">
+                    <div className="inline-flex items-center gap-1.5 px-2 py-1 rounded-lg bg-blue-50 text-blue-800 text-sm font-medium">
+                      <Package size={14} className="text-blue-600" />
+                      {product.stockQuantity != null ? product.stockQuantity : "—"}
                     </div>
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap text-center">
@@ -138,15 +216,37 @@ const MyStoreProductTable = ({ products, onManage, onProductIdMissing }) => {
             product.productImageUrls?.[0] ||
             product.imageUrl ||
             "/placeholder.png";
+          const storeId = getStoreProductId(product);
+          const isSelected = storeId && selectedIds.has(storeId);
 
           return (
             <div
-              key={product.id}
-              className="bg-gradient-to-br from-white to-gray-50 rounded-2xl border-2 border-gray-200 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden"
+              key={product.id ?? storeId ?? index}
+              className={`bg-gradient-to-br from-white to-gray-50 rounded-2xl border-2 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden ${
+                isSelected ? "border-emerald-500 ring-2 ring-emerald-200" : "border-gray-200"
+              }`}
             >
               {/* Header with Image and Status */}
               <div className="bg-gradient-to-r from-emerald-50 to-teal-50 p-4 border-b-2 border-emerald-200">
                 <div className="flex items-start gap-4">
+                  {onSelectionChange && storeId && (
+                    <button
+                      type="button"
+                      onClick={() => toggleSelection(product)}
+                      className={`mt-1 w-6 h-6 rounded border-2 flex items-center justify-center flex-shrink-0 transition-all ${
+                        isSelected
+                          ? "bg-emerald-600 border-emerald-600 text-white"
+                          : "border-gray-300 hover:border-emerald-500 bg-white"
+                      }`}
+                      aria-label={isSelected ? "Seçimi kaldır" : "Seç"}
+                    >
+                      {isSelected && (
+                        <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        </svg>
+                      )}
+                    </button>
+                  )}
                   <img
                     src={cover}
                     alt={product.name || "Ürün görseli"}
@@ -167,6 +267,16 @@ const MyStoreProductTable = ({ products, onManage, onProductIdMissing }) => {
                           Pasif
                         </span>
                       )}
+                    </div>
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      <span className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-gray-100 text-gray-800 text-xs font-medium">
+                        <DollarSign size={12} className="text-emerald-600" />
+                        {formatPrice(product.prices)}
+                      </span>
+                      <span className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-blue-50 text-blue-800 text-xs font-medium">
+                        <Package size={12} className="text-blue-600" />
+                        Stok: {product.stockQuantity != null ? product.stockQuantity : "—"}
+                      </span>
                     </div>
                   </div>
                 </div>

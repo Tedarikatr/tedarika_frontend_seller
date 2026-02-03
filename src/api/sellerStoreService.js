@@ -80,6 +80,14 @@ export const fetchProductDatabase = () =>
 export const addProductToStore = (productId) =>
   apiRequest(`/SellerStoreProduct/${productId}/add`, "POST", null, true);
 
+/**
+ * Mağazadan ürünleri toplu kaldır (soft delete)
+ * @param {string[]} storeProductIds - Kaldırılacak mağaza ürün ID'leri (UUID)
+ * @returns {Promise<{totalRequested, successCount, failCount, results}>}
+ */
+export const removeProductsFromStore = (storeProductIds) =>
+  apiRequest("/SellerStoreProduct/remove", "POST", { storeProductIds }, true);
+
 export const toggleProductOnSale = (storeProductId, isOnSale) =>
   apiRequest(
     "/SellerStoreProduct/set-on-sale",
