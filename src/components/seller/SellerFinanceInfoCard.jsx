@@ -256,8 +256,7 @@ export default function SellerFinanceInfoCard() {
                 name="iban"
                 value={form.iban}
                 onChange={onChange}
-                maxLength={32}
-                placeholder="TR00 0000 0000 0000 0000 0000 00"
+                placeholder="TR 00 0000 0000 0000 0000 0000 00"
                 className={`flex-1 tracking-wider border rounded-md px-2 py-1 text-sm focus:ring-2 outline-none ${
                   ibanValid
                     ? "border-emerald-400 focus:ring-emerald-500"
