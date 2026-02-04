@@ -35,8 +35,7 @@ import {
   Pause,
   Pencil,
   Trash2,
-  Check,
-  X
+  Check
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import ProductPriceTiers from "@/components/storeProducts/ProductPriceTiers";
