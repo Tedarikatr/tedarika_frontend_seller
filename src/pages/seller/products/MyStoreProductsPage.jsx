@@ -591,6 +591,7 @@ const MyStoreProductsPage = () => {
               getStoreProductId={getStoreProductId}
               onRefresh={() => loadProducts(true)}
               onFeedback={showFeedback}
+              hasCoverage={hasCoverage}
             />
           )}
         </div>

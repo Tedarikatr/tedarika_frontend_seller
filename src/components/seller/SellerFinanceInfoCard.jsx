@@ -17,27 +17,60 @@ const EMPTY = {
   swiftCode: "",
 };
 
-// Yardımcı fonksiyonlar
-const formatIban = (val = "") =>
-  val.replace(/\s+/g, "").replace(/(.{4})/g, "$1 ").trim();
-const normalizeIban = (val = "") => val.replace(/\s+/g, "").toUpperCase();
+// TR IBAN: 26 karakter (TR + 24 rakam)
+const TR_IBAN_LENGTH = 26;
 
-// ✅ Gerçek IBAN doğrulama (ISO 13616 standardı)
+/** Ham değeri TR + 24 rakama çevirir (her zaman TR ile başlar) */
+const ensureTrIbanRaw = (val = "") => {
+  const cleaned = String(val).replace(/\s+/g, "").toUpperCase().replace(/[^A-Z0-9]/g, "");
+  const digitsOnly = (cleaned.startsWith("TR") ? cleaned.slice(2) : cleaned).replace(/\D/g, "");
+  return "TR" + digitsOnly.slice(0, 24);
+};
+
+/** Görüntüleme: TR + 2-4-4-4-4-4-2 formatı (TR silinemez) — TR 12 3456 7890 1234 5678 9010 12 */
+const TR_IBAN_GROUPS = [2, 4, 4, 4, 4, 4, 2];
+const formatIbanDisplay = (raw = "") => {
+  const r = raw.startsWith("TR") ? raw.slice(0, TR_IBAN_LENGTH) : ensureTrIbanRaw(raw);
+  const digits = (r.startsWith("TR") ? r.slice(2) : r).padEnd(24, " ").slice(0, 24);
+  let pos = 0;
+  const parts = TR_IBAN_GROUPS.map((len) => {
+    const part = digits.slice(pos, pos + len).replace(/\s/g, "");
+    pos += len;
+    return part;
+  }).filter(Boolean);
+  return "TR " + parts.join(" ");
+};
+
+const formatIban = (val = "") => formatIbanDisplay(ensureTrIbanRaw(val));
+const normalizeIban = (val = "") =>
+  ensureTrIbanRaw(val).slice(0, TR_IBAN_LENGTH);
+
+// 9+ haneli sayıda baştaki sıfırları kaybetmemek için string üzerinden mod 97
+const mod97 = (s) => {
+  let r = 0;
+  for (let i = 0; i < s.length; i++) {
+    r = (r * 10 + parseInt(s[i], 10)) % 97;
+  }
+  return r;
+};
+
+// Gerçek IBAN doğrulama (ISO 13616) — baştaki sıfır kaybı düzeltildi
 const isValidIban = (iban) => {
   const raw = normalizeIban(iban);
-  if (!/^TR\d{24}$/.test(raw)) return false; // TR ve 24 rakam
-  // Mod 97 algoritması
+  if (raw.length !== TR_IBAN_LENGTH || !/^TR\d{24}$/.test(raw)) return false;
   const rearranged = raw.slice(4) + raw.slice(0, 4);
   const converted = rearranged
     .split("")
-    .map((ch) => (ch >= "A" && ch <= "Z" ? ch.charCodeAt(0) - 55 : ch))
+    .map((ch) =>
+      ch >= "A" && ch <= "Z" ? String(ch.charCodeAt(0) - 55) : ch
+    )
     .join("");
   let remainder = converted;
   while (remainder.length > 9) {
-    remainder =
-      (parseInt(remainder.slice(0, 9), 10) % 97) + remainder.slice(9);
+    const part = remainder.slice(0, 9);
+    remainder = mod97(part).toString() + remainder.slice(9);
   }
-  return parseInt(remainder, 10) % 97 === 1;
+  return mod97(remainder) === 1;
 };
 
 export default function SellerFinanceInfoCard() {
@@ -63,7 +96,7 @@ export default function SellerFinanceInfoCard() {
         bankName: p?.bankName || "",
         bankBranch: p?.bankBranch || "",
         bankAccountHolderName: p?.bankAccountHolderName || "",
-        iban: formatIban(p?.iban || ""),
+        iban: formatIbanDisplay(ensureTrIbanRaw(p?.iban || "")),
         swiftCode: p?.swiftCode || "",
       });
       setMode(p && (p.bankName || p.iban) ? "view" : "edit");
@@ -81,8 +114,8 @@ export default function SellerFinanceInfoCard() {
   const onChange = (e) => {
     const { name, value } = e.target;
     if (name === "iban") {
-      const raw = value.toUpperCase().replace(/[^A-Z0-9]/g, "");
-      setForm((p) => ({ ...p, iban: formatIban(raw) }));
+      const raw = ensureTrIbanRaw(value);
+      setForm((p) => ({ ...p, iban: formatIbanDisplay(raw) }));
     } else {
       setForm((p) => ({ ...p, [name]: value }));
     }
@@ -223,7 +256,7 @@ export default function SellerFinanceInfoCard() {
                 name="iban"
                 value={form.iban}
                 onChange={onChange}
-                placeholder="TR__ ____ ____ ____ ____ ____"
+                placeholder="TR 00 0000 0000 0000 0000 0000 00"
                 className={`flex-1 tracking-wider border rounded-md px-2 py-1 text-sm focus:ring-2 outline-none ${
                   ibanValid
                     ? "border-emerald-400 focus:ring-emerald-500"
@@ -272,17 +305,17 @@ export default function SellerFinanceInfoCard() {
 
             <button
               type="button"
-              onClick={() => {
-                setForm({
-                  bankName: profile?.bankName || "",
-                  bankBranch: profile?.bankBranch || "",
-                  bankAccountHolderName: profile?.bankAccountHolderName || "",
-                  iban: formatIban(profile?.iban || ""),
-                  swiftCode: profile?.swiftCode || "",
-                });
-                setMode("view");
-                setMsg("");
-              }}
+                onClick={() => {
+                  setForm({
+                    bankName: profile?.bankName || "",
+                    bankBranch: profile?.bankBranch || "",
+                    bankAccountHolderName: profile?.bankAccountHolderName || "",
+                    iban: formatIbanDisplay(ensureTrIbanRaw(profile?.iban || "")),
+                    swiftCode: profile?.swiftCode || "",
+                  });
+                  setMode("view");
+                  setMsg("");
+                }}
               className="inline-flex items-center gap-2 px-4 py-2 rounded-md border border-gray-300 text-sm text-gray-700 hover:bg-gray-50"
             >
               <X className="w-4 h-4" /> Vazgeç

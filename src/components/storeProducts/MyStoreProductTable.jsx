@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { Settings, Image as ImageIcon, TrendingUp, List, FileEdit, Package, DollarSign, Pencil, Check, X } from "lucide-react";
 import ProductAttributesModal from "./ProductAttributesModal";
 import { updateProductPrice } from "@/api/sellerStoreProductPricesService";
+import { toggleProductOnSale } from "@/api/sellerStoreService";
 import { CURRENCY_CODES } from "@/constants/currencyCode";
 import { TABLE_STYLES } from "@/constants/tableStyles";
 
@@ -42,6 +43,7 @@ const MyStoreProductTable = ({
   getStoreProductId = (p) => p.id ?? p.storeProductId,
   onRefresh,
   onFeedback,
+  hasCoverage = true,
 }) => {
   const navigate = useNavigate();
   const [selectedProductForAttributes, setSelectedProductForAttributes] = useState(null);
@@ -49,6 +51,8 @@ const MyStoreProductTable = ({
   const [editingPriceRow, setEditingPriceRow] = useState(null);
   const [editingPriceValue, setEditingPriceValue] = useState("");
   const [priceUpdateLoading, setPriceUpdateLoading] = useState(false);
+  /** Satışa aç/kapa toggle işlemi yapılan ürün (storeProductId) */
+  const [togglingSaleId, setTogglingSaleId] = useState(null);
 
   const toggleSelection = useCallback(
     (product) => {
@@ -113,6 +117,26 @@ const MyStoreProductTable = ({
       onFeedback?.(msg, "error");
     } finally {
       setPriceUpdateLoading(false);
+    }
+  };
+
+  const handleToggleSale = async (product) => {
+    const storeId = getStoreProductId(product);
+    if (!storeId) return;
+    if (!hasCoverage) {
+      onFeedback?.("Satışa açmak için önce hizmet bölgenizi tanımlayın.", "error");
+      return;
+    }
+    setTogglingSaleId(storeId);
+    try {
+      await toggleProductOnSale(storeId, !product.isOnSale);
+      onFeedback?.(product.isOnSale ? "Satış kapatıldı." : "Satışa açıldı.", "success");
+      onRefresh?.();
+    } catch (err) {
+      const msg = err?.message ?? err?.errors?.[0] ?? "İşlem başarısız.";
+      onFeedback?.(msg, "error");
+    } finally {
+      setTogglingSaleId(null);
     }
   };
 
@@ -262,16 +286,29 @@ const MyStoreProductTable = ({
                     </div>
                   </td>
                   <td className="px-3 py-3 whitespace-nowrap text-center">
-                    {product.isOnSale ? (
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-green-100 border border-green-300 text-green-800 text-xs font-bold">
-                        <TrendingUp className="w-3 h-3" />
-                        Satışta
+                    <div className="inline-flex items-center gap-2">
+                      <button
+                        type="button"
+                        role="switch"
+                        aria-checked={product.isOnSale}
+                        aria-label={product.isOnSale ? "Satışta — Kapatmak için tıklayın" : "Pasif — Açmak için tıklayın"}
+                        disabled={!hasCoverage || togglingSaleId === storeId}
+                        onClick={() => handleToggleSale(product)}
+                        title={!hasCoverage ? "Satışa açmak için hizmet bölgesi tanımlayın" : product.isOnSale ? "Satışı kapat" : "Satışa aç"}
+                        className={`relative inline-flex h-6 w-10 flex-shrink-0 cursor-pointer rounded-full border-2 transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-60 ${
+                          product.isOnSale ? "border-green-500 bg-green-500" : "border-gray-300 bg-gray-200"
+                        } ${!hasCoverage ? "opacity-70" : ""}`}
+                      >
+                        <span
+                          className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition-transform ${
+                            product.isOnSale ? "translate-x-4" : "translate-x-0.5"
+                          } ${togglingSaleId === storeId ? "animate-pulse" : ""}`}
+                        />
+                      </button>
+                      <span className={`text-xs font-bold ${product.isOnSale ? "text-green-800" : "text-amber-800"}`}>
+                        {product.isOnSale ? "Satışta" : "Pasif"}
                       </span>
-                    ) : (
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-amber-100 border border-amber-300 text-amber-800 text-xs font-bold">
-                        Pasif
-                      </span>
-                    )}
+                    </div>
                   </td>
                   <td className="px-3 py-3">
                     <div className="flex items-center justify-center gap-1.5 flex-wrap">
@@ -363,16 +400,29 @@ const MyStoreProductTable = ({
                           {product.name}
                         </h3>
                       </div>
-                      {product.isOnSale ? (
-                        <span className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-gradient-to-r from-green-100 to-emerald-100 border border-green-300 text-green-800 text-xs font-bold shadow-sm whitespace-nowrap">
-                          <TrendingUp className="w-3 h-3" />
-                          Satışta
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          role="switch"
+                          aria-checked={product.isOnSale}
+                          aria-label={product.isOnSale ? "Satışta — Kapatmak için tıklayın" : "Pasif — Açmak için tıklayın"}
+                          disabled={!hasCoverage || togglingSaleId === storeId}
+                          onClick={() => handleToggleSale(product)}
+                          title={!hasCoverage ? "Satışa açmak için hizmet bölgesi tanımlayın" : product.isOnSale ? "Satışı kapat" : "Satışa aç"}
+                          className={`relative inline-flex h-7 w-12 flex-shrink-0 cursor-pointer rounded-full border-2 transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-60 ${
+                            product.isOnSale ? "border-green-500 bg-green-500" : "border-gray-300 bg-gray-200"
+                          } ${!hasCoverage ? "opacity-70" : ""}`}
+                        >
+                          <span
+                            className={`pointer-events-none inline-block h-6 w-6 transform rounded-full bg-white shadow ring-0 transition-transform ${
+                              product.isOnSale ? "translate-x-5" : "translate-x-0.5"
+                            } ${togglingSaleId === storeId ? "animate-pulse" : ""}`}
+                          />
+                        </button>
+                        <span className={`text-xs font-bold ${product.isOnSale ? "text-green-800" : "text-amber-800"}`}>
+                          {product.isOnSale ? "Satışta" : "Pasif"}
                         </span>
-                      ) : (
-                        <span className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-gradient-to-r from-amber-100 to-orange-100 border border-amber-300 text-amber-800 text-xs font-bold shadow-sm whitespace-nowrap">
-                          Pasif
-                        </span>
-                      )}
+                      </div>
                     </div>
                     <div className="flex flex-wrap gap-2 mt-2 items-center">
                       {editingPriceRow === storeId ? (
