@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { createStore, getAllCategories } from "@/api/sellerStoreService";
+import { refreshToken } from "@/api/sellerAuthService";
 import { useNavigate } from "react-router-dom";
 import { Store, Upload, Image as ImageIcon, X, CheckCircle, Loader2, Sparkles, Award } from "lucide-react";
 
@@ -90,7 +91,25 @@ const StoreCreate = () => {
       setSubmitting(true);
       setMessage("Mağaza oluşturuluyor...");
       await createStore(form);
-      navigate("/seller/store/update", { replace: true });
+
+      // Token yenile (mağaza oluşturulduktan sonra)
+      try {
+        const token = localStorage.getItem("sellerToken");
+        if (token) {
+          const refreshed = await refreshToken({ token });
+          if (refreshed?.token) {
+            localStorage.setItem("sellerToken", refreshed.token);
+            if (refreshed?.subscriptionActive !== undefined)
+              localStorage.setItem("sellerSubscriptionActive", String(refreshed.subscriptionActive));
+            if (refreshed?.isthesystemactive !== undefined)
+              localStorage.setItem("sellerSystemActive", String(refreshed.isthesystemactive ?? refreshed.Status ?? ""));
+          }
+        }
+      } catch {
+        /* Token yenileme başarısız - devam et */
+      }
+
+      navigate("/seller/profile#store", { replace: true });
     } catch {
       setMessage("Mağaza oluşturulamadı.");
     } finally {

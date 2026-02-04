@@ -85,22 +85,22 @@ export default function SellerCompanyDocuments() {
   };
 
   return (
-    <div className="w-full py-6">
+    <div className="w-full py-4 sm:py-6">
       {/* Başlık */}
-      <div className="px-6">
+      <div className="px-4 sm:px-6">
         <div className="flex items-center gap-3">
           <div className="p-2 rounded-xl bg-sky-600/10 text-sky-700">
             <Shield className="w-5 h-5" />
           </div>
           <div>
-            <h2 className="text-2xl font-semibold tracking-tight">Şirket Belgeleri</h2>
+            <h2 className="text-xl sm:text-2xl font-semibold tracking-tight">Şirket Belgeleri</h2>
             <p className="text-sm text-gray-600">Zorunlu belgeleri yükleyin ve mevcut belgeleri yönetin.</p>
           </div>
         </div>
       </div>
 
       {/* Eksik belgeler durumu */}
-      <div className="px-6 mt-4">
+      <div className="px-4 sm:px-6 mt-4">
         {missingRequired.length > 0 ? (
           <div className="flex items-start gap-2 text-amber-800 bg-amber-50 p-3 rounded-xl border border-amber-200">
             <AlertTriangle className="w-5 h-5 mt-0.5" />
@@ -124,7 +124,7 @@ export default function SellerCompanyDocuments() {
       </div>
 
       {/* Form */}
-      <form onSubmit={submit} className="px-6 mt-4 grid grid-cols-1 lg:grid-cols-4 gap-6">
+      <form onSubmit={submit} className="px-4 sm:px-6 mt-4 grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6">
         {/* Belge Türü */}
         <div className="lg:col-span-1">
           <label className="text-sm font-medium text-gray-700">
@@ -184,10 +184,10 @@ export default function SellerCompanyDocuments() {
         </div>
       </form>
 
-      {msg && <p className="px-6 mt-3 text-sm">{msg}</p>}
+      {msg && <p className="px-4 sm:px-6 mt-3 text-sm">{msg}</p>}
 
       {/* Mevcut Belgeler */}
-      <div className="px-6 mt-6 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+      <div className="px-4 sm:px-6 mt-4 sm:mt-6 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
         {docs.map((d) => {
           const code = normalizeDocType(d.documentType);
           return (

@@ -145,9 +145,9 @@ const ForgotPasswordPage = () => {
 
       <div className="min-h-screen flex flex-col bg-white">
         <SellerHeader />
-        <div className="flex flex-1 items-center justify-center bg-white py-24 px-4">
-          <div className="w-full max-w-lg mx-auto bg-white rounded-3xl shadow-2xl p-10 border border-gray-100">
-            <h3 className="text-4xl font-bold text-center mb-4 text-gray-900">
+        <div className="flex flex-1 items-center justify-center bg-white py-12 sm:py-16 md:py-24 px-4 sm:px-6">
+          <div className="w-full max-w-lg mx-auto bg-white rounded-2xl sm:rounded-3xl shadow-2xl p-6 sm:p-8 md:p-10 border border-gray-100 overflow-hidden">
+            <h3 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-4 text-gray-900">
               Şifremi Unuttum
             </h3>
 
@@ -157,7 +157,7 @@ const ForgotPasswordPage = () => {
                   E-postanıza 6 haneli bir kod gönderilecektir. Kod 10 dakika
                   geçerlidir.
                 </p>
-                <div className="space-y-7">
+                <div className="space-y-5 sm:space-y-7">
                   <FormInput
                     name="email"
                     type="email"
@@ -172,7 +172,7 @@ const ForgotPasswordPage = () => {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="mt-10 w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-4 rounded-2xl text-lg transition disabled:opacity-50 shadow-lg"
+                  className="mt-8 sm:mt-10 w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 sm:py-4 rounded-xl sm:rounded-2xl text-base sm:text-lg transition disabled:opacity-50 shadow-lg"
                 >
                   {isSubmitting ? "Kod Gönderiliyor..." : "Kod Gönder"}
                 </button>
@@ -183,7 +183,7 @@ const ForgotPasswordPage = () => {
                   E-postanıza gelen 6 haneli kodu girin. Şifre en az 8 karakter,
                   büyük/küçük harf, rakam ve özel karakter içermelidir.
                 </p>
-                <div className="space-y-7">
+                <div className="space-y-5 sm:space-y-7">
                   <div className="rounded-xl bg-[#f0fdfa] border border-[#bde7e3] px-5 py-3 flex items-center gap-3">
                     <Mail size={22} />
                     <span className="text-[#003636] text-base truncate">
@@ -215,7 +215,7 @@ const ForgotPasswordPage = () => {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="mt-10 w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-4 rounded-2xl text-lg transition disabled:opacity-50 shadow-lg"
+                  className="mt-8 sm:mt-10 w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 sm:py-4 rounded-xl sm:rounded-2xl text-base sm:text-lg transition disabled:opacity-50 shadow-lg"
                 >
                   {isSubmitting ? "Sıfırlanıyor..." : "Şifreyi Sıfırla"}
                 </button>

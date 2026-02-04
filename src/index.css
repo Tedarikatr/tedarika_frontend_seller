@@ -1,7 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-/* index.css içine eklersen güzel olur */
+
 .input {
   @apply w-full px-4 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500;
 }
@@ -19,4 +19,52 @@
 
 .animate-fade-in-down {
   animation: fadeInDown 200ms ease-out;
+}
+
+/* Modal backdrop - tam blur (Safari uyumlu) */
+.modal-backdrop-blur {
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+/* Indeterminate progress bar - sunucu yanıtı beklerken */
+@keyframes progressIndeterminate {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(400%);
+  }
+}
+
+.progress-indeterminate {
+  position: relative;
+  overflow: hidden;
+  border-radius: 9999px;
+}
+
+.progress-indeterminate::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 30%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+  animation: progressIndeterminate 1.5s ease-in-out infinite;
+}
+
+/* Tablo yatay kaydırma - mobil touch uyumlu */
+.table-scroll-touch {
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+
+/* Mobil nav yatay kaydırma - scrollbar gizle */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
 }

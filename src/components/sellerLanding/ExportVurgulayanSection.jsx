@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 
 const ExportVurgulayanSection = () => {
   return (
-    <section className="relative bg-white py-32 px-6 text-center overflow-hidden">
+    <section className="relative bg-white py-12 sm:py-20 md:py-32 px-4 sm:px-6 text-center overflow-hidden">
       {/* Arka Plan Efektleri */}
       <div className="absolute top-10 left-10 w-40 h-40 bg-emerald-400 opacity-30 rounded-full blur-3xl animate-pulse-slow z-0" />
       <div className="absolute bottom-10 right-10 w-56 h-56 bg-indigo-400 opacity-20 rounded-full blur-3xl animate-pulse-slow z-0" />
@@ -11,7 +11,7 @@ const ExportVurgulayanSection = () => {
       <div className="max-w-6xl mx-auto relative z-10">
         {/* Başlık */}
         <motion.h2
-          className="text-5xl md:text-6xl font-extrabold text-[#003636] mb-6"
+          className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-extrabold text-[#003636] mb-4 sm:mb-6"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
@@ -34,10 +34,10 @@ const ExportVurgulayanSection = () => {
         </motion.p>
 
         {/* 3 Adımda İhracat */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8 md:gap-12">
           {/* Adım 1 */}
           <motion.div
-            className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-transform duration-300 hover:-translate-y-1"
+            className="bg-white rounded-2xl p-6 sm:p-8 shadow-lg hover:shadow-xl transition-transform duration-300 hover:-translate-y-1"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.6 }}
@@ -60,7 +60,7 @@ const ExportVurgulayanSection = () => {
 
           {/* Adım 2 */}
           <motion.div
-            className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-transform duration-300 hover:-translate-y-1"
+            className="bg-white rounded-2xl p-6 sm:p-8 shadow-lg hover:shadow-xl transition-transform duration-300 hover:-translate-y-1"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6, duration: 0.6 }}
@@ -83,7 +83,7 @@ const ExportVurgulayanSection = () => {
 
           {/* Adım 3 */}
           <motion.div
-            className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-transform duration-300 hover:-translate-y-1"
+            className="bg-white rounded-2xl p-6 sm:p-8 shadow-lg hover:shadow-xl transition-transform duration-300 hover:-translate-y-1"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.9, duration: 0.6 }}

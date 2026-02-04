@@ -45,7 +45,7 @@ const FileDrop = ({ onFiles, disabled }) => {
       onDragOver={onDragOver}
       onDragLeave={onDragLeave}
       className={cls(
-        "rounded-2xl border-2 border-dashed p-6 text-center transition",
+        "rounded-xl sm:rounded-2xl border-2 border-dashed p-4 sm:p-6 text-center transition",
         isOver ? "border-blue-400 bg-blue-50" : "border-gray-300 bg-gray-50",
         disabled && "opacity-60 cursor-not-allowed"
       )}
@@ -243,7 +243,7 @@ const ProductImagesManager = ({ storeProductId }) => {
   return (
     <div className="space-y-4">
       {/* üst bar */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div className="text-lg font-semibold">Görseller</div>
         <div className="flex items-center gap-2">
           <input

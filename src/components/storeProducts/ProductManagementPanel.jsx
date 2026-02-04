@@ -2,6 +2,7 @@
 // ProductManagementPanel.jsx - Ultra Modern & Beautiful 🎨
 // =============================
 import React, { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import {
   toggleProductOnSale,
   updateProductQuantityLimits,
@@ -10,20 +11,23 @@ import {
   updateProductUnitType,
 } from "@/api/sellerStoreService";
 import { addProductPrice, getAllProductPrices } from "@/api/sellerStoreProductPricesService";
-import { 
-  X, 
-  ImagePlus, 
-  Images, 
-  ChevronRight, 
-  Plus, 
-  Package, 
-  DollarSign, 
-  TrendingUp, 
+import {
+  X,
+  ImagePlus,
+  Images,
+  ChevronRight,
+  ChevronLeft,
+  Plus,
+  Package,
+  DollarSign,
+  TrendingUp,
   Settings,
   Save,
   Sparkles,
   Layers,
-  Box
+  Box,
+  Play,
+  Pause
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import ProductPriceTiers from "@/components/storeProducts/ProductPriceTiers";
@@ -101,19 +105,19 @@ const Badge = ({ children, variant = "default", size = "md" }) => {
 
 // Section Card Bileşeni
 const SectionCard = ({ title, icon: Icon, children, action }) => (
-  <div className="bg-gradient-to-br from-white to-gray-50/50 rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden">
-    <div className="bg-gradient-to-r from-gray-50 to-white px-5 py-4 border-b border-gray-100 flex items-center justify-between">
-      <div className="flex items-center gap-3">
+  <div className="bg-gradient-to-br from-white to-gray-50/50 rounded-xl sm:rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden">
+    <div className="bg-gradient-to-r from-gray-50 to-white px-4 sm:px-5 py-3 sm:py-4 border-b border-gray-100 flex items-center justify-between gap-2">
+      <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
         {Icon && (
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center text-white shadow-lg shadow-emerald-500/30">
-            <Icon size={18} />
+          <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center text-white shadow-lg shadow-emerald-500/30 flex-shrink-0">
+            <Icon size={16} />
           </div>
         )}
-        <h3 className="font-bold text-gray-800">{title}</h3>
+        <h3 className="font-bold text-gray-800 text-sm sm:text-base truncate">{title}</h3>
       </div>
       {action}
     </div>
-    <div className="p-5">
+    <div className="p-4 sm:p-5">
       {children}
     </div>
   </div>
@@ -141,6 +145,8 @@ const ProductManagementPanel = ({
       : product.productImageUrls || []
   );
   const [buster, setBuster] = useState(Date.now());
+  const [slideshowIndex, setSlideshowIndex] = useState(0);
+  const [slideshowPlaying, setSlideshowPlaying] = useState(false);
   
   // Yeni fiyat ekleme için state'ler
   const [showAddPrice, setShowAddPrice] = useState(false);
@@ -161,6 +167,25 @@ const ProductManagementPanel = ({
       loadProductPrices();
     }
   }, [storeProductId]);
+
+  // Ürün görselleri product prop ile senkronize
+  useEffect(() => {
+    const urls =
+      product.storeProductImagesUrls?.length
+        ? product.storeProductImagesUrls
+        : product.productImageUrls || [];
+    setImages(urls);
+    setSlideshowIndex((i) => (i >= urls.length ? 0 : i));
+  }, [product.storeProductImagesUrls, product.productImageUrls]);
+
+  // Slayt gösterisi otomatik ilerleme
+  useEffect(() => {
+    if (!slideshowPlaying || images.length <= 1) return;
+    const t = setInterval(() => {
+      setSlideshowIndex((i) => (i + 1) % images.length);
+    }, 3000);
+    return () => clearInterval(t);
+  }, [slideshowPlaying, images.length]);
 
   const loadProductPrices = async () => {
     try {
@@ -218,39 +243,39 @@ const ProductManagementPanel = ({
     }
   };
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/* Backdrop - Fixed blur overlay */}
+  const panelContent = (
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-3 sm:p-4">
+      {/* Backdrop - Tüm sayfayı kaplayan blur overlay (header dahil) */}
       <div 
-        className="fixed inset-0 bg-black/40 backdrop-blur-md transition-all"
+        className="fixed inset-0 bg-black/60 backdrop-blur-md transition-all"
         onClick={onClose}
       />
       
       {/* Panel - Centered and scrollable */}
-      <div className="relative w-full max-w-2xl max-h-[90vh] bg-gradient-to-br from-gray-50 to-white rounded-2xl shadow-2xl overflow-hidden animate-[slideIn_0.35s_ease-out] flex flex-col">
+      <div className="relative w-full max-w-2xl max-h-[90vh] bg-gradient-to-br from-gray-50 to-white rounded-xl sm:rounded-2xl shadow-2xl overflow-hidden animate-[slideIn_0.35s_ease-out] flex flex-col">
         
         {/* ============ Ultra Modern Header ============ */}
-        <div className="sticky top-0 z-10 bg-gradient-to-r from-emerald-600 via-emerald-700 to-teal-700 text-white p-6 shadow-xl flex-shrink-0">
+        <div className="sticky top-0 z-10 bg-gradient-to-r from-emerald-600 via-emerald-700 to-teal-700 text-white p-4 sm:p-6 shadow-xl flex-shrink-0">
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 p-2 hover:bg-white/20 rounded-xl transition-all duration-200 hover:rotate-90"
+            className="absolute top-3 right-3 sm:top-4 sm:right-4 p-2 hover:bg-white/20 rounded-lg sm:rounded-xl transition-all duration-200 hover:rotate-90"
           >
-            <X size={20} />
+            <X className="w-5 h-5 sm:w-6 sm:h-6" />
           </button>
           
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
-              <Sparkles size={24} className="animate-pulse" />
+          <div className="flex items-center gap-2 sm:gap-3 pr-10 sm:pr-12">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center flex-shrink-0">
+              <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 animate-pulse" />
             </div>
-            <div>
-              <h2 className="text-2xl font-bold">Ürün Yönetimi</h2>
-              <p className="text-emerald-100 text-sm">Detaylı düzenleme ve ayarlar</p>
+            <div className="min-w-0">
+              <h2 className="text-xl sm:text-2xl font-bold truncate">Ürün Yönetimi</h2>
+              <p className="text-emerald-100 text-xs sm:text-sm truncate">Detaylı düzenleme ve ayarlar</p>
             </div>
           </div>
         </div>
 
         {/* ============ Main Content ============ */}
-        <div className="p-6 space-y-5 overflow-y-auto flex-1">
+        <div className="p-4 sm:p-6 space-y-4 sm:space-y-5 overflow-y-auto flex-1">
           
           {/* ============ FİYAT İŞLEMLERİ ============ */}
           
@@ -270,7 +295,7 @@ const ProductManagementPanel = ({
             }
           >
             {showAddPrice && (
-              <div className="bg-gradient-to-br from-emerald-50 to-green-50 border border-emerald-200 rounded-xl p-5 mb-4 space-y-4">
+              <div className="bg-gradient-to-br from-emerald-50 to-green-50 border border-emerald-200 rounded-xl p-4 sm:p-5 mb-4 space-y-4">
                 <div>
                   <label className="text-xs font-semibold text-gray-700 mb-2 block flex items-center gap-2">
                     <DollarSign size={14} className="text-emerald-600" />
@@ -306,7 +331,7 @@ const ProductManagementPanel = ({
                     }
                   />
                 </div>
-                <div className="flex gap-2 pt-2">
+                <div className="flex flex-col sm:flex-row gap-2 pt-2">
                   <Button variant="primary" onClick={handleAddPrice} icon={Save}>
                     Kaydet
                   </Button>
@@ -493,28 +518,84 @@ const ProductManagementPanel = ({
             </div>
           </SectionCard>
 
-          {/* 📸 Ürün Görselleri */}
+          {/* 📸 Ürün Görselleri - Slayt Gösterisi */}
           <SectionCard title="Ürün Görselleri" icon={Images}>
             <div className="space-y-4">
               {images.length > 0 && (
-                <div className="grid grid-cols-4 gap-3">
-                  {images.slice(0, 4).map((url, i) => (
-                    <div key={i} className="relative group">
-                      <img
-                        src={`${url}?v=${buster}`}
-                        alt={`${product?.name || 'Ürün'} görseli ${i + 1}`}
-                        className="w-full aspect-square rounded-xl object-cover border-2 border-gray-200 shadow-sm group-hover:shadow-lg transition-all"
+                <div className="relative overflow-hidden rounded-xl bg-gray-100 border-2 border-gray-200">
+                  {/* Ana slayt alanı */}
+                  <div className="relative aspect-[4/3] sm:aspect-video bg-gradient-to-br from-gray-50 to-gray-100">
+                    <img
+                      src={`${images[slideshowIndex]}?v=${buster}`}
+                      alt={`${product?.name || "Ürün"} görseli ${slideshowIndex + 1}`}
+                      className="w-full h-full object-contain transition-opacity duration-300"
+                    />
+                    {/* Önceki / Sonraki butonları */}
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setSlideshowIndex((i) => (i - 1 + images.length) % images.length)
+                      }
+                      className="absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/90 hover:bg-white shadow-lg flex items-center justify-center text-gray-700 hover:text-emerald-600 transition-all"
+                      aria-label="Önceki"
+                    >
+                      <ChevronLeft size={24} />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setSlideshowIndex((i) => (i + 1) % images.length)
+                      }
+                      className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/90 hover:bg-white shadow-lg flex items-center justify-center text-gray-700 hover:text-emerald-600 transition-all"
+                      aria-label="Sonraki"
+                    >
+                      <ChevronRight size={24} />
+                    </button>
+                    {/* Otomatik oynatma butonu */}
+                    {images.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => setSlideshowPlaying(!slideshowPlaying)}
+                        className="absolute bottom-3 left-1/2 -translate-x-1/2 px-4 py-2 rounded-full bg-black/60 hover:bg-black/80 text-white text-sm font-medium flex items-center gap-2"
+                      >
+                        {slideshowPlaying ? (
+                          <>
+                            <Pause size={16} />
+                            Durdur
+                          </>
+                        ) : (
+                          <>
+                            <Play size={16} />
+                            Slayt Gösterisi
+                          </>
+                        )}
+                      </button>
+                    )}
+                  </div>
+                  {/* Nokta göstergeleri */}
+                  <div className="flex items-center justify-center gap-1.5 py-3 px-2">
+                    {images.map((_, i) => (
+                      <button
+                        key={i}
+                        type="button"
+                        onClick={() => setSlideshowIndex(i)}
+                        className={`w-2.5 h-2.5 rounded-full transition-all ${
+                          i === slideshowIndex
+                            ? "bg-emerald-600 scale-125"
+                            : "bg-gray-300 hover:bg-gray-400"
+                        }`}
+                        aria-label={`Görsel ${i + 1}`}
                       />
-                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 rounded-xl transition-opacity flex items-center justify-center">
-                        <span className="text-white text-xs font-medium">#{i + 1}</span>
-                      </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
+                  <p className="text-center text-xs text-gray-500 pb-2">
+                    {slideshowIndex + 1} / {images.length}
+                  </p>
                 </div>
               )}
               
               <div className="flex gap-2 flex-wrap">
-                <label className="flex-1 min-w-[150px]">
+                <label className="flex-1 min-w-0 sm:min-w-[150px]">
                   <div className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-medium border-2 border-dashed border-gray-300 text-gray-600 bg-white cursor-pointer hover:border-emerald-500 hover:text-emerald-600 hover:bg-emerald-50 transition-all">
                     <ImagePlus size={16} />
                     {selectedFiles?.length ? `${selectedFiles.length} dosya seçildi` : 'Dosya Seç'}
@@ -601,6 +682,8 @@ const ProductManagementPanel = ({
       `}</style>
     </div>
   );
+
+  return createPortal(panelContent, document.body);
 };
 
 export default ProductManagementPanel;

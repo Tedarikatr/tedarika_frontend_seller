@@ -76,8 +76,8 @@ export default function StepProductSelect({ data, setData, next, prev }) {
   };
 
   return (
-    <div className="w-full max-w-6xl mx-auto px-6 py-10 animate-fadeIn">
-      <h2 className="text-3xl font-bold text-gray-800 border-b pb-4 mb-8">
+    <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-10 animate-fadeIn">
+      <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 border-b pb-3 sm:pb-4 mb-6 sm:mb-8">
         Kampanya Hedefi: Ürün / Kategori Seçimi
       </h2>
 

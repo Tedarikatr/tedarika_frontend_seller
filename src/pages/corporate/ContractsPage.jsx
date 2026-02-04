@@ -88,9 +88,9 @@ const ContractsPage = () => {
       <div className="bg-white min-h-screen">
         <SellerHeader />
         
-        <div className="container mx-auto px-4 py-12 max-w-5xl">
+        <div className="container mx-auto px-4 sm:px-6 py-8 sm:py-12 max-w-5xl">
           {/* Hero Header */}
-          <div className="bg-gradient-to-r from-emerald-600 via-teal-600 to-green-600 rounded-3xl shadow-2xl p-8 mb-8 text-white">
+          <div className="bg-gradient-to-r from-emerald-600 via-teal-600 to-green-600 rounded-2xl sm:rounded-3xl shadow-2xl p-6 sm:p-8 mb-6 sm:mb-8 text-white">
             <div className="flex items-center gap-4 mb-4">
               <div className="bg-white/20 backdrop-blur-sm p-3 rounded-2xl">
                 <Scale className="w-8 h-8" />
@@ -109,9 +109,9 @@ const ContractsPage = () => {
           {contracts.map((contract, index) => (
             <article
               key={index}
-              className="bg-white rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 p-8"
+              className="bg-white rounded-2xl sm:rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 p-6 sm:p-8 overflow-hidden"
             >
-              <div className="flex items-start justify-between gap-4">
+              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                 <div className="flex items-start gap-4 flex-1">
                   <div className="w-14 h-14 bg-gradient-to-br from-emerald-600 via-teal-600 to-green-600 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg">
                     <FileText className="w-7 h-7 text-white" strokeWidth={2} />
@@ -129,7 +129,7 @@ const ContractsPage = () => {
                   href={contract.file}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex-shrink-0 inline-flex items-center gap-2 bg-gradient-to-r from-emerald-600 via-teal-600 to-green-600 text-white px-6 py-3 rounded-xl font-bold hover:shadow-xl transition-all hover:scale-105"
+                  className="flex-shrink-0 inline-flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-600 via-teal-600 to-green-600 text-white px-6 py-3 rounded-xl font-bold hover:shadow-xl transition-all hover:scale-105 w-full sm:w-auto"
                 >
                   <Download className="w-5 h-5" />
                   İndir
@@ -139,7 +139,7 @@ const ContractsPage = () => {
           ))}
         </div>
 
-        <div className="mt-8 bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-200 rounded-3xl p-8 shadow-xl">
+        <div className="mt-6 sm:mt-8 bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-200 rounded-2xl sm:rounded-3xl p-6 sm:p-8 shadow-xl overflow-hidden">
           <div className="flex items-center gap-3 mb-4">
             <div className="bg-gradient-to-br from-amber-500 to-orange-500 p-3 rounded-2xl shadow-lg animate-pulse">
               <AlertTriangle className="w-7 h-7 text-white" />

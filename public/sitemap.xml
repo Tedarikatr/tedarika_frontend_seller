@@ -1,19 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xmlns:sitemap="http://www.sitemaps.org/schemas/sitemap/0.9"
-        xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
-        http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
-  
-  <!-- Sitemap Index - Ana domain için subdomain sitemap'lerini referans eder -->
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+              http://www.sitemaps.org/schemas/sitemap/0.9/sitemap-index.xsd">
   <sitemap>
-    <loc>https://www.seller.tedarika.com.tr/sitemap.xml</loc>
-    <lastmod>2025-01-15</lastmod>
+    <loc>https://www.seller.tedarika.com.tr/sitemap-seller.xml</loc>
+    <lastmod>2025-02-04</lastmod>
   </sitemap>
-  
   <sitemap>
-    <loc>https://www.satici.tedarika.com.tr/sitemap.xml</loc>
-    <lastmod>2025-01-15</lastmod>
+    <loc>https://www.satici.tedarika.com.tr/sitemap-satici.xml</loc>
+    <lastmod>2025-02-04</lastmod>
   </sitemap>
-  
-</urlset>
+</sitemapindex>

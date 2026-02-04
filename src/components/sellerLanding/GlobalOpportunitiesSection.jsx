@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 
 const GlobalOpportunitiesSection = () => {
   return (
-    <section className="relative bg-white py-32 px-6 text-center overflow-hidden">
+    <section className="relative bg-white py-12 sm:py-20 md:py-32 px-4 sm:px-6 text-center overflow-hidden">
       {/* Arka Plan Efektleri */}
       <div className="absolute top-0 left-10 w-40 h-40 bg-teal-500 opacity-30 rounded-full blur-3xl animate-pulse-slow z-0" />
       <div className="absolute bottom-0 right-10 w-56 h-56 bg-emerald-500 opacity-20 rounded-full blur-3xl animate-pulse-slow z-0" />
@@ -11,7 +11,7 @@ const GlobalOpportunitiesSection = () => {
       <div className="max-w-6xl mx-auto relative z-10">
         {/* Başlık */}
         <motion.h2
-          className="text-6xl font-extrabold text-black mb-8"
+          className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-extrabold text-black mb-6 sm:mb-8 px-2"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
@@ -32,10 +32,10 @@ const GlobalOpportunitiesSection = () => {
         </motion.p>
 
         {/* 3 Adımda İhracat – Görsellerle Hedefe Ulaşın */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8 md:gap-12">
           {/* Adım 1 */}
           <motion.div
-            className="bg-white rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1"
+            className="bg-white rounded-2xl p-6 sm:p-8 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.6 }}
@@ -58,7 +58,7 @@ const GlobalOpportunitiesSection = () => {
 
           {/* Adım 2 */}
           <motion.div
-            className="bg-white rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1"
+            className="bg-white rounded-2xl p-6 sm:p-8 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5, duration: 0.6 }}
@@ -81,7 +81,7 @@ const GlobalOpportunitiesSection = () => {
 
           {/* Adım 3 */}
           <motion.div
-            className="bg-white rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1"
+            className="bg-white rounded-2xl p-6 sm:p-8 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.7, duration: 0.6 }}

@@ -89,9 +89,9 @@ const KvkkPage = () => {
       <div className="bg-white min-h-screen">
         <SellerHeader />
         
-        <div className="container mx-auto px-4 py-12 max-w-5xl">
+        <div className="container mx-auto px-4 sm:px-6 py-8 sm:py-12 max-w-5xl">
           {/* Hero Header */}
-          <div className="bg-gradient-to-r from-emerald-600 via-teal-600 to-green-600 rounded-3xl shadow-2xl p-8 mb-8 text-white">
+          <div className="bg-gradient-to-r from-emerald-600 via-teal-600 to-green-600 rounded-2xl sm:rounded-3xl shadow-2xl p-6 sm:p-8 mb-6 sm:mb-8 text-white">
           <div className="flex items-center gap-4 mb-4">
             <div className="bg-white/20 backdrop-blur-sm p-3 rounded-2xl">
               <Shield className="w-8 h-8" />
@@ -107,7 +107,7 @@ const KvkkPage = () => {
         </div>
 
         {/* Ana KVKK İçeriği */}
-        <article className="bg-white rounded-3xl shadow-xl p-8 md:p-10 mb-8 border border-gray-100">
+        <article className="bg-white rounded-2xl sm:rounded-3xl shadow-xl p-6 sm:p-8 md:p-10 mb-6 sm:mb-8 border border-gray-100 overflow-hidden">
           <div className="prose prose-lg max-w-none">
             <section className="mb-8">
               <p className="text-gray-700 leading-relaxed mb-4 text-lg">
@@ -123,7 +123,7 @@ const KvkkPage = () => {
 
         <div className="space-y-6">
           {/* Toplanan Veriler ve Kapsam */}
-          <article className="bg-white rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 p-8">
+          <article className="bg-white rounded-2xl sm:rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 p-6 sm:p-8 overflow-hidden">
             <div className="flex items-start gap-4 mb-4">
               <div className="w-14 h-14 bg-gradient-to-br from-emerald-600 via-teal-600 to-green-600 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg">
                 <FileText className="w-7 h-7 text-white" strokeWidth={2} />
@@ -151,7 +151,7 @@ const KvkkPage = () => {
           </article>
 
           {/* Veri İşleme Amaçları */}
-          <article className="bg-white rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 p-8">
+          <article className="bg-white rounded-2xl sm:rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 p-6 sm:p-8 overflow-hidden">
             <div className="flex items-start gap-4 mb-4">
               <div className="w-14 h-14 bg-gradient-to-br from-emerald-600 via-teal-600 to-green-600 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg">
                 <Eye className="w-7 h-7 text-white" strokeWidth={2} />
@@ -184,7 +184,7 @@ const KvkkPage = () => {
           </article>
 
           {/* Çerezler ve Analiz Araçları */}
-          <article className="bg-white rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 p-8">
+          <article className="bg-white rounded-2xl sm:rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 p-6 sm:p-8 overflow-hidden">
             <div className="flex items-start gap-4 mb-4">
               <div className="w-14 h-14 bg-gradient-to-br from-emerald-600 via-teal-600 to-green-600 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg">
                 <Lock className="w-7 h-7 text-white" strokeWidth={2} />
@@ -212,7 +212,7 @@ const KvkkPage = () => {
           </article>
 
           {/* Veri Paylaşımı ve Üçüncü Taraflar */}
-          <article className="bg-white rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 p-8">
+          <article className="bg-white rounded-2xl sm:rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 p-6 sm:p-8 overflow-hidden">
             <div className="flex items-start gap-4 mb-4">
               <div className="w-14 h-14 bg-gradient-to-br from-emerald-600 via-teal-600 to-green-600 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg">
                 <Bell className="w-7 h-7 text-white" strokeWidth={2} />
@@ -244,7 +244,7 @@ const KvkkPage = () => {
           </article>
 
           {/* Verilerin Saklanması ve Yurt Dışı Aktarım */}
-          <article className="bg-white rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 p-8">
+          <article className="bg-white rounded-2xl sm:rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 p-6 sm:p-8 overflow-hidden">
             <div className="flex items-start gap-4 mb-4">
               <div className="w-14 h-14 bg-gradient-to-br from-emerald-600 via-teal-600 to-green-600 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg">
                 <Shield className="w-7 h-7 text-white" strokeWidth={2} />
@@ -276,7 +276,7 @@ const KvkkPage = () => {
           </article>
 
           {/* Veri Güvenliği Önlemleri */}
-          <article className="bg-white rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 p-8">
+          <article className="bg-white rounded-2xl sm:rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 p-6 sm:p-8 overflow-hidden">
             <div className="flex items-start gap-4 mb-4">
               <div className="w-14 h-14 bg-gradient-to-br from-emerald-600 via-teal-600 to-green-600 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg">
                 <Lock className="w-7 h-7 text-white" strokeWidth={2} />
@@ -307,7 +307,7 @@ const KvkkPage = () => {
           </article>
 
           {/* Haklarınız ve İletişim */}
-          <article className="bg-white rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 p-8">
+          <article className="bg-white rounded-2xl sm:rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 p-6 sm:p-8 overflow-hidden">
             <div className="flex items-start gap-4 mb-4">
               <div className="w-14 h-14 bg-gradient-to-br from-emerald-600 via-teal-600 to-green-600 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg">
                 <UserCheck className="w-7 h-7 text-white" strokeWidth={2} />

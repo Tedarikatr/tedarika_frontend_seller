@@ -65,14 +65,14 @@ const SupportFormSection = () => {
   };
 
   return (
-    <section className="relative bg-white py-20 px-6 sm:px-10 overflow-hidden">
+    <section className="relative bg-white py-12 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-10 overflow-hidden">
       {/* Arka Plan Efektleri */}
       <div className="absolute top-0 left-0 w-72 h-72 bg-emerald-500 opacity-30 blur-3xl rounded-full animate-pulse-slow"></div>
       <div className="absolute bottom-0 right-0 w-72 h-72 bg-teal-600 opacity-30 blur-3xl rounded-full animate-pulse-slow"></div>
 
       <div className="max-w-4xl mx-auto relative z-10 text-center">
         <motion.h2
-          className="text-3xl sm:text-5xl font-extrabold text-[#003636] mb-6"
+          className="text-2xl sm:text-3xl lg:text-5xl font-extrabold text-[#003636] mb-4 sm:mb-6"
           initial={{ opacity: 0, y: -20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}

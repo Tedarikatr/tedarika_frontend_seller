@@ -24,7 +24,7 @@ const features = [
 
 const FeaturesSection = () => {
   return (
-    <section className="relative bg-white py-28 px-6 overflow-hidden">
+    <section className="relative bg-white py-16 sm:py-20 md:py-28 px-4 sm:px-6 overflow-hidden">
       {/* Dekoratif arka plan efektleri */}
       <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-[0.02]" />
       <div className="absolute top-10 left-10 w-40 h-40 bg-emerald-300 opacity-20 rounded-full blur-3xl animate-pulse-slow" />
@@ -33,7 +33,7 @@ const FeaturesSection = () => {
       <div className="max-w-6xl mx-auto relative z-10 text-center">
         {/* Başlık */}
         <motion.h2
-          className="text-4xl md:text-5xl font-extrabold text-[#002222] mb-5"
+          className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-[#002222] mb-4 sm:mb-5"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
@@ -45,7 +45,7 @@ const FeaturesSection = () => {
         </motion.h2>
 
         <motion.p
-          className="text-gray-600 text-lg max-w-2xl mx-auto mb-16"
+          className="text-gray-600 text-base sm:text-lg max-w-2xl mx-auto mb-10 sm:mb-16 px-2"
           initial={{ opacity: 0, y: 15 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2, duration: 0.6 }}
@@ -58,11 +58,11 @@ const FeaturesSection = () => {
         </motion.p>
 
         {/* Özellik Kartları */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8 md:gap-10">
           {features.map(({ icon: Icon, title, desc, bg }, index) => (
             <motion.div
               key={index}
-              className="bg-white rounded-2xl p-8 shadow-md hover:shadow-emerald-200/70 transition-all duration-300 hover:-translate-y-2 hover:scale-[1.02] group"
+              className="bg-white rounded-2xl p-6 sm:p-8 shadow-md hover:shadow-emerald-200/70 transition-all duration-300 hover:-translate-y-2 hover:scale-[1.02] group"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.2, duration: 0.6 }}
@@ -89,7 +89,7 @@ const FeaturesSection = () => {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.8, duration: 0.6 }}
         >
-          <h3 className="text-2xl md:text-3xl font-bold text-[#003333] mb-6">
+          <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-[#003333] mb-4 sm:mb-6">
             Bugün başlayın, yarın ilk siparişinizi alın
           </h3>
           <a

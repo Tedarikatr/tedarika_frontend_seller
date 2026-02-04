@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useLogout } from "@/hooks/useLogout";
 import {
   UserCircle,
   Building2,
@@ -27,6 +28,7 @@ export default function UserMenu({ user, storeLogo, initials }) {
   const menuRef = useRef(null);
   const navigate = useNavigate();
   const location = useLocation();
+  const performLogout = useLogout();
 
   // Dışarı tıklanınca kapat
   useEffect(() => {
@@ -74,8 +76,7 @@ export default function UserMenu({ user, storeLogo, initials }) {
   };
 
   const handleLogout = () => {
-    localStorage.clear();
-    navigate("/seller/login");
+    performLogout();
   };
 
   return (

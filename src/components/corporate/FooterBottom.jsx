@@ -29,15 +29,15 @@ const FooterBottom = () => {
           </div>
 
           {/* Sağ: Ödeme ikonları ve ETBİS */}
-          <div className="flex flex-wrap justify-center md:justify-end items-center gap-4">
+          <div className="flex flex-wrap justify-center md:justify-end items-center gap-2 sm:gap-4">
             {/* Ödeme ikonları */}
-            <div className="flex items-center gap-3 bg-white/5 rounded-xl px-4 py-2 border border-white/10">
+            <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 bg-white/5 rounded-xl px-3 sm:px-4 py-2 border border-white/10">
               {paymentIcons.map((icon) => (
                 <img
                   key={icon}
                   src={publicUrl(`images/${icon}.svg`)}
                   alt={`${icon} logosu`}
-                  className="h-6 rounded-lg opacity-70 hover:opacity-100 transition-all duration-200 hover:scale-110"
+                  className="h-5 sm:h-6 rounded-lg opacity-70 hover:opacity-100 transition-all duration-200 hover:scale-110"
                 />
               ))}
             </div>

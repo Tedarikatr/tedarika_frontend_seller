@@ -117,11 +117,11 @@ const LoginPage = () => {
       
     <div className="min-h-screen flex flex-col bg-white">
       <SellerHeader />
-      <div className="flex flex-1 items-center justify-center bg-white py-24 px-4">
-        <form onSubmit={handleSubmit} className="w-full max-w-lg mx-auto bg-white rounded-3xl shadow-2xl p-10 border border-gray-100">
-          <h3 className="text-4xl font-bold text-center mb-12 text-gray-900">Satıcı Giriş</h3>
+      <div className="flex flex-1 items-center justify-center bg-white py-12 sm:py-16 md:py-24 px-4 sm:px-6">
+        <form onSubmit={handleSubmit} className="w-full max-w-lg mx-auto bg-white rounded-2xl sm:rounded-3xl shadow-2xl p-6 sm:p-8 md:p-10 border border-gray-100 overflow-hidden">
+          <h3 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-8 sm:mb-10 md:mb-12 text-gray-900">Satıcı Giriş</h3>
 
-          <div className="space-y-7">
+          <div className="space-y-5 sm:space-y-7">
             <FormInput
               name="emailOrPhone"
               value={formData.emailOrPhone}
@@ -154,7 +154,7 @@ const LoginPage = () => {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="mt-10 w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-4 rounded-2xl text-lg transition disabled:opacity-50 shadow-lg"
+            className="mt-8 sm:mt-10 w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 sm:py-4 rounded-xl sm:rounded-2xl text-base sm:text-lg transition disabled:opacity-50 shadow-lg"
           >
             {isSubmitting ? "Giriş Yapılıyor..." : "Giriş Yap"}
           </button>

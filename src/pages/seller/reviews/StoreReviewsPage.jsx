@@ -51,23 +51,23 @@ const StoreReviewsPage = () => {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-amber-50/30 px-4 sm:px-6 lg:px-8 py-8">
       <div className="max-w-6xl mx-auto">
         {/* Hero Header */}
-        <header className="mb-8 relative bg-gradient-to-r from-emerald-600 via-teal-600 to-green-600 rounded-3xl shadow-2xl px-8 py-12 text-center overflow-hidden">
+        <header className="mb-6 sm:mb-8 relative bg-gradient-to-r from-emerald-600 via-teal-600 to-green-600 rounded-2xl sm:rounded-3xl shadow-2xl px-4 sm:px-6 md:px-8 py-8 sm:py-10 md:py-12 text-center overflow-hidden">
           {/* Dekoratif Arka Plan */}
           <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent pointer-events-none"></div>
           <div className="absolute top-10 right-10 w-32 h-32 bg-white/10 rounded-full blur-3xl"></div>
           <div className="absolute bottom-10 left-10 w-40 h-40 bg-amber-400/20 rounded-full blur-3xl"></div>
           
           <div className="relative z-10">
-            <div className="flex items-center justify-center gap-3 mb-4">
-              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center shadow-xl animate-pulse">
-                <Star className="w-8 h-8 text-white fill-white" />
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3 mb-4">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center shadow-xl animate-pulse flex-shrink-0">
+                <Star className="w-6 h-6 sm:w-8 sm:h-8 text-white fill-white" />
               </div>
-              <h1 className="text-5xl font-extrabold text-white tracking-tight">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-white tracking-tight">
                 Mağaza Yorumları
               </h1>
-              <Sparkles className="w-8 h-8 text-yellow-300 animate-pulse" />
+              <Sparkles className="w-6 h-6 sm:w-8 sm:h-8 text-yellow-300 animate-pulse hidden sm:block" />
             </div>
-            <p className="text-emerald-100 text-lg font-medium">
+            <p className="text-emerald-100 text-sm sm:text-base md:text-lg font-medium px-2">
               Müşterilerinizin mağaza deneyimlerine verdiği puan ve yorumları inceleyin
             </p>
           </div>
@@ -141,7 +141,7 @@ const StatCard = ({ icon: Icon, label, value, gradient, bgGradient }) => (
     <div className="flex items-center justify-between">
       <div>
         <p className="text-gray-600 text-sm font-semibold mb-2">{label}</p>
-        <p className="text-4xl font-extrabold text-gray-900">{value}</p>
+        <p className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-gray-900">{value}</p>
       </div>
       <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${gradient} flex items-center justify-center shadow-lg`}>
         <Icon className="w-7 h-7 text-white" />

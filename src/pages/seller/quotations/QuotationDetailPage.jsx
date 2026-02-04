@@ -175,7 +175,7 @@ const QuotationDetailPage = () => {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50/30 px-4 sm:px-6 lg:px-8 py-8">
       <div className="max-w-5xl mx-auto">
         {/* Hero Header */}
-        <header className="mb-8 relative bg-gradient-to-r from-emerald-600 via-teal-600 to-green-600 rounded-3xl shadow-2xl px-8 py-10 overflow-hidden">
+        <header className="mb-6 sm:mb-8 relative bg-gradient-to-r from-emerald-600 via-teal-600 to-green-600 rounded-2xl sm:rounded-3xl shadow-2xl px-4 sm:px-6 md:px-8 py-6 sm:py-8 md:py-10 overflow-hidden">
           {/* Dekoratif Arka Plan */}
           <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent pointer-events-none"></div>
           <div className="absolute top-10 right-10 w-32 h-32 bg-white/10 rounded-full blur-3xl"></div>
@@ -194,7 +194,7 @@ const QuotationDetailPage = () => {
                 <FileText className="w-8 h-8 text-white" />
               </div>
               <div>
-                <h1 className="text-4xl font-extrabold text-white tracking-tight">
+                <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white tracking-tight">
                   Teklif Detayı
                 </h1>
                 <p className="text-emerald-100 text-sm font-medium">
@@ -207,7 +207,7 @@ const QuotationDetailPage = () => {
         </header>
 
         {/* Teklif Bilgileri */}
-        <section className="bg-gradient-to-br from-white to-gray-50 rounded-3xl shadow-xl p-8 mb-6 border-2 border-gray-200">
+        <section className="bg-gradient-to-br from-white to-gray-50 rounded-2xl sm:rounded-3xl shadow-xl p-6 sm:p-8 mb-4 sm:mb-6 border-2 border-gray-200 overflow-hidden">
           <div className="flex items-center gap-3 mb-6">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg">
               <Package className="w-5 h-5 text-white" />

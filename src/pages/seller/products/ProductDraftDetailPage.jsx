@@ -14,6 +14,7 @@ import {
   Tag,
   Loader2,
   Eye,
+  SkipForward,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -63,6 +64,10 @@ const ProductDraftDetailPage = () => {
         return <CheckCircle className="w-5 h-5" />;
       case "XCircle":
         return <XCircle className="w-5 h-5" />;
+      case "Loader2":
+        return <Loader2 className="w-5 h-5 animate-spin" />;
+      case "SkipForward":
+        return <SkipForward className="w-5 h-5" />;
       default:
         return <AlertCircle className="w-5 h-5" />;
     }
@@ -79,6 +84,10 @@ const ProductDraftDetailPage = () => {
         return "bg-green-100 text-green-800 border-green-200";
       case "red":
         return "bg-red-100 text-red-800 border-red-200";
+      case "blue":
+        return "bg-blue-100 text-blue-800 border-blue-200";
+      case "gray":
+        return "bg-gray-100 text-gray-800 border-gray-200";
       default:
         return "bg-gray-100 text-gray-800 border-gray-200";
     }
@@ -86,17 +95,17 @@ const ProductDraftDetailPage = () => {
 
   const filteredProducts = products.filter((product) => {
     if (filter === "all") return true;
-    if (filter === "pending") return product.status === "Pending";
-    if (filter === "approved") return product.status === "Approved";
-    if (filter === "rejected") return product.status === "Rejected";
+    if (filter === "pending") return product.status === "Pending" || product.status === 0 || product.status === 3; // 3=Processing
+    if (filter === "approved") return product.status === "Approved" || product.status === 1;
+    if (filter === "rejected") return product.status === "Rejected" || product.status === 2 || product.status === 4; // 4=DuplicateEanSkipped
     return true;
   });
 
   const stats = {
     total: products.length,
-    pending: products.filter((p) => p.status === "Pending").length,
-    approved: products.filter((p) => p.status === "Approved").length,
-    rejected: products.filter((p) => p.status === "Rejected").length,
+    pending: products.filter((p) => p.status === "Pending" || p.status === 0 || p.status === 3).length,
+    approved: products.filter((p) => p.status === "Approved" || p.status === 1).length,
+    rejected: products.filter((p) => p.status === "Rejected" || p.status === 2 || p.status === 4).length,
   };
 
   if (loading) {
@@ -114,7 +123,7 @@ const ProductDraftDetailPage = () => {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
       {/* Header */}
       <div className="bg-gradient-to-r from-emerald-600 via-teal-600 to-green-600 text-white shadow-xl">
-        <div className="max-w-7xl mx-auto px-6 py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
           <button
             onClick={() => navigate("/seller/products/drafts")}
             className="inline-flex items-center gap-2 text-white/90 hover:text-white mb-4 transition"
@@ -123,12 +132,12 @@ const ProductDraftDetailPage = () => {
             Geri Dön
           </button>
 
-          <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center shadow-lg">
-              <Package size={32} />
+          <div className="flex items-center gap-3 sm:gap-4">
+            <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center shadow-lg flex-shrink-0">
+              <Package className="w-6 h-6 sm:w-8 sm:h-8" />
             </div>
-            <div>
-              <h1 className="text-3xl font-bold mb-1">Draft Ürünleri</h1>
+            <div className="min-w-0">
+              <h1 className="text-2xl sm:text-3xl font-bold mb-1 truncate">Draft Ürünleri</h1>
               <p className="text-emerald-100 text-sm">{stats.total} ürün</p>
             </div>
           </div>
@@ -136,7 +145,7 @@ const ProductDraftDetailPage = () => {
       </div>
 
       {/* Filter & Stats */}
-      <div className="max-w-7xl mx-auto px-6 py-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
           {[
             { key: "all", label: "Tümü", count: stats.total, color: "emerald" },
@@ -159,8 +168,8 @@ const ProductDraftDetailPage = () => {
           ))}
         </div>
 
-        {/* Products Table */}
-        <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
+        {/* Products Table - Desktop */}
+        <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100 hidden xl:block">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead className="bg-gradient-to-r from-emerald-50 to-teal-50 border-b-2 border-emerald-200">
@@ -240,6 +249,52 @@ const ProductDraftDetailPage = () => {
             </table>
           </div>
         </div>
+
+        {/* Products Cards - Mobile/Tablet */}
+        <div className="xl:hidden space-y-4 mt-4">
+          {filteredProducts.map((product) => {
+            const statusConfig = DRAFT_STATUS_LABELS[product.status] || DRAFT_STATUS_LABELS.Pending;
+            return (
+              <div
+                key={product.id}
+                className="bg-white rounded-2xl shadow-lg border-2 border-gray-100 overflow-hidden hover:shadow-xl transition-all"
+              >
+                <div className="p-4 sm:p-5 border-b border-gray-100">
+                  <h3 className="font-bold text-gray-900 text-base sm:text-lg line-clamp-2 mb-2">
+                    {product.name}
+                  </h3>
+                  <div className="flex flex-wrap gap-2 text-xs text-gray-500 mb-2">
+                    {product.sku && <span>SKU: {product.sku}</span>}
+                    {product.ean && <span>EAN: {product.ean}</span>}
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="inline-flex items-center gap-1 text-sm text-gray-600">
+                      <Tag className="w-4 h-4" />
+                      {product.brandName || "—"}
+                    </span>
+                    <span className="inline-flex items-center gap-1 text-sm text-gray-600">
+                      <Calendar className="w-4 h-4" />
+                      {new Date(product.createdAt).toLocaleDateString("tr-TR")}
+                    </span>
+                  </div>
+                  <span className={`inline-flex items-center gap-2 px-3 py-1 rounded-lg mt-2 ${getStatusBadgeClass(product.status)} text-xs font-bold border`}>
+                    {getStatusIcon(product.status)}
+                    {statusConfig.text}
+                  </span>
+                </div>
+                <div className="p-4">
+                  <button
+                    onClick={() => handleViewDetail(product.id)}
+                    className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-xl text-sm font-semibold hover:opacity-90 transition"
+                  >
+                    <Eye className="w-4 h-4" />
+                    Detay
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
 
       {/* Detail Modal */}
@@ -259,19 +314,19 @@ const ProductDraftDetailPage = () => {
               onClick={(e) => e.stopPropagation()}
               className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto"
             >
-              <div className="sticky top-0 bg-gradient-to-r from-emerald-600 to-teal-600 text-white p-6 rounded-t-2xl">
-                <h2 className="text-2xl font-bold">{selectedProduct.name}</h2>
+              <div className="sticky top-0 bg-gradient-to-r from-emerald-600 to-teal-600 text-white p-4 sm:p-6 rounded-t-2xl">
+                <h2 className="text-lg sm:text-2xl font-bold line-clamp-2">{selectedProduct.name}</h2>
                 <p className="text-emerald-100 text-sm mt-1">
                   {selectedProduct.brandName || "Marka belirtilmemiş"}
                 </p>
               </div>
 
-              <div className="p-6 space-y-6">
+              <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
                 {/* Images */}
                 {selectedProduct.imageUrls && selectedProduct.imageUrls.length > 0 && (
                   <div>
                     <h3 className="font-bold text-gray-900 mb-3">Görseller</h3>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4">
                       {selectedProduct.imageUrls.map((url, index) => (
                         <img
                           key={index}
@@ -285,7 +340,7 @@ const ProductDraftDetailPage = () => {
                 )}
 
                 {/* Basic Info Grid */}
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div>
                     <p className="text-sm text-gray-500">SKU</p>
                     <p className="font-bold text-gray-900">{selectedProduct.sku || "—"}</p>

@@ -12,12 +12,34 @@ import ForgotPasswordPage from "@/pages/seller/ForgotPasswordPage";
 import SellerApplicationPage from "@/pages/seller/SellerApplicationPage";
 import SellerBrandListPage from "@/pages/seller/brands/SellerBrandListPage";
 
-// Corporate pages
-import AboutPage from "@/pages/corporate/AboutPage";
-import ContactPage from "@/pages/corporate/ContactPage";
+// Corporate pages (KVKK, Contracts - corporate klasöründe)
 import KvkkPage from "@/pages/corporate/KvkkPage";
-import SssPage from "@/pages/corporate/SssPage";
 import ContractsPage from "@/pages/corporate/ContractsPage";
+
+// Hakkımızda, İletişim, SSS - SellerCenter içinde (Hızlı erişim paneli ile)
+import AboutPage from "@/pages/sellerCenter/AboutPage";
+import ContactPage from "@/pages/sellerCenter/ContactPage";
+import SssPage from "@/pages/sellerCenter/SssPage";
+
+// Satıcı Merkezi (Seller Center) - public SEO sayfaları
+import {
+  SellerCenterIndexPage,
+  Ilk7GunPage,
+  MagazaDogrulamaPage,
+  UrunListelemePage,
+  GorselStandartlariPage,
+  FiyatlandirmaTeklifPage,
+  SiparisYonetimiPage,
+  LojistikPage,
+  GumrukEvrakGtipPage,
+  OdemeTahsilatPage,
+  UyusmazlikIadePage,
+  SaticiPolitikalariPage,
+  MarkaKorumasiPage,
+  SaticiPerformansPage,
+  EntegrasyonlarPage,
+  GuvenlikPage,
+} from "@/pages/sellerCenter";
 
 // Subscription
 import SubscriptionPage from "@/pages/seller/subscription/SubscriptionPage";
@@ -83,6 +105,24 @@ function App() {
       <Route path="/corporate/kvkk" element={<KvkkPage />} />
       <Route path="/corporate/sss" element={<SssPage />} />
       <Route path="/corporate/contracts" element={<ContractsPage />} />
+
+      {/* ── Satıcı Merkezi (Seller Center) - public SEO ───────── */}
+      <Route path="/satici-merkezi" element={<SellerCenterIndexPage />} />
+      <Route path="/satici-merkezi/ilk-7-gun" element={<Ilk7GunPage />} />
+      <Route path="/satici-merkezi/magaza-dogrulama" element={<MagazaDogrulamaPage />} />
+      <Route path="/satici-merkezi/urun-listeleme" element={<UrunListelemePage />} />
+      <Route path="/satici-merkezi/gorsel-standartlari" element={<GorselStandartlariPage />} />
+      <Route path="/satici-merkezi/fiyatlandirma-teklif" element={<FiyatlandirmaTeklifPage />} />
+      <Route path="/satici-merkezi/siparis-yonetimi" element={<SiparisYonetimiPage />} />
+      <Route path="/satici-merkezi/lojistik" element={<LojistikPage />} />
+      <Route path="/satici-merkezi/gumruk-evrak-gtip" element={<GumrukEvrakGtipPage />} />
+      <Route path="/satici-merkezi/odeme-tahsilat" element={<OdemeTahsilatPage />} />
+      <Route path="/satici-merkezi/uyusmazlik-iade" element={<UyusmazlikIadePage />} />
+      <Route path="/satici-merkezi/satici-politikalari" element={<SaticiPolitikalariPage />} />
+      <Route path="/satici-merkezi/marka-korumasi" element={<MarkaKorumasiPage />} />
+      <Route path="/satici-merkezi/satici-performans" element={<SaticiPerformansPage />} />
+      <Route path="/satici-merkezi/entegrasyonlar" element={<EntegrasyonlarPage />} />
+      <Route path="/satici-merkezi/guvenlik" element={<GuvenlikPage />} />
       
       {/* ── Subscription (login gerekli; aktif değilse erişilir) ── */}
       <Route

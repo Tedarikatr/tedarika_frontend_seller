@@ -145,7 +145,7 @@ export default function CompanyUpdate() {
 
   if (initializing || !form) {
     return (
-      <div className="px-6 py-10">
+      <div className="px-4 sm:px-6 py-6 sm:py-10">
         <div className="max-w-6xl mx-auto bg-white border rounded-2xl p-6 shadow-sm animate-pulse">
           <div className="h-8 w-64 bg-gray-200 rounded mb-6" />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -181,7 +181,7 @@ export default function CompanyUpdate() {
         <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl" />
         <div className="absolute bottom-0 left-0 w-64 h-64 bg-white/10 rounded-full blur-3xl" />
         
-        <div className="max-w-6xl mx-auto px-6 py-12 relative z-10">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12 relative z-10">
           <motion.div 
             className="flex items-center gap-4"
             initial={{ y: -20 }}
@@ -202,10 +202,10 @@ export default function CompanyUpdate() {
         </div>
       </motion.header>
 
-      <main className="max-w-6xl mx-auto px-6 py-10">
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-10">
         <motion.form
           onSubmit={handleSubmit}
-          className="bg-white rounded-3xl shadow-2xl border-2 border-gray-200 p-10"
+          className="bg-white rounded-2xl sm:rounded-3xl shadow-2xl border-2 border-gray-200 p-4 sm:p-6 lg:p-10"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.3 }}

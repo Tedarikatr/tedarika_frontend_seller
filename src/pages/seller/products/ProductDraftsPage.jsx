@@ -18,6 +18,7 @@ import {
   Calendar,
   Tag,
   Loader2,
+  SkipForward,
 } from "lucide-react";
 
 const ProductDraftsPage = () => {
@@ -57,6 +58,10 @@ const ProductDraftsPage = () => {
         return <CheckCircle className="w-5 h-5" />;
       case "XCircle":
         return <XCircle className="w-5 h-5" />;
+      case "Loader2":
+        return <Loader2 className="w-5 h-5 animate-spin" />;
+      case "SkipForward":
+        return <SkipForward className="w-5 h-5" />;
       default:
         return <AlertCircle className="w-5 h-5" />;
     }
@@ -88,6 +93,10 @@ const ProductDraftsPage = () => {
         return "bg-green-100 text-green-800 border-green-200";
       case "red":
         return "bg-red-100 text-red-800 border-red-200";
+      case "blue":
+        return "bg-blue-100 text-blue-800 border-blue-200";
+      case "gray":
+        return "bg-gray-100 text-gray-800 border-gray-200";
       default:
         return "bg-gray-100 text-gray-800 border-gray-200";
     }
@@ -128,18 +137,18 @@ const ProductDraftsPage = () => {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
       {/* Hero Header */}
       <div className="bg-gradient-to-r from-emerald-600 via-teal-600 to-green-600 text-white shadow-xl">
-        <div className="max-w-7xl mx-auto px-6 py-8">
-          <div className="flex items-center justify-between flex-wrap gap-4">
-            <div className="flex items-center gap-4">
-              <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center shadow-lg">
-                <FileText size={32} className="animate-pulse" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-3 sm:gap-4">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center shadow-lg flex-shrink-0">
+                <FileText className="w-6 h-6 sm:w-8 sm:h-8 animate-pulse" />
               </div>
-              <div>
-                <h1 className="text-3xl font-bold mb-1 flex items-center gap-2">
+              <div className="min-w-0">
+                <h1 className="text-2xl sm:text-3xl font-bold mb-1 flex flex-wrap items-center gap-2">
                   Ürün Başvuruları
-                  <Sparkles size={24} className="text-yellow-300" />
+                  <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-300 flex-shrink-0" />
                 </h1>
-                <p className="text-emerald-100 text-sm">
+                <p className="text-emerald-100 text-xs sm:text-sm">
                   Toplu ürün yükleme başvurularınızı görüntüleyin
                 </p>
               </div>
@@ -147,7 +156,7 @@ const ProductDraftsPage = () => {
 
             <button
               onClick={() => navigate("/seller/products/draft/upload")}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white rounded-xl font-semibold transition-all border border-white/30"
+              className="inline-flex items-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white rounded-xl font-semibold transition-all border border-white/30 text-sm sm:text-base"
             >
               <Upload className="w-5 h-5" />
               Yeni Başvuru
@@ -157,7 +166,7 @@ const ProductDraftsPage = () => {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-6 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
           <StatCard
@@ -224,7 +233,61 @@ const ProductDraftsPage = () => {
               </button>
             </div>
           ) : (
-            <div className="overflow-x-auto">
+            <>
+              {/* Mobil kart görünümü */}
+              <div className="xl:hidden space-y-3 p-4 sm:p-0">
+                {filteredDrafts.map((draft) => {
+                  const statusKey = typeof draft.status === "number" ? draft.status : draft.status;
+                  const statusConfig = DRAFT_STATUS_LABELS[statusKey] || { text: "Bilinmiyor", color: "gray", icon: "AlertCircle" };
+                  const sourceConfig = SOURCE_TYPE_LABELS[draft.sourceType] || SOURCE_TYPE_LABELS.Json;
+                  return (
+                    <div
+                      key={draft.id}
+                      className="bg-white border-2 border-gray-200 rounded-xl p-4 shadow-sm hover:border-emerald-300 transition-all"
+                    >
+                      <div className="flex items-start justify-between gap-3 mb-3">
+                        <div className="min-w-0 flex-1">
+                          <h3 className="font-bold text-gray-900 truncate">{draft.name}</h3>
+                          {draft.description && (
+                            <p className="text-xs text-gray-500 mt-1 truncate">{draft.description}</p>
+                          )}
+                        </div>
+                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg ${getStatusBadgeClass(statusKey)} text-xs font-bold border flex-shrink-0`}>
+                          {getStatusIcon(draft.status)}
+                          {statusConfig.text}
+                        </span>
+                      </div>
+                      <div className="flex flex-wrap gap-2 text-xs text-gray-600 mb-3">
+                        <span className="inline-flex items-center gap-1">
+                          <Tag className="w-3 h-3" />
+                          {draft.brandName || "—"}
+                        </span>
+                        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded ${getSourceBadgeClass(draft.sourceType)}`}>
+                          {getSourceIcon(draft.sourceType)}
+                          {sourceConfig.text}
+                        </span>
+                        <span className="inline-flex items-center gap-1">
+                          <Calendar className="w-3 h-3" />
+                          {new Date(draft.createdAt).toLocaleDateString("tr-TR")}
+                        </span>
+                      </div>
+                      {draft.sourceReference && (
+                        <a
+                          href={draft.sourceReference}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-xs font-semibold"
+                        >
+                          <ExternalLink className="w-3 h-3" />
+                          Dosya
+                        </a>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+              {/* Masaüstü tablo görünümü */}
+              <div className="hidden xl:block overflow-x-auto table-scroll-touch">
               <table className="min-w-full">
                 <thead className="bg-gradient-to-r from-emerald-50 to-teal-50 border-b-2 border-emerald-200">
                   <tr>
@@ -327,7 +390,8 @@ const ProductDraftsPage = () => {
                   })}
                 </tbody>
               </table>
-            </div>
+              </div>
+            </>
           )}
         </div>
       </div>
@@ -339,17 +403,17 @@ const ProductDraftsPage = () => {
 const StatCard = ({ label, value, icon: Icon, gradient, bgGradient, active, onClick }) => (
   <button
     onClick={onClick}
-    className={`bg-gradient-to-br ${bgGradient} rounded-2xl p-5 border-2 shadow-lg hover:shadow-xl transition-all cursor-pointer ${
+    className={`bg-gradient-to-br ${bgGradient} rounded-xl sm:rounded-2xl p-4 sm:p-5 border-2 shadow-lg hover:shadow-xl transition-all cursor-pointer ${
       active ? `border-${gradient.split("-")[1]}-400 ring-4 ring-${gradient.split("-")[1]}-100` : "border-gray-200"
     }`}
   >
     <div className="flex items-center justify-between">
       <div>
         <p className="text-xs font-semibold text-gray-700 mb-1">{label}</p>
-        <p className="text-3xl font-bold text-gray-800">{value}</p>
+        <p className="text-2xl sm:text-3xl font-bold text-gray-800">{value}</p>
       </div>
-      <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${gradient} flex items-center justify-center text-white shadow-lg`}>
-        <Icon size={28} />
+      <div className={`w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 rounded-lg sm:rounded-xl bg-gradient-to-br ${gradient} flex items-center justify-center text-white shadow-lg`}>
+        <Icon className="w-5 h-5 sm:w-6 sm:h-6 lg:w-7 lg:h-7" />
       </div>
     </div>
   </button>
