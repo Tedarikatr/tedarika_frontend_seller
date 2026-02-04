@@ -3,19 +3,33 @@
 // =============================
 import React, { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { Settings, Image as ImageIcon, TrendingUp, List, FileEdit, Package, DollarSign } from "lucide-react";
+import { Settings, Image as ImageIcon, TrendingUp, List, FileEdit, Package, DollarSign, Pencil, Check, X } from "lucide-react";
 import ProductAttributesModal from "./ProductAttributesModal";
+import { updateProductPrice } from "@/api/sellerStoreProductPricesService";
 import { CURRENCY_CODES } from "@/constants/currencyCode";
 import { TABLE_STYLES } from "@/constants/tableStyles";
 
-/** prices dizisinden ilk fiyatı formatla */
-const formatPrice = (prices) => {
-  if (!prices?.length) return "—";
-  const p = prices[0];
-  const val = p?.unitPrice;
-  const code = p?.currencyCode || "TRY";
+const TRY_CODE = "TRY";
+
+/** TRY fiyatını bul (tablo varsayılan para birimi) */
+const getTryPrice = (prices) => {
+  if (!prices?.length) return null;
+  return prices.find((p) => p.currencyCode === TRY_CODE) || prices[0];
+};
+
+/** Tek fiyat objesini formatla */
+const formatPriceFromObj = (price) => {
+  if (!price) return "—";
+  const val = price?.unitPrice;
+  const code = price?.currencyCode || TRY_CODE;
   const sym = CURRENCY_CODES[code]?.symbol ?? code;
   return val != null ? `${Number(val).toLocaleString("tr-TR")} ${sym}` : "—";
+};
+
+/** prices dizisinden ilk fiyatı formatla (geriye uyumluluk) */
+const formatPrice = (prices) => {
+  const p = getTryPrice(prices) || (prices?.[0]);
+  return formatPriceFromObj(p);
 };
 
 const MyStoreProductTable = ({
@@ -26,9 +40,15 @@ const MyStoreProductTable = ({
   selectedIds = new Set(),
   onSelectionChange,
   getStoreProductId = (p) => p.id ?? p.storeProductId,
+  onRefresh,
+  onFeedback,
 }) => {
   const navigate = useNavigate();
   const [selectedProductForAttributes, setSelectedProductForAttributes] = useState(null);
+  /** TRY fiyat güncelleme: hangi satır düzenleniyor (storeProductId) ve geçici değer */
+  const [editingPriceRow, setEditingPriceRow] = useState(null);
+  const [editingPriceValue, setEditingPriceValue] = useState("");
+  const [priceUpdateLoading, setPriceUpdateLoading] = useState(false);
 
   const toggleSelection = useCallback(
     (product) => {
@@ -51,6 +71,51 @@ const MyStoreProductTable = ({
     }
     navigate(`/seller/products/edit-request/${productId}`);
   };
+
+  const tryPrice = (product) => getTryPrice(product.prices);
+
+  const startEditPrice = (product) => {
+    const price = tryPrice(product);
+    if (!price?.id) {
+      onFeedback?.("TRY fiyatı yok. Diğer para birimleri için Yönet kısmını kullanın.", "error");
+      return;
+    }
+    setEditingPriceRow(getStoreProductId(product));
+    setEditingPriceValue(String(price.unitPrice ?? ""));
+  };
+
+  const cancelEditPrice = () => {
+    setEditingPriceRow(null);
+    setEditingPriceValue("");
+  };
+
+  const saveEditPrice = async (product) => {
+    const storeId = getStoreProductId(product);
+    const price = tryPrice(product);
+    if (!storeId || !price?.id) return;
+    const num = parseFloat(editingPriceValue);
+    if (isNaN(num) || num <= 0) {
+      onFeedback?.("Birim fiyat 0'dan büyük olmalıdır.", "error");
+      return;
+    }
+    if (!Number.isFinite(num) || (String(num).split(".")[1]?.length ?? 0) > 4) {
+      onFeedback?.("Birim fiyat en fazla 4 ondalık hane içermelidir.", "error");
+      return;
+    }
+    setPriceUpdateLoading(true);
+    try {
+      await updateProductPrice(storeId, price.id, { unitPrice: num });
+      onFeedback?.("Fiyat güncellendi.", "success");
+      onRefresh?.();
+      cancelEditPrice();
+    } catch (err) {
+      const msg = err?.message ?? err?.errors?.[0] ?? "Fiyat güncellenemedi.";
+      onFeedback?.(msg, "error");
+    } finally {
+      setPriceUpdateLoading(false);
+    }
+  };
+
   if (!products?.length) {
     return (
       <div className="p-10 text-center">
@@ -141,10 +206,54 @@ const MyStoreProductTable = ({
                     </div>
                   </td>
                   <td className="px-3 py-3 text-center">
-                    <div className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-gray-100 text-gray-800 text-xs font-medium max-w-[120px] truncate" title={formatPrice(product.prices)}>
-                      <DollarSign size={12} className="text-emerald-600 flex-shrink-0" />
-                      <span className="truncate">{formatPrice(product.prices)}</span>
-                    </div>
+                    {editingPriceRow === storeId ? (
+                      <div className="inline-flex items-center gap-1.5 flex-wrap justify-center">
+                        <input
+                          type="number"
+                          step="0.0001"
+                          min="0.01"
+                          value={editingPriceValue}
+                          onChange={(e) => setEditingPriceValue(e.target.value)}
+                          className="w-20 px-2 py-1 text-xs border border-emerald-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                          placeholder="Fiyat"
+                          disabled={priceUpdateLoading}
+                        />
+                        <span className="text-xs text-gray-500">{CURRENCY_CODES[TRY_CODE]?.symbol ?? TRY_CODE}</span>
+                        <button
+                          type="button"
+                          onClick={() => saveEditPrice(product)}
+                          disabled={priceUpdateLoading}
+                          className="p-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white disabled:opacity-50"
+                          title="Kaydet"
+                        >
+                          <Check size={14} />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={cancelEditPrice}
+                          disabled={priceUpdateLoading}
+                          className="p-1.5 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-700"
+                          title="İptal"
+                        >
+                          <X size={14} />
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-gray-100 text-gray-800 text-xs font-medium max-w-[140px]">
+                        <DollarSign size={12} className="text-emerald-600 flex-shrink-0" />
+                        <span className="truncate" title={formatPrice(product.prices)}>{formatPrice(product.prices)}</span>
+                        {tryPrice(product)?.id && (
+                          <button
+                            type="button"
+                            onClick={() => startEditPrice(product)}
+                            className="p-0.5 rounded hover:bg-emerald-200 text-emerald-700 flex-shrink-0"
+                            title="TRY fiyatını güncelle"
+                          >
+                            <Pencil size={12} />
+                          </button>
+                        )}
+                      </div>
+                    )}
                   </td>
                   <td className="px-3 py-3 whitespace-nowrap text-center">
                     <div className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-blue-50 text-blue-800 text-xs font-medium">
@@ -265,11 +374,45 @@ const MyStoreProductTable = ({
                         </span>
                       )}
                     </div>
-                    <div className="flex flex-wrap gap-2 mt-2">
-                      <span className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-gray-100 text-gray-800 text-xs font-medium">
-                        <DollarSign size={12} className="text-emerald-600" />
-                        {formatPrice(product.prices)}
-                      </span>
+                    <div className="flex flex-wrap gap-2 mt-2 items-center">
+                      {editingPriceRow === storeId ? (
+                        <div className="flex flex-wrap items-center gap-2">
+                          <input
+                            type="number"
+                            step="0.0001"
+                            min="0.01"
+                            value={editingPriceValue}
+                            onChange={(e) => setEditingPriceValue(e.target.value)}
+                            className="w-24 px-2 py-1.5 text-sm border border-emerald-300 rounded-lg focus:ring-2 focus:ring-emerald-500"
+                            placeholder="Fiyat"
+                            disabled={priceUpdateLoading}
+                          />
+                          <span className="text-xs text-gray-500">{CURRENCY_CODES[TRY_CODE]?.symbol ?? TRY_CODE}</span>
+                          <button type="button" onClick={() => saveEditPrice(product)} disabled={priceUpdateLoading} className="p-1.5 rounded-lg bg-emerald-600 text-white">
+                            <Check size={16} />
+                          </button>
+                          <button type="button" onClick={cancelEditPrice} disabled={priceUpdateLoading} className="p-1.5 rounded-lg bg-gray-200 text-gray-700">
+                            <X size={16} />
+                          </button>
+                        </div>
+                      ) : (
+                        <>
+                          <span className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-gray-100 text-gray-800 text-xs font-medium">
+                            <DollarSign size={12} className="text-emerald-600" />
+                            {formatPrice(product.prices)}
+                          </span>
+                          {tryPrice(product)?.id && (
+                            <button
+                              type="button"
+                              onClick={() => startEditPrice(product)}
+                              className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-emerald-100 text-emerald-700 text-xs font-medium"
+                            >
+                              <Pencil size={12} />
+                              Fiyat güncelle
+                            </button>
+                          )}
+                        </>
+                      )}
                       <span className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-blue-50 text-blue-800 text-xs font-medium">
                         <Package size={12} className="text-blue-600" />
                         Stok: {product.stockQuantity != null ? product.stockQuantity : "—"}

@@ -10,7 +10,12 @@ import {
   updateProductStock,
   updateProductUnitType,
 } from "@/api/sellerStoreService";
-import { addProductPrice, getAllProductPrices } from "@/api/sellerStoreProductPricesService";
+import {
+  addProductPrice,
+  getAllProductPrices,
+  updateProductPrice,
+  deleteProductPrice,
+} from "@/api/sellerStoreProductPricesService";
 import {
   X,
   ImagePlus,
@@ -27,7 +32,10 @@ import {
   Layers,
   Box,
   Play,
-  Pause
+  Pause,
+  Pencil,
+  Trash2,
+  Check
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import ProductPriceTiers from "@/components/storeProducts/ProductPriceTiers";
@@ -157,7 +165,12 @@ const ProductManagementPanel = ({
   
   // Ürün fiyatları (para birimleri)
   const [productPrices, setProductPrices] = useState(product.prices || []);
-  
+
+  // Tek fiyat düzenleme (Yönet panelinde)
+  const [editingPriceId, setEditingPriceId] = useState(null);
+  const [editingPriceUnitPrice, setEditingPriceUnitPrice] = useState("");
+  const [priceEditLoading, setPriceEditLoading] = useState(false);
+
   const storeProductId = product.storeProductId ?? product.id;
   const isOnSale = product.isOnSale ?? false;
 
@@ -213,11 +226,15 @@ const ProductManagementPanel = ({
       onFeedback("Lütfen tüm alanları doldurun!", "error");
       return;
     }
-    
+    const num = parseFloat(newPrice.unitPrice);
+    if (isNaN(num) || num <= 0) {
+      onFeedback("Birim fiyat sıfırdan büyük olmalıdır.", "error");
+      return;
+    }
     try {
       await addProductPrice(storeProductId, {
         currencyCode: newPrice.currencyCode,
-        unitPrice: parseFloat(newPrice.unitPrice),
+        unitPrice: num,
       });
       onFeedback("✅ Fiyat başarıyla eklendi!", "success");
       setShowAddPrice(false);
@@ -226,7 +243,57 @@ const ProductManagementPanel = ({
       onRefresh?.();
     } catch (err) {
       console.error(err);
-      onFeedback("❌ Fiyat eklenemedi!", "error");
+      const msg = err?.errors?.[0] ?? err?.message ?? "Fiyat eklenemedi.";
+      onFeedback(msg, "error");
+    }
+  };
+
+  const startEditPrice = (price) => {
+    setEditingPriceId(price.id);
+    setEditingPriceUnitPrice(String(price.unitPrice ?? ""));
+  };
+
+  const cancelEditPrice = () => {
+    setEditingPriceId(null);
+    setEditingPriceUnitPrice("");
+  };
+
+  const saveEditPrice = async () => {
+    if (!editingPriceId || editingPriceUnitPrice === "") return;
+    const num = parseFloat(editingPriceUnitPrice);
+    if (isNaN(num) || num <= 0) {
+      onFeedback("Birim fiyat pozitif olmalıdır.", "error");
+      return;
+    }
+    setPriceEditLoading(true);
+    try {
+      await updateProductPrice(storeProductId, editingPriceId, { unitPrice: num });
+      onFeedback("✅ Fiyat güncellendi!", "success");
+      await loadProductPrices();
+      onRefresh?.();
+      cancelEditPrice();
+    } catch (err) {
+      const msg = err?.errors?.[0] ?? err?.message ?? "Fiyat güncellenemedi.";
+      onFeedback(msg, "error");
+    } finally {
+      setPriceEditLoading(false);
+    }
+  };
+
+  const handleDeletePrice = async (price) => {
+    if (price.currencyCode === "TRY") {
+      onFeedback("TRY fiyatı silinemez; zorunlu para birimidir. Tabloda güncelleyebilirsiniz.", "error");
+      return;
+    }
+    if (!window.confirm(`${price.currencyCode} fiyatını kaldırmak istediğinize emin misiniz?`)) return;
+    try {
+      await deleteProductPrice(storeProductId, price.id);
+      onFeedback("✅ Fiyat kaldırıldı.", "success");
+      await loadProductPrices();
+      onRefresh?.();
+    } catch (err) {
+      const msg = err?.errors?.[0] ?? err?.message ?? "Fiyat kaldırılamadı.";
+      onFeedback(msg, "error");
     }
   };
 
@@ -294,6 +361,12 @@ const ProductManagementPanel = ({
               </Button>
             }
           >
+            <div className="mb-4 p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-xs flex items-start gap-2">
+              <span className="text-amber-600">ℹ️</span>
+              <p>
+                <strong>Tabloda</strong> varsayılan olarak <strong>TRY</strong> fiyatı güncellenir. Diğer para birimleri (EUR, USD vb.) burada eklenir ve yönetilir.
+              </p>
+            </div>
             {showAddPrice && (
               <div className="bg-gradient-to-br from-emerald-50 to-green-50 border border-emerald-200 rounded-xl p-4 sm:p-5 mb-4 space-y-4">
                 <div>
@@ -359,22 +432,83 @@ const ProductManagementPanel = ({
                   {productPrices.map((price) => (
                     <div
                       key={price.id}
-                      className="flex items-center justify-between bg-gradient-to-r from-white to-gray-50 border border-gray-200 rounded-xl px-4 py-3 hover:shadow-md transition-all"
+                      className="flex flex-wrap items-center justify-between gap-2 bg-gradient-to-r from-white to-gray-50 border border-gray-200 rounded-xl px-4 py-3 hover:shadow-md transition-all"
                     >
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center text-white font-bold text-sm shadow-lg">
-                          {price.currencyCode}
-                        </div>
-                        <div>
-                          <div className="text-xs text-gray-500">
-                            {CURRENCY_OPTIONS.find(c => c.value === price.currencyCode)?.label?.split(' - ')[1] || price.currencyCode}
+                      {editingPriceId === price.id ? (
+                        <div className="flex flex-wrap items-center gap-2 w-full">
+                          <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center text-white font-bold text-sm shadow-lg flex-shrink-0">
+                            {price.currencyCode}
                           </div>
-                          <div className="text-sm font-bold text-gray-800">
-                            {price.unitPrice} {CURRENCY_CODES[price.currencyCode]?.symbol || price.currencyCode}
+                          <input
+                            type="number"
+                            step="0.0001"
+                            min="0.01"
+                            value={editingPriceUnitPrice}
+                            onChange={(e) => setEditingPriceUnitPrice(e.target.value)}
+                            className="flex-1 min-w-[80px] px-3 py-2 text-sm border border-emerald-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                            placeholder="Birim fiyat"
+                            disabled={priceEditLoading}
+                          />
+                          <span className="text-xs text-gray-500">{CURRENCY_CODES[price.currencyCode]?.symbol || price.currencyCode}</span>
+                          <div className="flex items-center gap-1">
+                            <button
+                              type="button"
+                              onClick={saveEditPrice}
+                              disabled={priceEditLoading}
+                              className="p-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white disabled:opacity-50"
+                              title="Kaydet"
+                            >
+                              <Check size={16} />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={cancelEditPrice}
+                              disabled={priceEditLoading}
+                              className="p-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-700"
+                              title="İptal"
+                            >
+                              <X size={16} />
+                            </button>
                           </div>
                         </div>
-                      </div>
-                      <Badge variant="success">Aktif</Badge>
+                      ) : (
+                        <>
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center text-white font-bold text-sm shadow-lg">
+                              {price.currencyCode}
+                            </div>
+                            <div>
+                              <div className="text-xs text-gray-500">
+                                {CURRENCY_OPTIONS.find(c => c.value === price.currencyCode)?.label?.split(' - ')[1] || price.currencyCode}
+                              </div>
+                              <div className="text-sm font-bold text-gray-800">
+                                {price.unitPrice} {CURRENCY_CODES[price.currencyCode]?.symbol || price.currencyCode}
+                              </div>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Badge variant="success">Aktif</Badge>
+                            <button
+                              type="button"
+                              onClick={() => startEditPrice(price)}
+                              className="p-1.5 rounded-lg bg-blue-100 hover:bg-blue-200 text-blue-700 transition-colors"
+                              title="Fiyatı düzenle"
+                            >
+                              <Pencil size={14} />
+                            </button>
+                            {price.currencyCode !== "TRY" && (
+                              <button
+                                type="button"
+                                onClick={() => handleDeletePrice(price)}
+                                className="p-1.5 rounded-lg bg-red-100 hover:bg-red-200 text-red-700 transition-colors"
+                                title="Fiyatı kaldır"
+                              >
+                                <Trash2 size={14} />
+                              </button>
+                            )}
+                          </div>
+                        </>
+                      )}
                     </div>
                   ))}
                 </div>
