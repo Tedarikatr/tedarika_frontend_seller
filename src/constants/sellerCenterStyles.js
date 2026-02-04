@@ -3,25 +3,9 @@
  * Tüm Seller Center sayfalarında tutarlı görünüm için merkezi stil yapısı.
  */
 
+/** Ana sayfa arka plan rengi */
 export const SC_COLORS = {
-  /** Ana marka rengi - vurgular, aktif durumlar */
-  primary: "emerald",
-  /** İkincil renk - hero gradient, ikonlar */
-  secondary: "teal",
-  /** Arka plan tonları */
   bgPage: "bg-slate-50",
-  bgCard: "bg-white",
-  bgMuted: "bg-slate-100",
-  /** Metin */
-  textPrimary: "text-slate-900",
-  textSecondary: "text-slate-600",
-  textMuted: "text-slate-500",
-};
-
-export const SC_SPACING = {
-  sectionGap: "space-y-8",
-  cardPadding: "p-6 sm:p-8",
-  sectionPadding: "py-8 sm:py-10",
 };
 
 /** Hero bileşeni stilleri */
