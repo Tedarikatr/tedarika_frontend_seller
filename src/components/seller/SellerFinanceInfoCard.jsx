@@ -17,27 +17,42 @@ const EMPTY = {
   swiftCode: "",
 };
 
-// Yardımcı fonksiyonlar
-const formatIban = (val = "") =>
-  val.replace(/\s+/g, "").replace(/(.{4})/g, "$1 ").trim();
-const normalizeIban = (val = "") => val.replace(/\s+/g, "").toUpperCase();
+// TR IBAN: 26 karakter (TR + 24 rakam)
+const TR_IBAN_LENGTH = 26;
 
-// ✅ Gerçek IBAN doğrulama (ISO 13616 standardı)
+const formatIban = (val = "") => {
+  const raw = val.replace(/\s+/g, "").toUpperCase().slice(0, TR_IBAN_LENGTH);
+  return raw.replace(/(.{4})/g, "$1 ").trim();
+};
+const normalizeIban = (val = "") =>
+  val.replace(/\s+/g, "").toUpperCase().slice(0, TR_IBAN_LENGTH);
+
+// 9+ haneli sayıda baştaki sıfırları kaybetmemek için string üzerinden mod 97
+const mod97 = (s) => {
+  let r = 0;
+  for (let i = 0; i < s.length; i++) {
+    r = (r * 10 + parseInt(s[i], 10)) % 97;
+  }
+  return r;
+};
+
+// Gerçek IBAN doğrulama (ISO 13616) — baştaki sıfır kaybı düzeltildi
 const isValidIban = (iban) => {
   const raw = normalizeIban(iban);
-  if (!/^TR\d{24}$/.test(raw)) return false; // TR ve 24 rakam
-  // Mod 97 algoritması
+  if (raw.length !== TR_IBAN_LENGTH || !/^TR\d{24}$/.test(raw)) return false;
   const rearranged = raw.slice(4) + raw.slice(0, 4);
   const converted = rearranged
     .split("")
-    .map((ch) => (ch >= "A" && ch <= "Z" ? ch.charCodeAt(0) - 55 : ch))
+    .map((ch) =>
+      ch >= "A" && ch <= "Z" ? String(ch.charCodeAt(0) - 55) : ch
+    )
     .join("");
   let remainder = converted;
   while (remainder.length > 9) {
-    remainder =
-      (parseInt(remainder.slice(0, 9), 10) % 97) + remainder.slice(9);
+    const part = remainder.slice(0, 9);
+    remainder = mod97(part).toString() + remainder.slice(9);
   }
-  return parseInt(remainder, 10) % 97 === 1;
+  return mod97(remainder) === 1;
 };
 
 export default function SellerFinanceInfoCard() {
@@ -81,7 +96,10 @@ export default function SellerFinanceInfoCard() {
   const onChange = (e) => {
     const { name, value } = e.target;
     if (name === "iban") {
-      const raw = value.toUpperCase().replace(/[^A-Z0-9]/g, "");
+      const raw = value
+        .toUpperCase()
+        .replace(/[^A-Z0-9]/g, "")
+        .slice(0, TR_IBAN_LENGTH);
       setForm((p) => ({ ...p, iban: formatIban(raw) }));
     } else {
       setForm((p) => ({ ...p, [name]: value }));
@@ -223,7 +241,8 @@ export default function SellerFinanceInfoCard() {
                 name="iban"
                 value={form.iban}
                 onChange={onChange}
-                placeholder="TR__ ____ ____ ____ ____ ____"
+                maxLength={32}
+                placeholder="TR00 0000 0000 0000 0000 0000 00"
                 className={`flex-1 tracking-wider border rounded-md px-2 py-1 text-sm focus:ring-2 outline-none ${
                   ibanValid
                     ? "border-emerald-400 focus:ring-emerald-500"
