@@ -1,5 +1,5 @@
 // =============================
-// SellerFinanceInfoCard.jsx (Final - Gerçek IBAN Doğrulamalı)
+// SellerFinanceInfoCard.jsx — Ödeme bilgileri (TR IBAN format + uzunluk)
 // =============================
 import React, { useEffect, useMemo, useState } from "react";
 import {
@@ -45,32 +45,10 @@ const formatIban = (val = "") => formatIbanDisplay(ensureTrIbanRaw(val));
 const normalizeIban = (val = "") =>
   ensureTrIbanRaw(val).slice(0, TR_IBAN_LENGTH);
 
-// 9+ haneli sayıda baştaki sıfırları kaybetmemek için string üzerinden mod 97
-const mod97 = (s) => {
-  let r = 0;
-  for (let i = 0; i < s.length; i++) {
-    r = (r * 10 + parseInt(s[i], 10)) % 97;
-  }
-  return r;
-};
-
-// Gerçek IBAN doğrulama (ISO 13616) — baştaki sıfır kaybı düzeltildi
+/** Sadece format ve uzunluk: TR + tam 24 rakam (checksum hesaplaması yok) */
 const isValidIban = (iban) => {
   const raw = normalizeIban(iban);
-  if (raw.length !== TR_IBAN_LENGTH || !/^TR\d{24}$/.test(raw)) return false;
-  const rearranged = raw.slice(4) + raw.slice(0, 4);
-  const converted = rearranged
-    .split("")
-    .map((ch) =>
-      ch >= "A" && ch <= "Z" ? String(ch.charCodeAt(0) - 55) : ch
-    )
-    .join("");
-  let remainder = converted;
-  while (remainder.length > 9) {
-    const part = remainder.slice(0, 9);
-    remainder = mod97(part).toString() + remainder.slice(9);
-  }
-  return mod97(remainder) === 1;
+  return raw.length === TR_IBAN_LENGTH && /^TR\d{24}$/.test(raw);
 };
 
 export default function SellerFinanceInfoCard() {
@@ -83,7 +61,6 @@ export default function SellerFinanceInfoCard() {
   const [form, setForm] = useState(EMPTY);
   const [mode, setMode] = useState("view"); // "view" | "edit"
 
-  // ✅ IBAN doğrulama (gerçek)
   const ibanValid = useMemo(() => isValidIban(form.iban), [form.iban]);
 
   // API'den profil verisini al
