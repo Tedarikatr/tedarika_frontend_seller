@@ -1,0 +1,16 @@
+export { default as SellerCenterIndexPage } from "./SellerCenterIndexPage";
+export { default as Ilk7GunPage } from "./Ilk7GunPage";
+export { default as MagazaDogrulamaPage } from "./MagazaDogrulamaPage";
+export { default as UrunListelemePage } from "./UrunListelemePage";
+export { default as GorselStandartlariPage } from "./GorselStandartlariPage";
+export { default as FiyatlandirmaTeklifPage } from "./FiyatlandirmaTeklifPage";
+export { default as SiparisYonetimiPage } from "./SiparisYonetimiPage";
+export { default as LojistikPage } from "./LojistikPage";
+export { default as GumrukEvrakGtipPage } from "./GumrukEvrakGtipPage";
+export { default as OdemeTahsilatPage } from "./OdemeTahsilatPage";
+export { default as UyusmazlikIadePage } from "./UyusmazlikIadePage";
+export { default as SaticiPolitikalariPage } from "./SaticiPolitikalariPage";
+export { default as MarkaKorumasiPage } from "./MarkaKorumasiPage";
+export { default as SaticiPerformansPage } from "./SaticiPerformansPage";
+export { default as EntegrasyonlarPage } from "./EntegrasyonlarPage";
+export { default as GuvenlikPage } from "./GuvenlikPage";

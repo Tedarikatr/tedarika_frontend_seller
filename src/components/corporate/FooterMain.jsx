@@ -12,6 +12,7 @@ const publicUrl = (path) => {
 const FooterMain = () => {
   const topics = [
     { label: "Hakkımızda", path: "/corporate/about" },
+    { label: "Satıcı Merkezi", path: "/satici-merkezi" },
     { label: "İletişim", path: "/corporate/contact" },
     { label: "KVKK", path: "/corporate/kvkk" },
     { label: "SSS", path: "/corporate/sss" },

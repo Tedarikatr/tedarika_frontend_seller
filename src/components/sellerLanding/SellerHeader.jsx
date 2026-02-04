@@ -15,6 +15,7 @@ const mainNavLinks = [
 
 const corporateLinks = [
   { label: "Hakkımızda", href: "/corporate/about", icon: Info },
+  { label: "Satıcı Merkezi", href: "/satici-merkezi", icon: null },
   { label: "İletişim", href: "/corporate/contact", icon: Phone },
   { label: "SSS", href: "/corporate/sss", icon: HelpCircle }
 ];
