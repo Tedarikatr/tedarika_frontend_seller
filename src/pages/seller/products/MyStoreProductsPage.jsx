@@ -61,7 +61,7 @@ const MyStoreProductsPage = () => {
   const [bulkPriceForm, setBulkPriceForm] = useState({
     currencyCode: "TRY",
     updateMode: "percent",
-    newUnitPrice: "",
+    amountToAdd: "",
     percentageChange: "",
     useSelectedProducts: false,
   });
@@ -160,17 +160,17 @@ const MyStoreProductsPage = () => {
   };
 
   const handleBulkPriceUpdate = async () => {
-    const { currencyCode, updateMode, newUnitPrice, percentageChange, useSelectedProducts } = bulkPriceForm;
+    const { currencyCode, updateMode, amountToAdd, percentageChange, useSelectedProducts } = bulkPriceForm;
     const useFixed = updateMode === "fixed";
-    const fixedVal = parseFloat(newUnitPrice);
+    const addVal = parseFloat(amountToAdd);
     const percentVal = parseFloat(percentageChange);
 
     if (!currencyCode || currencyCode.length !== 3) {
       showFeedback("Lütfen para birimi seçin.", "error");
       return;
     }
-    if (useFixed && (isNaN(fixedVal) || fixedVal <= 0)) {
-      showFeedback("Yeni birim fiyat 0'dan büyük olmalıdır.", "error");
+    if (useFixed && isNaN(addVal)) {
+      showFeedback("Lütfen eklenecek tutarı girin (negatif = indirim).", "error");
       return;
     }
     if (!useFixed && isNaN(percentVal)) {
@@ -185,18 +185,18 @@ const MyStoreProductsPage = () => {
       if (useSelectedProducts && selectedIds.size > 0) {
         body.storeProductIds = Array.from(selectedIds);
       }
-      if (useFixed) body.newUnitPrice = fixedVal;
+      if (useFixed) body.amountToAdd = addVal;
       else body.percentageChange = percentVal;
 
       const res = await bulkUpdatePrices(body);
       const count = res?.updatedCount ?? 0;
       await loadProducts(true);
       setShowBulkPriceModal(false);
-      setBulkPriceForm({ currencyCode: "TRY", updateMode: "percent", newUnitPrice: "", percentageChange: "", useSelectedProducts: false });
+      setBulkPriceForm({ currencyCode: "TRY", updateMode: "percent", amountToAdd: "", percentageChange: "", useSelectedProducts: false });
       setBulkPriceError(null);
       showFeedback(`${count} ürün fiyatı güncellendi.`, "success");
     } catch (err) {
-      const msg = err?.message ?? "Toplu fiyat güncelleme başarısız.";
+      const msg = err?.errors?.[0] ?? err?.message ?? "Toplu fiyat güncelleme başarısız.";
       setBulkPriceError(msg);
     } finally {
       setBulkPriceLoading(false);
@@ -589,6 +589,8 @@ const MyStoreProductsPage = () => {
               selectedIds={selectedIds}
               onSelectionChange={handleSelectionChange}
               getStoreProductId={getStoreProductId}
+              onRefresh={() => loadProducts(true)}
+              onFeedback={showFeedback}
             />
           )}
         </div>
@@ -652,7 +654,7 @@ const MyStoreProductsPage = () => {
                   </label>
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input type="radio" name="updateMode" checked={bulkPriceForm.updateMode === "fixed"} onChange={() => setBulkPriceForm((f) => ({ ...f, updateMode: "fixed" }))} className="text-amber-600" />
-                    <span className="text-sm">Sabit Fiyat</span>
+                    <span className="text-sm">Sabit Tutar Ekle/Çıkar</span>
                   </label>
                 </div>
               </div>
@@ -670,14 +672,13 @@ const MyStoreProductsPage = () => {
                 </div>
               ) : (
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">Yeni Birim Fiyat</label>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">Eklenecek tutar (negatif = indirim, örn. 100₺+30₺=130₺)</label>
                   <input
                     type="number"
                     step="0.01"
-                    min="0.01"
-                    placeholder="örn. 150.50"
-                    value={bulkPriceForm.newUnitPrice}
-                    onChange={(e) => setBulkPriceForm((f) => ({ ...f, newUnitPrice: e.target.value }))}
+                    placeholder="örn. 30 veya -10"
+                    value={bulkPriceForm.amountToAdd}
+                    onChange={(e) => setBulkPriceForm((f) => ({ ...f, amountToAdd: e.target.value }))}
                     className="w-full px-3 py-2.5 rounded-xl border-2 border-gray-200 focus:border-amber-500 focus:ring-2 focus:ring-amber-100"
                   />
                 </div>

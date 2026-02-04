@@ -16,7 +16,6 @@ export const addProductPrice = async (storeProductId, priceData) => {
     `${BASE_URL}/${storeProductId}/prices`,
     "POST",
     {
-      storeProductId: storeProductId,
       currencyCode: priceData.currencyCode,
       unitPrice: priceData.unitPrice,
     },
@@ -74,15 +73,17 @@ export const getAllProductPrices = async (storeProductId) => {
  * @param {string} priceData.currencyCode - Para birimi kodu
  * @param {number} priceData.unitPrice - Birim fiyat
  */
+/**
+ * Tek fiyat güncelleme (ID ile) — StoreProductPriceUpdateDto: sadece unitPrice
+ * @param {string} storeProductId - Mağaza ürün ID'si (UUID)
+ * @param {string} priceId - Fiyat kaydı ID'si (UUID)
+ * @param {object} priceData - { unitPrice: number } (pozitif, en fazla 4 ondalık)
+ */
 export const updateProductPrice = async (storeProductId, priceId, priceData) => {
   return apiRequest(
     `${BASE_URL}/${storeProductId}/prices/${priceId}`,
     "PUT",
-    {
-      storeProductId: priceData.storeProductId || storeProductId,
-      currencyCode: priceData.currencyCode,
-      unitPrice: priceData.unitPrice,
-    },
+    { unitPrice: priceData.unitPrice },
     true
   );
 };
@@ -102,12 +103,13 @@ export const deleteProductPrice = async (storeProductId, priceId) => {
 };
 
 /**
- * Toplu fiyat güncelleme
+ * Toplu fiyat güncelleme (BulkUpdatePricesRequest)
+ * Ya amountToAdd ya da percentageChange verilir; ikisi birlikte veya ikisi boş olamaz.
  * @param {object} body - bulk-update istek gövdesi
- * @param {string} body.currencyCode - Para birimi (TRY, EUR, USD vb.)
- * @param {string[]} [body.storeProductIds] - Güncellenecek mağaza ürün ID'leri (opsiyonel)
- * @param {number} [body.newUnitPrice] - Yeni sabit birim fiyat (percentageChange ile birlikte kullanılamaz)
- * @param {number} [body.percentageChange] - Yüzde değişim (örn. 10 = %10 artış, -5 = %5 indirim)
+ * @param {string} body.currencyCode - Para birimi (3 karakter: TRY, EUR, USD vb.)
+ * @param {string[]} [body.storeProductIds] - Güncellenecek mağaza ürün ID'leri (boş/null = mağazanın tüm ürünleri)
+ * @param {number} [body.amountToAdd] - Sabit ekleme (örn. 30 → 100₺+30₺=130₺). Negatif = indirim.
+ * @param {number} [body.percentageChange] - Yüzde (örn. 5 = %5 artış, -5 = %5 indirim)
  */
 export const bulkUpdatePrices = (body) =>
   apiRequest(`${BASE_URL}/prices/bulk-update`, "PUT", body, true);
