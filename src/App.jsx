@@ -12,12 +12,14 @@ import ForgotPasswordPage from "@/pages/seller/ForgotPasswordPage";
 import SellerApplicationPage from "@/pages/seller/SellerApplicationPage";
 import SellerBrandListPage from "@/pages/seller/brands/SellerBrandListPage";
 
-// Corporate pages
-import AboutPage from "@/pages/corporate/AboutPage";
-import ContactPage from "@/pages/corporate/ContactPage";
+// Corporate pages (KVKK, Contracts - corporate klasöründe)
 import KvkkPage from "@/pages/corporate/KvkkPage";
-import SssPage from "@/pages/corporate/SssPage";
 import ContractsPage from "@/pages/corporate/ContractsPage";
+
+// Hakkımızda, İletişim, SSS - SellerCenter içinde (Hızlı erişim paneli ile)
+import AboutPage from "@/pages/sellerCenter/AboutPage";
+import ContactPage from "@/pages/sellerCenter/ContactPage";
+import SssPage from "@/pages/sellerCenter/SssPage";
 
 // Satıcı Merkezi (Seller Center) - public SEO sayfaları
 import {

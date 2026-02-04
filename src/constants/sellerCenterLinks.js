@@ -28,6 +28,16 @@ export const sellerCenterNavLinks = [
   { label: "WhatsApp Destek", href: "https://wa.me/905382362605", external: true, icon: MessageCircle },
 ];
 
+/** Satıcı Merkezi başlangıç rehberi bağlantıları (Hızlı başlangıç) */
+export const sellerCenterQuickLinks = [
+  { label: "İlk 7 Gün Planı", href: "/satici-merkezi/ilk-7-gun" },
+  { label: "Ürün listeleme standartları", href: "/satici-merkezi/urun-listeleme" },
+  { label: "B2B fiyatlandırma ve teklif", href: "/satici-merkezi/fiyatlandirma-teklif" },
+  { label: "Lojistik ve GTİP", href: "/satici-merkezi/lojistik" },
+  { label: "Ödeme ve tahsilat", href: "/satici-merkezi/odeme-tahsilat" },
+  { label: "Satıcı performans ve büyüme", href: "/satici-merkezi/satici-performans" },
+];
+
 /** Footer ana sayfa bağlantıları (Hakkımızda, Satıcı Merkezi, İletişim, KVKK, SSS) */
 export const footerTopics = [
   { label: "Hakkımızda", path: "/corporate/about" },

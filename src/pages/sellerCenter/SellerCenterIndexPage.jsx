@@ -4,6 +4,7 @@ import { Link, useLocation } from "react-router-dom";
 import { BookOpen, ArrowRight, Sparkles } from "lucide-react";
 import SellerCenterLayout from "./SellerCenterLayout";
 import { createSeoMeta, getBreadcrumbSchema } from "@/utils/seo";
+import { sellerCenterQuickLinks } from "@/constants/sellerCenterLinks";
 
 const SellerCenterIndexPage = () => {
   const location = useLocation();
@@ -28,14 +29,7 @@ const SellerCenterIndexPage = () => {
     "Tahsilat ve uyuşmazlık: riskin yönetimi.",
   ];
 
-  const quickLinks = [
-    { to: "/satici-merkezi/ilk-7-gun", label: "İlk 7 Gün Planı (onboarding)" },
-    { to: "/satici-merkezi/urun-listeleme", label: "Ürün listeleme standartları" },
-    { to: "/satici-merkezi/fiyatlandirma-teklif", label: "B2B fiyatlandırma ve teklif yönetimi" },
-    { to: "/satici-merkezi/lojistik", label: "Lojistik, gümrük evrakları ve GTİP" },
-    { to: "/satici-merkezi/odeme-tahsilat", label: "Tahsilat, ödeme güvenliği ve kesintiler" },
-    { to: "/satici-merkezi/satici-performans", label: "Satıcı performans puanı ve büyüme" },
-  ];
+  const quickLinks = sellerCenterQuickLinks.map((l) => ({ to: l.href, label: l.label }));
 
   return (
     <>
@@ -86,7 +80,7 @@ const SellerCenterIndexPage = () => {
             </h2>
             <ul className="space-y-3">
               {quickLinks.map(({ to, label }) => (
-                <li key={to}>
+                <li key={label}>
                   <Link
                     to={to}
                     className="group inline-flex items-center gap-2 text-emerald-700 hover:text-emerald-800 font-medium"
