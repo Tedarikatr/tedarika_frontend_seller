@@ -21,6 +21,12 @@
   animation: fadeInDown 200ms ease-out;
 }
 
+/* Modal backdrop - tam blur (Safari uyumlu) */
+.modal-backdrop-blur {
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
 /* Indeterminate progress bar - sunucu yanıtı beklerken */
 @keyframes progressIndeterminate {
   0% {

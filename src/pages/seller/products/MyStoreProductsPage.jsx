@@ -2,6 +2,7 @@
 // MyStoreProductsPage.jsx - Ultra Modern & Beautiful 🎨
 // =============================
 import React, { useEffect, useState, useMemo } from "react";
+import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
 import {
   getStoreCoverage,
@@ -65,6 +66,7 @@ const MyStoreProductsPage = () => {
     useSelectedProducts: false,
   });
   const [bulkPriceLoading, setBulkPriceLoading] = useState(false);
+  const [bulkPriceError, setBulkPriceError] = useState(null);
 
   // Kur çevirimi modal
   const [showConvertModal, setShowConvertModal] = useState(false);
@@ -74,6 +76,7 @@ const MyStoreProductsPage = () => {
     useSelectedProducts: false,
   });
   const [convertLoading, setConvertLoading] = useState(false);
+  const [convertError, setConvertError] = useState(null);
 
   const loadProducts = async (forceRefresh = false) => {
     const isLoadingState = forceRefresh ? setRefreshing : setLoading;
@@ -176,6 +179,7 @@ const MyStoreProductsPage = () => {
     }
 
     setBulkPriceLoading(true);
+    setBulkPriceError(null);
     try {
       const body = { currencyCode };
       if (useSelectedProducts && selectedIds.size > 0) {
@@ -189,9 +193,11 @@ const MyStoreProductsPage = () => {
       await loadProducts(true);
       setShowBulkPriceModal(false);
       setBulkPriceForm({ currencyCode: "TRY", updateMode: "percent", newUnitPrice: "", percentageChange: "", useSelectedProducts: false });
+      setBulkPriceError(null);
       showFeedback(`${count} ürün fiyatı güncellendi.`, "success");
     } catch (err) {
-      showFeedback(err?.message ?? "Toplu fiyat güncelleme başarısız.", "error");
+      const msg = err?.message ?? "Toplu fiyat güncelleme başarısız.";
+      setBulkPriceError(msg);
     } finally {
       setBulkPriceLoading(false);
     }
@@ -215,6 +221,7 @@ const MyStoreProductsPage = () => {
     }
 
     setConvertLoading(true);
+    setConvertError(null);
     try {
       const body = { targetCurrencyCode, rateTryPerUnitTarget: rate };
       if (useSelectedProducts && selectedIds.size > 0) {
@@ -226,13 +233,40 @@ const MyStoreProductsPage = () => {
       await loadProducts(true);
       setShowConvertModal(false);
       setConvertForm({ targetCurrencyCode: "EUR", rateTryPerUnitTarget: "", useSelectedProducts: false });
+      setConvertError(null);
       showFeedback(`${count} ürün TRY'den ${targetCurrencyCode}'ye çevrildi.`, "success");
     } catch (err) {
-      showFeedback(err?.message ?? "Kur çevirimi başarısız.", "error");
+      setConvertError(err?.message ?? "Kur çevirimi başarısız.");
     } finally {
       setConvertLoading(false);
     }
   };
+
+  // Body scroll lock + Escape to close modals
+  useEffect(() => {
+    if (showBulkPriceModal || showConvertModal) {
+      document.body.style.overflow = "hidden";
+      const onEscape = (e) => {
+        if (e.key === "Escape") {
+          if (showBulkPriceModal && !bulkPriceLoading) {
+            setShowBulkPriceModal(false);
+            setBulkPriceError(null);
+          }
+          if (showConvertModal && !convertLoading) {
+            setShowConvertModal(false);
+            setConvertError(null);
+          }
+        }
+      };
+      window.addEventListener("keydown", onEscape);
+      return () => {
+        document.body.style.overflow = "";
+        window.removeEventListener("keydown", onEscape);
+      };
+    }
+    document.body.style.overflow = "";
+    return undefined;
+  }, [showBulkPriceModal, showConvertModal, bulkPriceLoading, convertLoading]);
 
   const handleProductIdMissing = (product) => {
     setProductsWithoutProductId((prev) => {
@@ -472,7 +506,7 @@ const MyStoreProductsPage = () => {
               <div className="flex flex-wrap items-center gap-3 pt-2 border-t border-gray-100">
                 <button
                   type="button"
-                  onClick={() => setShowBulkPriceModal(true)}
+                  onClick={() => { setShowBulkPriceModal(true); setBulkPriceError(null); }}
                   className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white text-sm font-bold shadow-lg hover:shadow-xl transition-all"
                 >
                   <DollarSign size={18} />
@@ -480,7 +514,7 @@ const MyStoreProductsPage = () => {
                 </button>
                 <button
                   type="button"
-                  onClick={() => setShowConvertModal(true)}
+                  onClick={() => { setShowConvertModal(true); setConvertError(null); }}
                   className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-sm font-bold shadow-lg hover:shadow-xl transition-all"
                 >
                   <ArrowRightLeft size={18} />
@@ -572,27 +606,37 @@ const MyStoreProductsPage = () => {
         )}
       </div>
 
-      {/* Toplu Fiyat Güncelleme Modal */}
-      {showBulkPriceModal && (
-        <div className="fixed inset-0 z-[9998] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => !bulkPriceLoading && setShowBulkPriceModal(false)} />
-          <div className="relative w-full max-w-md bg-white rounded-2xl shadow-2xl border-2 border-gray-200 overflow-hidden animate-[slideIn_0.3s_ease-out]">
-            <div className="bg-gradient-to-r from-amber-500 to-orange-500 text-white px-6 py-4 flex items-center justify-between">
+      {/* Toplu Fiyat Güncelleme Modal - createPortal ile body'ye render, blur + scroll fix */}
+      {showBulkPriceModal && createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 overflow-y-auto" style={{ position: "fixed" }}>
+          <div
+            className="fixed inset-0 bg-black/70 modal-backdrop-blur"
+            onClick={() => !bulkPriceLoading && (setShowBulkPriceModal(false), setBulkPriceError(null))}
+            aria-hidden="true"
+          />
+          <div className="relative w-full max-w-md my-8 bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden animate-[modalSlideIn_0.3s_ease-out] flex flex-col max-h-[calc(100vh-4rem)]">
+            <div className="flex-shrink-0 bg-gradient-to-r from-amber-500 to-orange-500 text-white px-6 py-3 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <DollarSign size={24} />
-                <h3 className="text-lg font-bold">Toplu Fiyat Güncelle</h3>
+                <DollarSign size={22} />
+                <h3 className="text-base font-bold">Toplu Fiyat Güncelle</h3>
               </div>
-              <button type="button" onClick={() => !bulkPriceLoading && setShowBulkPriceModal(false)} className="p-1 hover:bg-white/20 rounded-lg transition-colors">
-                <X size={22} />
+              <button type="button" onClick={() => !bulkPriceLoading && (setShowBulkPriceModal(false), setBulkPriceError(null))} className="p-1.5 hover:bg-white/20 rounded-lg transition-colors">
+                <X size={20} />
               </button>
             </div>
-            <div className="p-6 space-y-4">
+            <div className="flex-1 overflow-y-auto p-5 space-y-4">
+              {bulkPriceError && (
+                <div className="flex items-start gap-2 p-3 rounded-xl bg-red-50 border border-red-200 text-red-800 text-sm">
+                  <XCircle size={18} className="flex-shrink-0 mt-0.5" />
+                  <span>{bulkPriceError}</span>
+                </div>
+              )}
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1">Para Birimi</label>
                 <select
                   value={bulkPriceForm.currencyCode}
                   onChange={(e) => setBulkPriceForm((f) => ({ ...f, currencyCode: e.target.value }))}
-                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-amber-500 focus:ring-2 focus:ring-amber-100"
+                  className="w-full px-3 py-2.5 rounded-xl border-2 border-gray-200 focus:border-amber-500 focus:ring-2 focus:ring-amber-100"
                 >
                   {CURRENCY_OPTIONS.map((opt) => (
                     <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -601,7 +645,7 @@ const MyStoreProductsPage = () => {
               </div>
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">Güncelleme Tipi</label>
-                <div className="flex gap-3">
+                <div className="flex gap-4">
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input type="radio" name="updateMode" checked={bulkPriceForm.updateMode === "percent"} onChange={() => setBulkPriceForm((f) => ({ ...f, updateMode: "percent" }))} className="text-amber-600" />
                     <span className="text-sm">Yüzde Değişim</span>
@@ -621,7 +665,7 @@ const MyStoreProductsPage = () => {
                     placeholder="örn. 10 veya -5"
                     value={bulkPriceForm.percentageChange}
                     onChange={(e) => setBulkPriceForm((f) => ({ ...f, percentageChange: e.target.value }))}
-                    className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-amber-500 focus:ring-2 focus:ring-amber-100"
+                    className="w-full px-3 py-2.5 rounded-xl border-2 border-gray-200 focus:border-amber-500 focus:ring-2 focus:ring-amber-100"
                   />
                 </div>
               ) : (
@@ -634,7 +678,7 @@ const MyStoreProductsPage = () => {
                     placeholder="örn. 150.50"
                     value={bulkPriceForm.newUnitPrice}
                     onChange={(e) => setBulkPriceForm((f) => ({ ...f, newUnitPrice: e.target.value }))}
-                    className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-amber-500 focus:ring-2 focus:ring-amber-100"
+                    className="w-full px-3 py-2.5 rounded-xl border-2 border-gray-200 focus:border-amber-500 focus:ring-2 focus:ring-amber-100"
                   />
                 </div>
               )}
@@ -650,11 +694,11 @@ const MyStoreProductsPage = () => {
                 </label>
               )}
             </div>
-            <div className="px-6 pb-6 flex gap-3">
+            <div className="flex-shrink-0 px-5 pb-5 pt-2 flex gap-3 border-t border-gray-100">
               <button
                 type="button"
-                onClick={() => !bulkPriceLoading && setShowBulkPriceModal(false)}
-                className="flex-1 px-4 py-3 rounded-xl border-2 border-gray-200 text-gray-700 font-medium hover:bg-gray-50"
+                onClick={() => !bulkPriceLoading && (setShowBulkPriceModal(false), setBulkPriceError(null))}
+                className="flex-1 px-4 py-2.5 rounded-xl border-2 border-gray-200 text-gray-700 font-medium hover:bg-gray-50 transition-colors"
               >
                 İptal
               </button>
@@ -662,30 +706,41 @@ const MyStoreProductsPage = () => {
                 type="button"
                 onClick={handleBulkPriceUpdate}
                 disabled={bulkPriceLoading}
-                className="flex-1 px-4 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold hover:from-amber-600 hover:to-orange-600 disabled:opacity-50"
+                className="flex-1 px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold hover:from-amber-600 hover:to-orange-600 disabled:opacity-50 transition-colors"
               >
                 {bulkPriceLoading ? "Güncelleniyor..." : "Güncelle"}
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
-      {/* TRY'den Kur Çevir Modal */}
-      {showConvertModal && (
-        <div className="fixed inset-0 z-[9998] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => !convertLoading && setShowConvertModal(false)} />
-          <div className="relative w-full max-w-md bg-white rounded-2xl shadow-2xl border-2 border-gray-200 overflow-hidden animate-[slideIn_0.3s_ease-out]">
-            <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-4 flex items-center justify-between">
+      {/* TRY'den Kur Çevir Modal - createPortal ile body'ye render */}
+      {showConvertModal && createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 overflow-y-auto" style={{ position: "fixed" }}>
+          <div
+            className="fixed inset-0 bg-black/70 modal-backdrop-blur"
+            onClick={() => !convertLoading && (setShowConvertModal(false), setConvertError(null))}
+            aria-hidden="true"
+          />
+          <div className="relative w-full max-w-md my-8 bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden animate-[modalSlideIn_0.3s_ease-out] flex flex-col max-h-[calc(100vh-4rem)]">
+            <div className="flex-shrink-0 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-3 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <ArrowRightLeft size={24} />
-                <h3 className="text-lg font-bold">TRY'den Kur Çevir</h3>
+                <ArrowRightLeft size={22} />
+                <h3 className="text-base font-bold">TRY&apos;den Kur Çevir</h3>
               </div>
-              <button type="button" onClick={() => !convertLoading && setShowConvertModal(false)} className="p-1 hover:bg-white/20 rounded-lg transition-colors">
-                <X size={22} />
+              <button type="button" onClick={() => !convertLoading && (setShowConvertModal(false), setConvertError(null))} className="p-1.5 hover:bg-white/20 rounded-lg transition-colors">
+                <X size={20} />
               </button>
             </div>
-            <div className="p-6 space-y-4">
+            <div className="flex-1 overflow-y-auto p-5 space-y-4">
+              {convertError && (
+                <div className="flex items-start gap-2 p-3 rounded-xl bg-red-50 border border-red-200 text-red-800 text-sm">
+                  <XCircle size={18} className="flex-shrink-0 mt-0.5" />
+                  <span>{convertError}</span>
+                </div>
+              )}
               <p className="text-sm text-gray-600">
                 TRY fiyatlarınız, belirttiğiniz kura göre hedef para birimine çevrilir. Örn: 1 EUR = 35 TRY
               </p>
@@ -694,7 +749,7 @@ const MyStoreProductsPage = () => {
                 <select
                   value={convertForm.targetCurrencyCode}
                   onChange={(e) => setConvertForm((f) => ({ ...f, targetCurrencyCode: e.target.value }))}
-                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                  className="w-full px-3 py-2.5 rounded-xl border-2 border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                 >
                   {CURRENCY_OPTIONS.filter((o) => o.value !== "TRY").map((opt) => (
                     <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -710,7 +765,7 @@ const MyStoreProductsPage = () => {
                   placeholder="örn. 35"
                   value={convertForm.rateTryPerUnitTarget}
                   onChange={(e) => setConvertForm((f) => ({ ...f, rateTryPerUnitTarget: e.target.value }))}
-                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                  className="w-full px-3 py-2.5 rounded-xl border-2 border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                 />
               </div>
               {selectedIds.size > 0 && (
@@ -725,11 +780,11 @@ const MyStoreProductsPage = () => {
                 </label>
               )}
             </div>
-            <div className="px-6 pb-6 flex gap-3">
+            <div className="flex-shrink-0 px-5 pb-5 pt-2 flex gap-3 border-t border-gray-100">
               <button
                 type="button"
-                onClick={() => !convertLoading && setShowConvertModal(false)}
-                className="flex-1 px-4 py-3 rounded-xl border-2 border-gray-200 text-gray-700 font-medium hover:bg-gray-50"
+                onClick={() => !convertLoading && (setShowConvertModal(false), setConvertError(null))}
+                className="flex-1 px-4 py-2.5 rounded-xl border-2 border-gray-200 text-gray-700 font-medium hover:bg-gray-50 transition-colors"
               >
                 İptal
               </button>
@@ -737,13 +792,14 @@ const MyStoreProductsPage = () => {
                 type="button"
                 onClick={handleConvertFromTry}
                 disabled={convertLoading}
-                className="flex-1 px-4 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50"
+                className="flex-1 px-4 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 transition-colors"
               >
                 {convertLoading ? "Çevriliyor..." : "Çevir"}
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* Ürün Yönetimi Paneli */}
@@ -764,6 +820,10 @@ const MyStoreProductsPage = () => {
         }
         @keyframes slideIn {
           from { transform: scale(0.95) translateY(-20px); opacity: 0; }
+          to { transform: scale(1) translateY(0); opacity: 1; }
+        }
+        @keyframes modalSlideIn {
+          from { transform: scale(0.96) translateY(-12px); opacity: 0; }
           to { transform: scale(1) translateY(0); opacity: 1; }
         }
       `}</style>
