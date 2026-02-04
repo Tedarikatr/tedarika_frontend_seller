@@ -146,25 +146,25 @@ const ProductDatabaseTable = ({
         <div className={TABLE_STYLES.mobileCardBody}>
           <button
             onClick={() => setSelectedProductForAttributes(prod)}
-            className="w-full inline-flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-purple-600 text-white text-xs font-semibold"
+            className={`${TABLE_STYLES.mobileBtn} bg-purple-600 text-white`}
           >
-            <List className="w-3.5 h-3.5" />
+            <List className="w-4 h-4" />
             Özellikler
           </button>
           {isAdded ? (
-            <span className="w-full inline-flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-green-100 border border-green-300 text-green-800 text-xs font-semibold">
-              <CheckCircle className="w-3.5 h-3.5" />
+            <span className={`${TABLE_STYLES.mobileBtn} bg-green-100 border border-green-300 text-green-800 pointer-events-none`}>
+              <CheckCircle className="w-4 h-4" />
               Mağazada Var
             </span>
           ) : (
             <button
               onClick={() => onAdd(productId)}
               disabled={isAdding}
-              className={`w-full inline-flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold ${
-                isAdding ? "bg-gray-300 text-gray-500" : "bg-blue-600 text-white"
+              className={`${TABLE_STYLES.mobileBtn} ${
+                isAdding ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "bg-blue-600 text-white"
               }`}
             >
-              <Plus className="w-3.5 h-3.5" />
+              <Plus className="w-4 h-4" />
               {isAdding ? "Ekleniyor..." : "Mağazama Ekle"}
             </button>
           )}

@@ -53,3 +53,9 @@
   background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
   animation: progressIndeterminate 1.5s ease-in-out infinite;
 }
+
+/* Tablo yatay kaydırma - mobil touch uyumlu */
+.table-scroll-touch {
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}

@@ -287,7 +287,7 @@ const ProductDraftsPage = () => {
                 })}
               </div>
               {/* Masaüstü tablo görünümü */}
-              <div className="hidden xl:block overflow-x-auto">
+              <div className="hidden xl:block overflow-x-auto table-scroll-touch">
               <table className="min-w-full">
                 <thead className="bg-gradient-to-r from-emerald-50 to-teal-50 border-b-2 border-emerald-200">
                   <tr>

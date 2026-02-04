@@ -201,7 +201,7 @@ const MyStoreProductTable = ({
       </div>
 
       {/* Tablet & Mobile Cards */}
-      <div className="xl:hidden space-y-4 p-4">
+      <div className={`xl:hidden ${TABLE_STYLES.mobileContainer}`}>
         {products.map((product, index) => {
           const itemNo = startIndex + index + 1;
           const cover =
@@ -227,7 +227,7 @@ const MyStoreProductTable = ({
                     <button
                       type="button"
                       onClick={() => toggleSelection(product)}
-                      className={`mt-1 w-6 h-6 rounded border-2 flex items-center justify-center flex-shrink-0 transition-all ${
+                      className={`mt-1 min-w-[44px] min-h-[44px] w-10 h-10 rounded-lg border-2 flex items-center justify-center flex-shrink-0 transition-all touch-manipulation ${
                         isSelected
                           ? "bg-emerald-600 border-emerald-600 text-white"
                           : "border-gray-300 hover:border-emerald-500 bg-white"
@@ -279,26 +279,26 @@ const MyStoreProductTable = ({
                 </div>
               </div>
 
-              {/* Action Buttons */}
-              <div className="p-4 space-y-2">
+              {/* Action Buttons - min 44px touch target */}
+              <div className={`${TABLE_STYLES.mobileCardBody} space-y-2`}>
                 <button
                   type="button"
                   onClick={() => handleEditRequest(product)}
-                  className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm font-bold hover:shadow-lg hover:scale-105 transition-all duration-300"
+                  className={`${TABLE_STYLES.mobileBtn} bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:shadow-lg active:scale-[0.98] transition-all`}
                 >
                   <FileEdit className="w-4 h-4" />
                   Düzenleme Talebi Gönder
                 </button>
                 <button
                   onClick={() => setSelectedProductForAttributes(product)}
-                  className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-sm font-bold hover:shadow-lg hover:scale-105 transition-all duration-300"
+                  className={`${TABLE_STYLES.mobileBtn} bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:shadow-lg active:scale-[0.98] transition-all`}
                 >
                   <List className="w-4 h-4" />
                   Özellikler
                 </button>
                 <button
                   onClick={() => onManage(product)}
-                  className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-sm font-bold hover:shadow-lg hover:scale-105 transition-all duration-300"
+                  className={`${TABLE_STYLES.mobileBtn} bg-gradient-to-r from-emerald-600 to-teal-600 text-white hover:shadow-lg active:scale-[0.98] transition-all`}
                 >
                   <Settings className="w-4 h-4" />
                   Ürün Yönetimi

@@ -3,10 +3,13 @@
  * Değişiklik yapıldığında tüm tablolar güncellenir.
  */
 export const TABLE_STYLES = {
-  // Tablo container
-  container: "w-full overflow-x-auto",
+  // Tablo container (mobil: yatay kaydırma, iOS touch uyumlu için table-scroll-touch class eklenir)
+  container: "w-full overflow-x-auto overflow-y-visible overscroll-x-contain table-scroll-touch",
   table: "min-w-[800px] w-full",
   tableMinWidth: 800,
+
+  // Mobil kart container (safe-area, touch-friendly)
+  mobileContainer: "space-y-3 p-3 sm:p-4 pb-[env(safe-area-inset-bottom,0px)]",
 
   // Header
   thead: "bg-gradient-to-r from-emerald-50 to-teal-50 border-b-2 border-emerald-200",
@@ -39,6 +42,8 @@ export const TABLE_STYLES = {
 
   // Mobil kart
   mobileCard: "bg-gradient-to-br from-white to-gray-50 rounded-xl border-2 border-gray-200 shadow-md overflow-hidden",
-  mobileCardHeader: "bg-gradient-to-r from-emerald-50 to-teal-50 p-3 border-b border-emerald-200",
-  mobileCardBody: "p-3 space-y-2",
+  mobileCardHeader: "bg-gradient-to-r from-emerald-50 to-teal-50 p-3 sm:p-4 border-b border-emerald-200",
+  mobileCardBody: "p-3 sm:p-4 space-y-2",
+  // Mobil buton - min 44px touch target
+  mobileBtn: "min-h-[44px] inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-semibold w-full",
 };

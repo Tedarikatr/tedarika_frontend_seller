@@ -54,8 +54,14 @@ const DataTable = ({
 
   return (
     <div className={`${TABLE_STYLES.container} ${className}`}>
-      {/* Desktop Tablo */}
-      <div className="hidden xl:block">
+      {/* Tablo - mobilde yatay kaydırma, xl'de mobil kart varsa kartlar gösterilir */}
+      <div className={mobileCard ? "hidden xl:block" : ""}>
+        {!mobileCard && (
+          <p className="xl:hidden text-xs text-gray-500 mb-2 px-1 flex items-center gap-1">
+            <span className="inline-block w-4 h-4 text-emerald-500">←</span>
+            Kaydırarak tüm sütunları görüntüleyin
+          </p>
+        )}
         <table className={TABLE_STYLES.table} style={{ minWidth: minTableWidth }}>
           <thead className={TABLE_STYLES.thead}>
             <tr>
@@ -134,9 +140,9 @@ const DataTable = ({
         </table>
       </div>
 
-      {/* Mobil Kartlar */}
+      {/* Mobil Kartlar - xl altında gösterilir */}
       {mobileCard && (
-        <div className="xl:hidden space-y-3 p-3">
+        <div className={`xl:hidden ${TABLE_STYLES.mobileContainer}`}>
           {data.map((item, index) => (
             <div key={getRowId(item)} className={TABLE_STYLES.mobileCard}>
               {mobileCard(item, startIndex + index)}
