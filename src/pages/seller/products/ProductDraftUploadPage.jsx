@@ -82,6 +82,8 @@ const ProductDraftUploadPage = () => {
   const [uploadSuccessModal, setUploadSuccessModal] = useState(null); // { type, productCount?, message }
   // Hata durumunda modalda gösterilecek hatalar (açılır menü + bildirim merkezi)
   const [uploadErrorDisplay, setUploadErrorDisplay] = useState(null); // { errors: string[], type }
+  /** Yükleme tamamlandıktan sonra Dosya seç mühürlü kalır (tekrar seçim engelli) */
+  const [sealedTypes, setSealedTypes] = useState({ excel: false, xml: false, json: false, "xml-url": false });
 
   const isAnyUploadActive = uploadState.active || loadingManual || uploadErrorDisplay;
   useEffect(() => {
@@ -202,6 +204,7 @@ const ProductDraftUploadPage = () => {
 
       if (mountedRef.current) {
         setUploadSuccessModal({ type, productCount, message: successMessage });
+        setSealedTypes((prev) => ({ ...prev, [type]: true }));
         notifySuccess({
           message: successMessage,
           productCount,
@@ -1471,13 +1474,33 @@ const ProductDraftUploadPage = () => {
                   type="file"
                   accept=".xlsx,.xls"
                   onChange={(e) => setExcelFile(e.target.files[0])}
-                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-green-500 focus:ring-4 focus:ring-green-100 transition-all"
+                  disabled={isUploading || sealedTypes.excel}
+                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-green-500 focus:ring-4 focus:ring-green-100 transition-all disabled:opacity-60 disabled:pointer-events-none"
                 />
                 {excelFile && (
                   <p className="mt-2 text-sm text-green-600 flex items-center gap-2">
                     <CheckCircle className="w-4 h-4" />
                     {excelFile.name}
                   </p>
+                )}
+                {sealedTypes.excel && (
+                  <p className="mt-2 text-sm text-amber-700 flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                    Yükleme tamamlandı. Tekrar yüklemek için &quot;Yeni dosya seç&quot; butonuna tıklayın.
+                  </p>
+                )}
+                {sealedTypes.excel && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSealedTypes((p) => ({ ...p, excel: false }));
+                      setExcelFile(null);
+                      setExcelResetKey((k) => k + 1);
+                    }}
+                    className="mt-2 px-4 py-2 rounded-lg border-2 border-green-600 text-green-700 font-medium hover:bg-green-50 transition-colors"
+                  >
+                    Yeni dosya seç
+                  </button>
                 )}
               </div>
 
@@ -1510,7 +1533,7 @@ const ProductDraftUploadPage = () => {
 
               <button
                 onClick={handleExcelUpload}
-                disabled={isUploading || !excelFile}
+                disabled={isUploading || !excelFile || sealedTypes.excel}
                 className="w-full inline-flex items-center justify-center gap-2 px-6 py-4 rounded-xl bg-gradient-to-r from-green-600 to-emerald-600 text-white text-lg font-bold hover:shadow-lg hover:scale-105 transition-all disabled:opacity-50 disabled:hover:scale-100"
               >
                 {isUploading ? (
@@ -1548,8 +1571,27 @@ const ProductDraftUploadPage = () => {
                   onChange={(e) => setJsonText(e.target.value)}
                   placeholder='{"name": "Ürün Adı", "brand": "Marka", ...}'
                   rows={12}
-                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all font-mono text-sm"
+                  disabled={isUploading || sealedTypes.json}
+                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all font-mono text-sm disabled:opacity-60 disabled:pointer-events-none"
                 />
+                {sealedTypes.json && (
+                  <>
+                    <p className="mt-2 text-sm text-amber-700 flex items-center gap-2">
+                      <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                      Gönderim tamamlandı. Tekrar göndermek için &quot;Yeni içerik gir&quot; butonuna tıklayın.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSealedTypes((p) => ({ ...p, json: false }));
+                        setJsonText("");
+                      }}
+                      className="mt-2 px-4 py-2 rounded-lg border-2 border-blue-600 text-blue-700 font-medium hover:bg-blue-50 transition-colors"
+                    >
+                      Yeni içerik gir
+                    </button>
+                  </>
+                )}
               </div>
 
               {uploadType === "json" && (
@@ -1568,7 +1610,7 @@ const ProductDraftUploadPage = () => {
 
               <button
                 onClick={handleJsonUpload}
-                disabled={isUploading || !jsonText.trim()}
+                disabled={isUploading || !jsonText.trim() || sealedTypes.json}
                 className="w-full inline-flex items-center justify-center gap-2 px-6 py-4 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-lg font-bold hover:shadow-lg hover:scale-105 transition-all disabled:opacity-50 disabled:hover:scale-100"
               >
                 {isUploading ? (
@@ -1613,13 +1655,33 @@ const ProductDraftUploadPage = () => {
                   type="file"
                   accept=".xml"
                   onChange={(e) => setXmlFile(e.target.files[0])}
-                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-purple-500 focus:ring-4 focus:ring-purple-100 transition-all"
+                  disabled={isUploading || sealedTypes.xml}
+                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-purple-500 focus:ring-4 focus:ring-purple-100 transition-all disabled:opacity-60 disabled:pointer-events-none"
                 />
                 {xmlFile && (
                   <p className="mt-2 text-sm text-purple-600 flex items-center gap-2">
                     <CheckCircle className="w-4 h-4" />
                     {xmlFile.name}
                   </p>
+                )}
+                {sealedTypes.xml && (
+                  <p className="mt-2 text-sm text-amber-700 flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                    Yükleme tamamlandı. Tekrar yüklemek için &quot;Yeni dosya seç&quot; butonuna tıklayın.
+                  </p>
+                )}
+                {sealedTypes.xml && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSealedTypes((p) => ({ ...p, xml: false }));
+                      setXmlFile(null);
+                      setXmlResetKey((k) => k + 1);
+                    }}
+                    className="mt-2 px-4 py-2 rounded-lg border-2 border-purple-600 text-purple-700 font-medium hover:bg-purple-50 transition-colors"
+                  >
+                    Yeni dosya seç
+                  </button>
                 )}
               </div>
 
@@ -1632,7 +1694,8 @@ const ProductDraftUploadPage = () => {
                   value={xmlUploadName}
                   onChange={(e) => setXmlUploadName(e.target.value)}
                   placeholder="Örn: Ocak 2025 Ürünleri"
-                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-purple-500 focus:ring-4 focus:ring-purple-100 transition-all"
+                  disabled={sealedTypes.xml}
+                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-purple-500 focus:ring-4 focus:ring-purple-100 transition-all disabled:opacity-60 disabled:pointer-events-none"
                 />
               </div>
 
@@ -1652,7 +1715,7 @@ const ProductDraftUploadPage = () => {
 
               <button
                 onClick={handleXmlUpload}
-                disabled={isUploading || !xmlFile}
+                disabled={isUploading || !xmlFile || sealedTypes.xml}
                 className="w-full inline-flex items-center justify-center gap-2 px-6 py-4 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 text-white text-lg font-bold hover:shadow-lg hover:scale-105 transition-all disabled:opacity-50 disabled:hover:scale-100"
               >
                 {isUploading ? (
@@ -1697,7 +1760,8 @@ const ProductDraftUploadPage = () => {
                   value={xmlUrl}
                   onChange={(e) => setXmlUrl(e.target.value)}
                   placeholder="https://example.com/products.xml"
-                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-orange-500 focus:ring-4 focus:ring-orange-100 transition-all"
+                  disabled={isUploading || sealedTypes["xml-url"]}
+                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-orange-500 focus:ring-4 focus:ring-orange-100 transition-all disabled:opacity-60 disabled:pointer-events-none"
                 />
               </div>
 
@@ -1710,9 +1774,29 @@ const ProductDraftUploadPage = () => {
                   value={xmlUrlUploadName}
                   onChange={(e) => setXmlUrlUploadName(e.target.value)}
                   placeholder="Örn: API Entegrasyonu"
-                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-orange-500 focus:ring-4 focus:ring-orange-100 transition-all"
+                  disabled={sealedTypes["xml-url"]}
+                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-orange-500 focus:ring-4 focus:ring-orange-100 transition-all disabled:opacity-60 disabled:pointer-events-none"
                 />
               </div>
+              {sealedTypes["xml-url"] && (
+                <>
+                  <p className="text-sm text-amber-700 flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                    Yükleme tamamlandı. Tekrar yüklemek için &quot;Yeni URL gir&quot; butonuna tıklayın.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSealedTypes((p) => ({ ...p, "xml-url": false }));
+                      setXmlUrl("");
+                      setXmlUrlUploadName("");
+                    }}
+                    className="px-4 py-2 rounded-lg border-2 border-orange-600 text-orange-700 font-medium hover:bg-orange-50 transition-colors"
+                  >
+                    Yeni URL gir
+                  </button>
+                </>
+              )}
 
               {uploadType === "xml-url" && (
                 <div className="space-y-2">
@@ -1730,7 +1814,7 @@ const ProductDraftUploadPage = () => {
 
               <button
                 onClick={handleXmlUrlUpload}
-                disabled={isUploading || !xmlUrl.trim()}
+                disabled={isUploading || !xmlUrl.trim() || sealedTypes["xml-url"]}
                 className="w-full inline-flex items-center justify-center gap-2 px-6 py-4 rounded-xl bg-gradient-to-r from-orange-600 to-red-600 text-white text-lg font-bold hover:shadow-lg hover:scale-105 transition-all disabled:opacity-50 disabled:hover:scale-100"
               >
                 {isUploading ? (
