@@ -33,12 +33,7 @@ const TABS = [
 
 const SellerProfilePage = () => {
   const location = useLocation();
-  const isSubscribed =
-    localStorage.getItem("sellerSubscriptionActive") === "true";
-
-  const [activeTab, setActiveTab] = useState(
-    isSubscribed ? "seller" : "subscription"
-  );
+  const [activeTab, setActiveTab] = useState("seller");
 
   // Hash'ten tab belirleme
   useEffect(() => {
