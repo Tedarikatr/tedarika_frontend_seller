@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Mail, Phone } from "lucide-react";
+import { footerTopics } from "@/constants/sellerCenterLinks";
 
 const Logo = `${import.meta.env.BASE_URL}images/logo.png`.replace(/\/{2,}/g, "/");
 
@@ -10,13 +11,7 @@ const publicUrl = (path) => {
 };
 
 const FooterMain = () => {
-  const topics = [
-    { label: "Hakkımızda", path: "/corporate/about" },
-    { label: "Satıcı Merkezi", path: "/satici-merkezi" },
-    { label: "İletişim", path: "/corporate/contact" },
-    { label: "KVKK", path: "/corporate/kvkk" },
-    { label: "SSS", path: "/corporate/sss" },
-  ];
+  const topics = footerTopics;
 
   const portalLinks = [
     { label: "Yatırımcı İlişkileri", url: "https://www.portal.tedarika.com.tr/yatirimci-iliskileri" },

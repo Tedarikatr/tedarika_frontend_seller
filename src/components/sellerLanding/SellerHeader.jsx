@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { ChevronDown, Menu, MessageCircle, X, Home, Info, Phone, HelpCircle, Calendar, ExternalLink } from "lucide-react";
+import { ChevronDown, Menu, MessageCircle, X, Home, ExternalLink } from "lucide-react";
+import { corporateLinks, supportLinks } from "@/constants/sellerCenterLinks";
 
 const publicUrl = (path) => {
   return `${import.meta.env.BASE_URL}${path}`.replace(/\/{2,}/g, "/");
@@ -9,20 +10,8 @@ const publicUrl = (path) => {
 const Logo = publicUrl("images/logo.png");
 
 const mainNavLinks = [
-  { label: "Resmi Anasayfa", href: "/", icon: Home },
-  { label: "Fiyatlar", href: "#pricing", icon: null }
-];
-
-const corporateLinks = [
-  { label: "Hakkımızda", href: "/corporate/about", icon: Info },
-  { label: "Satıcı Merkezi", href: "/satici-merkezi", icon: null },
-  { label: "İletişim", href: "/corporate/contact", icon: Phone },
-  { label: "SSS", href: "/corporate/sss", icon: HelpCircle }
-];
-
-const supportLinks = [
-  { label: "Randevu Oluştur", href: "/seller/appointment", icon: Calendar },
-  { label: "WhatsApp Destek", href: "https://wa.me/905382362605", external: true, icon: MessageCircle }
+  { label: "Anasayfa", href: "/", icon: Home },
+  { label: "Fiyatlar", href: "#pricing", icon: null },
 ];
 
 const SellerHeader = () => {
@@ -87,7 +76,7 @@ const SellerHeader = () => {
                 className="flex items-center gap-1 hover:text-emerald-300 hover:bg-white/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 rounded-lg px-3 py-2"
                 aria-haspopup="true"
               >
-                Kurumsal
+                Satıcı Merkezi
                 <ChevronDown className="w-4 h-4" />
               </button>
               <div className="absolute left-0 top-full pt-2 hidden w-48 group-hover:block group-focus-within:block z-[9999]">
@@ -97,8 +86,38 @@ const SellerHeader = () => {
                       <a
                         key={link.label}
                         href={link.href}
-                        className="block px-3 py-2 hover:bg-white/10 hover:text-white transition-colors"
+                        className="flex items-center gap-2 px-3 py-2 hover:bg-white/10 hover:text-white transition-colors"
                       >
+                        {link.icon && <link.icon className="w-4 h-4 text-emerald-400/80 flex-shrink-0" />}
+                        {link.label}
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="relative group z-50">
+              <button
+                type="button"
+                className="flex items-center gap-1 hover:text-emerald-300 hover:bg-white/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 rounded-lg px-3 py-2"
+                aria-haspopup="true"
+              >
+                Destek
+                <ChevronDown className="w-4 h-4" />
+              </button>
+              <div className="absolute left-0 top-full pt-2 hidden w-56 group-hover:block group-focus-within:block z-[9999]">
+                <div className="rounded-lg border border-white/10 bg-[#002829] shadow-xl">
+                  <div className="py-2 text-sm text-white">
+                    {supportLinks.map((link) => (
+                      <a
+                        key={link.label}
+                        href={link.href}
+                        target={link.external ? "_blank" : undefined}
+                        rel={link.external ? "noopener noreferrer" : undefined}
+                        className="flex items-center gap-2 px-3 py-2 hover:bg-white/10 hover:text-white transition-colors"
+                      >
+                        {link.icon && <link.icon className="w-4 h-4 text-emerald-400/80 flex-shrink-0" />}
                         {link.label}
                       </a>
                     ))}
@@ -122,37 +141,6 @@ const SellerHeader = () => {
             >
               Giriş Yap
             </button>
-
-            <div className="relative group z-50">
-              <button
-                type="button"
-                className="flex items-center gap-1 text-white font-semibold text-base px-3 py-2 rounded-lg hover:text-emerald-300 hover:bg-white/10 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
-                aria-haspopup="true"
-              >
-                Destek
-                <ChevronDown className="w-4 h-4" />
-              </button>
-              <div className="absolute right-0 top-full pt-2 hidden w-56 group-hover:block group-focus-within:block z-[9999]">
-                <div className="rounded-lg border border-white/10 bg-[#002829] shadow-xl">
-                  <div className="py-2 text-sm text-white">
-                    {supportLinks.map((link) => (
-                      <a
-                        key={link.label}
-                        href={link.href}
-                        target={link.external ? "_blank" : undefined}
-                        rel={link.external ? "noopener noreferrer" : undefined}
-                        className="flex items-center gap-2 px-3 py-2 hover:bg-white/10 hover:text-white transition-colors"
-                      >
-                        {link.label === "WhatsApp Destek" && (
-                          <MessageCircle className="w-4 h-4" />
-                        )}
-                        <span>{link.label}</span>
-                      </a>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
           </div>
 
           {/* Mobile menu button - lg:hidden = sadece < 1024px'de görünür */}
@@ -213,7 +201,7 @@ const SellerHeader = () => {
 
               <div className="space-y-1">
                 <div className="px-4 py-2 text-xs font-semibold uppercase tracking-wider text-emerald-400/90">
-                  Kurumsal
+                  Satıcı Merkezi
                 </div>
                 {corporateLinks.map((link) => (
                   <a
