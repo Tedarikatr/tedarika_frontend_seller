@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { CheckCircle, Plus, Tag, Package, List } from "lucide-react";
+import DataTable, { TABLE_STYLES } from "@/components/ui/DataTable";
 import ProductAttributesModal from "./ProductAttributesModal";
 
 const ProductDatabaseTable = ({
@@ -10,199 +11,188 @@ const ProductDatabaseTable = ({
   startIndex = 0,
 }) => {
   const [selectedProductForAttributes, setSelectedProductForAttributes] = useState(null);
-  return (
-    <div className="w-full">
-      {/* Desktop Table */}
-      <div className="hidden xl:block overflow-x-auto">
-      <table className="min-w-full">
-        <thead className="bg-gradient-to-r from-emerald-50 to-teal-50 border-b-2 border-emerald-200">
-          <tr>
-            <th className="px-6 py-4 text-left text-xs font-bold text-emerald-800 uppercase tracking-wider">
-              #
-            </th>
-            <th className="px-6 py-4 text-left text-xs font-bold text-emerald-800 uppercase tracking-wider">
-              Ürün Adı
-            </th>
-            <th className="px-6 py-4 text-left text-xs font-bold text-emerald-800 uppercase tracking-wider">
-              Kategori
-            </th>
-            <th className="px-6 py-4 text-left text-xs font-bold text-emerald-800 uppercase tracking-wider">
-              Marka
-            </th>
-            <th className="px-6 py-4 text-left text-xs font-bold text-emerald-800 uppercase tracking-wider">
-              EAN
-            </th>
-            <th className="px-6 py-4 text-left text-xs font-bold text-emerald-800 uppercase tracking-wider">
-              SKU
-            </th>
-            <th className="px-6 py-4 text-center text-xs font-bold text-emerald-800 uppercase tracking-wider">
-              İşlem
-            </th>
-          </tr>
-        </thead>
-        <tbody className="bg-white divide-y divide-gray-100">
-          {products.map((prod, index) => {
-            const productId = String(prod.id ?? prod.productId);
-            const isAdded = addedIds.includes(productId);
-            const isAdding = String(addingId) === productId;
 
-            return (
-              <tr 
-                key={productId} 
-                className="hover:bg-gradient-to-r hover:from-emerald-50 hover:to-teal-50 transition-all duration-200"
-              >
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-medium">
-                  {startIndex + index + 1}
-                </td>
-                <td className="px-6 py-4">
-                  <div className="flex items-center gap-2">
-                    <Package className="w-5 h-5 text-emerald-600" />
-                    <span className="font-bold text-gray-900">{prod.name}</span>
-                  </div>
-                </td>
-                <td className="px-6 py-4">
-                  <div>
-                    <div className="text-sm font-semibold text-gray-900">{prod.categoryName}</div>
-                    {prod.categorySubName && (
-                      <div className="text-xs text-gray-500 mt-1">{prod.categorySubName}</div>
-                    )}
-                  </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="flex items-center gap-2">
-                    <Tag className="w-4 h-4 text-gray-400" />
-                    <span className="text-sm text-gray-700 font-medium">{prod.brand}</span>
-                  </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className="px-3 py-1 rounded-lg bg-gray-100 text-gray-700 text-xs font-mono font-semibold">
-                    {prod.ean ?? prod.barcode ?? "-"}
-                  </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className="px-3 py-1 rounded-lg bg-gray-100 text-gray-700 text-xs font-mono font-semibold">
-                    {prod.sku ?? "-"}
-                  </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-center">
-                  <div className="flex items-center justify-center gap-2 flex-wrap">
-                    <button
-                      onClick={() => setSelectedProductForAttributes(prod)}
-                      className="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 text-white text-sm font-bold hover:shadow-lg hover:scale-105 transition-all duration-300"
-                    >
-                      <List className="w-4 h-4" />
-                      Özellikler
-                    </button>
-                    {isAdded ? (
-                      <span className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-green-100 to-emerald-100 border-2 border-green-300 text-green-800 text-sm font-bold shadow-sm">
-                        <CheckCircle className="w-4 h-4" />
-                        Mağazada Var
-                      </span>
-                    ) : (
-                      <button
-                        onClick={() => onAdd(productId)}
-                        disabled={isAdding}
-                        className={`inline-flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-bold transition-all duration-300 ${
-                          isAdding
-                            ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                            : "bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:shadow-lg hover:scale-105"
-                        }`}
-                      >
-                        <Plus className="w-4 h-4" />
-                        {isAdding ? "Ekleniyor..." : "Mağazama Ekle"}
-                      </button>
-                    )}
-                  </div>
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-      </div>
-
-      {/* Tablet & Mobile Cards */}
-      <div className="xl:hidden space-y-4 p-2 sm:p-4">
-        {products.map((prod, index) => {
-          const productId = String(prod.id ?? prod.productId);
-          const isAdded = addedIds.includes(productId);
-          const isAdding = String(addingId) === productId;
-
-          return (
-            <div
-              key={productId}
-              className="bg-gradient-to-br from-white to-gray-50 rounded-2xl border-2 border-gray-200 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden"
+  const columns = [
+    {
+      key: "#",
+      label: "#",
+      width: 48,
+      render: (_, displayIndex) => (
+        <span className="text-gray-500 font-medium">{displayIndex + 1}</span>
+      ),
+    },
+    {
+      key: "name",
+      label: "Ürün Adı",
+      minWidth: 140,
+      render: (prod) => (
+        <div className="flex items-center gap-2 min-w-0">
+          <Package className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+          <span className="font-semibold text-gray-900 truncate" title={prod.name}>
+            {prod.name}
+          </span>
+        </div>
+      ),
+    },
+    {
+      key: "category",
+      label: "Kategori",
+      minWidth: 120,
+      render: (prod) => (
+        <div className={TABLE_STYLES.cellLineClamp2}>
+          <span className="text-gray-900">{prod.categoryName}</span>
+          {prod.categorySubName && (
+            <span className="text-gray-500 text-xs block">{prod.categorySubName}</span>
+          )}
+        </div>
+      ),
+    },
+    {
+      key: "brand",
+      label: "Marka",
+      minWidth: 100,
+      render: (prod) => (
+        <div className="flex items-center gap-1.5 truncate">
+          <Tag className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
+          <span className="text-gray-700 truncate">{prod.brand || "-"}</span>
+        </div>
+      ),
+    },
+    {
+      key: "ean",
+      label: "EAN",
+      minWidth: 100,
+      render: (prod) => (
+        <span className={`${TABLE_STYLES.badge} ${TABLE_STYLES.badgeGray} font-mono text-[11px]`}>
+          {prod.ean ?? prod.barcode ?? "-"}
+        </span>
+      ),
+    },
+    {
+      key: "sku",
+      label: "SKU",
+      minWidth: 90,
+      render: (prod) => (
+        <span className={`${TABLE_STYLES.badge} ${TABLE_STYLES.badgeGray} font-mono text-[11px]`}>
+          {prod.sku ?? "-"}
+        </span>
+      ),
+    },
+    {
+      key: "actions",
+      label: "İşlem",
+      align: "center",
+      minWidth: 200,
+      render: (prod) => {
+        const productId = String(prod.id ?? prod.productId);
+        const isAdded = addedIds.includes(productId);
+        const isAdding = String(addingId) === productId;
+        return (
+          <div className="flex items-center justify-center gap-1.5 flex-wrap">
+            <button
+              onClick={() => setSelectedProductForAttributes(prod)}
+              className={`${TABLE_STYLES.btn} bg-purple-600 hover:bg-purple-700 text-white`}
             >
-              <div className="bg-gradient-to-r from-emerald-50 to-teal-50 p-4 border-b-2 border-emerald-200">
-                <div className="flex items-start gap-3">
-                  <Package className="w-10 h-10 text-emerald-600 flex-shrink-0" />
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-bold text-gray-900 text-base sm:text-lg line-clamp-2">
-                      {prod.name}
-                    </h3>
-                    <div className="mt-2 flex flex-wrap gap-2">
-                      <span className="text-xs text-gray-600 bg-gray-100 px-2 py-0.5 rounded">
-                        {prod.categoryName}
-                        {prod.categorySubName && ` / ${prod.categorySubName}`}
-                      </span>
-                      <span className="text-xs text-gray-600 bg-gray-100 px-2 py-0.5 rounded">
-                        {prod.brand || "-"}
-                      </span>
-                    </div>
-                    <div className="mt-2 flex flex-wrap gap-2">
-                      <span className="text-xs font-mono bg-gray-200 px-2 py-0.5 rounded">
-                        EAN: {prod.ean ?? prod.barcode ?? "-"}
-                      </span>
-                      <span className="text-xs font-mono bg-gray-200 px-2 py-0.5 rounded">
-                        SKU: {prod.sku ?? "-"}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="p-4 space-y-2">
-                <button
-                  onClick={() => setSelectedProductForAttributes(prod)}
-                  className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 text-white text-sm font-bold hover:shadow-lg transition-all"
-                >
-                  <List className="w-4 h-4" />
-                  Özellikler
-                </button>
-                {isAdded ? (
-                  <span className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-gradient-to-r from-green-100 to-emerald-100 border-2 border-green-300 text-green-800 text-sm font-bold">
-                    <CheckCircle className="w-4 h-4" />
-                    Mağazada Var
-                  </span>
-                ) : (
-                  <button
-                    onClick={() => onAdd(productId)}
-                    disabled={isAdding}
-                    className={`w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-bold transition-all ${
-                      isAdding
-                        ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                        : "bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:shadow-lg"
-                    }`}
-                  >
-                    <Plus className="w-4 h-4" />
-                    {isAdding ? "Ekleniyor..." : "Mağazama Ekle"}
-                  </button>
-                )}
+              <List className="w-3.5 h-3.5" />
+              Özellikler
+            </button>
+            {isAdded ? (
+              <span className={`${TABLE_STYLES.badge} ${TABLE_STYLES.badgeGreen}`}>
+                <CheckCircle className="w-3.5 h-3.5" />
+                Mağazada Var
+              </span>
+            ) : (
+              <button
+                onClick={() => onAdd(productId)}
+                disabled={isAdding}
+                className={`${TABLE_STYLES.btn} ${
+                  isAdding ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700 text-white"
+                }`}
+              >
+                <Plus className="w-3.5 h-3.5" />
+                {isAdding ? "Ekleniyor..." : "Ekle"}
+              </button>
+            )}
+          </div>
+        );
+      },
+    },
+  ];
+
+  const mobileCard = (prod, index) => {
+    const productId = String(prod.id ?? prod.productId);
+    const isAdded = addedIds.includes(productId);
+    const isAdding = String(addingId) === productId;
+    return (
+      <>
+        <div className={TABLE_STYLES.mobileCardHeader}>
+          <div className="flex items-start gap-3">
+            <Package className="w-8 h-8 text-emerald-600 flex-shrink-0" />
+            <div className="flex-1 min-w-0">
+              <span className="text-xs text-gray-500">#{index + 1}</span>
+              <h3 className="font-bold text-gray-900 text-sm line-clamp-2 mt-0.5">{prod.name}</h3>
+              <div className="mt-2 flex flex-wrap gap-1.5">
+                <span className="text-[11px] text-gray-600 bg-gray-100 px-1.5 py-0.5 rounded">
+                  {prod.categoryName}
+                  {prod.categorySubName && ` / ${prod.categorySubName}`}
+                </span>
+                <span className="text-[11px] text-gray-600 bg-gray-100 px-1.5 py-0.5 rounded">
+                  {prod.brand || "-"}
+                </span>
               </div>
             </div>
-          );
-        })}
-      </div>
+          </div>
+        </div>
+        <div className={TABLE_STYLES.mobileCardBody}>
+          <button
+            onClick={() => setSelectedProductForAttributes(prod)}
+            className="w-full inline-flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-purple-600 text-white text-xs font-semibold"
+          >
+            <List className="w-3.5 h-3.5" />
+            Özellikler
+          </button>
+          {isAdded ? (
+            <span className="w-full inline-flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-green-100 border border-green-300 text-green-800 text-xs font-semibold">
+              <CheckCircle className="w-3.5 h-3.5" />
+              Mağazada Var
+            </span>
+          ) : (
+            <button
+              onClick={() => onAdd(productId)}
+              disabled={isAdding}
+              className={`w-full inline-flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold ${
+                isAdding ? "bg-gray-300 text-gray-500" : "bg-blue-600 text-white"
+              }`}
+            >
+              <Plus className="w-3.5 h-3.5" />
+              {isAdding ? "Ekleniyor..." : "Mağazama Ekle"}
+            </button>
+          )}
+        </div>
+      </>
+    );
+  };
 
-      {/* Attributes Modal */}
+  return (
+    <>
+      <DataTable
+        columns={columns}
+        data={products}
+        rowKey={(p) => String(p.id ?? p.productId)}
+        startIndex={startIndex}
+        emptyMessage="Ürün bulunamadı."
+        minTableWidth={900}
+        mobileCard={mobileCard}
+      />
       {selectedProductForAttributes && (
         <ProductAttributesModal
-          productId={selectedProductForAttributes.id || selectedProductForAttributes.productId}
+          productId={selectedProductForAttributes.id ?? selectedProductForAttributes.productId}
           productName={selectedProductForAttributes.name}
           isOpen={!!selectedProductForAttributes}
           onClose={() => setSelectedProductForAttributes(null)}
         />
       )}
-    </div>
+    </>
   );
 };
 

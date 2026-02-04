@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate, useLocation, Outlet } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import Topbar from "./Topbar";
@@ -15,6 +15,7 @@ const SellerLayout = () => {
   const [isRestricted, setIsRestricted] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const mainRef = useRef(null);
 
   const exemptPaths = [
     "/seller/company",
@@ -58,6 +59,13 @@ const SellerLayout = () => {
 
     verifySellerState();
   }, [location.pathname, navigate]);
+
+  // Sayfa geçişinde içerik scroll'unu en üste al
+  useEffect(() => {
+    if (mainRef.current) {
+      mainRef.current.scrollTo(0, 0);
+    }
+  }, [location.pathname]);
 
   // 🔒 Abonelik ve sistem aktiflik kontrolü
   useEffect(() => {
@@ -120,7 +128,8 @@ const SellerLayout = () => {
         <Topbar onMenuClick={() => setIsSidebarOpen(true)} />
 
         <main
-          className={`flex-1 overflow-y-auto px-4 md:px-8 py-6 bg-white/60 backdrop-blur-2xl rounded-tl-3xl shadow-inner relative transition ${
+          ref={mainRef}
+          className={`flex-1 overflow-y-auto px-4 md:px-6 py-4 bg-white/60 backdrop-blur-2xl rounded-tl-2xl shadow-inner relative transition ${
             shouldShowOverlay ? "pointer-events-none opacity-40 blur-sm" : ""
           }`}
         >

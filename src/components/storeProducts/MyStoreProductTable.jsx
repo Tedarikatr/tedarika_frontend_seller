@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { Settings, Image as ImageIcon, TrendingUp, List, FileEdit, Package, DollarSign } from "lucide-react";
 import ProductAttributesModal from "./ProductAttributesModal";
 import { CURRENCY_CODES } from "@/constants/currencyCode";
+import { TABLE_STYLES } from "@/constants/tableStyles";
 
 /** prices dizisinden ilk fiyatı formatla */
 const formatPrice = (prices) => {
@@ -61,39 +62,27 @@ const MyStoreProductTable = ({
   }
 
   return (
-    <div className="w-full">
+    <div className={TABLE_STYLES.container}>
       {/* Desktop Table */}
-      <div className="hidden xl:block overflow-x-auto">
-        <table className="min-w-[900px] w-full">
-          <thead className="bg-gradient-to-r from-emerald-50 to-teal-50 border-b-2 border-emerald-200">
+      <div className="hidden xl:block">
+        <table className={TABLE_STYLES.table} style={{ minWidth: 900 }}>
+          <thead className={TABLE_STYLES.thead}>
             <tr>
               {onSelectionChange && (
-                <th className="px-3 py-3 text-center text-xs font-bold text-emerald-800 uppercase tracking-wider">
+                <th className={`${TABLE_STYLES.thCenter} w-12`}>
                   <span className="sr-only">Seç</span>
                 </th>
               )}
-              <th className="px-3 py-3 text-center text-xs font-bold text-emerald-800 uppercase tracking-wider">
-                #
-              </th>
-              <th className="px-3 py-3 text-left text-xs font-bold text-emerald-800 uppercase tracking-wider">
-                Ürün
-              </th>
-              <th className="px-3 py-3 text-center text-xs font-bold text-emerald-800 uppercase tracking-wider">
-                Fiyat
-              </th>
-              <th className="px-3 py-3 text-center text-xs font-bold text-emerald-800 uppercase tracking-wider">
-                Stok
-              </th>
-              <th className="px-3 py-3 text-center text-xs font-bold text-emerald-800 uppercase tracking-wider">
-                Durum
-              </th>
-              <th className="px-3 py-3 text-center text-xs font-bold text-emerald-800 uppercase tracking-wider">
-                İşlem
-              </th>
+              <th className={TABLE_STYLES.thCenter}>#</th>
+              <th className={TABLE_STYLES.th}>Ürün</th>
+              <th className={TABLE_STYLES.thCenter}>Fiyat</th>
+              <th className={TABLE_STYLES.thCenter}>Stok</th>
+              <th className={TABLE_STYLES.thCenter}>Durum</th>
+              <th className={TABLE_STYLES.thCenter}>İşlem</th>
             </tr>
           </thead>
 
-          <tbody className="bg-white divide-y divide-gray-100">
+          <tbody className={TABLE_STYLES.tbody}>
             {products.map((product, index) => {
               const cover =
                 product.storeProductImagesUrls?.[0] ||
@@ -107,7 +96,7 @@ const MyStoreProductTable = ({
               return (
                 <tr
                   key={product.id ?? storeId ?? index}
-                  className={`hover:bg-gradient-to-r hover:from-emerald-50 hover:to-teal-50 transition-all duration-200 ${isSelected ? "bg-emerald-50/80" : ""}`}
+                  className={`${TABLE_STYLES.tr} ${isSelected ? TABLE_STYLES.trSelected : ""}`}
                 >
                   {onSelectionChange && (
                     <td className="px-3 py-3 whitespace-nowrap text-center">
