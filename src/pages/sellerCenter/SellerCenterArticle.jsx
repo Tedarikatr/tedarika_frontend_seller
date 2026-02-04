@@ -1,19 +1,17 @@
 import React from "react";
 import { Helmet } from "react-helmet-async";
-import { Link, useLocation } from "react-router-dom";
-import { ChevronRight } from "lucide-react";
+import { useLocation } from "react-router-dom";
 import SellerCenterLayout from "./SellerCenterLayout";
+import {
+  SellerCenterBreadcrumb,
+  SellerCenterHero,
+  SellerCenterProse,
+} from "./components";
 import { createSeoMeta, getBreadcrumbSchema } from "@/utils/seo";
 
 /**
  * Satıcı Merkezi makale sayfası: SEO meta, breadcrumb, hero, prose içerik.
- * @param {string} title - Meta title
- * @param {string} description - Meta description
- * @param {string} keywords - Meta keywords (optional)
- * @param {string} h1 - Sayfa H1
- * @param {string} [subtitle] - Hero alt başlık
- * @param {Array} breadcrumbs - [{ name, url }]
- * @param {React.ReactNode} children - İçerik (article body)
+ * Kurumsal tasarım bileşenleri ile standart yapı.
  */
 const SellerCenterArticle = ({
   title,
@@ -21,7 +19,9 @@ const SellerCenterArticle = ({
   keywords = "",
   h1,
   subtitle,
+  heroDescription,
   breadcrumbs = [],
+  icon,
   children,
 }) => {
   const location = useLocation();
@@ -62,36 +62,9 @@ const SellerCenterArticle = ({
         <script type="application/ld+json">{JSON.stringify(breadcrumbSchema)}</script>
       </Helmet>
       <SellerCenterLayout>
-        {/* Breadcrumb */}
-        <nav className="flex items-center gap-1 text-sm text-gray-500 mb-6 flex-wrap" aria-label="Breadcrumb">
-          {breadcrumbItems.map((item, i) => (
-            <React.Fragment key={item.url}>
-              {i > 0 && <ChevronRight className="w-4 h-4 text-gray-400 flex-shrink-0" />}
-              {i < breadcrumbItems.length - 1 ? (
-                <Link to={item.url} className="hover:text-emerald-600 transition-colors">
-                  {item.name}
-                </Link>
-              ) : (
-                <span className="text-gray-700 font-medium">{item.name}</span>
-              )}
-            </React.Fragment>
-          ))}
-        </nav>
-        {/* Hero */}
-        <header className="bg-gradient-to-r from-emerald-600 via-teal-600 to-green-600 rounded-2xl sm:rounded-3xl shadow-2xl p-6 sm:p-8 mb-8">
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-white mb-2">
-            {h1}
-          </h1>
-          {subtitle && (
-            <p className="text-emerald-100 text-base sm:text-lg max-w-3xl">
-              {subtitle}
-            </p>
-          )}
-        </header>
-        {/* Article body */}
-        <article className="prose prose-lg max-w-none prose-headings:text-gray-900 prose-p:text-gray-700 prose-li:text-gray-700 prose-ul:my-4 prose-ol:my-4">
-          {children}
-        </article>
+        <SellerCenterBreadcrumb items={breadcrumbItems} />
+        <SellerCenterHero h1={h1} subtitle={subtitle} description={heroDescription} icon={icon} />
+        <SellerCenterProse>{children}</SellerCenterProse>
       </SellerCenterLayout>
     </>
   );

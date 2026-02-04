@@ -1,8 +1,15 @@
 import React from "react";
 import { Helmet } from "react-helmet-async";
 import { Link, useLocation } from "react-router-dom";
-import { BookOpen, ArrowRight, Sparkles } from "lucide-react";
+import { BookOpen } from "lucide-react";
 import SellerCenterLayout from "./SellerCenterLayout";
+import {
+  SellerCenterBreadcrumb,
+  SellerCenterHero,
+  SellerCenterSection,
+  SellerCenterLinkList,
+  SellerCenterCallout,
+} from "./components";
 import { createSeoMeta, getBreadcrumbSchema } from "@/utils/seo";
 import { sellerCenterQuickLinks } from "@/constants/sellerCenterLinks";
 
@@ -20,6 +27,11 @@ const SellerCenterIndexPage = () => {
     { name: "Ana Sayfa", url: "/seller/landing" },
     { name: "Satıcı Merkezi", url: "/satici-merkezi" },
   ]);
+
+  const breadcrumbItems = [
+    { name: "Ana Sayfa", url: "/seller/landing" },
+    { name: "Satıcı Merkezi", url: "/satici-merkezi" },
+  ];
 
   const criticalTopics = [
     "Mağaza kimliği ve doğrulama: alıcı güveni burada başlar.",
@@ -47,57 +59,36 @@ const SellerCenterIndexPage = () => {
         <script type="application/ld+json">{JSON.stringify(breadcrumbSchema)}</script>
       </Helmet>
       <SellerCenterLayout>
-        <header className="bg-gradient-to-r from-emerald-600 via-teal-600 to-green-600 rounded-2xl sm:rounded-3xl shadow-2xl p-6 sm:p-8 mb-8">
-          <div className="flex items-center gap-3 mb-3">
-            <div className="w-12 h-12 sm:w-14 sm:h-14 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
-              <BookOpen className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
-            </div>
-            <Sparkles className="w-6 h-6 text-amber-200" />
-          </div>
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-white mb-2">
-            Satıcı Merkezi
-          </h1>
-          <p className="text-emerald-100 text-base sm:text-lg max-w-3xl">
-            Tedarika Satıcı Merkezi; mağazanızı kurduktan sonra satışa hazır hale gelmeniz, ürün kataloğunuzu doğru standartlarda yayınlamanız ve B2B siparişleri sorunsuz yönetmeniz için hazırlanmış operasyon rehberidir. Buradaki içerikler “kural metni” değil, sahada iş yapan KOBİ'lerin ihtiyacına göre hazırlanmış uygulama kılavuzlarıdır.
-          </p>
-        </header>
+        <SellerCenterBreadcrumb items={breadcrumbItems} />
+        <SellerCenterHero
+          h1="Satıcı Merkezi"
+          subtitle="B2B toptan satış ve e-ihracat operasyon rehberi"
+          description="Tedarika Satıcı Merkezi; mağazanızı kurduktan sonra satışa hazır hale gelmeniz, ürün kataloğunuzu doğru standartlarda yayınlamanız ve B2B siparişleri sorunsuz yönetmeniz için hazırlanmış operasyon rehberidir."
+          icon={BookOpen}
+        />
 
         <article className="space-y-8">
-          <section>
-            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">
-              Satıcı panelinde en kritik 5 konu
-            </h2>
-            <ol className="list-decimal list-inside space-y-2 text-gray-700">
+          <SellerCenterSection title="Satıcı panelinde en kritik 5 konu">
+            <ol className="list-decimal list-inside space-y-2 text-slate-600">
               {criticalTopics.map((item, i) => (
                 <li key={i}>{item}</li>
               ))}
             </ol>
-          </section>
+          </SellerCenterSection>
 
-          <section>
-            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">
-              Hızlı başlangıç bağlantıları
-            </h2>
-            <ul className="space-y-3">
-              {quickLinks.map(({ to, label }) => (
-                <li key={label}>
-                  <Link
-                    to={to}
-                    className="group inline-flex items-center gap-2 text-emerald-700 hover:text-emerald-800 font-medium"
-                  >
-                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                    {label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </section>
+          <SellerCenterSection title="Hızlı başlangıç bağlantıları">
+            <SellerCenterLinkList links={quickLinks} />
+          </SellerCenterSection>
 
-          <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 sm:p-5">
+          <SellerCenterCallout variant="warning">
             <p className="text-amber-900 font-semibold">
-              Yeni satıcıysanız önce <Link to="/satici-merkezi/ilk-7-gun" className="underline hover:no-underline">İlk 7 Gün Planı</Link> sayfasını tamamlayın.
+              Yeni satıcıysanız önce{" "}
+              <Link to="/satici-merkezi/ilk-7-gun" className="underline hover:no-underline text-amber-800">
+                İlk 7 Gün Planı
+              </Link>{" "}
+              sayfasını tamamlayın.
             </p>
-          </div>
+          </SellerCenterCallout>
         </article>
       </SellerCenterLayout>
     </>

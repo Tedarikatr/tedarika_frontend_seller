@@ -1,9 +1,14 @@
 import React, { useRef, useState } from "react";
 import { useToast } from "@/contexts/ToastContext";
 import { Helmet } from "react-helmet-async";
-import { Link, useLocation } from "react-router-dom";
-import { Mail, MessageSquare, Phone, ChevronRight } from "lucide-react";
+import { useLocation } from "react-router-dom";
+import { Mail, MessageSquare, Phone } from "lucide-react";
 import SellerCenterLayout from "./SellerCenterLayout";
+import {
+  SellerCenterBreadcrumb,
+  SellerCenterHero,
+  SellerCenterCard,
+} from "./components";
 import { createSeoMeta, getBreadcrumbSchema } from "@/utils/seo";
 
 const ContactPage = () => {
@@ -15,10 +20,11 @@ const ContactPage = () => {
     keywords: "tedarika iletişim, satıcı destek, müşteri hizmetleri, iletişim bilgileri, destek hattı"
   });
 
-  const breadcrumbSchema = getBreadcrumbSchema([
+  const breadcrumbItems = [
     { name: "Ana Sayfa", url: "/seller/landing" },
     { name: "İletişim", url: location.pathname }
-  ]);
+  ];
+
   const toast = useToast();
   const subjectRef = useRef();
   const messageRef = useRef();
@@ -46,6 +52,12 @@ const ContactPage = () => {
     }
   };
 
+  const contactCards = [
+    { icon: Mail, title: "E-posta", href: "mailto:info@tedarika.com.tr", label: "info@tedarika.com.tr", gradient: "from-emerald-600 to-teal-600" },
+    { icon: Phone, title: "Telefon", href: "tel:+905382362605", label: "+90 (538) 236 26 05", gradient: "from-teal-600 to-green-600" },
+    { icon: MessageSquare, title: "WhatsApp", href: "https://wa.me/905382362605", label: "WhatsApp ile ulaşın", gradient: "from-green-600 to-emerald-600", external: true },
+  ];
+
   return (
     <>
       <Helmet>
@@ -67,7 +79,7 @@ const ContactPage = () => {
         <meta name="twitter:title" content={seoMeta.twitter.title} />
         <meta name="twitter:description" content={seoMeta.twitter.description} />
         <meta name="twitter:image" content={seoMeta.twitter.image} />
-        <script type="application/ld+json">{JSON.stringify(breadcrumbSchema)}</script>
+        <script type="application/ld+json">{JSON.stringify(getBreadcrumbSchema(breadcrumbItems))}</script>
         <script type="application/ld+json">{JSON.stringify({
           "@context": "https://schema.org",
           "@type": "ContactPage",
@@ -88,74 +100,80 @@ const ContactPage = () => {
         })}</script>
       </Helmet>
       <SellerCenterLayout>
-        <nav className="flex items-center gap-1 text-sm text-gray-500 mb-6 flex-wrap" aria-label="Breadcrumb">
-          <Link to="/seller/landing" className="hover:text-emerald-600">Ana Sayfa</Link>
-          <ChevronRight className="w-4 h-4 text-gray-400" />
-          <span className="text-gray-700 font-medium">İletişim</span>
-        </nav>
-        <div className="bg-gradient-to-r from-emerald-600 via-teal-600 to-green-600 rounded-2xl sm:rounded-3xl shadow-2xl p-6 sm:p-8 mb-6 sm:mb-8 text-white">
-          <div className="flex items-center gap-4 mb-4">
-            <div className="bg-white/20 backdrop-blur-sm p-3 rounded-2xl">
-              <MessageSquare className="w-8 h-8" />
+        <SellerCenterBreadcrumb items={breadcrumbItems} />
+        <SellerCenterHero h1="İletişim" subtitle="Bizimle iletişime geçin" icon={MessageSquare} />
+
+        <div className="grid gap-4 sm:gap-6 md:grid-cols-3 mb-6 sm:mb-8">
+          {contactCards.map(({ icon: Icon, title, href, label, gradient, external }) => (
+            <SellerCenterCard key={title} hover>
+              <div className="flex items-center gap-3 mb-3">
+                <div className={`w-10 h-10 rounded-lg bg-gradient-to-r ${gradient} flex items-center justify-center`}>
+                  <Icon className="w-5 h-5 text-white" />
+                </div>
+                <h3 className="text-lg font-bold text-slate-900">{title}</h3>
+              </div>
+              <a
+                href={href}
+                target={external ? "_blank" : undefined}
+                rel={external ? "noopener noreferrer" : undefined}
+                className="text-emerald-600 hover:text-emerald-700 font-semibold"
+              >
+                {label}
+              </a>
+            </SellerCenterCard>
+          ))}
+        </div>
+
+        <SellerCenterCard>
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div className="text-center mb-6">
+              <h2 className="text-xl font-bold text-slate-900 mb-2">Mesaj Gönderin</h2>
+              <p className="text-slate-600">Sorularınız, önerileriniz veya iş birliği teklifleriniz için bize yazın</p>
             </div>
             <div>
-              <h1 className="text-3xl md:text-4xl font-black">İletişim</h1>
-              <p className="text-emerald-50 mt-2">Bizimle iletişime geçin</p>
+              <label className="block text-sm font-semibold mb-2 text-slate-900">Konu</label>
+              <input
+                ref={subjectRef}
+                type="text"
+                required
+                placeholder="Mesajınızın konusunu yazın"
+                className="w-full border border-slate-300 px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all"
+              />
             </div>
-          </div>
-        </div>
-        <div className="grid gap-4 sm:gap-6 md:gap-8 md:grid-cols-3 mb-6 sm:mb-8">
-          <div className="bg-white rounded-3xl shadow-xl hover:shadow-2xl transition-shadow p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="bg-gradient-to-r from-emerald-600 to-teal-600 p-3 rounded-xl">
-                <Mail className="w-6 h-6 text-white" />
-              </div>
-              <h3 className="text-xl font-bold text-gray-900">E-posta</h3>
+            <div>
+              <label className="block text-sm font-semibold mb-2 text-slate-900">Mesajınız</label>
+              <textarea
+                ref={messageRef}
+                required
+                placeholder="Mesajınızı detaylı bir şekilde yazın..."
+                className="w-full border border-slate-300 px-4 py-3 rounded-xl h-40 resize-none focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all"
+              />
             </div>
-            <a href="mailto:info@tedarika.com.tr" className="text-teal-600 hover:text-teal-700 font-semibold">info@tedarika.com.tr</a>
-          </div>
-          <div className="bg-white rounded-3xl shadow-xl hover:shadow-2xl transition-shadow p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="bg-gradient-to-r from-teal-600 to-green-600 p-3 rounded-xl">
-                <Phone className="w-6 h-6 text-white" />
-              </div>
-              <h3 className="text-xl font-bold text-gray-900">Telefon</h3>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-slate-50 p-4 rounded-xl border border-slate-200">
+              <span className="text-sm text-slate-700 font-medium">Dosya Ekle (Opsiyonel)</span>
+              <label className="bg-white text-sm font-semibold px-4 py-2 border border-slate-300 rounded-xl hover:bg-slate-50 cursor-pointer transition-colors text-center sm:text-left">
+                Dosya Seç
+                <input ref={fileRef} type="file" className="hidden" />
+              </label>
             </div>
-            <a href="tel:+905382362605" className="text-teal-600 hover:text-teal-700 font-semibold">+90 (538) 236 26 05</a>
-          </div>
-          <div className="bg-white rounded-3xl shadow-xl hover:shadow-2xl transition-shadow p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="bg-gradient-to-r from-green-600 to-emerald-600 p-3 rounded-xl">
-                <MessageSquare className="w-6 h-6 text-white" />
-              </div>
-              <h3 className="text-xl font-bold text-gray-900">WhatsApp</h3>
+            <div className="flex justify-center pt-2">
+              <button
+                type="submit"
+                disabled={loading}
+                className="bg-gradient-to-r from-emerald-600 to-teal-600 text-white px-8 py-3 rounded-xl font-bold hover:shadow-lg transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                {loading ? (
+                  <span className="flex items-center gap-2">
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    Gönderiliyor...
+                  </span>
+                ) : (
+                  "Mesajı Gönder"
+                )}
+              </button>
             </div>
-            <a href="https://wa.me/905382362605" target="_blank" rel="noopener noreferrer" className="text-teal-600 hover:text-teal-700 font-semibold">WhatsApp ile ulaşın</a>
-          </div>
-        </div>
-        <form onSubmit={handleSubmit} className="bg-white rounded-2xl sm:rounded-3xl shadow-xl p-6 sm:p-8 space-y-5 sm:space-y-6 overflow-hidden">
-          <div className="text-center mb-6">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Mesaj Gönderin</h2>
-            <p className="text-gray-600">Sorularınız, önerileriniz veya iş birliği teklifleriniz için bize yazın</p>
-          </div>
-          <div>
-            <label className="block text-sm font-semibold mb-2 text-gray-900">Konu</label>
-            <input ref={subjectRef} type="text" required placeholder="Mesajınızın konusunu yazın" className="w-full border border-gray-300 px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all" />
-          </div>
-          <div>
-            <label className="block text-sm font-semibold mb-2 text-gray-900">Mesajınız</label>
-            <textarea ref={messageRef} required placeholder="Mesajınızı detaylı bir şekilde yazın..." className="w-full border border-gray-300 px-4 py-3 rounded-xl h-40 resize-none focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all" />
-          </div>
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-gray-50 p-4 rounded-xl border border-gray-200">
-            <span className="text-sm text-gray-700 font-medium">Dosya Ekle (Opsiyonel)</span>
-            <label className="bg-white text-sm font-semibold px-4 py-2 border border-gray-300 rounded-xl hover:bg-gray-50 cursor-pointer transition-colors text-center sm:text-left">Dosya Seç<input ref={fileRef} type="file" className="hidden" /></label>
-          </div>
-          <div className="flex justify-center pt-2">
-            <button type="submit" disabled={loading} className="bg-gradient-to-r from-emerald-600 via-teal-600 to-green-600 text-white px-8 py-3 rounded-xl font-bold hover:shadow-lg transition-all duration-300 hover:scale-105 disabled:opacity-60 disabled:cursor-not-allowed">
-              {loading ? <span className="flex items-center gap-2"><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />Gönderiliyor...</span> : "Mesajı Gönder"}
-            </button>
-          </div>
-        </form>
+          </form>
+        </SellerCenterCard>
       </SellerCenterLayout>
     </>
   );

@@ -59,3 +59,12 @@
   -webkit-overflow-scrolling: touch;
   scrollbar-width: thin;
 }
+
+/* Mobil nav yatay kaydırma - scrollbar gizle */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
