@@ -6,6 +6,7 @@ import SellerCenterLayout from "./SellerCenterLayout";
 import {
   SellerCenterBreadcrumb,
   SellerCenterHero,
+  SellerCenterCard,
   SellerCenterSection,
   SellerCenterLinkList,
   SellerCenterCallout,
@@ -67,29 +68,31 @@ const SellerCenterIndexPage = () => {
           icon={BookOpen}
         />
 
-        <article className="space-y-8">
-          <SellerCenterSection title="Satıcı panelinde en kritik 5 konu">
-            <ol className="list-decimal list-inside space-y-2 text-slate-600">
-              {criticalTopics.map((item, i) => (
-                <li key={i}>{item}</li>
-              ))}
-            </ol>
-          </SellerCenterSection>
+        <SellerCenterCard>
+          <article className="space-y-8">
+            <SellerCenterSection title="Satıcı panelinde en kritik 5 konu">
+              <ol className="list-decimal list-inside space-y-2 text-slate-600">
+                {criticalTopics.map((item, i) => (
+                  <li key={i}>{item}</li>
+                ))}
+              </ol>
+            </SellerCenterSection>
 
-          <SellerCenterSection title="Hızlı başlangıç bağlantıları">
-            <SellerCenterLinkList links={quickLinks} />
-          </SellerCenterSection>
+            <SellerCenterSection title="Hızlı başlangıç bağlantıları">
+              <SellerCenterLinkList links={quickLinks} />
+            </SellerCenterSection>
 
-          <SellerCenterCallout variant="warning">
-            <p className="text-amber-900 font-semibold">
-              Yeni satıcıysanız önce{" "}
-              <Link to="/satici-merkezi/ilk-7-gun" className="underline hover:no-underline text-amber-800">
-                İlk 7 Gün Planı
-              </Link>{" "}
-              sayfasını tamamlayın.
-            </p>
-          </SellerCenterCallout>
-        </article>
+            <SellerCenterCallout variant="warning">
+              <p className="text-amber-900 font-semibold">
+                Yeni satıcıysanız önce{" "}
+                <Link to="/satici-merkezi/ilk-7-gun" className="underline hover:no-underline text-amber-800">
+                  İlk 7 Gün Planı
+                </Link>{" "}
+                sayfasını tamamlayın.
+              </p>
+            </SellerCenterCallout>
+          </article>
+        </SellerCenterCard>
       </SellerCenterLayout>
     </>
   );

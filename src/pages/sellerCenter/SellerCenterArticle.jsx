@@ -5,6 +5,7 @@ import SellerCenterLayout from "./SellerCenterLayout";
 import {
   SellerCenterBreadcrumb,
   SellerCenterHero,
+  SellerCenterCard,
   SellerCenterProse,
 } from "./components";
 import { createSeoMeta, getBreadcrumbSchema } from "@/utils/seo";
@@ -64,7 +65,9 @@ const SellerCenterArticle = ({
       <SellerCenterLayout>
         <SellerCenterBreadcrumb items={breadcrumbItems} />
         <SellerCenterHero h1={h1} subtitle={subtitle} description={heroDescription} icon={icon} />
-        <SellerCenterProse>{children}</SellerCenterProse>
+        <SellerCenterCard>
+          <SellerCenterProse>{children}</SellerCenterProse>
+        </SellerCenterCard>
       </SellerCenterLayout>
     </>
   );
