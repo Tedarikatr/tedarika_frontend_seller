@@ -3,7 +3,6 @@
 // =============================
 import React, { useEffect, useState } from "react";
 import { fetchStoreOrders } from "@/api/sellerOrderService";
-import { getShippingLabel } from "@/api/sellerShippingService";
 import { Link, useNavigate } from "react-router-dom";
 import { statusLabels } from "@/constants/orderStatus";
 import { 
@@ -17,8 +16,7 @@ import {
   Calendar,
   DollarSign,
   Sparkles,
-  Truck,
-  Loader2
+  Truck
 } from "lucide-react";
 
 const StatusBadge = ({ status }) => {
@@ -74,8 +72,6 @@ const StatusBadge = ({ status }) => {
 const OrderListPage = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [trackingMap, setTrackingMap] = useState({});
-  const [trackingLoading, setTrackingLoading] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -88,24 +84,11 @@ const OrderListPage = () => {
     const loadOrders = async () => {
       try {
         const res = await fetchStoreOrders();
-        setOrders(res);
-        setTrackingLoading(true);
-        const entries = await Promise.all(
-          (res || []).map(async (order) => {
-            try {
-              const label = await getShippingLabel(order.id);
-              return [order.id, label];
-            } catch {
-              return [order.id, null];
-            }
-          })
-        );
-        setTrackingMap(Object.fromEntries(entries));
+        setOrders(res || []);
       } catch (err) {
         console.error("Siparişler alınamadı:", err);
       } finally {
         setLoading(false);
-        setTrackingLoading(false);
       }
     };
 
@@ -315,10 +298,7 @@ const OrderListPage = () => {
                             <StatusBadge status={order.status} />
                           </td>
                           <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap hidden lg:table-cell">
-                            <TrackingBadge
-                              loading={trackingLoading}
-                              tracking={trackingMap[order.id]}
-                            />
+                            <OrderKargoCell order={order} />
                           </td>
                           <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-center">
                             <Link
@@ -343,39 +323,18 @@ const OrderListPage = () => {
   );
 };
 
-const TrackingBadge = ({ loading, tracking }) => {
-  if (loading && !tracking) {
+/** Kargo sütunu: Liste API'den gelen bilgi veya "-". Etiket için detay sayfasına gidilir (gereksiz istek önlenir). */
+const OrderKargoCell = ({ order }) => {
+  const hasTracking = order.trackingNumber || order.carrierCompany;
+  if (hasTracking) {
     return (
-      <span className="inline-flex items-center gap-2 text-xs text-gray-500">
-        <Loader2 className="w-3 h-3 animate-spin" />
-        Yükleniyor
+      <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold border bg-gray-50 text-gray-700 border-gray-200" title={order.trackingNumber || ""}>
+        <Truck size={12} />
+        {order.trackingNumber ? `${order.carrierCompany || "Kargo"}: ${String(order.trackingNumber).slice(0, 12)}…` : order.carrierCompany || "Kargo var"}
       </span>
     );
   }
-
-  if (!tracking) {
-    return <span className="text-xs text-gray-400">-</span>;
-  }
-
-  const statusText = tracking.trackingStatus || (tracking.fileUrl || tracking.responsiveLabelUrl ? "Etiket Var" : "Kayıt Var");
-  const normalized = String(statusText || "").toLowerCase();
-  let badgeClass = "bg-gray-50 text-gray-700 border-gray-200";
-  let icon = <Truck size={12} />;
-
-  if (normalized.includes("deliver")) {
-    badgeClass = "bg-emerald-50 text-emerald-700 border-emerald-200";
-  } else if (normalized.includes("transit") || normalized.includes("in")) {
-    badgeClass = "bg-blue-50 text-blue-700 border-blue-200";
-  } else if (normalized.includes("return") || normalized.includes("cancel")) {
-    badgeClass = "bg-rose-50 text-rose-700 border-rose-200";
-  }
-
-  return (
-    <span className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold border ${badgeClass}`}>
-      {icon}
-      {statusText}
-    </span>
-  );
+  return <span className="text-xs text-gray-400">Detayda gör</span>;
 };
 
 export default OrderListPage;
