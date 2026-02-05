@@ -43,4 +43,5 @@ export const BrandStatus = {
   0: "Pending",
   1: "Approved",
   2: "Suspended",
+  3: "Rejected",
 };

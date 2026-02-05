@@ -11,9 +11,11 @@ import {
   cancelOrder
 } from "@/api/sellerOrderService";
 import {
-  downloadOrderCarrierLabel,
-  getOrderCarrierTracking,
-} from "@/api/sellerOrderCarrierService";
+  getShippingLabel,
+  getShippingOffers,
+  acceptShippingOffer,
+  downloadShippingLabel,
+} from "@/api/sellerShippingService";
 import { statusLabels } from "@/constants/orderStatus";
 import { CARRIER_OPTIONS } from "@/constants/carrierCompanies";
 import { toast } from "react-hot-toast";
@@ -124,12 +126,16 @@ const OrderDetailPage = () => {
   const [paymentOpen, setPaymentOpen] = useState(false);
   const [paymentLoading, setPaymentLoading] = useState(false);
   const [paymentError, setPaymentError] = useState("");
-  const [geliverTracking, setGeliverTracking] = useState(null);
-  const [geliverLoading, setGeliverLoading] = useState(false);
-  const [geliverError, setGeliverError] = useState("");
+  const [shippingLabel, setShippingLabel] = useState(null);
+  const [shippingLabelLoading, setShippingLabelLoading] = useState(false);
+  const [shippingLabelError, setShippingLabelError] = useState("");
   const [showLabelModal, setShowLabelModal] = useState(false);
   const [labelLoading, setLabelLoading] = useState(false);
   const [labelPdfUrl, setLabelPdfUrl] = useState(null);
+  const [offers, setOffers] = useState(null);
+  const [offersLoading, setOffersLoading] = useState(false);
+  const [acceptOfferLoading, setAcceptOfferLoading] = useState(false);
+  const [selectedOfferId, setSelectedOfferId] = useState(null);
 
   // Kargo Modal State
   const [showCarrierModal, setShowCarrierModal] = useState(false);
@@ -167,24 +173,64 @@ const OrderDetailPage = () => {
     }
   };
 
-  const loadGeliverTracking = async () => {
-    setGeliverLoading(true);
-    setGeliverError("");
+  const loadShippingLabel = async () => {
+    setShippingLabelLoading(true);
+    setShippingLabelError("");
     try {
-      const data = await getOrderCarrierTracking(Number(orderId));
-      setGeliverTracking(data);
+      const data = await getShippingLabel(Number(orderId));
+      setShippingLabel(data);
     } catch (err) {
-      setGeliverTracking(null);
-      setGeliverError(err?.message || "Kargo bilgisi alınamadı.");
+      setShippingLabel(null);
+      if (err?.message && !err.message.includes("bulunamadı") && !err.message.includes("404")) {
+        setShippingLabelError(err.message);
+      }
     } finally {
-      setGeliverLoading(false);
+      setShippingLabelLoading(false);
     }
   };
 
+  const loadOffers = async () => {
+    setOffersLoading(true);
+    setOffers(null);
+    setSelectedOfferId(null);
+    try {
+      const data = await getShippingOffers(Number(orderId), {});
+      setOffers(data);
+      if (data?.cheapestOfferId) setSelectedOfferId(data.cheapestOfferId);
+    } catch (err) {
+      toast.error(err?.message || "Kargo teklifleri alınamadı.");
+    } finally {
+      setOffersLoading(false);
+    }
+  };
+
+  const handleAcceptOffer = async () => {
+    if (!offers?.providerShipmentId || !selectedOfferId) {
+      toast.error("Lütfen bir teklif seçin.");
+      return;
+    }
+    const offer = offers.offers?.find((o) => o.id === selectedOfferId);
+    setAcceptOfferLoading(true);
+    try {
+      await acceptShippingOffer(Number(orderId), {
+        providerShipmentId: offers.providerShipmentId,
+        offerId: selectedOfferId,
+        acceptedOfferTotalAmount: offer ? parseFloat(offer.totalAmount) : undefined,
+      });
+      toast.success("Teklif kabul edildi, etiket oluşturuldu.");
+      setOffers(null);
+      setSelectedOfferId(null);
+      await loadShippingLabel();
+    } catch (err) {
+      toast.error(err?.message || "Teklif kabul edilemedi.");
+    } finally {
+      setAcceptOfferLoading(false);
+    }
+  };
 
   useEffect(() => {
     loadOrder();
-    loadGeliverTracking();
+    loadShippingLabel();
     setPaymentOpen(false);
     setPaymentError("");
   }, [orderId]);
@@ -278,7 +324,7 @@ const OrderDetailPage = () => {
     setLabelLoading(true);
     setLabelPdfUrl(null);
     try {
-      const blob = await downloadOrderCarrierLabel(Number(orderId));
+      const blob = await downloadShippingLabel(Number(orderId));
       const url = window.URL.createObjectURL(blob);
       setLabelPdfUrl(url);
       setShowLabelModal(true);
@@ -304,7 +350,7 @@ const OrderDetailPage = () => {
     if (labelPdfUrl) {
       const link = document.createElement("a");
       link.href = labelPdfUrl;
-      link.download = `geliver-label-${order?.orderNumber || orderId}.pdf`;
+      link.download = shippingLabel?.fileName || `kargo-etiket-${order?.orderNumber || orderId}.pdf`;
       document.body.appendChild(link);
       link.click();
       link.remove();
@@ -417,7 +463,7 @@ const OrderDetailPage = () => {
                       <span className="sm:hidden">Kargo</span>
                     </button>
 
-                    {geliverTracking?.fileUrl && (
+                    {shippingLabel && (
                       <button
                         onClick={handleViewLabel}
                         disabled={labelLoading}
@@ -431,6 +477,21 @@ const OrderDetailPage = () => {
                         <span className="hidden lg:inline">Kargo Etiketi Görüntüle</span>
                         <span className="hidden sm:inline lg:hidden">Etiket</span>
                         <span className="sm:hidden">Etiket</span>
+                      </button>
+                    )}
+                    {!shippingLabel && (order.status === "Created" || order.status === "Confirmed") && (
+                      <button
+                        onClick={loadOffers}
+                        disabled={offersLoading}
+                        className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white rounded-lg sm:rounded-xl font-semibold transition-all disabled:opacity-50 border border-white/30 text-xs sm:text-sm"
+                      >
+                        {offersLoading ? (
+                          <Loader2 className="w-3 h-3 sm:w-4 sm:h-4 animate-spin" />
+                        ) : (
+                          <Truck className="w-3 h-3 sm:w-4 sm:h-4" />
+                        )}
+                        <span className="hidden sm:inline">Kargo Teklifi Al</span>
+                        <span className="sm:hidden">Teklif</span>
                       </button>
                     )}
 
@@ -495,8 +556,67 @@ const OrderDetailPage = () => {
           />
         </div>
 
-        {/* Kargo Takip Durumu ve Webhook Timeline */}
-        {geliverTracking && (
+        {shippingLabelError && (
+          <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 flex items-center gap-2 text-amber-800 text-sm mb-4">
+            <InfoIcon className="w-5 h-5 flex-shrink-0" />
+            {shippingLabelError}
+          </div>
+        )}
+        {/* Kargo Teklifleri (henüz etiket yoksa) */}
+        {offers && !shippingLabel && (
+          <div className="bg-white rounded-xl sm:rounded-2xl border border-gray-200 overflow-hidden">
+            <div className="bg-gradient-to-r from-sky-50 to-blue-50 px-4 sm:px-6 py-4 border-b border-sky-100">
+              <h2 className="text-base sm:text-lg font-bold text-gray-800">Kargo Teklifleri</h2>
+              <p className="text-xs text-gray-600 mt-1">Bir teklif seçip kabul ederek kargo etiketi oluşturun.</p>
+            </div>
+            <div className="p-4 sm:p-6">
+              <div className="space-y-3 mb-4">
+                {offers.offers?.map((offer) => (
+                  <label
+                    key={offer.id}
+                    className={`flex items-center justify-between p-4 rounded-xl border-2 cursor-pointer transition-all ${
+                      selectedOfferId === offer.id ? "border-emerald-500 bg-emerald-50" : "border-gray-200 hover:border-gray-300"
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="offer"
+                      checked={selectedOfferId === offer.id}
+                      onChange={() => setSelectedOfferId(offer.id)}
+                      className="sr-only"
+                    />
+                    <div>
+                      <span className="font-semibold text-gray-800">{offer.providerCode}</span>
+                      <span className="text-gray-500 text-sm ml-2">{offer.providerServiceCode}</span>
+                    </div>
+                    <span className="font-bold text-emerald-700">
+                      {offer.totalAmount} {offer.currency}
+                    </span>
+                  </label>
+                ))}
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  onClick={handleAcceptOffer}
+                  disabled={acceptOfferLoading || !selectedOfferId}
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-xl font-semibold hover:bg-emerald-700 disabled:opacity-50"
+                >
+                  {acceptOfferLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
+                  Seçilen Teklifi Kabul Et
+                </button>
+                <button
+                  onClick={() => setOffers(null)}
+                  className="px-4 py-2 border border-gray-300 rounded-xl text-gray-700 font-semibold hover:bg-gray-50"
+                >
+                  İptal
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Kargo Takip Durumu */}
+        {shippingLabel && (
           <div className="bg-white rounded-xl sm:rounded-2xl lg:rounded-3xl shadow-2xl border border-gray-200 overflow-hidden">
             <div className="bg-gradient-to-r from-indigo-50 to-purple-50 px-4 sm:px-6 py-3 sm:py-4 border-b border-indigo-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
               <div className="flex items-center gap-2 sm:gap-3">
@@ -505,15 +625,15 @@ const OrderDetailPage = () => {
                 </div>
                 <div>
                   <h2 className="text-base sm:text-lg font-bold text-gray-800">Kargo Takip Durumu</h2>
-                  <p className="text-xs text-gray-500">Webhook ile otomatik güncellenir</p>
+                  <p className="text-xs text-gray-500">Takip durumu otomatik güncellenir</p>
                 </div>
               </div>
               <button
-                onClick={loadGeliverTracking}
-                disabled={geliverLoading}
+                onClick={loadShippingLabel}
+                disabled={shippingLabelLoading}
                 className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-white border border-indigo-200 text-indigo-700 text-xs sm:text-sm font-semibold rounded-lg sm:rounded-xl shadow-sm hover:shadow transition disabled:opacity-50 w-full sm:w-auto justify-center"
               >
-                {geliverLoading ? <Loader2 className="w-3 h-3 sm:w-4 sm:h-4 animate-spin" /> : <RefreshCw className="w-3 h-3 sm:w-4 sm:h-4" />}
+                {shippingLabelLoading ? <Loader2 className="w-3 h-3 sm:w-4 sm:h-4 animate-spin" /> : <RefreshCw className="w-3 h-3 sm:w-4 sm:h-4" />}
                 Yenile
               </button>
             </div>
@@ -526,9 +646,9 @@ const OrderDetailPage = () => {
                   Takip Durumu Timeline
                 </h3>
                 <TrackingTimeline
-                  trackingStatus={geliverTracking.trackingStatus}
+                  trackingStatus={shippingLabel.trackingStatus}
                   orderStatus={order.status}
-                  trackingUpdatedAt={geliverTracking.trackingUpdatedAt}
+                  trackingUpdatedAt={shippingLabel.trackingUpdatedAt}
                 />
               </div>
 
@@ -537,10 +657,10 @@ const OrderDetailPage = () => {
                 <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl p-4 border border-blue-200">
                   <p className="text-xs text-blue-600 mb-1">Tracking Status</p>
                   <p className="font-bold text-gray-800">
-                    {geliverTracking.trackingStatus ? (
+                    {shippingLabel.trackingStatus ? (
                       <span className="inline-flex items-center gap-2">
                         <Circle className="w-2 h-2 fill-current" />
-                        {geliverTracking.trackingStatus}
+                        {shippingLabel.trackingStatus}
                       </span>
                     ) : (
                       "Henüz güncellenmedi"
@@ -553,32 +673,32 @@ const OrderDetailPage = () => {
                     <StatusBadge status={order.status} />
                   </p>
                 </div>
-                {geliverTracking.trackingUpdatedAt && (
+                {shippingLabel.trackingUpdatedAt && (
                   <div className="bg-gradient-to-br from-emerald-50 to-green-50 rounded-xl p-4 border border-emerald-200">
                     <p className="text-xs text-emerald-600 mb-1">Son Güncelleme</p>
                     <p className="font-bold text-gray-800">
-                      {new Date(geliverTracking.trackingUpdatedAt).toLocaleString("tr-TR")}
+                      {new Date(shippingLabel.trackingUpdatedAt).toLocaleString("tr-TR")}
                     </p>
                   </div>
                 )}
-                {geliverTracking.shipmentId && (
+                {shippingLabel.shipmentId && (
                   <div className="bg-gradient-to-br from-amber-50 to-yellow-50 rounded-xl p-4 border border-amber-200">
                     <p className="text-xs text-amber-600 mb-1">Shipment ID</p>
-                    <p className="font-bold text-gray-800 text-xs break-all">{geliverTracking.shipmentId}</p>
+                    <p className="font-bold text-gray-800 text-xs break-all">{shippingLabel.shipmentId}</p>
                   </div>
                 )}
               </div>
 
-              {/* Webhook Mapping Bilgisi */}
+              {/* Durum eşlemesi bilgisi */}
               <div className="bg-gradient-to-br from-gray-50 to-white border border-gray-200 rounded-xl p-4">
                 <div className="flex items-start gap-3">
                   <div className="w-8 h-8 rounded-lg bg-indigo-100 flex items-center justify-center flex-shrink-0">
                     <InfoIcon className="w-4 h-4 text-indigo-600" />
                   </div>
                   <div className="flex-1">
-                    <p className="text-xs font-semibold text-gray-700 mb-1">Webhook Durum Mapping</p>
+                    <p className="text-xs font-semibold text-gray-700 mb-1">Durum Eşlemesi</p>
                     <p className="text-xs text-gray-600 mb-2">
-                      Geliver webhook'larından gelen tracking durumları otomatik olarak sipariş durumuna çevrilir:
+                      Kargo takip durumları otomatik olarak sipariş durumuna çevrilir:
                     </p>
                     <div className="space-y-1.5 text-xs">
                       <div className="flex items-center gap-2 p-2 bg-blue-50 rounded-lg border border-blue-100">

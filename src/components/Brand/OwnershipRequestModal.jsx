@@ -29,13 +29,7 @@ export default function OwnershipRequestModal({
     e.preventDefault();
     setError("");
 
-    // Yetkili satıcı için expiryDate kontrolü
-    if (ownershipType === 1 && !expiryDate) {
-      setError("Yetkili satıcı için son kullanma tarihi zorunludur.");
-      return;
-    }
-
-    // ExpiryDate geçmişte olamaz
+    // ExpiryDate girilmişse geçmişte olamaz
     if (expiryDate && new Date(expiryDate) < new Date()) {
       setError("Son kullanma tarihi geçmişte olamaz.");
       return;
@@ -194,11 +188,11 @@ export default function OwnershipRequestModal({
               </div>
             </div>
 
-            {/* Son Kullanma Tarihi (Sadece Yetkili Satıcı için) */}
+            {/* Son Kullanma Tarihi (Sadece Yetkili Satıcı için, opsiyonel) */}
             {ownershipType === 1 && (
               <div>
                 <label className="block text-sm font-bold text-gray-700 mb-2">
-                  Son Kullanma Tarihi <span className="text-red-500">*</span>
+                  Son Kullanma Tarihi <span className="text-gray-500 text-xs">(Opsiyonel)</span>
                 </label>
                 <div className="relative">
                   <Calendar className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -212,11 +206,10 @@ export default function OwnershipRequestModal({
                     min={new Date().toISOString().split("T")[0]}
                     className="w-full pl-12 pr-4 py-3 rounded-xl border-2 border-gray-200 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 transition-all duration-300 text-gray-800 font-medium"
                     disabled={loading}
-                    required
                   />
                 </div>
                 <p className="text-xs text-gray-500 mt-2">
-                  Yetkili satıcı sözleşmesinin sona ereceği tarih
+                  Yetkili satıcı sözleşmesinin sona ereceği tarih (isteğe bağlı)
                 </p>
               </div>
             )}
@@ -275,7 +268,7 @@ export default function OwnershipRequestModal({
             </button>
             <button
               type="submit"
-              disabled={loading || (ownershipType === 1 && !expiryDate)}
+              disabled={loading}
               className="flex-1 px-6 py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-bold hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               {loading ? (

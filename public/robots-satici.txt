@@ -30,6 +30,6 @@ Disallow: /seller/apply
 # API endpoint'leri
 Disallow: /api/
 
-# Bu domain için sitemap (sitemap-index.xml kullanılıyor)
+# Bu domain için tek sitemap (tüm sayfalar: satıcı merkezi, kurumsal, kayıt vb.)
 Sitemap: https://www.satici.tedarika.com.tr/sitemap.xml
 

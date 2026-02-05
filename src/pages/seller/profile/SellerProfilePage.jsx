@@ -19,7 +19,7 @@ import CompanyInfoCard from "@/components/seller/CompanyInfoCard";
 import SellerFinanceInfoCard from "@/components/seller/SellerFinanceInfoCard";
 import BulletinPreferencesCard from "@/components/seller/BulletinPreferencesCard";
 import SubscriptionPlans from "@/components/seller/SubscriptionPlans"; // 👈 SubscriptionPage'den çıkarılıp component olarak kaydedilecek
-import SellerGeliverIntegrationCard from "@/components/seller/SellerGeliverIntegrationCard";
+import ShippingSettingsCard from "@/components/seller/ShippingSettingsCard";
 
 const TABS = [
   { key: "seller", label: "Satıcı", icon: <UserCircle className="w-5 h-5" /> },
@@ -27,7 +27,7 @@ const TABS = [
   { key: "store", label: "Mağaza", icon: <Store className="w-5 h-5" /> },
   { key: "subscription", label: "Abonelik", icon: <ShieldCheck className="w-5 h-5" /> },
   { key: "finance", label: "Ödeme", icon: <CreditCard className="w-5 h-5" /> },
-  { key: "cargo", label: "Kargo Entegrasyonu", icon: <Truck className="w-5 h-5" /> },
+  { key: "cargo", label: "Kargo Ayarları", icon: <Truck className="w-5 h-5" /> },
   { key: "notifications", label: "İletişim Tercihleri", icon: <Mail className="w-5 h-5" /> },
 ];
 
@@ -71,7 +71,7 @@ const SellerProfilePage = () => {
       case "finance":
         return <SellerFinanceInfoCard />;
       case "cargo":
-        return <SellerGeliverIntegrationCard />;
+        return <ShippingSettingsCard />;
       case "notifications":
         return <BulletinPreferencesCard />;
       default:

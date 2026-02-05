@@ -4,11 +4,11 @@
               xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
               http://www.sitemaps.org/schemas/sitemap/0.9/sitemap-index.xsd">
   <sitemap>
-    <loc>https://www.seller.tedarika.com.tr/sitemap-seller.xml</loc>
+    <loc>https://www.seller.tedarika.com.tr/sitemap.xml</loc>
     <lastmod>2025-02-04</lastmod>
   </sitemap>
   <sitemap>
-    <loc>https://www.satici.tedarika.com.tr/sitemap-satici.xml</loc>
+    <loc>https://www.satici.tedarika.com.tr/sitemap.xml</loc>
     <lastmod>2025-02-04</lastmod>
   </sitemap>
 </sitemapindex>
