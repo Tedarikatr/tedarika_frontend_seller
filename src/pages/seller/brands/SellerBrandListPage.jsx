@@ -47,9 +47,9 @@ export default function SellerBrandPage() {
         getBrandOwnership(),
         getOwnedBrands(),
       ]);
-      setBrands(brandList);
-      setOwnerships(ownershipList);
-      setOwnedBrands(ownedList);
+      setBrands(Array.isArray(brandList) ? brandList : []);
+      setOwnerships(Array.isArray(ownershipList) ? ownershipList : []);
+      setOwnedBrands(Array.isArray(ownedList) ? ownedList : []);
     } catch (err) {
       showToast("Veri alınamadı: " + err.message, "error");
     } finally {
@@ -92,11 +92,10 @@ export default function SellerBrandPage() {
   // Stats
   const stats = useMemo(() => {
     const owned = ownedBrands.length;
-    const pending = ownerships.filter(o => o.status === 0 || o.status === "Pending").length;
+    const pending = ownerships.filter((o) => o.status === 0 || o.status === "Pending").length;
     const total = brands.length;
-
     return { owned, pending, total };
-  }, [ownedBrands.length, ownerships, brands.length]);
+  }, [ownedBrands, ownerships, brands]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-purple-50/30 px-4 sm:px-6 lg:px-8 py-8">

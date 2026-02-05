@@ -42,9 +42,9 @@ export default function CreateBrandModal({ isOpen, onClose, onSuccess }) {
     setLoading(true);
     try {
       const formData = new FormData();
-      formData.append("brandName", brandName.trim());
+      formData.append("Name", brandName.trim());
       if (image) {
-        formData.append("image", image);
+        formData.append("Image", image);
       }
 
       const result = await createBrand(formData);
@@ -195,8 +195,8 @@ export default function CreateBrandModal({ isOpen, onClose, onSuccess }) {
             {/* Bilgi Notu */}
             <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-4">
               <p className="text-sm text-blue-800">
-                <strong>Not:</strong> Oluşturduğunuz marka admin onayından sonra aktif olacaktır. 
-                Marka oluşturulduktan sonra otomatik olarak marka sahibi olarak atanacaksınız.
+                <strong>Not:</strong> Oluşturduğunuz marka onay bekler (Pending) durumda kaydedilir; sizin için bir sahiplik başvurusu da oluşturulur. 
+                Admin markayı onayladıktan sonra sahipliğiniz onaylanırsa marka sizin mağazanıza ait olur, aksi halde marka genel listede kalır.
               </p>
             </div>
           </div>
