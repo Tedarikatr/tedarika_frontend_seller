@@ -19,7 +19,7 @@ const MENU_ITEMS = [
   { key: "store", label: "Mağaza Bilgileri", icon: Store, path: "/seller/profile#store" },
   { key: "subscription", label: "Abonelik", icon: ShieldCheck, path: "/seller/profile#subscription" },
   { key: "finance", label: "Ödeme", icon: CreditCard, path: "/seller/profile#finance" },
-  { key: "cargo", label: "Kargo Entegrasyonu", icon: Truck, path: "/seller/profile#cargo" },
+  { key: "cargo", label: "Kargo Ayarları", icon: Truck, path: "/seller/profile#cargo" },
   { key: "notifications", label: "İletişim Tercihleri", icon: Mail, path: "/seller/profile#notifications" },
 ];
 

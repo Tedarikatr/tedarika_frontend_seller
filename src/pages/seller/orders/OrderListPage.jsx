@@ -3,7 +3,7 @@
 // =============================
 import React, { useEffect, useState } from "react";
 import { fetchStoreOrders } from "@/api/sellerOrderService";
-import { getOrderCarrierTracking } from "@/api/sellerOrderCarrierService";
+import { getShippingLabel } from "@/api/sellerShippingService";
 import { Link, useNavigate } from "react-router-dom";
 import { statusLabels } from "@/constants/orderStatus";
 import { 
@@ -93,8 +93,8 @@ const OrderListPage = () => {
         const entries = await Promise.all(
           (res || []).map(async (order) => {
             try {
-              const tracking = await getOrderCarrierTracking(order.id);
-              return [order.id, tracking];
+              const label = await getShippingLabel(order.id);
+              return [order.id, label];
             } catch {
               return [order.id, null];
             }
