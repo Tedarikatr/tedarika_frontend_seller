@@ -1,119 +1,17 @@
 {
   "rewrites": [
-    {
-      "source": "/robots.txt",
-      "destination": "/robots-seller.txt",
-      "has": [
-        {
-          "type": "host",
-          "value": "www.seller.tedarika.com.tr"
-        }
-      ]
-    },
-    {
-      "source": "/robots.txt",
-      "destination": "/robots-satici.txt",
-      "has": [
-        {
-          "type": "host",
-          "value": "www.satici.tedarika.com.tr"
-        }
-      ]
-    },
-    {
-      "source": "/sitemap.xml",
-      "destination": "/sitemap-seller-index.xml",
-      "has": [
-        {
-          "type": "host",
-          "value": "www.seller.tedarika.com.tr"
-        }
-      ]
-    },
-    {
-      "source": "/sitemap.xml",
-      "destination": "/sitemap-satici-index.xml",
-      "has": [
-        {
-          "type": "host",
-          "value": "www.satici.tedarika.com.tr"
-        }
-      ]
-    },
+    { "source": "/robots.txt", "destination": "/robots-seller.txt", "has": [{ "type": "host", "value": "www.seller.tedarika.com.tr" }] },
+    { "source": "/robots.txt", "destination": "/robots-satici.txt", "has": [{ "type": "host", "value": "www.satici.tedarika.com.tr" }] },
+    { "source": "/sitemap.xml", "destination": "/sitemap-seller.xml", "has": [{ "type": "host", "value": "www.seller.tedarika.com.tr" }] },
+    { "source": "/sitemap.xml", "destination": "/sitemap-satici.xml", "has": [{ "type": "host", "value": "www.satici.tedarika.com.tr" }] },
     { "source": "/(.*)", "destination": "/" }
   ],
   "headers": [
-    {
-      "source": "/sitemap.xml",
-      "headers": [
-        {
-          "key": "Content-Type",
-          "value": "application/xml"
-        }
-      ]
-    },
-    {
-      "source": "/sitemap-seller.xml",
-      "headers": [
-        {
-          "key": "Content-Type",
-          "value": "application/xml"
-        }
-      ]
-    },
-    {
-      "source": "/sitemap-satici.xml",
-      "headers": [
-        {
-          "key": "Content-Type",
-          "value": "application/xml"
-        }
-      ]
-    },
-    {
-      "source": "/sitemap-seller-index.xml",
-      "headers": [
-        {
-          "key": "Content-Type",
-          "value": "application/xml"
-        }
-      ]
-    },
-    {
-      "source": "/sitemap-satici-index.xml",
-      "headers": [
-        {
-          "key": "Content-Type",
-          "value": "application/xml"
-        }
-      ]
-    },
-    {
-      "source": "/robots.txt",
-      "headers": [
-        {
-          "key": "Content-Type",
-          "value": "text/plain"
-        }
-      ]
-    },
-    {
-      "source": "/robots-seller.txt",
-      "headers": [
-        {
-          "key": "Content-Type",
-          "value": "text/plain"
-        }
-      ]
-    },
-    {
-      "source": "/robots-satici.txt",
-      "headers": [
-        {
-          "key": "Content-Type",
-          "value": "text/plain"
-        }
-      ]
-    }
+    { "source": "/sitemap.xml", "headers": [{ "key": "Content-Type", "value": "application/xml" }] },
+    { "source": "/sitemap-seller.xml", "headers": [{ "key": "Content-Type", "value": "application/xml" }] },
+    { "source": "/sitemap-satici.xml", "headers": [{ "key": "Content-Type", "value": "application/xml" }] },
+    { "source": "/robots.txt", "headers": [{ "key": "Content-Type", "value": "text/plain" }] },
+    { "source": "/robots-seller.txt", "headers": [{ "key": "Content-Type", "value": "text/plain" }] },
+    { "source": "/robots-satici.txt", "headers": [{ "key": "Content-Type", "value": "text/plain" }] }
   ]
 }
