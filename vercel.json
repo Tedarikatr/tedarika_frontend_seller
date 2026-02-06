@@ -12,6 +12,8 @@
     { "source": "/sitemap-satici.xml", "headers": [{ "key": "Content-Type", "value": "application/xml" }] },
     { "source": "/robots.txt", "headers": [{ "key": "Content-Type", "value": "text/plain" }] },
     { "source": "/robots-seller.txt", "headers": [{ "key": "Content-Type", "value": "text/plain" }] },
-    { "source": "/robots-satici.txt", "headers": [{ "key": "Content-Type", "value": "text/plain" }] }
+    { "source": "/robots-satici.txt", "headers": [{ "key": "Content-Type", "value": "text/plain" }] },
+    { "source": "/", "headers": [{ "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate, max-age=0" }] },
+    { "source": "/index.html", "headers": [{ "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate, max-age=0" }] }
   ]
 }
