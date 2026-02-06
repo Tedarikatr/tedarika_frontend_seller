@@ -143,7 +143,9 @@ const OrderDetailPage = () => {
   const [refreshOffersLoading, setRefreshOffersLoading] = useState(false);
   const [acceptOfferLoading, setAcceptOfferLoading] = useState(false);
   const [selectedOfferId, setSelectedOfferId] = useState(null);
-  const [shippingMenuOpen, setShippingMenuOpen] = useState(true);
+  const [shippingMenuOpen, setShippingMenuOpen] = useState(false);
+  const [paymentMenuOpen, setPaymentMenuOpen] = useState(false);
+  const [productsMenuOpen, setProductsMenuOpen] = useState(false);
   const [packageDimensions, setPackageDimensions] = useState({
     weightKg: "",
     lengthCm: "",
@@ -914,16 +916,34 @@ const OrderDetailPage = () => {
           )}
         </div>
 
-        {/* Ödeme Bilgileri */}
-        <div className="bg-white rounded-2xl sm:rounded-3xl shadow-2xl border border-gray-200 overflow-hidden">
-          <div className="bg-gradient-to-r from-purple-50 to-pink-50 px-4 sm:px-6 py-3 sm:py-4 border-b border-purple-100 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+        {/* Ödeme Bilgileri — Açılır menü */}
+        <div className="bg-white rounded-xl sm:rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
+          <button
+            type="button"
+            onClick={() => setPaymentMenuOpen((o) => !o)}
+            className="w-full flex items-center justify-between gap-3 px-4 sm:px-6 py-4 bg-gradient-to-r from-purple-50 to-pink-50 hover:from-purple-100 hover:to-pink-100 border-b border-gray-200 transition-colors text-left"
+          >
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center text-white shadow-lg">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center text-white shadow-md">
                 <CreditCard size={20} />
               </div>
-              <h2 className="text-lg font-bold text-gray-800">Ödeme Bilgileri</h2>
+              <div>
+                <h2 className="text-base sm:text-lg font-bold text-gray-800">Ödeme Bilgileri</h2>
+                <p className="text-xs text-gray-500 mt-0.5">
+                  {payment ? `₺${Number(payment.totalAmount ?? 0).toFixed(2)} · ${payment.status === "Pending" ? "Ödenmedi" : "Ödendi"}` : "Detayları yüklemek için açın"}
+                </p>
+              </div>
             </div>
-            <div className="flex items-center gap-3">
+            {paymentMenuOpen ? (
+              <ChevronUp className="w-5 h-5 text-gray-500 flex-shrink-0" />
+            ) : (
+              <ChevronDown className="w-5 h-5 text-gray-500 flex-shrink-0" />
+            )}
+          </button>
+
+          {paymentMenuOpen && (
+          <div className="p-4 sm:p-6 space-y-4">
+            <div className="flex flex-wrap gap-2 mb-4">
               <button
                 onClick={handleFetchPayment}
                 disabled={paymentLoading}
@@ -948,9 +968,6 @@ const OrderDetailPage = () => {
                 </button>
               )}
             </div>
-          </div>
-
-          <div className="p-6 space-y-4">
             {/* Kısa Özet */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl p-4 border border-blue-200">
@@ -1040,21 +1057,36 @@ const OrderDetailPage = () => {
               </div>
             )}
           </div>
+          )}
         </div>
 
-        {/* Ürünler */}
-        <div className="bg-white rounded-3xl shadow-2xl border border-gray-200 overflow-hidden">
-          <div className="bg-gradient-to-r from-emerald-50 to-green-50 px-6 py-4 border-b border-emerald-100 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center text-white shadow-lg">
-              <ShoppingBag size={20} />
+        {/* Sipariş Ürünleri — Açılır menü */}
+        <div className="bg-white rounded-xl sm:rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
+          <button
+            type="button"
+            onClick={() => setProductsMenuOpen((o) => !o)}
+            className="w-full flex items-center justify-between gap-3 px-4 sm:px-6 py-4 bg-gradient-to-r from-emerald-50 to-green-50 hover:from-emerald-100 hover:to-green-100 border-b border-gray-200 transition-colors text-left"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center text-white shadow-md">
+                <ShoppingBag size={20} />
+              </div>
+              <div>
+                <h2 className="text-base sm:text-lg font-bold text-gray-800">Sipariş Ürünleri</h2>
+                <p className="text-xs text-gray-500 mt-0.5">
+                  {order.items?.length ?? 0} ürün
+                </p>
+              </div>
             </div>
-            <h2 className="text-lg font-bold text-gray-800">Sipariş Ürünleri</h2>
-            <span className="ml-auto px-3 py-1 bg-emerald-200 text-emerald-800 rounded-full text-xs font-bold">
-              {order.items.length} Ürün
-            </span>
-          </div>
+            {productsMenuOpen ? (
+              <ChevronUp className="w-5 h-5 text-gray-500 flex-shrink-0" />
+            ) : (
+              <ChevronDown className="w-5 h-5 text-gray-500 flex-shrink-0" />
+            )}
+          </button>
 
-          <div className="p-6">
+          {productsMenuOpen && (
+          <div className="p-4 sm:p-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
               {order.items.map((item, i) => (
                 <div
@@ -1098,6 +1130,7 @@ const OrderDetailPage = () => {
               ))}
             </div>
           </div>
+          )}
         </div>
       </div>
 
