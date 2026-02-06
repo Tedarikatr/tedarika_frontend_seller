@@ -952,6 +952,7 @@ const OrderDetailPage = () => {
                     </div>
                   </div>
                 </div>
+              </div>
                   </div>
                 </div>
               )}
