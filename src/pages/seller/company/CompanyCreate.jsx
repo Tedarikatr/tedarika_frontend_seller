@@ -58,11 +58,12 @@ const CompanyCreate = () => {
     setMessage("Kaydediliyor...");
 
     // Raporda type number; CompanyCreateDto: name, taxNumber, taxOffice, country, province, address, type
+    // Ülke arka planda Türkiye (TR) olarak gönderilir
     const payload = {
       name: form.name.trim(),
       taxNumber: taxNum,
       taxOffice: form.taxOffice.trim(),
-      country: form.country.trim() || "TR",
+      country: "TR",
       province: form.province.trim(),
       address: form.address.trim(),
       type: typeNum,
@@ -143,7 +144,6 @@ const CompanyCreate = () => {
             </div>
 
             <TaxOfficeSelect value={form.taxOffice} onChange={handleChange} required />
-            <input name="country" value={form.country} onChange={handleChange} placeholder="Ülke (örn. TR)" required className="input" />
             <input name="province" value={form.province} onChange={handleChange} placeholder="Şehir" required className="input" />
             <input name="address" value={form.address} onChange={handleChange} placeholder="Adres" required className="input md:col-span-2" />
           </div>

@@ -1,5 +1,6 @@
 // src/pages/seller/company/CompanyUpdate.jsx
 import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { getMyCompany, updateCompany } from "@/api/sellerCompanyService";
 import TaxOfficeSelect from "@/components/seller/TaxOfficeSelect";
 import { Building2, Loader2, CheckCircle, AlertTriangle, Sparkles, FileText } from "lucide-react";
@@ -30,6 +31,7 @@ const Field = ({ label, required, children, hint }) => (
 );
 
 export default function CompanyUpdate() {
+  const navigate = useNavigate();
   const [form, setForm] = useState(null);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
@@ -132,7 +134,8 @@ export default function CompanyUpdate() {
         type: typeNum,
       });
 
-      setMessage("✅ Şirket bilgileri başarıyla güncellendi.");
+      // Ayarlar (profil) sayfasındaki Şirket sekmesine yönlendir; bildirim orada gösterilecek
+      navigate("/seller/profile#company", { state: { companyUpdated: true }, replace: false });
     } catch (err) {
       setMessage("❌ " + (err?.message || "Güncelleme sırasında bir hata oluştu."));
     } finally {

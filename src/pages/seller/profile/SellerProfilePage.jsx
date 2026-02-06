@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { toast } from "react-hot-toast";
 import {
   UserCircle,
   Building2,
@@ -33,6 +34,7 @@ const TABS = [
 
 const SellerProfilePage = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("seller");
 
   // Hash'ten tab belirleme
@@ -42,6 +44,15 @@ const SellerProfilePage = () => {
       setActiveTab(hash);
     }
   }, [location.hash]);
+
+  // Şirket güncellemeden yönlendirildiyse bildirim göster ve state temizle
+  useEffect(() => {
+    if (location.state?.companyUpdated) {
+      toast.success("Şirket bilgileri başarıyla güncellendi.");
+      setActiveTab("company");
+      navigate("/seller/profile#company", { replace: true, state: {} });
+    }
+  }, [location.state?.companyUpdated, navigate]);
 
   // Custom event ile tab değiştirme (UserMenu'den gelen)
   useEffect(() => {
