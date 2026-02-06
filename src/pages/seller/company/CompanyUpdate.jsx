@@ -5,19 +5,11 @@ import TaxOfficeSelect from "@/components/seller/TaxOfficeSelect";
 import { Building2, Loader2, CheckCircle, AlertTriangle, Sparkles, FileText } from "lucide-react";
 import { motion } from "framer-motion";
 
-// UI (numeric) → API (string enum) map
-const COMPANY_TYPE_NUM2STR = {
-  1: "SoleProprietorship",
-  2: "Limited",
-  3: "JointStock",
-  4: "Cooperative",
-  5: "BranchOffice",
-  6: "ForeignCompany",
-  99: "Other",
-};
+// Raporda type number: 1=Şahıs, 2=Limited, 3=Anonim, 4=Kooperatif, 5=Şube, 6=Yabancı, 99=Diğer
+const COMPANY_TYPE_SAHIS = 1;
 
 const companyTypeOptions = [
-  { value: 1, label: "Şahıs" },
+  { value: 1, label: "Şahıs Şirketi" },
   { value: 2, label: "Limited Şirket" },
   { value: 3, label: "Anonim Şirket" },
   { value: 4, label: "Kooperatif" },
@@ -47,11 +39,8 @@ export default function CompanyUpdate() {
     (async () => {
       try {
         const data = await getMyCompany();
-
-        // backend type hem number hem string gelebilir → UI numeric'e normalize et
-        const str2num = Object.fromEntries(
-          Object.entries(COMPANY_TYPE_NUM2STR).map(([k, v]) => [v, Number(k)])
-        );
+        // API type number döner; string gelirse 1=Şahıs vb. map ile sayıya çevir
+        const str2num = { SoleProprietorship: 1, Limited: 2, JointStock: 3, Cooperative: 4, BranchOffice: 5, ForeignCompany: 6, Other: 99 };
         const uiType =
           typeof data.type === "number"
             ? data.type
@@ -82,21 +71,26 @@ export default function CompanyUpdate() {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
+  const isSahis = Number(form?.type) === COMPANY_TYPE_SAHIS;
+
   const requiredOk = useMemo(() => {
     if (!form) return false;
-    // Vergi numarası 10 haneli olmalı
-    const taxNum = form.taxNumber?.trim();
-    if (!taxNum || taxNum.length !== 10 || !/^\d{10}$/.test(taxNum)) return false;
+    const taxNum = (form.taxNumber ?? "").trim();
+    // Şahıs şirketi ise TCKN 11 hane, değilse VKN 10 hane
+    if (isSahis) {
+      if (!taxNum || taxNum.length !== 11 || !/^\d{11}$/.test(taxNum)) return false;
+    } else {
+      if (!taxNum || taxNum.length !== 10 || !/^\d{10}$/.test(taxNum)) return false;
+    }
     return (
       form.name?.trim() &&
-      form.taxNumber?.trim() &&
       form.taxOffice?.trim() &&
       form.country?.trim() &&
       form.province?.trim() &&
       form.address?.trim() &&
       (form.type !== "" && form.type !== null && form.type !== undefined)
     );
-  }, [form]);
+  }, [form, isSahis]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -109,30 +103,33 @@ export default function CompanyUpdate() {
       return;
     }
 
-    // Ekstra vergi numarası kontrolü
     const taxNum = form.taxNumber.trim();
-    if (taxNum.length !== 10 || !/^\d{10}$/.test(taxNum)) {
-      setMessage("⚠️ Vergi numarası 10 haneli rakamlardan oluşmalıdır!");
-      setLoading(false);
-      return;
+    if (isSahis) {
+      if (taxNum.length !== 11 || !/^\d{11}$/.test(taxNum)) {
+        setMessage("⚠️ Şahıs şirketi için TCKN 11 haneli rakamlardan oluşmalıdır.");
+        setLoading(false);
+        return;
+      }
+    } else {
+      if (taxNum.length !== 10 || !/^\d{10}$/.test(taxNum)) {
+        setMessage("⚠️ Vergi numarası 10 haneli rakamlardan oluşmalıdır.");
+        setLoading(false);
+        return;
+      }
     }
 
     try {
-      // UI numeric → API string enum (Swagger örneği)
-      const num = Number(form.type);
-      const apiType = Number.isNaN(num)
-        ? form.type || "Other"
-        : COMPANY_TYPE_NUM2STR[num] ?? "Other";
-
+      // Raporda CompanyUpdateDto: id (opsiyonel), name, taxNumber, taxOffice, country, province, address, type (number)
+      const typeNum = Number(form.type);
       await updateCompany({
-        ...form,
+        id: form.id,
         name: form.name.trim(),
-        taxNumber: form.taxNumber.trim(),
+        taxNumber: taxNum,
         taxOffice: form.taxOffice.trim(),
         country: form.country.trim(),
         province: form.province.trim(),
         address: form.address.trim(),
-        type: apiType,
+        type: typeNum,
       });
 
       setMessage("✅ Şirket bilgileri başarıyla güncellendi.");
@@ -159,14 +156,15 @@ export default function CompanyUpdate() {
     );
   }
 
+  const taxLabel = isSahis ? "TCKN (11 hane)" : "Vergi Numarası (10 hane)";
+  const taxMaxLength = isSahis ? 11 : 10;
+
   const fields = [
     { name: "name", label: "Şirket Adı", required: true },
-    { name: "taxNumber", label: "Vergi No", required: true },
+    { name: "taxNumber", label: taxLabel, required: true, maxLength: taxMaxLength, isTax: true },
     { name: "country", label: "Ülke", required: true },
     { name: "province", label: "Şehir", required: true },
   ];
-
-  const textFields = fields; // textFields değişkeni tanımla
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-emerald-50">
@@ -212,19 +210,22 @@ export default function CompanyUpdate() {
         >
           {/* Text Fields */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {textFields.map((f) => (
+            {fields.map((f) => (
               <Field key={f.name} label={f.label} required={f.required}>
                 <input
                   name={f.name}
                   value={form[f.name]}
-                  onChange={handleChange}
+                  onChange={f.isTax ? (e) => {
+                    const v = e.target.value.replace(/\D/g, "").slice(0, taxMaxLength);
+                    setForm((prev) => ({ ...prev, [f.name]: v }));
+                  } : handleChange}
                   placeholder={f.label}
                   required={f.required}
                   className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 transition-all"
-                  {...(f.name === "taxNumber" && {
-                    maxLength: 10,
-                    pattern: "\\d{10}",
-                    title: "Vergi numarası 10 haneli rakamlardan oluşmalıdır"
+                  {...(f.isTax && {
+                    maxLength: taxMaxLength,
+                    pattern: taxMaxLength === 11 ? "\\d{11}" : "\\d{10}",
+                    title: isSahis ? "Şahıs şirketi için TCKN 11 haneli olmalıdır" : "Vergi numarası 10 haneli olmalıdır"
                   })}
                 />
               </Field>
@@ -316,7 +317,11 @@ export default function CompanyUpdate() {
                 animate={{ opacity: 1 }}
               >
                 <AlertTriangle className="w-5 h-5 mt-0.5 flex-shrink-0" />
-                <p className="text-sm font-semibold">Lütfen tüm zorunlu alanları doldurun ve vergi numarasının 10 haneli olduğundan emin olun.</p>
+                <p className="text-sm font-semibold">
+                  {isSahis
+                    ? "Lütfen tüm zorunlu alanları doldurun. Şahıs şirketi için TCKN 11 haneli olmalıdır."
+                    : "Lütfen tüm zorunlu alanları doldurun ve vergi numarasının 10 haneli olduğundan emin olun."}
+                </p>
               </motion.div>
             )}
           </div>

@@ -4,20 +4,11 @@ import { createCompany, hasCompany } from "@/api/sellerCompanyService";
 import { Building2, CheckCircle, Info } from "lucide-react";
 import TaxOfficeSelect from "@/components/seller/TaxOfficeSelect";
 
-// Numeric → API string enum map (Swagger örneği: "SoleProprietorship")
-const COMPANY_TYPE_NUM2STR = {
-  1: "SoleProprietorship",
-  2: "Limited",
-  3: "JointStock",
-  4: "Cooperative",
-  5: "BranchOffice",
-  6: "ForeignCompany",
-  99: "Other",
-};
+// Raporda type number: 1=Şahıs, 2=Limited, 3=Anonim, 4=Kooperatif, 5=Şube, 6=Yabancı, 99=Diğer
+const COMPANY_TYPE_SAHIS = 1;
 
-// Türkçe seçenekler (UI)
 const companyTypeOptions = [
-  { value: 1, label: "Şahıs" },
+  { value: 1, label: "Şahıs Şirketi" },
   { value: 2, label: "Limited Şirket" },
   { value: 3, label: "Anonim Şirket" },
   { value: 4, label: "Kooperatif" },
@@ -32,12 +23,14 @@ const CompanyCreate = () => {
     name: "",
     taxNumber: "",
     taxOffice: "",
-    country: "",
+    country: "TR",
     province: "",
     address: "",
     type: "",
   });
   const [message, setMessage] = useState("");
+
+  const isSahis = Number(form.type) === COMPANY_TYPE_SAHIS;
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -46,29 +39,33 @@ const CompanyCreate = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    // Vergi numarası validasyonu
+    const typeNum = Number(form.type);
     const taxNum = form.taxNumber.trim();
-    if (taxNum.length !== 10 || !/^\d{10}$/.test(taxNum)) {
-      setMessage("⚠️ Vergi numarası 10 haneli rakamlardan oluşmalıdır!");
-      return;
+
+    // Şahıs şirketi ise TCKN 11 hane zorunlu; değilse VKN 10 hane
+    if (typeNum === COMPANY_TYPE_SAHIS) {
+      if (!taxNum || taxNum.length !== 11 || !/^\d{11}$/.test(taxNum)) {
+        setMessage("⚠️ Şahıs şirketi için TCKN 11 haneli rakamlardan oluşmalıdır.");
+        return;
+      }
+    } else {
+      if (!taxNum || taxNum.length !== 10 || !/^\d{10}$/.test(taxNum)) {
+        setMessage("⚠️ Vergi numarası 10 haneli rakamlardan oluşmalıdır.");
+        return;
+      }
     }
-    
+
     setMessage("Kaydediliyor...");
 
-    // API string enum kabul ediyor ise numeric → string çeviriyoruz
-    const num = Number(form.type);
-    const apiType = Number.isNaN(num) ? form.type : (COMPANY_TYPE_NUM2STR[num] ?? form.type);
-
+    // Raporda type number; CompanyCreateDto: name, taxNumber, taxOffice, country, province, address, type
     const payload = {
-      ...form,
       name: form.name.trim(),
-      taxNumber: form.taxNumber.trim(),
+      taxNumber: taxNum,
       taxOffice: form.taxOffice.trim(),
-      country: form.country.trim(),
+      country: form.country.trim() || "TR",
       province: form.province.trim(),
       address: form.address.trim(),
-      type: apiType, // <- string enum
+      type: typeNum,
     };
 
     try {
@@ -117,31 +114,38 @@ const CompanyCreate = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <input name="name" value={form.name} onChange={handleChange} placeholder="Şirket Adı" required className="input" />
-            <input 
-              name="taxNumber" 
-              value={form.taxNumber} 
-              onChange={handleChange} 
-              placeholder="Vergi Numarası (10 hane)" 
-              required 
-              className="input"
-              maxLength={10}
-              pattern="\d{10}"
-              title="Vergi numarası 10 haneli rakamlardan oluşmalıdır"
-            />
-
-            {/* 🔽 Vergi Dairesi Select */}
-            <TaxOfficeSelect value={form.taxOffice} onChange={handleChange} required />
-
-            <input name="country" value={form.country} onChange={handleChange} placeholder="Ülke" required className="input" />
-            <input name="province" value={form.province} onChange={handleChange} placeholder="Şehir" required className="input" />
-            <input name="address" value={form.address} onChange={handleChange} placeholder="Adres" required className="input md:col-span-2" />
-
             <select name="type" value={form.type} onChange={handleChange} required className="input bg-[#f8fdfc] text-[#002222] placeholder-[#5a7d7c]">
               <option value="">Şirket Türü Seçin</option>
               {companyTypeOptions.map((opt) => (
                 <option key={opt.value} value={opt.value}>{opt.label}</option>
               ))}
             </select>
+
+            {/* Şahıs şirketi ise TCKN (11 hane), değilse Vergi No (10 hane) */}
+            <div className="md:col-span-2">
+              <label className="block text-sm font-semibold text-[#003032] mb-1">
+                {isSahis ? "TCKN (11 hane) *" : "Vergi Numarası (10 hane) *"}
+              </label>
+              <input
+                name="taxNumber"
+                value={form.taxNumber}
+                onChange={(e) => {
+                  const v = e.target.value.replace(/\D/g, "").slice(0, isSahis ? 11 : 10);
+                  setForm((prev) => ({ ...prev, taxNumber: v }));
+                }}
+                placeholder={isSahis ? "TCKN - 11 haneli" : "Vergi No - 10 haneli"}
+                required
+                className="input"
+                maxLength={isSahis ? 11 : 10}
+                pattern={isSahis ? "\\d{11}" : "\\d{10}"}
+                title={isSahis ? "Şahıs şirketi için TCKN 11 haneli olmalıdır" : "Vergi numarası 10 haneli olmalıdır"}
+              />
+            </div>
+
+            <TaxOfficeSelect value={form.taxOffice} onChange={handleChange} required />
+            <input name="country" value={form.country} onChange={handleChange} placeholder="Ülke (örn. TR)" required className="input" />
+            <input name="province" value={form.province} onChange={handleChange} placeholder="Şehir" required className="input" />
+            <input name="address" value={form.address} onChange={handleChange} placeholder="Adres" required className="input md:col-span-2" />
           </div>
 
           <div className="mt-6 flex items-start gap-2 text-sm text-emerald-900 bg-[#f0fdfa] px-4 py-3 rounded-lg border border-emerald-300">
