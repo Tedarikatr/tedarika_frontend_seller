@@ -13,6 +13,7 @@ import {
 import {
   getShippingLabel,
   getShippingOffers,
+  refreshShippingOffers,
   acceptShippingOffer,
   downloadShippingLabel,
 } from "@/api/sellerShippingService";
@@ -139,8 +140,10 @@ const OrderDetailPage = () => {
   const [labelPdfUrl, setLabelPdfUrl] = useState(null);
   const [offers, setOffers] = useState(null);
   const [offersLoading, setOffersLoading] = useState(false);
+  const [refreshOffersLoading, setRefreshOffersLoading] = useState(false);
   const [acceptOfferLoading, setAcceptOfferLoading] = useState(false);
   const [selectedOfferId, setSelectedOfferId] = useState(null);
+  const [shippingMenuOpen, setShippingMenuOpen] = useState(true);
   const [packageDimensions, setPackageDimensions] = useState({
     weightKg: "",
     lengthCm: "",
@@ -225,18 +228,35 @@ const OrderDetailPage = () => {
     }
   };
 
+  const handleRefreshOffers = async () => {
+    if (!offers?.providerShipmentId) {
+      toast.error("Önce kargo teklifi alın.");
+      return;
+    }
+    setRefreshOffersLoading(true);
+    try {
+      const data = await refreshShippingOffers(Number(orderId), offers.providerShipmentId);
+      setOffers(data);
+      if (data?.cheapestOfferId) setSelectedOfferId(data.cheapestOfferId);
+      if (data?.offers?.length) toast.success("Teklifler güncellendi.");
+      else toast("Teklifler henüz hazır değil, birkaç saniye sonra tekrar deneyin.", { icon: "ℹ️" });
+    } catch (err) {
+      toast.error(err?.message || "Teklifler yenilenemedi.");
+    } finally {
+      setRefreshOffersLoading(false);
+    }
+  };
+
   const handleAcceptOffer = async () => {
     if (!offers?.providerShipmentId || !selectedOfferId) {
       toast.error("Lütfen bir teklif seçin.");
       return;
     }
-    const offer = offers.offers?.find((o) => o.id === selectedOfferId);
     setAcceptOfferLoading(true);
     try {
       await acceptShippingOffer(Number(orderId), {
         providerShipmentId: offers.providerShipmentId,
         offerId: selectedOfferId,
-        acceptedOfferTotalAmount: offer ? parseFloat(offer.totalAmount) : undefined,
       });
       toast.success("Teklif kabul edildi, etiket oluşturuldu.");
       setOffers(null);
@@ -561,180 +581,243 @@ const OrderDetailPage = () => {
           />
         </div>
 
-        {shippingLabelError && (
-          <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 flex items-center gap-2 text-amber-800 text-sm mb-4">
-            <InfoIcon className="w-5 h-5 flex-shrink-0" />
-            {shippingLabelError}
-          </div>
-        )}
-        {/* Kargo Teklifi Al – Paket boyutları (opsiyonel) + Teklifler */}
-        {!shippingLabel && (order.status === "Created" || order.status === "Confirmed") && (
-          <div className="bg-white rounded-xl sm:rounded-2xl border border-gray-200 overflow-hidden mb-4">
-            <div className="bg-gradient-to-r from-sky-50 to-blue-50 px-4 sm:px-6 py-4 border-b border-sky-100">
-              <h2 className="text-base sm:text-lg font-bold text-gray-800">Kargo Etiketi Oluştur</h2>
-              <p className="text-xs text-gray-600 mt-1">Kargo teklifi alıp birini kabul ederek etiket oluşturabilirsiniz. Alıcı adresi sipariş teslimat adresinden otomatik alınır.</p>
-            </div>
-            <div className="p-4 sm:p-6">
-              {/* Paket boyutları (opsiyonel) – ShippingPackageDimensionsRequestDto */}
-              <div className="mb-4">
-                <button
-                  type="button"
-                  onClick={() => setShowPackageForm((v) => !v)}
-                  className="inline-flex items-center gap-2 text-sm font-semibold text-sky-700 hover:text-sky-800"
-                >
-                  <Ruler className="w-4 h-4" />
-                  Paket boyutları (desi – opsiyonel)
-                  {showPackageForm ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                </button>
-                {showPackageForm && (
-                  <div className="mt-3 grid grid-cols-2 sm:grid-cols-4 gap-3 p-4 bg-gray-50 rounded-xl border border-gray-200">
-                    <label className="flex flex-col gap-1">
-                      <span className="text-xs text-gray-600">Ağırlık (kg)</span>
-                      <input
-                        type="number"
-                        step="0.01"
-                        min="0"
-                        value={packageDimensions.weightKg}
-                        onChange={(e) => setPackageDimensions((p) => ({ ...p, weightKg: e.target.value }))}
-                        placeholder="Örn. 2.5"
-                        className="rounded-lg border border-gray-300 px-3 py-2 text-sm"
-                      />
-                    </label>
-                    <label className="flex flex-col gap-1">
-                      <span className="text-xs text-gray-600">Uzunluk (cm)</span>
-                      <input
-                        type="number"
-                        step="0.1"
-                        min="0"
-                        value={packageDimensions.lengthCm}
-                        onChange={(e) => setPackageDimensions((p) => ({ ...p, lengthCm: e.target.value }))}
-                        placeholder="Örn. 30"
-                        className="rounded-lg border border-gray-300 px-3 py-2 text-sm"
-                      />
-                    </label>
-                    <label className="flex flex-col gap-1">
-                      <span className="text-xs text-gray-600">Genişlik (cm)</span>
-                      <input
-                        type="number"
-                        step="0.1"
-                        min="0"
-                        value={packageDimensions.widthCm}
-                        onChange={(e) => setPackageDimensions((p) => ({ ...p, widthCm: e.target.value }))}
-                        placeholder="Örn. 20"
-                        className="rounded-lg border border-gray-300 px-3 py-2 text-sm"
-                      />
-                    </label>
-                    <label className="flex flex-col gap-1">
-                      <span className="text-xs text-gray-600">Yükseklik (cm)</span>
-                      <input
-                        type="number"
-                        step="0.1"
-                        min="0"
-                        value={packageDimensions.heightCm}
-                        onChange={(e) => setPackageDimensions((p) => ({ ...p, heightCm: e.target.value }))}
-                        placeholder="Örn. 15"
-                        className="rounded-lg border border-gray-300 px-3 py-2 text-sm"
-                      />
-                    </label>
-                  </div>
-                )}
+        {/* Kargo İşlemleri — Açılır menü */}
+        <div className="bg-white rounded-xl sm:rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
+          <button
+            type="button"
+            onClick={() => setShippingMenuOpen((o) => !o)}
+            className="w-full flex items-center justify-between gap-3 px-4 sm:px-6 py-4 bg-gradient-to-r from-slate-50 to-gray-50 hover:from-slate-100 hover:to-gray-100 border-b border-gray-200 transition-colors text-left"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-500 to-blue-600 flex items-center justify-center text-white shadow-md">
+                <Truck className="w-5 h-5" />
               </div>
-              <button
-                onClick={loadOffers}
-                disabled={offersLoading}
-                className="inline-flex items-center gap-2 px-4 py-2.5 bg-sky-600 text-white rounded-xl font-semibold hover:bg-sky-700 disabled:opacity-50"
-              >
-                {offersLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Truck className="w-4 h-4" />}
-                Kargo Teklifi Al
-              </button>
+              <div>
+                <h2 className="text-base sm:text-lg font-bold text-gray-800">Kargo İşlemleri</h2>
+                <p className="text-xs text-gray-500 mt-0.5">
+                  {shippingLabel
+                    ? "Etiket oluşturuldu · Görüntüle / İndir"
+                    : offers
+                    ? "Teklifler listelendi · Seçip kabul edin"
+                    : "Teklif al, etiket oluştur, takip et"}
+                </p>
+              </div>
             </div>
-          </div>
-        )}
-        {/* Kargo Teklifleri listesi (teklif alındıktan sonra) */}
-        {offers && !shippingLabel && (
-          <div className="bg-white rounded-xl sm:rounded-2xl border border-gray-200 overflow-hidden">
-            <div className="bg-gradient-to-r from-emerald-50 to-green-50 px-4 sm:px-6 py-4 border-b border-emerald-100">
-              <h2 className="text-base sm:text-lg font-bold text-gray-800">Kargo Teklifleri</h2>
-              <p className="text-xs text-gray-600 mt-1">Bir teklif seçip kabul edin. Kabul edilen tutar satıcı ödemesinden kesilir.</p>
-            </div>
-            <div className="p-4 sm:p-6">
-              <div className="space-y-3 mb-4">
-                {offers.offers?.map((offer) => (
-                  <label
-                    key={offer.id}
-                    className={`flex items-center justify-between gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${
-                      selectedOfferId === offer.id ? "border-emerald-500 bg-emerald-50" : "border-gray-200 hover:border-gray-300"
-                    }`}
-                  >
-                    <input
-                      type="radio"
-                      name="offer"
-                      checked={selectedOfferId === offer.id}
-                      onChange={() => setSelectedOfferId(offer.id)}
-                      className="sr-only"
-                    />
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className="font-semibold text-gray-800">{offer.providerCode}</span>
-                        <span className="text-gray-500 text-sm">{offer.providerServiceCode}</span>
-                        {offers.cheapestOfferId === offer.id && (
-                          <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">En ucuz</span>
-                        )}
-                        {offers.fastestOfferId === offer.id && (
-                          <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-800">En hızlı</span>
-                        )}
+            {shippingMenuOpen ? (
+              <ChevronUp className="w-5 h-5 text-gray-500 flex-shrink-0" />
+            ) : (
+              <ChevronDown className="w-5 h-5 text-gray-500 flex-shrink-0" />
+            )}
+          </button>
+
+          {shippingMenuOpen && (
+            <div className="p-4 sm:p-6 space-y-4">
+              {shippingLabelError && (
+                <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 flex items-center gap-2 text-amber-800 text-sm">
+                  <InfoIcon className="w-5 h-5 flex-shrink-0" />
+                  {shippingLabelError}
+                </div>
+              )}
+
+              {/* 1) Henüz etiket yok: Gönderi oluştur + Teklif al */}
+              {!shippingLabel && (order.status === "Created" || order.status === "Confirmed") && (
+                <div className="rounded-xl border border-sky-100 bg-sky-50/50 p-4 sm:p-5">
+                  <h3 className="text-sm font-bold text-gray-800 mb-1">Kargo Etiketi Oluştur</h3>
+                  <p className="text-xs text-gray-600 mb-4">Kargo teklifi alıp birini kabul ederek etiket oluşturabilirsiniz. Alıcı adresi sipariş teslimat adresinden otomatik alınır.</p>
+                  <div className="mb-4">
+                    <button
+                      type="button"
+                      onClick={() => setShowPackageForm((v) => !v)}
+                      className="inline-flex items-center gap-2 text-sm font-semibold text-sky-700 hover:text-sky-800"
+                    >
+                      <Ruler className="w-4 h-4" />
+                      Paket boyutları (desi – opsiyonel)
+                      {showPackageForm ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                    </button>
+                    {showPackageForm && (
+                      <div className="mt-3 grid grid-cols-2 sm:grid-cols-4 gap-3 p-4 bg-white rounded-xl border border-sky-200">
+                        <label className="flex flex-col gap-1">
+                          <span className="text-xs text-gray-600">Ağırlık (kg)</span>
+                          <input
+                            type="number"
+                            step="0.01"
+                            min="0"
+                            value={packageDimensions.weightKg}
+                            onChange={(e) => setPackageDimensions((p) => ({ ...p, weightKg: e.target.value }))}
+                            placeholder="Örn. 2.5"
+                            className="rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                          />
+                        </label>
+                        <label className="flex flex-col gap-1">
+                          <span className="text-xs text-gray-600">Uzunluk (cm)</span>
+                          <input
+                            type="number"
+                            step="0.1"
+                            min="0"
+                            value={packageDimensions.lengthCm}
+                            onChange={(e) => setPackageDimensions((p) => ({ ...p, lengthCm: e.target.value }))}
+                            placeholder="Örn. 30"
+                            className="rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                          />
+                        </label>
+                        <label className="flex flex-col gap-1">
+                          <span className="text-xs text-gray-600">Genişlik (cm)</span>
+                          <input
+                            type="number"
+                            step="0.1"
+                            min="0"
+                            value={packageDimensions.widthCm}
+                            onChange={(e) => setPackageDimensions((p) => ({ ...p, widthCm: e.target.value }))}
+                            placeholder="Örn. 20"
+                            className="rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                          />
+                        </label>
+                        <label className="flex flex-col gap-1">
+                          <span className="text-xs text-gray-600">Yükseklik (cm)</span>
+                          <input
+                            type="number"
+                            step="0.1"
+                            min="0"
+                            value={packageDimensions.heightCm}
+                            onChange={(e) => setPackageDimensions((p) => ({ ...p, heightCm: e.target.value }))}
+                            placeholder="Örn. 15"
+                            className="rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                          />
+                        </label>
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      onClick={loadOffers}
+                      disabled={offersLoading}
+                      className="inline-flex items-center gap-2 px-4 py-2.5 bg-sky-600 text-white rounded-xl font-semibold hover:bg-sky-700 disabled:opacity-50"
+                    >
+                      {offersLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Truck className="w-4 h-4" />}
+                      Kargo Teklifi Al
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* 2) Teklifler listesi: seç + kabul veya yenile */}
+              {offers && !shippingLabel && (
+                <div className="rounded-xl border border-emerald-100 bg-emerald-50/50 p-4 sm:p-5">
+                  <h3 className="text-sm font-bold text-gray-800 mb-1">Kargo Teklifleri</h3>
+                  <p className="text-xs text-gray-600 mb-4">Bir teklif seçip kabul edin. Kabul edilen tutar satıcı ödemesinden kesilir.</p>
+                  {(!offers.offers || offers.offers.length === 0) ? (
+                    <div className="flex flex-wrap items-center gap-2">
+                      <p className="text-sm text-gray-600">Teklifler henüz gelmedi veya boş. Yenileyebilirsiniz.</p>
+                      <button
+                        onClick={handleRefreshOffers}
+                        disabled={refreshOffersLoading}
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-sky-600 text-white rounded-xl font-semibold hover:bg-sky-700 disabled:opacity-50"
+                      >
+                        {refreshOffersLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
+                        Teklifleri Yenile
+                      </button>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="space-y-3 mb-4">
+                        {offers.offers.map((offer) => (
+                          <label
+                            key={offer.id}
+                            className={`flex items-center justify-between gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${
+                              selectedOfferId === offer.id ? "border-emerald-500 bg-emerald-50" : "border-gray-200 hover:border-gray-300 bg-white"
+                            }`}
+                          >
+                            <input
+                              type="radio"
+                              name="offer"
+                              checked={selectedOfferId === offer.id}
+                              onChange={() => setSelectedOfferId(offer.id)}
+                              className="sr-only"
+                            />
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <span className="font-semibold text-gray-800">{offer.providerCode}</span>
+                                <span className="text-gray-500 text-sm">{offer.providerServiceCode}</span>
+                                {offers.cheapestOfferId === offer.id && (
+                                  <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">En ucuz</span>
+                                )}
+                                {offers.fastestOfferId === offer.id && (
+                                  <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-800">En hızlı</span>
+                                )}
+                              </div>
+                              {offer.estimatedDeliveryTime && (
+                                <p className="text-xs text-gray-500 mt-1">Tahmini: {offer.estimatedDeliveryTime}</p>
+                              )}
+                            </div>
+                            <span className="font-bold text-emerald-700 whitespace-nowrap">
+                              {offer.totalAmount} {offer.currency}
+                            </span>
+                          </label>
+                        ))}
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        <button
+                          onClick={handleAcceptOffer}
+                          disabled={acceptOfferLoading || !selectedOfferId}
+                          className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-xl font-semibold hover:bg-emerald-700 disabled:opacity-50"
+                        >
+                          {acceptOfferLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
+                          Seçilen Teklifi Kabul Et
+                        </button>
+                        <button
+                          onClick={handleRefreshOffers}
+                          disabled={refreshOffersLoading}
+                          className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-xl text-gray-700 font-semibold hover:bg-gray-50 disabled:opacity-50"
+                        >
+                          {refreshOffersLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
+                          Teklifleri Yenile
+                        </button>
+                        <button
+                          onClick={() => { setOffers(null); setSelectedOfferId(null); }}
+                          className="px-4 py-2 border border-gray-300 rounded-xl text-gray-700 font-semibold hover:bg-gray-50"
+                        >
+                          İptal
+                        </button>
+                      </div>
+                    </>
+                  )}
+                </div>
+              )}
+
+              {/* 3) Etiket var: bilgi + görüntüle / indir + takip */}
+              {shippingLabel && (
+                <div className="rounded-xl border border-indigo-200 bg-gradient-to-br from-indigo-50/80 to-purple-50/80 overflow-hidden">
+                  <div className="px-4 sm:px-5 py-3 border-b border-indigo-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                    <div className="flex items-center gap-2 sm:gap-3">
+                      <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-md flex-shrink-0">
+                        <Activity size={18} className="sm:w-5 sm:h-5" />
+                      </div>
+                      <div>
+                        <h3 className="text-sm font-bold text-gray-800">Kargo Takip Durumu</h3>
+                        <p className="text-xs text-gray-500">Takip durumu otomatik güncellenir</p>
                       </div>
                     </div>
-                    <span className="font-bold text-emerald-700 whitespace-nowrap">
-                      {offer.totalAmount} {offer.currency}
-                    </span>
-                  </label>
-                ))}
-              </div>
-              <div className="flex flex-wrap gap-2">
-                <button
-                  onClick={handleAcceptOffer}
-                  disabled={acceptOfferLoading || !selectedOfferId}
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-xl font-semibold hover:bg-emerald-700 disabled:opacity-50"
-                >
-                  {acceptOfferLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
-                  Seçilen Teklifi Kabul Et
-                </button>
-                <button
-                  onClick={() => setOffers(null)}
-                  className="px-4 py-2 border border-gray-300 rounded-xl text-gray-700 font-semibold hover:bg-gray-50"
-                >
-                  İptal
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
+                    <div className="flex flex-wrap gap-2">
+                      <button
+                        onClick={handleViewLabel}
+                        disabled={labelLoading}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 text-white text-xs font-semibold rounded-lg hover:bg-indigo-700 disabled:opacity-50"
+                      >
+                        {labelLoading ? <Loader2 className="w-3 h-3 animate-spin" /> : <FileText className="w-3 h-3" />}
+                        Etiket Görüntüle
+                      </button>
+                      <button
+                        onClick={loadShippingLabel}
+                        disabled={shippingLabelLoading}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-indigo-200 text-indigo-700 text-xs font-semibold rounded-lg hover:bg-indigo-50 disabled:opacity-50"
+                      >
+                        {shippingLabelLoading ? <Loader2 className="w-3 h-3 animate-spin" /> : <RefreshCw className="w-3 h-3" />}
+                        Yenile
+                      </button>
+                    </div>
+                  </div>
 
-        {/* Kargo Takip Durumu */}
-        {shippingLabel && (
-          <div className="bg-white rounded-xl sm:rounded-2xl lg:rounded-3xl shadow-2xl border border-gray-200 overflow-hidden">
-            <div className="bg-gradient-to-r from-indigo-50 to-purple-50 px-4 sm:px-6 py-3 sm:py-4 border-b border-indigo-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-              <div className="flex items-center gap-2 sm:gap-3">
-                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-lg flex-shrink-0">
-                  <Activity size={18} className="sm:w-5 sm:h-5" />
-                </div>
-                <div>
-                  <h2 className="text-base sm:text-lg font-bold text-gray-800">Kargo Takip Durumu</h2>
-                  <p className="text-xs text-gray-500">Takip durumu otomatik güncellenir</p>
-                </div>
-              </div>
-              <button
-                onClick={loadShippingLabel}
-                disabled={shippingLabelLoading}
-                className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-white border border-indigo-200 text-indigo-700 text-xs sm:text-sm font-semibold rounded-lg sm:rounded-xl shadow-sm hover:shadow transition disabled:opacity-50 w-full sm:w-auto justify-center"
-              >
-                {shippingLabelLoading ? <Loader2 className="w-3 h-3 sm:w-4 sm:h-4 animate-spin" /> : <RefreshCw className="w-3 h-3 sm:w-4 sm:h-4" />}
-                Yenile
-              </button>
-            </div>
-
-            <div className="p-4 sm:p-6">
+                  <div className="p-4 sm:p-5">
               {/* Tracking Status Timeline */}
               <div className="mb-4 sm:mb-6">
                 <h3 className="text-xs sm:text-sm font-semibold text-gray-700 mb-3 sm:mb-4 flex items-center gap-2">
@@ -869,11 +952,13 @@ const OrderDetailPage = () => {
                     </div>
                   </div>
                 </div>
-              </div>
-            </div>
-          </div>
-        )}
+                  </div>
+                </div>
+              )}
 
+            </div>
+          )}
+        </div>
 
         {/* Ödeme Bilgileri */}
         <div className="bg-white rounded-2xl sm:rounded-3xl shadow-2xl border border-gray-200 overflow-hidden">

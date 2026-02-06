@@ -18,7 +18,7 @@ export const putSenderAddress = async (body) => {
 
 // ----- SellerShippingOrderController (api/seller/orders/{orderId}/shipping) -----
 
-/** POST api/seller/orders/{orderId}/shipping/offers - Kargo tekliflerini al */
+/** POST api/seller/orders/{orderId}/shipping/offers - Gönderi oluştur, kargo tekliflerini al */
 export const getShippingOffers = async (orderId, body = null) => {
   return await apiRequest(
     `${BASE_ORDER_SHIPPING(orderId)}/offers`,
@@ -26,6 +26,12 @@ export const getShippingOffers = async (orderId, body = null) => {
     body && Object.keys(body).length ? body : {},
     true
   );
+};
+
+/** GET api/seller/orders/{orderId}/shipping/offers?providerShipmentId=... - Teklifleri yenile (aynı gönderi) */
+export const refreshShippingOffers = async (orderId, providerShipmentId) => {
+  const path = `${BASE_ORDER_SHIPPING(orderId)}/offers?providerShipmentId=${encodeURIComponent(providerShipmentId)}`;
+  return await apiRequest(path, "GET", null, true);
 };
 
 /** POST api/seller/orders/{orderId}/shipping/accept-offer - Teklif kabul & etiket oluştur */
