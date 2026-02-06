@@ -818,11 +818,11 @@ const OrderDetailPage = () => {
                   </div>
 
                   <div className="p-4 sm:p-5">
-              {/* Tracking Status Timeline */}
+              {/* Kargonun anlık durumu */}
               <div className="mb-4 sm:mb-6">
                 <h3 className="text-xs sm:text-sm font-semibold text-gray-700 mb-3 sm:mb-4 flex items-center gap-2">
                   <Navigation className="w-3 h-3 sm:w-4 sm:h-4" />
-                  Takip Durumu Timeline
+                  Kargonun Şu Anki Durumu (Akış Özeti)
                 </h3>
                 <TrackingTimeline
                   trackingStatus={shippingLabel.trackingStatus}
@@ -864,7 +864,7 @@ const OrderDetailPage = () => {
                   </div>
                 )}
                 <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl p-4 border border-blue-200">
-                  <p className="text-xs text-blue-600 mb-1">Tracking Status</p>
+                  <p className="text-xs text-blue-600 mb-1">Takip Durumu</p>
                   <p className="font-bold text-gray-800">
                     {shippingLabel.trackingStatus ? (
                       <span className="inline-flex items-center gap-2">
@@ -906,54 +906,7 @@ const OrderDetailPage = () => {
                 )}
               </div>
 
-              {/* Durum eşlemesi bilgisi */}
-              <div className="bg-gradient-to-br from-gray-50 to-white border border-gray-200 rounded-xl p-4">
-                <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-indigo-100 flex items-center justify-center flex-shrink-0">
-                    <InfoIcon className="w-4 h-4 text-indigo-600" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-xs font-semibold text-gray-700 mb-1">Durum Eşlemesi</p>
-                    <p className="text-xs text-gray-600 mb-2">
-                      Kargo takip durumları otomatik olarak sipariş durumuna çevrilir:
-                    </p>
-                    <div className="space-y-1.5 text-xs">
-                      <div className="flex items-center gap-2 p-2 bg-blue-50 rounded-lg border border-blue-100">
-                        <span className="text-gray-600 font-medium">PRE_TRANSIT / TRANSIT / OUT_FOR_DELIVERY</span>
-                        <span className="text-gray-400">→</span>
-                        <span className="font-semibold text-blue-600">Shipped</span>
-                        <span className="text-gray-500 text-xs">(Kargoya verildi / Yolda / Dağıtımda)</span>
-                      </div>
-                      <div className="flex items-center gap-2 p-2 bg-purple-50 rounded-lg border border-purple-100">
-                        <span className="text-gray-600 font-medium">DELIVERED</span>
-                        <span className="text-gray-400">→</span>
-                        <span className="font-semibold text-purple-600">Delivered</span>
-                        <span className="text-gray-500 text-xs">(Teslim edildi)</span>
-                      </div>
-                      <div className="flex items-center gap-2 p-2 bg-amber-50 rounded-lg border border-amber-100">
-                        <span className="text-gray-600 font-medium">RETURNED</span>
-                        <span className="text-gray-400">→</span>
-                        <span className="font-semibold text-amber-600">RefundPending</span>
-                        <span className="text-gray-500 text-xs">(İade/inceleme süreci)</span>
-                      </div>
-                      <div className="flex items-center gap-2 p-2 bg-red-50 rounded-lg border border-red-100">
-                        <span className="text-gray-600 font-medium">CANCELLED</span>
-                        <span className="text-gray-400">→</span>
-                        <span className="font-semibold text-red-600">Cancelled</span>
-                        <span className="text-gray-500 text-xs">(Kargo iptal edildi)</span>
-                      </div>
-                    </div>
-                    <div className="mt-3 pt-3 border-t border-gray-200">
-                      <p className="text-xs text-gray-600">
-                        <span className="font-semibold">Not:</span> Webhook işlemleri idempotent'tir. 
-                        Aynı webhook birden fazla kez gelirse sadece en yeni olan işlenir. 
-                        Sipariş durumu geçişleri geçerlilik kontrolünden geçer.
-                      </p>
-                    </div>
-                  </div>
                 </div>
-              </div>
-                  </div>
                 </div>
               )}
 
@@ -1474,7 +1427,7 @@ const TrackingTimeline = ({ trackingStatus, orderStatus, trackingUpdatedAt }) =>
                 <div className="text-xs text-gray-500 space-y-1.5">
                   <p className="text-gray-600 italic">{step.description}</p>
                   <div className="flex items-center gap-2">
-                    <span className="font-medium">Tracking Status:</span>
+                    <span className="font-medium">Takip Durumu:</span>
                     <span className="font-semibold text-gray-700">
                       {step.trackingStatuses.join(" / ")}
                     </span>
