@@ -69,18 +69,28 @@ export async function apiRequest(
 
   if (!response.ok) {
     const errorText = await response.text().catch(() => "");
-    let errorMessage = "Sunucu hatası.";
+    let errorMessage = "İşlem başarısız. Lütfen tekrar deneyin.";
 
     try {
       const parsed = errorText ? JSON.parse(errorText) : {};
       const json = typeof parsed === "object" && parsed !== null ? parsed : {};
-      // ErrorResponse: statusCode, message, errors[] — errors varsa birleştir
-      const baseMsg = json.title || json.message || json.error;
+      // ErrorResponse (SellerUserController): statusCode, message, errors[]
+      const apiMessage = json.message || json.title || json.error;
       const errors = Array.isArray(json.errors) && json.errors.length ? json.errors : [];
-      errorMessage = errors.length ? errors.join(" ") : (baseMsg || (typeof parsed === "string" ? parsed : errorText) || response.statusText);
+      if (apiMessage && typeof apiMessage === "string") {
+        errorMessage = apiMessage;
+      } else if (errors.length) {
+        errorMessage = errors.join(" ");
+      } else if (typeof parsed === "string" && parsed) {
+        errorMessage = parsed;
+      } else if (errorText) {
+        errorMessage = errorText;
+      } else {
+        errorMessage = response.statusText || errorMessage;
+      }
     } catch {
-      console.error("API Text Error:", errorText);
-      errorMessage = errorText || response.statusText;
+      if (errorText) errorMessage = errorText;
+      else errorMessage = response.statusText || errorMessage;
     }
 
     throw new Error(errorMessage);
@@ -153,13 +163,18 @@ export function apiRequestWithUploadProgress(
             resolve({ message: xhr.responseText || "" });
           }
         } else {
-          let errorMessage = "Sunucu hatası.";
+          let errorMessage = "İşlem başarısız. Lütfen tekrar deneyin.";
           try {
             const parsed = xhr.responseText ? JSON.parse(xhr.responseText) : {};
             const json = typeof parsed === "object" && parsed !== null ? parsed : {};
-            errorMessage = json.title || json.message || json.error || (typeof parsed === "string" ? parsed : xhr.responseText) || xhr.statusText;
+            const apiMessage = json.message || json.title || json.error;
+            const errors = Array.isArray(json.errors) && json.errors.length ? json.errors : [];
+            if (apiMessage && typeof apiMessage === "string") errorMessage = apiMessage;
+            else if (errors.length) errorMessage = errors.join(" ");
+            else if (xhr.responseText) errorMessage = xhr.responseText;
+            else errorMessage = xhr.statusText || errorMessage;
           } catch {
-            errorMessage = xhr.responseText || xhr.statusText;
+            errorMessage = xhr.responseText || xhr.statusText || errorMessage;
           }
           reject(new Error(errorMessage));
         }

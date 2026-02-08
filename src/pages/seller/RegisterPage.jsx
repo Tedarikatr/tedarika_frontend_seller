@@ -112,12 +112,9 @@ const handleSubmit = async (e) => {
       navigate("/seller/login");
     }, 1500);
   } catch (err) {
-    const errorMessage =
-      err?.response?.data?.message ||
-      err.message ||
-      "Kayıt sırasında bir hata oluştu.";
+    const errorMessage = err?.message || "Kayıt sırasında bir hata oluştu.";
     toast.error(errorMessage);
-    setIsSubmitting(false); // Hata durumunda butonu tekrar aktif et
+    setIsSubmitting(false);
   }
 };
 

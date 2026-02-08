@@ -62,11 +62,14 @@ const LoginPage = () => {
         localStorage.setItem("sellerEmail", result.email);
         localStorage.setItem("sellerRole", result.role);
 
-        // Backend token'a koymadığı için bunları ayrıca kaydediyoruz
-        if (result?.isthesystemactive !== undefined)
-          localStorage.setItem("sellerSystemActive", String(result.isthesystemactive));
-        if (result?.subscriptionActive !== undefined)
-          localStorage.setItem("sellerSubscriptionActive", String(result.subscriptionActive));
+        // API yanıtı features içinde döner (subscriptionActive, isthesystemactive, messagingServiceEnabled)
+        const features = result?.features ?? {};
+        if (features.subscriptionActive !== undefined)
+          localStorage.setItem("sellerSubscriptionActive", String(features.subscriptionActive));
+        if (features.isthesystemactive !== undefined)
+          localStorage.setItem("sellerSystemActive", String(features.isthesystemactive));
+        if (features.messagingServiceEnabled !== undefined)
+          localStorage.setItem("sellerMessagingEnabled", String(features.messagingServiceEnabled));
 
         toast.success("Giriş başarılı, yönlendiriliyorsunuz...");
         navigate("/seller/dashboard");
@@ -74,7 +77,8 @@ const LoginPage = () => {
         toast.error("Beklenen token verisi alınamadı.");
       }
     } catch (err) {
-      toast.error(err?.response?.data?.message || "Giriş sırasında hata oluştu.");
+      const message = err?.message || "Giriş sırasında hata oluştu.";
+      toast.error(message);
     } finally {
       setIsSubmitting(false);
     }
