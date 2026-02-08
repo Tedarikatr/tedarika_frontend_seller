@@ -176,10 +176,12 @@ export const getOrganizationSchema = () => {
  * @param {string} path - Sayfa yolu
  * @returns {Object} - JSON-LD objesi
  */
+/**
+ * WebSite + SearchAction: Google'da sitelinks arama kutusu (Rich Result) için.
+ * urlTemplate, sayfada gerçekten kullanılan arama URL'i ile eşleşmeli (yoksa landing ile query).
+ */
 export const getWebsiteSchema = (path = '') => {
   const currentDomain = getCurrentDomain();
-  const cleanPath = path.startsWith('/') ? path : `/${path}`;
-  
   return {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
@@ -190,7 +192,7 @@ export const getWebsiteSchema = (path = '') => {
       '@type': 'SearchAction',
       'target': {
         '@type': 'EntryPoint',
-        'urlTemplate': `${currentDomain}/search?q={search_term_string}`
+        'urlTemplate': `${currentDomain}/seller/landing?q={search_term_string}`
       },
       'query-input': 'required name=search_term_string'
     }
