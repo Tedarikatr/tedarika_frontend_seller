@@ -113,3 +113,69 @@ Teknik tarama/dizine ekleme uyumluluğu bu raporla karşılanıyor. Sıralamayı
 - **noindex (panel):** Giriş gerektiren tüm panel sayfalarında `SellerLayout` üzerinden `<meta name="robots" content="noindex, nofollow" />` eklendi.
 
 Bu rapor, [Google Arama Merkezi – Tarama ve dizine ekleme](https://developers.google.com/search/docs/crawling-indexing?hl=tr) dokümanına göre hazırlanmıştır.
+
+---
+
+## 11. SEO Başlangıç Kılavuzu Kontrol Listesi
+
+[Google SEO Başlangıç Kılavuzu](https://developers.google.com/search/docs/fundamentals/seo-starter-guide?hl=tr) maddelerine göre proje kontrol edilmiştir. Arama sonuçlarında görünürlük ve sıralama için önerilen tüm teknik ve içeriksel noktalar aşağıda işaretlenmiştir.
+
+### Google'ın içeriğinizi bulmasına yardımcı olun
+
+| Kılavuz maddesi | Durum | Projedeki karşılığı |
+|-----------------|--------|----------------------|
+| Sitenin dizinde olup olmadığını kontrol (`site:` operatörü) | ✅ | Search Console ve manuel arama ile yapılabilir. |
+| Site haritası gönderme | ✅ | Sitemap XML mevcut; robots.txt’te Sitemap referansı var. |
+| Google’ın sayfayı kullanıcıyla aynı görmesi (CSS/JS erişilebilir) | ✅ | Kritik meta ilk HTML’de; React ile sayfa meta’ları güncelleniyor. |
+| İstenmeyen sayfaları dizinden çıkarma | ✅ | Panel sayfalarında noindex; robots.txt ile Disallow. |
+
+### Sitenizi düzenleyin
+
+| Kılavuz maddesi | Durum | Projedeki karşılığı |
+|-----------------|--------|----------------------|
+| Açıklayıcı URL’ler | ✅ | `/seller/landing`, `/seller/register`, `/satici-merkezi/...`, `/corporate/about` vb. anlamlı path’ler. |
+| Konu bakımından benzer sayfaları dizinlerde gruplama | ✅ | `/corporate/`, `/satici-merkezi/`, `/seller/` ile gruplandırma yapılıyor. |
+| Yinelenen içeriği azaltma | ✅ | Canonical `/seller/landing`; sayfa bazlı canonical; yönlendirme tutarlı. |
+
+### İlginç ve yararlı içerik
+
+| Kılavuz maddesi | Durum | Projedeki karşılığı |
+|-----------------|--------|----------------------|
+| Sayfaya özgü, net başlık ve açıklama | ✅ | Her kamu sayfasında `createSeoMeta` ile title ve description. |
+| Okuyucuların arayacağı terimleri düşünme | ✅ | Title/description’da B2B, satıcı paneli, ihracat, Tedarika vb. doğal kullanılıyor. |
+| Dikkat dağıtan reklamlardan kaçınma | N/A | Satıcı paneli; reklam stratejisi iş kararı. |
+| İlgili kaynaklara bağlantı (açıklayıcı bağlantı metni) | ✅ | Footer, kurumsal sayfalar, Satıcı Merkezi iç linkleri anlamlı anchor metinle. |
+
+### Arama sonuçlarındaki görünüm (başlık bağlantısı ve snippet)
+
+| Kılavuz maddesi | Durum | Projedeki karşılığı |
+|-----------------|--------|----------------------|
+| Başlık bağlantısını etkileme (`<title>`, sayfaya özgü, net, kısa) | ✅ | Tüm kamu sayfalarında Helmet ile `<title>`; varsayılan title `seo.js`’te. |
+| Snippet / meta açıklama (kısa, sayfaya özgü, alakalı) | ✅ | Her sayfada `meta name="description"`; SSS sayfasında FAQPage JSON-LD (zengin sonuç potansiyeli). |
+
+### Resimler
+
+| Kılavuz maddesi | Durum | Projedeki karşılığı |
+|-----------------|--------|----------------------|
+| Alakalı metnin yakınına yüksek kaliteli resimler | ✅ | Landing ve kurumsal sayfalarda içerikle uyumlu görseller. |
+| Açıklayıcı alternatif metin (`alt`) | ✅ | Logo, ödeme ikonları, ürün/mağaza görselleri için anlamlı `alt` kullanılıyor. |
+
+### Odaklanmamanız gereken konular (Kılavuz)
+
+| Konu | Proje durumu |
+|------|----------------------|
+| Meta keywords | Kılavuza göre Google kullanmaz; projede diğer motorlar için opsiyonel bırakıldı, `seo.js` içinde not eklendi. |
+| Anahtar kelime doldurma | Yapılmıyor; title/description doğal. |
+| Alan adı/URL’de anahtar kelime zorunluluğu | Tek başına gerekli değil; mevcut URL yapısı yeterli. |
+| Minimum/maksimum içerik uzunluğu | Sabir kelime sayısı hedefi yok; sayfalar anlamlı uzunlukta. |
+| Yinelenen içerik “cezası” | Aynı içeriğin farklı URL’leri canonical ile standartlaştırıldı. |
+
+### Sonraki adımlar (Kılavuz)
+
+| Kılavuz önerisi | Durum |
+|-----------------|--------|
+| Search Console kullanımı | Sitemap ve doğrulama adımları `docs/SEO_GOOGLE_CHECKLIST.md` içinde. |
+| Zaman içinde SEO’yu koruma | Bu rapor ve checklist güncel tutularak kullanılabilir. |
+| Yapılandırılmış veri (zengin sonuçlar) | Organization, WebSite, BreadcrumbList, SSS sayfasında FAQPage mevcut. |
+
+**Özet:** Proje, [SEO Başlangıç Kılavuzu](https://developers.google.com/search/docs/fundamentals/seo-starter-guide?hl=tr)ndaki teknik ve içerik önerileriyle uyumludur. Sıralama için içerik kalitesi, backlink ve sayfa deneyimi (Core Web Vitals) ile Search Console kullanımı önerilir.

@@ -93,13 +93,17 @@ export const getRobotsUrl = () => {
 };
 
 /**
- * Sayfa için SEO meta bilgileri oluşturur
+ * Sayfa için SEO meta bilgileri oluşturur.
+ * Google SEO Başlangıç Kılavuzu: başlık sayfaya özgü, net ve kısa; meta açıklama sayfaya özgü ve alakalı noktaları içermeli.
+ * Not: Google Arama "keywords" meta etiketini kullanmaz; diğer arama motorları için isteğe bağlı bırakıyoruz.
+ *
  * @param {Object} options - SEO seçenekleri
- * @param {string} options.title - Sayfa başlığı
- * @param {string} options.description - Meta açıklama
+ * @param {string} options.title - Sayfa başlığı (arama sonucunda başlık bağlantısı; ~50-60 karakter önerilir)
+ * @param {string} options.description - Meta açıklama (snippet için; ~150-160 karakter önerilir)
  * @param {string} options.path - Sayfa yolu
  * @param {string} options.image - OG image yolu
  * @param {string} options.type - OG type (website, article, vb.)
+ * @param {string} options.keywords - Opsiyonel; Google kullanmaz, diğer motorlar için
  * @returns {Object} - SEO meta objesi
  */
 export const createSeoMeta = ({
