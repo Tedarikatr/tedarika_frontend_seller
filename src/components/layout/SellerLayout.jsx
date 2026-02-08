@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { useNavigate, useLocation, Outlet } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import Sidebar from "./Sidebar";
 import Topbar from "./Topbar";
 import { hasCompany } from "@/api/sellerCompanyService";
@@ -115,6 +116,10 @@ const SellerLayout = () => {
   const shouldShowOverlay = isRestricted && !isProfilePage;
 
   return (
+    <>
+      <Helmet>
+        <meta name="robots" content="noindex, nofollow" />
+      </Helmet>
     <div className="flex h-screen w-full overflow-hidden relative">
       {/* Sidebar */}
       <Sidebar
@@ -182,6 +187,7 @@ const SellerLayout = () => {
         </div>
       )}
     </div>
+    </>
   );
 };
 
