@@ -9,7 +9,11 @@ import {
   CheckCircle,
   XCircle,
   Save,
+  Pencil,
 } from "lucide-react";
+
+const COUNTRY_CODE_DEFAULT = "TR";
+const COUNTRY_NAME_DEFAULT = "Türkiye";
 
 const defaultForm = {
   name: "",
@@ -19,12 +23,9 @@ const defaultForm = {
   address2: "",
   cityCode: "",
   cityName: "",
-  districtId: "",
   districtName: "",
   streetName: "",
   zip: "",
-  countryCode: "TR",
-  countryName: "Türkiye",
   isDefaultSenderAddress: true,
   isDefaultReturnAddress: true,
 };
@@ -36,13 +37,17 @@ export default function ShippingSettingsCard() {
   const [messageType, setMessageType] = useState("success");
   const [form, setForm] = useState(defaultForm);
   const [hasAddress, setHasAddress] = useState(false);
+  /** Adres kayıtlıyken formu kapalı tutar; "Düzenle" ile açılır */
+  const [formExpanded, setFormExpanded] = useState(false);
 
   const loadSenderAddress = async () => {
     setLoading(true);
     setMessage("");
     try {
       const data = await getSenderAddress();
-      setHasAddress(true);
+      const hasData = !!(data?.address1 || data?.name);
+      setHasAddress(hasData);
+      if (hasData) setFormExpanded(false);
       setForm({
         name: data.name ?? "",
         email: data.email ?? "",
@@ -51,12 +56,9 @@ export default function ShippingSettingsCard() {
         address2: data.address2 ?? "",
         cityCode: data.cityCode ?? "",
         cityName: data.cityName ?? "",
-        districtId: data.districtId ?? "",
         districtName: data.districtName ?? "",
         streetName: data.streetName ?? "",
         zip: data.zip ?? "",
-        countryCode: data.countryCode ?? "TR",
-        countryName: data.countryName ?? "Türkiye",
         isDefaultSenderAddress: data.isDefaultSenderAddress !== false,
         isDefaultReturnAddress: data.isDefaultReturnAddress !== false,
       });
@@ -114,17 +116,17 @@ export default function ShippingSettingsCard() {
         address2: form.address2?.trim() || undefined,
         cityCode: form.cityCode?.trim() || undefined,
         cityName: form.cityName?.trim() || undefined,
-        districtId: form.districtId ? Number(form.districtId) : undefined,
         districtName: form.districtName?.trim() || undefined,
         streetName: form.streetName?.trim() || undefined,
         zip: form.zip?.trim() || undefined,
-        countryCode: form.countryCode?.trim() || "TR",
-        countryName: form.countryName?.trim() || undefined,
+        countryCode: COUNTRY_CODE_DEFAULT,
+        countryName: COUNTRY_NAME_DEFAULT,
         isDefaultSenderAddress: Boolean(form.isDefaultSenderAddress),
         isDefaultReturnAddress: Boolean(form.isDefaultReturnAddress),
       };
       await putSenderAddress(payload);
       setHasAddress(true);
+      setFormExpanded(false);
       setMessage("Gönderici adresi kaydedildi.");
       await loadSenderAddress();
     } catch (err) {
@@ -188,146 +190,162 @@ export default function ShippingSettingsCard() {
             Kargo etiketi ve teklifleri için kullanılacak gönderici adresinizi girin. Mağaza numaranız otomatik kısa ad olarak kullanılır.
           </p>
 
-          <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Field
-              label="Ad / Ünvan"
-              name="name"
-              value={form.name}
-              onChange={handleChange}
-              placeholder="Mağaza Adı Tic. Ltd. Şti."
-              required
-            />
-            <Field
-              label="E-posta"
-              name="email"
-              type="email"
-              value={form.email}
-              onChange={handleChange}
-              placeholder="magaza@example.com"
-            />
-            <Field
-              label="Telefon"
-              name="phone"
-              value={form.phone}
-              onChange={handleChange}
-              placeholder="+905551234567"
-              required
-            />
-            <Field
-              label="Adres satırı 1"
-              name="address1"
-              value={form.address1}
-              onChange={handleChange}
-              placeholder="Mahalle, sokak, no"
-              required
-              className="md:col-span-2"
-            />
-            <Field
-              label="Adres satırı 2"
-              name="address2"
-              value={form.address2}
-              onChange={handleChange}
-              placeholder="Bina, daire (opsiyonel)"
-              className="md:col-span-2"
-            />
-            <div className="flex flex-col gap-1">
-              <label className="text-sm font-medium text-gray-700">
-                İl <span className="text-rose-600">*</span>
-              </label>
-              <select
-                name="cityCode"
-                value={form.cityCode}
-                onChange={handleCitySelect}
-                className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none"
-              >
-                <option value="">Seçiniz...</option>
-                {TURKEY_PROVINCES.map((p) => (
-                  <option key={p.code} value={p.code}>
-                    {p.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <Field
-              label="İlçe adı"
-              name="districtName"
-              value={form.districtName}
-              onChange={handleChange}
-              placeholder="İlçe"
-            />
-            <Field
-              label="İlçe ID (Geliver)"
-              name="districtId"
-              value={form.districtId}
-              onChange={handleChange}
-              type="number"
-              placeholder="Opsiyonel"
-            />
-            <Field
-              label="Sokak adı"
-              name="streetName"
-              value={form.streetName}
-              onChange={handleChange}
-              placeholder="Opsiyonel"
-            />
-            <Field
-              label="Posta kodu"
-              name="zip"
-              value={form.zip}
-              onChange={handleChange}
-              placeholder="34020"
-            />
-            <Field
-              label="Ülke kodu"
-              name="countryCode"
-              value={form.countryCode}
-              onChange={handleChange}
-              placeholder="TR"
-            />
-            <Field
-              label="Ülke adı"
-              name="countryName"
-              value={form.countryName}
-              onChange={handleChange}
-              placeholder="Türkiye"
-            />
-            <div className="md:col-span-2 flex flex-wrap gap-6 mt-2">
-              <label className="inline-flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  name="isDefaultSenderAddress"
-                  checked={form.isDefaultSenderAddress}
-                  onChange={handleChange}
-                  className="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
-                />
-                <span className="text-sm text-gray-700">Varsayılan gönderici adresi</span>
-              </label>
-              <label className="inline-flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  name="isDefaultReturnAddress"
-                  checked={form.isDefaultReturnAddress}
-                  onChange={handleChange}
-                  className="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
-                />
-                <span className="text-sm text-gray-700">Varsayılan iade adresi</span>
-              </label>
-            </div>
-            <div className="md:col-span-2 flex justify-end pt-2">
+          {hasAddress && !formExpanded ? (
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 rounded-xl border border-gray-200 bg-white p-4">
+              <div className="text-sm text-gray-700">
+                <p className="font-medium text-gray-900">{form.name || "—"}</p>
+                <p>{form.address1}</p>
+                {form.address2 && <p>{form.address2}</p>}
+                <p>
+                  {[form.districtName, form.cityName].filter(Boolean).join(", ")}
+                  {form.zip && ` ${form.zip}`}
+                </p>
+                <p className="text-gray-500 mt-1">
+                  {COUNTRY_NAME_DEFAULT} ({COUNTRY_CODE_DEFAULT})
+                </p>
+              </div>
               <button
-                type="submit"
-                disabled={saving}
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-sm font-semibold hover:shadow-lg transition disabled:opacity-50"
+                type="button"
+                onClick={() => setFormExpanded(true)}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-emerald-600 text-emerald-600 text-sm font-medium hover:bg-emerald-50 transition shrink-0"
               >
-                {saving ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  <Save className="w-4 h-4" />
-                )}
-                {hasAddress ? "Güncelle" : "Kaydet"}
+                <Pencil className="w-4 h-4" />
+                Düzenle
               </button>
             </div>
-          </form>
+          ) : (
+            <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Field
+                label="Ad / Ünvan"
+                name="name"
+                value={form.name}
+                onChange={handleChange}
+                placeholder="Mağaza Adı Tic. Ltd. Şti."
+                required
+              />
+              <Field
+                label="E-posta"
+                name="email"
+                type="email"
+                value={form.email}
+                onChange={handleChange}
+                placeholder="magaza@example.com"
+              />
+              <Field
+                label="Telefon"
+                name="phone"
+                value={form.phone}
+                onChange={handleChange}
+                placeholder="+905551234567"
+                required
+              />
+              <Field
+                label="Adres satırı 1"
+                name="address1"
+                value={form.address1}
+                onChange={handleChange}
+                placeholder="Mahalle, sokak, no"
+                required
+                className="md:col-span-2"
+              />
+              <Field
+                label="Adres satırı 2"
+                name="address2"
+                value={form.address2}
+                onChange={handleChange}
+                placeholder="Bina, daire (opsiyonel)"
+                className="md:col-span-2"
+              />
+              <div className="flex flex-col gap-1">
+                <label className="text-sm font-medium text-gray-700">
+                  İl <span className="text-rose-600">*</span>
+                </label>
+                <select
+                  name="cityCode"
+                  value={form.cityCode}
+                  onChange={handleCitySelect}
+                  className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none"
+                >
+                  <option value="">Seçiniz...</option>
+                  {TURKEY_PROVINCES.map((p) => (
+                    <option key={p.code} value={p.code}>
+                      {p.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <Field
+                label="İlçe adı"
+                name="districtName"
+                value={form.districtName}
+                onChange={handleChange}
+                placeholder="İlçe"
+              />
+              <Field
+                label="Sokak adı"
+                name="streetName"
+                value={form.streetName}
+                onChange={handleChange}
+                placeholder="Opsiyonel"
+              />
+              <Field
+                label="Posta kodu"
+                name="zip"
+                value={form.zip}
+                onChange={handleChange}
+                placeholder="34020"
+              />
+              <div className="md:col-span-2 flex items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-600">
+                <span className="font-medium text-gray-700">Ülke:</span>
+                <span>{COUNTRY_NAME_DEFAULT} ({COUNTRY_CODE_DEFAULT})</span>
+              </div>
+              <div className="md:col-span-2 flex flex-wrap gap-6 mt-2">
+                <label className="inline-flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    name="isDefaultSenderAddress"
+                    checked={form.isDefaultSenderAddress}
+                    onChange={handleChange}
+                    className="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
+                  />
+                  <span className="text-sm text-gray-700">Varsayılan gönderici adresi</span>
+                </label>
+                <label className="inline-flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    name="isDefaultReturnAddress"
+                    checked={form.isDefaultReturnAddress}
+                    onChange={handleChange}
+                    className="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
+                  />
+                  <span className="text-sm text-gray-700">Varsayılan iade adresi</span>
+                </label>
+              </div>
+              <div className="md:col-span-2 flex justify-end gap-2 pt-2">
+                {hasAddress && (
+                  <button
+                    type="button"
+                    onClick={() => setFormExpanded(false)}
+                    className="px-4 py-2.5 rounded-xl border border-gray-300 text-gray-700 text-sm font-medium hover:bg-gray-50 transition"
+                  >
+                    İptal
+                  </button>
+                )}
+                <button
+                  type="submit"
+                  disabled={saving}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-sm font-semibold hover:shadow-lg transition disabled:opacity-50"
+                >
+                  {saving ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Save className="w-4 h-4" />
+                  )}
+                  {hasAddress ? "Güncelle" : "Kaydet"}
+                </button>
+              </div>
+            </form>
+          )}
         </div>
       )}
 
