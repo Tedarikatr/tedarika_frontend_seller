@@ -8,9 +8,9 @@
       content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=no, viewport-fit=cover"
     />
 
-    <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="/logo.svg" />
-    <link rel="apple-touch-icon" href="/logo.svg" />
+    <!-- Favicon (PNG fallback - logo.svg yoksa /images/logo.png kullan) -->
+    <link rel="icon" type="image/png" href="/images/logo.png" />
+    <link rel="apple-touch-icon" href="/images/logo.png" />
     <meta name="theme-color" content="#003636" />
 
     <!-- PWA / Mobile Optimization -->
@@ -39,10 +39,10 @@
     <meta property="og:url" content="https://www.seller.tedarika.com.tr/" />
     <meta property="og:title" content="Tedarika Satıcı Paneli - B2B Pazaryerinde Mağazanızı Açın" />
     <meta property="og:description" content="Türkiye'den dünyaya ihracat yapın. Güvenli ödeme, kolay ürün yönetimi, global alıcılara ulaşın. KOBİ'ler için en hızlı büyüyen B2B platformu." />
-    <meta property="og:image" content="https://www.seller.tedarika.com.tr/logo.svg" />
+    <meta property="og:image" content="https://www.seller.tedarika.com.tr/images/logo.png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="Tedarika Satıcı Paneli Logo" />
+    <meta property="og:image:alt" content="Tedarika Satıcı Paneli - B2B Pazaryeri" />
     <meta property="og:locale" content="tr_TR" />
     <meta property="og:site_name" content="Tedarika" />
     
@@ -51,8 +51,8 @@
     <meta name="twitter:url" content="https://www.seller.tedarika.com.tr/" />
     <meta name="twitter:title" content="Tedarika Satıcı Paneli - B2B Pazaryerinde Mağazanızı Açın" />
     <meta name="twitter:description" content="Türkiye'den dünyaya ihracat yapın. Güvenli ödeme, kolay ürün yönetimi, global alıcılara ulaşın." />
-    <meta name="twitter:image" content="https://www.seller.tedarika.com.tr/logo.svg" />
-    <meta name="twitter:image:alt" content="Tedarika Satıcı Paneli Logo" />
+    <meta name="twitter:image" content="https://www.seller.tedarika.com.tr/images/logo.png" />
+    <meta name="twitter:image:alt" content="Tedarika Satıcı Paneli - B2B Pazaryeri" />
     
     <!-- Canonical URL -->
     <link rel="canonical" href="https://www.seller.tedarika.com.tr/" />
@@ -65,6 +65,48 @@
     <meta name="geo.region" content="TR" />
     <meta name="geo.placename" content="Turkey" />
     <meta name="format-detection" content="telephone=no" />
+
+    <!-- Google Search Console: Doğrulama için meta tag ekleyin (Örnek: <meta name="google-site-verification" content="XXXXXXXX" />) -->
+
+    <!-- Yapısal veri (JSON-LD) - Google arama sonuçları için -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Organization",
+          "@id": "https://www.seller.tedarika.com.tr/#organization",
+          "name": "Tedarika",
+          "url": "https://www.tedarika.com.tr",
+          "logo": "https://www.seller.tedarika.com.tr/images/logo.png",
+          "contactPoint": {
+            "@type": "ContactPoint",
+            "telephone": "+90-538-236-26-05",
+            "contactType": "customer service",
+            "availableLanguage": ["Turkish", "English"],
+            "areaServed": "TR",
+            "email": "info@tedarika.com.tr"
+          },
+          "sameAs": [
+            "https://www.linkedin.com/company/tedarika",
+            "https://twitter.com/tedarika"
+          ]
+        },
+        {
+          "@type": "WebSite",
+          "name": "Tedarika Satıcı Paneli",
+          "url": "https://www.seller.tedarika.com.tr",
+          "description": "Türkiye'nin B2B pazaryeri satıcı paneli. Mağazanızı açın, ihracat yapın, global alıcılara ulaşın.",
+          "publisher": { "@id": "https://www.seller.tedarika.com.tr/#organization" },
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": { "@type": "EntryPoint", "urlTemplate": "https://www.seller.tedarika.com.tr/seller/landing?q={search_term_string}" },
+            "query-input": "required name=search_term_string"
+          }
+        }
+      ]
+    }
+    </script>
 
     <title>Tedarika Satıcı Paneli - B2B Pazaryeri ile İhracat Yapın | Mağazanızı Ücretsiz Açın</title>
   </head>

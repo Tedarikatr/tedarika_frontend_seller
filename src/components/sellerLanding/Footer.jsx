@@ -29,7 +29,7 @@ const Footer = () => {
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row gap-10">
           {/* Logo ve iletişim */}
           <div className="w-full md:w-1/2">
-            <img src={publicUrl("logo.svg")} alt="Tedarika Logo" className="w-40 mb-4" />
+            <img src={publicUrl("images/logo.png")} alt="Tedarika Logo" className="w-40 mb-4" />
             <p className="text-sm text-gray-300 mb-4 max-w-sm">
               Tedarika Bir Coşkunlar Limited Şirketi A.Ş Kuruluşudur
             </p>

@@ -48,7 +48,7 @@ export const getCanonicalUrl = (path = '') => {
  * @param {string} imagePath - Resim yolu (opsiyonel)
  * @returns {string} - Tam image URL
  */
-export const getOgImageUrl = (imagePath = '/logo.svg') => {
+export const getOgImageUrl = (imagePath = '/images/logo.png') => {
   const domain = getCurrentDomain();
   const cleanPath = imagePath.startsWith('/') ? imagePath : `/${imagePath}`;
   return `${domain}${cleanPath}`;
@@ -106,7 +106,7 @@ export const createSeoMeta = ({
   title,
   description,
   path = '',
-  image = '/logo.svg',
+  image = '/images/logo.png',
   type = 'website',
   keywords = ''
 }) => {
@@ -151,7 +151,7 @@ export const getOrganizationSchema = () => {
     '@type': 'Organization',
     'name': 'Tedarika',
     'url': mainDomain,
-    'logo': `${currentDomain}/logo.svg`,
+    'logo': `${currentDomain}/images/logo.png`,
     'contactPoint': {
       '@type': 'ContactPoint',
       'telephone': '+90-538-236-26-05',
