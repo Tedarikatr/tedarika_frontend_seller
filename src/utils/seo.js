@@ -48,7 +48,7 @@ export const getCanonicalUrl = (path = '') => {
  * @param {string} imagePath - Resim yolu (opsiyonel)
  * @returns {string} - Tam image URL
  */
-export const getOgImageUrl = (imagePath = '/logo.svg') => {
+export const getOgImageUrl = (imagePath = '/images/logo.png') => {
   const domain = getCurrentDomain();
   const cleanPath = imagePath.startsWith('/') ? imagePath : `/${imagePath}`;
   return `${domain}${cleanPath}`;
@@ -93,20 +93,24 @@ export const getRobotsUrl = () => {
 };
 
 /**
- * Sayfa için SEO meta bilgileri oluşturur
+ * Sayfa için SEO meta bilgileri oluşturur.
+ * Google SEO Başlangıç Kılavuzu: başlık sayfaya özgü, net ve kısa; meta açıklama sayfaya özgü ve alakalı noktaları içermeli.
+ * Not: Google Arama "keywords" meta etiketini kullanmaz; diğer arama motorları için isteğe bağlı bırakıyoruz.
+ *
  * @param {Object} options - SEO seçenekleri
- * @param {string} options.title - Sayfa başlığı
- * @param {string} options.description - Meta açıklama
+ * @param {string} options.title - Sayfa başlığı (arama sonucunda başlık bağlantısı; ~50-60 karakter önerilir)
+ * @param {string} options.description - Meta açıklama (snippet için; ~150-160 karakter önerilir)
  * @param {string} options.path - Sayfa yolu
  * @param {string} options.image - OG image yolu
  * @param {string} options.type - OG type (website, article, vb.)
+ * @param {string} options.keywords - Opsiyonel; Google kullanmaz, diğer motorlar için
  * @returns {Object} - SEO meta objesi
  */
 export const createSeoMeta = ({
   title,
   description,
   path = '',
-  image = '/logo.svg',
+  image = '/images/logo.png',
   type = 'website',
   keywords = ''
 }) => {
@@ -151,7 +155,7 @@ export const getOrganizationSchema = () => {
     '@type': 'Organization',
     'name': 'Tedarika',
     'url': mainDomain,
-    'logo': `${currentDomain}/logo.svg`,
+    'logo': `${currentDomain}/images/logo.png`,
     'contactPoint': {
       '@type': 'ContactPoint',
       'telephone': '+90-538-236-26-05',
@@ -172,10 +176,12 @@ export const getOrganizationSchema = () => {
  * @param {string} path - Sayfa yolu
  * @returns {Object} - JSON-LD objesi
  */
+/**
+ * WebSite + SearchAction: Google'da sitelinks arama kutusu (Rich Result) için.
+ * urlTemplate, sayfada gerçekten kullanılan arama URL'i ile eşleşmeli (yoksa landing ile query).
+ */
 export const getWebsiteSchema = (path = '') => {
   const currentDomain = getCurrentDomain();
-  const cleanPath = path.startsWith('/') ? path : `/${path}`;
-  
   return {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
@@ -186,7 +192,7 @@ export const getWebsiteSchema = (path = '') => {
       '@type': 'SearchAction',
       'target': {
         '@type': 'EntryPoint',
-        'urlTemplate': `${currentDomain}/search?q={search_term_string}`
+        'urlTemplate': `${currentDomain}/seller/landing?q={search_term_string}`
       },
       'query-input': 'required name=search_term_string'
     }

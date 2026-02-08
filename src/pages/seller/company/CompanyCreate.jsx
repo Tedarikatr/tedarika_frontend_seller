@@ -63,7 +63,7 @@ const CompanyCreate = () => {
       name: form.name.trim(),
       taxNumber: taxNum,
       taxOffice: form.taxOffice.trim(),
-      country: "TR",
+      country: "Türkiye",
       province: form.province.trim(),
       address: form.address.trim(),
       type: typeNum,

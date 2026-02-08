@@ -60,7 +60,7 @@ const AboutPage = () => {
           "@type": "Organization",
           "name": "Tedarika Satıcı Platformu",
           "url": "https://seller.tedarika.com.tr",
-          "logo": "https://seller.tedarika.com.tr/images/logo.svg",
+          "logo": "https://www.seller.tedarika.com.tr/images/logo.png",
           "description": "Tedarika Satıcı Platformu, ihracat yapmak isteyen KOBİ'lere ve üreticilere özel olarak tasarlanmış dijital bir pazaryeri çözümüdür.",
           "slogan": "Üret, biz dünyaya taşıyalım",
           "sameAs": ["https://www.tedarika.com.tr"],

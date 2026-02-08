@@ -99,19 +99,20 @@ const StoreCreate = () => {
           const refreshed = await refreshToken({ token });
           if (refreshed?.token) {
             localStorage.setItem("sellerToken", refreshed.token);
-            if (refreshed?.subscriptionActive !== undefined)
-              localStorage.setItem("sellerSubscriptionActive", String(refreshed.subscriptionActive));
-            if (refreshed?.isthesystemactive !== undefined)
-              localStorage.setItem("sellerSystemActive", String(refreshed.isthesystemactive ?? refreshed.Status ?? ""));
+            const features = refreshed?.features ?? {};
+            if (features.subscriptionActive !== undefined)
+              localStorage.setItem("sellerSubscriptionActive", String(features.subscriptionActive));
+            if (features.isthesystemactive !== undefined)
+              localStorage.setItem("sellerSystemActive", String(features.isthesystemactive));
           }
         }
       } catch {
-        /* Token yenileme başarısız - devam et */
+        /* Token yenileme başarısız - sessizce devam et */
       }
 
       navigate("/seller/profile#store", { replace: true });
-    } catch {
-      setMessage("Mağaza oluşturulamadı.");
+    } catch (err) {
+      setMessage(err?.message || "Mağaza oluşturulamadı.");
     } finally {
       setSubmitting(false);
     }

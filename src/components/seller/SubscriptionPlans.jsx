@@ -79,17 +79,11 @@ export default function SubscriptionPlans() {
 
       if (refreshed?.token) {
         localStorage.setItem("sellerToken", refreshed.token);
-
-        if (refreshed?.subscriptionActive !== undefined)
-          localStorage.setItem(
-            "sellerSubscriptionActive",
-            String(refreshed.subscriptionActive)
-          );
-        if (refreshed?.isthesystemactive !== undefined)
-          localStorage.setItem(
-            "sellerSystemActive",
-            String(refreshed.isthesystemactive || refreshed.Status)
-          );
+        const features = refreshed?.features ?? {};
+        if (features.subscriptionActive !== undefined)
+          localStorage.setItem("sellerSubscriptionActive", String(features.subscriptionActive));
+        if (features.isthesystemactive !== undefined)
+          localStorage.setItem("sellerSystemActive", String(features.isthesystemactive));
 
         toast.success("Token yenilendi.");
         setTimeout(() => window.location.reload(), 1000);
@@ -97,8 +91,8 @@ export default function SubscriptionPlans() {
         toast.error("Token yenilenemedi. Lütfen tekrar giriş yapın.");
       }
     } catch (err) {
-      console.error("Token yenileme hatası:", err);
-      toast.error("Token yenileme başarısız. Lütfen tekrar giriş yapın.");
+      const message = err?.message || "Token yenileme başarısız. Lütfen tekrar giriş yapın.";
+      toast.error(message);
     }
   };
 
