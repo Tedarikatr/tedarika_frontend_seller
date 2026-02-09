@@ -5,6 +5,7 @@ import Sidebar from "./Sidebar";
 import Topbar from "./Topbar";
 import { hasCompany } from "@/api/sellerCompanyService";
 import { getMyStore } from "@/api/sellerStoreService";
+import { usePaymentInfoNotificationSync } from "@/hooks/usePaymentInfoNotificationSync";
 import { AlertCircle, Lock } from "lucide-react";
 import { getDecodedSellerPayload } from "@/utils/auth";
 import { toast } from "react-hot-toast";
@@ -23,6 +24,9 @@ const SellerLayout = () => {
     "/seller/store/create",
     "/seller/logout",
   ];
+
+  // Merkezi bildirim: ödeme bilgisi eksikse uyarı ekle, doluysa kaldır
+  usePaymentInfoNotificationSync();
 
   // 🧩 Şirket ve mağaza kontrolü
   useEffect(() => {
