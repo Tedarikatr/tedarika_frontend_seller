@@ -6,6 +6,7 @@ import {
   getPayoutProfile,
   savePayoutProfile,
 } from "@/api/sellerPayoutProfileService";
+import { useNotification } from "@/contexts/NotificationContext";
 import { Loader2, Copy, Check, Pencil, X } from "lucide-react";
 
 // Boş form şablonu
@@ -52,6 +53,7 @@ const isValidIban = (iban) => {
 };
 
 export default function SellerFinanceInfoCard() {
+  const { clearPaymentInfoMissingAndNotifyVerified } = useNotification();
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -124,6 +126,7 @@ export default function SellerFinanceInfoCard() {
         swiftCode: form.swiftCode.trim(),
       });
       setMsg("Ödeme bilgileri başarıyla kaydedildi.");
+      clearPaymentInfoMissingAndNotifyVerified();
       await refresh();
       setMode("view");
     } catch (err) {

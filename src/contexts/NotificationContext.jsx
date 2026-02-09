@@ -24,8 +24,12 @@ export const NOTIFICATION_TYPES = {
 export const NOTIFICATION_SOURCES = {
   GENERAL: "general",
   PRODUCT_UPLOAD: "product_upload",
+  PAYMENT_INFO: "payment_info",
   // İleride: ORDER, QUOTATION, REFUND, vb.
 };
+
+// Ödeme bilgisi eksik bildirimi sabit id (eklenince kaldırılıp doğrulama bildirimi gönderilir)
+export const PAYMENT_INFO_MISSING_ID = "payment-info-missing";
 
 // Varsayılan bildirimler
 const getDefaultNotifications = () => [
@@ -156,6 +160,50 @@ export const NotificationProvider = ({ children }) => {
     localStorage.removeItem(STORAGE_KEY);
   }, []);
 
+  // Ödeme bilgisi eksikse merkeze tek bir "eksik ödeme bilgisi" bildirimi ekler (zaten varsa eklemez)
+  const ensurePaymentInfoMissingNotification = useCallback(() => {
+    setNotifications((prev) => {
+      if (prev.some((n) => n.id === PAYMENT_INFO_MISSING_ID)) return prev;
+      const newNotif = {
+        id: PAYMENT_INFO_MISSING_ID,
+        type: NOTIFICATION_TYPES.WARNING,
+        title: "Ödeme Bilgileri Eksik",
+        message: "Ödemelerin alınabilmesi için Ayarlar > Ödeme sekmesinden banka adı, IBAN ve hesap sahibi bilgilerinizi eklemeniz gerekir.",
+        actionLabel: "Ödeme Bilgilerini Ekle",
+        actionUrl: "/seller/profile#finance",
+        read: false,
+        createdAt: new Date().toISOString(),
+        source: NOTIFICATION_SOURCES.PAYMENT_INFO,
+        metadata: {},
+      };
+      const updated = [newNotif, ...prev];
+      saveToStorage(updated);
+      return updated;
+    });
+  }, [saveToStorage]);
+
+  // Ödeme bilgisi eklendikten / doğrulandıktan sonra: eksik bildirimini kaldırır ve "doğrulandı, hatırlatmalar kesildi" bildirimi ekler
+  const clearPaymentInfoMissingAndNotifyVerified = useCallback(() => {
+    setNotifications((prev) => {
+      let updated = prev.filter((n) => n.id !== PAYMENT_INFO_MISSING_ID);
+      const verifiedNotif = {
+        id: `payment-info-verified-${Date.now()}`,
+        type: NOTIFICATION_TYPES.SUCCESS,
+        title: "Ödeme Bilgileri Kaydedildi",
+        message: "Ödeme bilgileriniz kaydedildi ve doğrulandı. Bu konudaki hatırlatma bildirimleri artık gönderilmeyecek.",
+        actionLabel: "Profil",
+        actionUrl: "/seller/profile#finance",
+        read: false,
+        createdAt: new Date().toISOString(),
+        source: NOTIFICATION_SOURCES.PAYMENT_INFO,
+        metadata: { verified: true },
+      };
+      updated = [verifiedNotif, ...updated];
+      saveToStorage(updated);
+      return updated;
+    });
+  }, [saveToStorage]);
+
   // Okunmamış bildirim sayısı
   const unreadCount = notifications.filter((n) => !n.read).length;
 
@@ -168,6 +216,8 @@ export const NotificationProvider = ({ children }) => {
     markAllAsRead,
     removeNotification,
     clearAll,
+    ensurePaymentInfoMissingNotification,
+    clearPaymentInfoMissingAndNotifyVerified,
   };
 
   return (
