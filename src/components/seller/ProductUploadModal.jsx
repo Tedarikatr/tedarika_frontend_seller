@@ -46,12 +46,17 @@ const ProductUploadModal = ({
   const hasErrors = errors && errors.length > 0;
 
   return (
-    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 min-h-[100dvh] min-h-screen overflow-hidden overscroll-none">
-      {/* Blur arka plan - tam viewport kaplama */}
-      <div className="absolute inset-0 min-h-[100dvh] min-h-screen bg-black/50 backdrop-blur-md" aria-hidden="true" style={{ minHeight: "100dvh" }} />
+    <div
+      className="fixed inset-0 z-[200] flex items-center justify-center p-4 overflow-hidden overscroll-none"
+      style={{ minHeight: "100dvh" }}
+      role="dialog"
+      aria-modal="true"
+    >
+      {/* Blur arka plan - viewport sabit */}
+      <div className="absolute inset-0 bg-black/50 backdrop-blur-md" aria-hidden="true" />
 
-      {/* Modal içerik */}
-      <div className="relative z-10 bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden border-2 border-gray-200 animate-[fadeIn_0.2s_ease-out]">
+      {/* Modal içerik - viewport ortasında, uzun içerikte kaydırılabilir */}
+      <div className="relative z-10 my-8 bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[calc(100dvh-4rem)] overflow-hidden border-2 border-gray-200 animate-[fadeIn_0.2s_ease-out] flex flex-col">
         {/* Header - Uyarı */}
         <div className="bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 px-6 py-5 text-center">
           <div className="w-14 h-14 mx-auto mb-3 rounded-full bg-white/25 flex items-center justify-center">
@@ -71,8 +76,8 @@ const ProductUploadModal = ({
           </p>
         </div>
 
-        {/* Process Bar */}
-        <div className="px-6 py-5">
+        {/* Process Bar + Hatalar + Kapat — kaydırılabilir alan */}
+        <div className="px-6 py-5 overflow-y-auto flex-1 min-h-0">
           <div className="mb-4">
             <div className="flex justify-between text-sm text-gray-600 mb-1">
               <span>İlerleme</span>
@@ -92,7 +97,7 @@ const ProductUploadModal = ({
             </div>
           </div>
 
-          {/* Hatalar - Açılır menü */}
+          {/* Hatalar - Açılır menü; çok hata olunca sayfa kaydırmayla görünür */}
           {hasErrors && (
             <div className="mt-4 border border-red-200 rounded-xl overflow-hidden bg-red-50">
               <button
@@ -111,7 +116,7 @@ const ProductUploadModal = ({
                 )}
               </button>
               {errorsExpanded && (
-                <div className="max-h-48 overflow-y-auto border-t border-red-200">
+                <div className="max-h-64 overflow-y-auto border-t border-red-200">
                   <ul className="p-3 space-y-2">
                     {errors.map((err, idx) => (
                       <li

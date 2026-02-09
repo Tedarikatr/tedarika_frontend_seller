@@ -356,33 +356,37 @@ const ProductDraftUploadPage = () => {
   };
 
   const handleManualUpload = async () => {
-    // Validate products
+    // Validate products — MD: name zorunlu, stores zorunlu (en az bir mağaza)
     const validProducts = products.filter((p) => {
-      // API dokümantasyonuna göre zorunlu alanlar: Name, Store.UnitType, Store.StockQuantity, Store.MinOrderQuantity, Store.UnitPrice, Store.CurrencyCode
       return (
         p.name?.trim() &&
         p.store.unitType &&
         p.store.unitType > 0 &&
-        p.store.stockQuantity &&
-        p.store.stockQuantity > 0 &&
+        p.store.stockQuantity !== "" &&
+        p.store.stockQuantity !== null &&
+        p.store.stockQuantity !== undefined &&
+        Number(p.store.stockQuantity) >= 0 &&
         p.store.minOrderQuantity !== "" &&
         p.store.minOrderQuantity !== null &&
         p.store.minOrderQuantity !== undefined &&
-        p.store.minOrderQuantity >= 0 &&
-        p.store.unitPrice &&
-        p.store.unitPrice > 0 &&
+        Number(p.store.minOrderQuantity) >= 0 &&
+        p.store.unitPrice !== "" &&
+        p.store.unitPrice !== null &&
+        p.store.unitPrice !== undefined &&
+        Number(p.store.unitPrice) >= 0 &&
         p.store.currencyCode?.trim()
       );
     });
 
     if (validProducts.length === 0) {
-      notifyValidationError({ message: "En az bir geçerli ürün bilgisi gereklidir. Zorunlu alanları kontrol edin.", uploadType: "manual", field: "products" });
+      notifyValidationError({ message: "En az bir geçerli ürün bilgisi gereklidir. Ürün adı, birim, stok, min. sipariş, birim fiyat ve para birimi zorunludur.", uploadType: "manual", field: "products" });
       return;
     }
 
-    // Görsel validasyonu (en fazla 10 görsel, max 10MB/dosya)
+    // Görsel validasyonu (en fazla 10 görsel/ürün, max 10MB/dosya) — MD ile uyumlu
     for (const product of validProducts) {
-      if (product.images && product.images.length > 10) {
+      const imgCount = product.images?.length ?? 0;
+      if (imgCount > 10) {
         notifyValidationError({ message: `Ürün "${product.name}" için en fazla 10 görsel gönderebilirsiniz.`, uploadType: "manual", field: "images" });
         return;
       }
@@ -393,10 +397,9 @@ const ProductDraftUploadPage = () => {
             notifyValidationError({ message: `Görsel "${imageFile.name}" 10 MB limitini aşıyor.`, uploadType: "manual", field: "imageSize" });
             return;
           }
-          // Format kontrolü
-          const allowedExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
+          const allowedExtensions = [".jpg", ".jpeg", ".png", ".gif", ".webp"];
           const fileName = imageFile.name.toLowerCase();
-          const hasValidExtension = allowedExtensions.some(ext => fileName.endsWith(ext));
+          const hasValidExtension = allowedExtensions.some((ext) => fileName.endsWith(ext));
           if (!hasValidExtension) {
             notifyValidationError({ message: `Görsel "${imageFile.name}" desteklenmiyor. İzin verilen: .jpg, .jpeg, .png, .gif, .webp`, uploadType: "manual", field: "imageFormat" });
             return;
@@ -409,93 +412,82 @@ const ProductDraftUploadPage = () => {
     setLoadingManual(true);
     setUploadProgress(getUploadProgress("validating"));
     try {
-      // API dokümantasyonuna göre her ürün ayrı ayrı gönderilmeli (tek ürün endpoint'i)
-      // Ancak kullanıcı deneyimi için tüm ürünleri sırayla gönderelim
-      let successCount = 0;
-      let errorCount = 0;
-      const totalProducts = validProducts.length;
+      // MD: add-product-manual — tek istek: Products (JSON string), Images (dosyalar sırayla), UploadName
+      // DraftProductImportModel: name, sku, ean, brandName, categoryId, categorySubId, gtip, description, preparationDays, expirationDate, imageCount, colorVariants, stores[]
+      const productsPayload = validProducts.map((p) => {
+        const imageCount = p.images?.length ?? 0;
+        const storeRow = {
+          unitType: Number(p.store.unitType) || 1,
+          stockQuantity: Number(p.store.stockQuantity) ?? 0,
+          minOrderQuantity: Number(p.store.minOrderQuantity) ?? 1,
+          maxOrderQuantity: p.store.maxOrderQuantity !== "" && p.store.maxOrderQuantity != null ? Number(p.store.maxOrderQuantity) : undefined,
+          unitPrice: Number(p.store.unitPrice) ?? 0,
+          currencyCode: (p.store.currencyCode || "TRY").trim(),
+          mainProductCode: p.store.mainProductCode?.trim() || undefined,
+          stockCode: p.store.stockCode?.trim() || undefined,
+          criticalStock: p.store.criticalStock !== "" && p.store.criticalStock != null ? Number(p.store.criticalStock) : undefined,
+          width: p.store.width !== "" && p.store.width != null ? Number(p.store.width) : undefined,
+          length: p.store.length !== "" && p.store.length != null ? Number(p.store.length) : undefined,
+          height: p.store.height !== "" && p.store.height != null ? Number(p.store.height) : undefined,
+          weight: p.store.weight !== "" && p.store.weight != null ? Number(p.store.weight) : undefined,
+          volumeWeight: p.store.volumeWeight !== "" && p.store.volumeWeight != null ? Number(p.store.volumeWeight) : undefined,
+        };
+        return {
+          name: p.name.trim(),
+          sku: p.sku?.trim() || undefined,
+          ean: p.ean?.trim() || undefined,
+          brandName: p.brandName?.trim() || undefined,
+          categoryId: p.categoryId ? Number(p.categoryId) : undefined,
+          categorySubId: p.categorySubId ? Number(p.categorySubId) : undefined,
+          gtip: p.gtip?.trim() || undefined,
+          description: p.description?.trim() || undefined,
+          preparationDays: p.preparationTime ? undefined : undefined, // API: int? (gün); formda tarih var, isteğe bağlı bırakıyoruz
+          expirationDate: p.expirationDate ? new Date(p.expirationDate).toISOString() : undefined,
+          imageCount,
+          colorVariants: p.colorVariants?.filter((c) => c?.trim()).length ? p.colorVariants.filter((c) => c?.trim()) : undefined,
+          stores: [storeRow],
+        };
+      });
 
-      for (let idx = 0; idx < validProducts.length; idx++) {
-        const product = validProducts[idx];
-        setUploadProgress(getUploadProgress("uploading", (idx / totalProducts) * 100));
-        try {
-          // API 7.3: product JSON serialize edilmiş, Files, DraftName
-          const productPayload = {
-            name: product.name.trim(),
-            store: {
-              unitType: Number(product.store.unitType) || 0,
-              stockQuantity: Number(product.store.stockQuantity) || 0,
-              minOrderQuantity: Number(product.store.minOrderQuantity) ?? 0,
-              maxOrderQuantity: product.store.maxOrderQuantity !== "" && product.store.maxOrderQuantity != null
-                ? Number(product.store.maxOrderQuantity) : undefined,
-              unitPrice: Number(product.store.unitPrice) || 0,
-              currencyCode: (product.store.currencyCode || "TRY").trim(),
-              mainProductCode: product.store.mainProductCode?.trim() || undefined,
-              stockCode: product.store.stockCode?.trim() || undefined,
-              criticalStock: product.store.criticalStock !== "" && product.store.criticalStock != null
-                ? Number(product.store.criticalStock) : undefined,
-              width: product.store.width !== "" && product.store.width != null ? Number(product.store.width) : undefined,
-              length: product.store.length !== "" && product.store.length != null ? Number(product.store.length) : undefined,
-              height: product.store.height !== "" && product.store.height != null ? Number(product.store.height) : undefined,
-              weight: product.store.weight !== "" && product.store.weight != null ? Number(product.store.weight) : undefined,
-              volumeWeight: product.store.volumeWeight !== "" && product.store.volumeWeight != null ? Number(product.store.volumeWeight) : undefined,
-            },
-            sku: product.sku?.trim() || undefined,
-            ean: product.ean?.trim() || undefined,
-            brandId: product.brandId?.trim() || undefined,
-            brandName: product.brandName?.trim() || undefined,
-            categoryId: product.categoryId ? Number(product.categoryId) : undefined,
-            categorySubId: product.categorySubId ? Number(product.categorySubId) : undefined,
-            gtip: product.gtip?.trim() || undefined,
-            description: product.description?.trim() || undefined,
-            preparationTime: product.preparationTime ? new Date(product.preparationTime).toISOString() : undefined,
-            expirationDate: product.expirationDate ? new Date(product.expirationDate).toISOString() : undefined,
-            colorVariants: product.colorVariants?.filter((c) => c?.trim()).length ? product.colorVariants.filter((c) => c?.trim()) : undefined,
-          };
-
-          const formData = new FormData();
-          formData.append("product", JSON.stringify(productPayload));
-          if (draftName?.trim()) formData.append("DraftName", draftName.trim());
-          if (product.images?.length) {
-            product.images.forEach((f) => formData.append("Files", f));
-          }
-
-          await addProductManual(formData);
-          successCount++;
-        } catch (err) {
-          console.error(`Ürün "${product.name}" yüklenemedi:`, err);
-          errorCount++;
-          const errMsg = err?.message || "Bilinmeyen hata";
-          notifySingleProductError({ productName: product.name, message: errMsg });
-          setUploadErrorDisplay((prev) => ({
-            errors: [...(prev?.errors || []), `Ürün "${product.name}": ${errMsg}`],
-            type: "manual",
-          }));
+      const formData = new FormData();
+      formData.append("Products", JSON.stringify(productsPayload));
+      if (draftName?.trim()) formData.append("UploadName", draftName.trim());
+      // Görseller sırayla: ürün1 görselleri, ürün2 görselleri, ... (MD: imageCount ile eşleşmeli)
+      for (const product of validProducts) {
+        if (product.images?.length) {
+          product.images.forEach((file) => formData.append("Images", file));
         }
       }
 
-      if (successCount > 0) {
-        setUploadProgress(getUploadProgress("done"));
-        notifyManualResult({
-          successCount,
-          errorCount,
-          message: `${successCount} ürün başarıyla yüklendi!${errorCount > 0 ? ` ${errorCount} ürün yüklenemedi.` : ""}`,
-        });
+      setUploadProgress(getUploadProgress("uploading", 50));
+      const response = await addProductManual(formData);
+      const productCount = response?.count ?? 0;
+      const message = response?.message ?? `${productCount} ürün taslağı yüklendi.`;
+
+      setUploadProgress(getUploadProgress("done"));
+      notifyManualResult({
+        successCount: productCount,
+        errorCount: validProducts.length - productCount,
+        message: productCount > 0 ? message : "Hiçbir ürün yüklenemedi.",
+      });
+      if (productCount > 0) {
+        setSealedTypes((prev) => ({ ...prev, manual: true }));
         navigate("/seller/products/drafts");
       } else {
-        notifyManualResult({ successCount: 0, errorCount, message: "Hiçbir ürün yüklenemedi." });
-        setUploadErrorDisplay((prev) => ({
-          errors: prev?.errors || ["Hiçbir ürün yüklenemedi."],
+        setUploadErrorDisplay({
+          errors: [message || "Ürünler yüklenemedi."],
           type: "manual",
-        }));
+        });
       }
     } catch (err) {
       console.error("Manuel yükleme başarısız:", err);
-      const errMsg = err?.message || "Beklenmeyen hata";
-      notifyError({ message: `Ürünler yüklenemedi: ${errMsg}`, uploadType: "manual", errorDetail: errMsg });
-      setUploadErrorDisplay({ errors: [errMsg], type: "manual" });
+      const errMsg = err?.message || err?.response?.data || "Beklenmeyen hata";
+      const errStr = typeof errMsg === "string" ? errMsg : JSON.stringify(errMsg);
+      notifyError({ message: `Ürünler yüklenemedi: ${errStr}`, uploadType: "manual", errorDetail: errStr });
+      setUploadErrorDisplay({ errors: [errStr], type: "manual" });
     } finally {
       setLoadingManual(false);
+      setUploadProgress(0);
     }
   };
 
