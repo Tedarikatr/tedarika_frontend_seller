@@ -22,6 +22,7 @@ const CompanyCreate = () => {
   const [form, setForm] = useState({
     name: "",
     taxNumber: "",
+    tckn: "",
     taxOffice: "",
     country: "TR",
     province: "",
@@ -41,33 +42,37 @@ const CompanyCreate = () => {
     e.preventDefault();
     const typeNum = Number(form.type);
     const taxNum = form.taxNumber.trim();
+    const tcknVal = form.tckn.trim();
 
-    // Şahıs şirketi ise TCKN 11 hane zorunlu; değilse VKN 10 hane
+    // Her şirket tipinde VKN (vergi numarası) 10 hane zorunlu
+    if (!taxNum || taxNum.length !== 10 || !/^\d{10}$/.test(taxNum)) {
+      setMessage("⚠️ Vergi numarası (VKN) 10 haneli rakamlardan oluşmalıdır.");
+      return;
+    }
+
+    // Şahıs firması (type=1) ise TCKN 11 hane zorunlu; ilk hane 0 olamaz
     if (typeNum === COMPANY_TYPE_SAHIS) {
-      if (!taxNum || taxNum.length !== 11 || !/^\d{11}$/.test(taxNum)) {
-        setMessage("⚠️ Şahıs şirketi için TCKN 11 haneli rakamlardan oluşmalıdır.");
-        return;
-      }
-    } else {
-      if (!taxNum || taxNum.length !== 10 || !/^\d{10}$/.test(taxNum)) {
-        setMessage("⚠️ Vergi numarası 10 haneli rakamlardan oluşmalıdır.");
+      if (!tcknVal || tcknVal.length !== 11 || !/^[1-9]\d{10}$/.test(tcknVal)) {
+        setMessage("⚠️ Şahıs firması için T.C. Kimlik No (TCKN) 11 haneli olmalı ve 0 ile başlamamalıdır.");
         return;
       }
     }
 
     setMessage("Kaydediliyor...");
 
-    // Raporda type number; CompanyCreateDto: name, taxNumber, taxOffice, country, province, address, type
-    // Ülke arka planda Türkiye (TR) olarak gönderilir
+    // CompanyCreateDto: name, taxNumber, taxOffice, country, province, address, type, tckn (şahıs için zorunlu)
     const payload = {
       name: form.name.trim(),
       taxNumber: taxNum,
       taxOffice: form.taxOffice.trim(),
-      country: "Türkiye",
+      country: "TR",
       province: form.province.trim(),
       address: form.address.trim(),
       type: typeNum,
     };
+    if (typeNum === COMPANY_TYPE_SAHIS) {
+      payload.tckn = tcknVal;
+    }
 
     try {
       await createCompany(payload);
@@ -122,26 +127,49 @@ const CompanyCreate = () => {
               ))}
             </select>
 
-            {/* Şahıs şirketi ise TCKN (11 hane), değilse Vergi No (10 hane) */}
+            {/* Vergi Numarası (VKN) – her şirket tipinde 10 hane zorunlu */}
             <div className="md:col-span-2">
               <label className="block text-sm font-semibold text-[#003032] mb-1">
-                {isSahis ? "TCKN (11 hane) *" : "Vergi Numarası (10 hane) *"}
+                Vergi Numarası (VKN, 10 hane) *
               </label>
               <input
                 name="taxNumber"
                 value={form.taxNumber}
                 onChange={(e) => {
-                  const v = e.target.value.replace(/\D/g, "").slice(0, isSahis ? 11 : 10);
+                  const v = e.target.value.replace(/\D/g, "").slice(0, 10);
                   setForm((prev) => ({ ...prev, taxNumber: v }));
                 }}
-                placeholder={isSahis ? "TCKN - 11 haneli" : "Vergi No - 10 haneli"}
+                placeholder="Vergi No - 10 haneli"
                 required
                 className="input"
-                maxLength={isSahis ? 11 : 10}
-                pattern={isSahis ? "\\d{11}" : "\\d{10}"}
-                title={isSahis ? "Şahıs şirketi için TCKN 11 haneli olmalıdır" : "Vergi numarası 10 haneli olmalıdır"}
+                maxLength={10}
+                pattern="\\d{10}"
+                title="Vergi numarası 10 haneli olmalıdır"
               />
             </div>
+
+            {/* T.C. Kimlik No (TCKN) – sadece Şahıs firması (type=1) için zorunlu */}
+            {isSahis && (
+              <div className="md:col-span-2">
+                <label className="block text-sm font-semibold text-[#003032] mb-1">
+                  T.C. Kimlik Numarası (TCKN, 11 hane) *
+                </label>
+                <input
+                  name="tckn"
+                  value={form.tckn}
+                  onChange={(e) => {
+                    const v = e.target.value.replace(/\D/g, "").slice(0, 11);
+                    setForm((prev) => ({ ...prev, tckn: v }));
+                  }}
+                  placeholder="TCKN - 11 haneli (0 ile başlamaz)"
+                  required
+                  className="input"
+                  maxLength={11}
+                  pattern="[1-9]\\d{10}"
+                  title="Şahıs firması için TCKN 11 haneli olmalı ve 0 ile başlamamalıdır"
+                />
+              </div>
+            )}
 
             <TaxOfficeSelect value={form.taxOffice} onChange={handleChange} required />
             <input name="province" value={form.province} onChange={handleChange} placeholder="Şehir" required className="input" />

@@ -7,9 +7,16 @@ import { getMyDocuments } from "@/api/sellerCompanyDocumentService";
 import { DOC_LABELS, REQUIRED_DOC_TYPES } from "@/constants/companyDocuments";
 import { FileText, AlertTriangle, CheckCircle2, Plus, FolderOpen, Building2 } from "lucide-react";
 
-/** API string enum -> TR etiket */
-const companyTypeOptions = {
-  SoleProprietorship: "Şahıs",
+/** API type: number (1-6, 99) veya string enum -> TR etiket */
+const companyTypeLabels = {
+  1: "Şahıs Şirketi",
+  2: "Limited Şirket",
+  3: "Anonim Şirket",
+  4: "Kooperatif",
+  5: "Şube",
+  6: "Yabancı Şirket",
+  99: "Diğer",
+  SoleProprietorship: "Şahıs Şirketi",
   Limited: "Limited Şirket",
   JointStock: "Anonim Şirket",
   Cooperative: "Kooperatif",
@@ -113,13 +120,16 @@ const CompanyInfoCard = () => {
       {/* Temel şirket alanları */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-5 gap-x-10 text-sm text-gray-700">
         <Field label="Şirket Adı" value={company.name} />
-        <Field label="Vergi No" value={company.taxNumber} />
+        <Field label="Vergi No (VKN)" value={company.taxNumber} />
+        {company.tckn != null && company.tckn !== "" && (
+          <Field label="T.C. Kimlik No (TCKN)" value={company.tckn} />
+        )}
         <Field label="Vergi Dairesi" value={company.taxOffice} />
         <Field label="Ülke" value={company.country} />
         <Field label="Şehir" value={company.province} />
         <Field label="Adres" value={company.address} />
         <Field label="Şirket No" value={company.companyNumber} />
-        <Field label="Şirket Türü" value={companyTypeOptions[company.type] || company.type} />
+        <Field label="Şirket Türü" value={companyTypeLabels[company.type] ?? company.type} />
         <Field label="Doğrulama">
           <Badge color={company.isVerified ? "blue" : "amber"}>{company.isVerified ? "Doğrulandı" : "Bekliyor"}</Badge>
         </Field>
