@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { X, Loader2, Send, Calendar, FileText } from "lucide-react";
 import { requestBrandOwnership } from "@/api/brandservice";
-import { BrandOwnershipType } from "@/constants/brandEnums";
+import { BrandOwnershipTypeTr } from "@/constants/brandEnums";
 
 export default function OwnershipRequestModal({ 
   isOpen, 
@@ -143,7 +143,7 @@ export default function OwnershipRequestModal({
                       )}
                     </div>
                     <span className="font-bold text-gray-900">
-                      {BrandOwnershipType[0]}
+                      {BrandOwnershipTypeTr[0]}
                     </span>
                   </div>
                   <p className="text-sm text-gray-600">
@@ -178,7 +178,7 @@ export default function OwnershipRequestModal({
                       )}
                     </div>
                     <span className="font-bold text-gray-900">
-                      {BrandOwnershipType[1]}
+                      {BrandOwnershipTypeTr[1]}
                     </span>
                   </div>
                   <p className="text-sm text-gray-600">
