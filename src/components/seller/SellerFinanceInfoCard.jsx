@@ -2,12 +2,14 @@
 // SellerFinanceInfoCard.jsx — Ödeme bilgileri (TR IBAN format + uzunluk)
 // =============================
 import React, { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   getPayoutProfile,
   savePayoutProfile,
 } from "@/api/sellerPayoutProfileService";
 import { useNotification } from "@/contexts/NotificationContext";
-import { Loader2, Copy, Check, Pencil, X } from "lucide-react";
+import { isStoreNotFoundError, STORE_CREATE_PATH } from "@/utils/storeNotFound";
+import { Loader2, Copy, Check, Pencil, X, AlertCircle } from "lucide-react";
 
 // Boş form şablonu
 const EMPTY = {
@@ -53,6 +55,7 @@ const isValidIban = (iban) => {
 };
 
 export default function SellerFinanceInfoCard() {
+  const navigate = useNavigate();
   const { clearPaymentInfoMissingAndNotifyVerified } = useNotification();
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
@@ -62,6 +65,8 @@ export default function SellerFinanceInfoCard() {
   const [profile, setProfile] = useState(null);
   const [form, setForm] = useState(EMPTY);
   const [mode, setMode] = useState("view"); // "view" | "edit"
+  /** Mağaza yok 404: backend mesajı göster + Mağaza Oluştur CTA */
+  const [storeRequiredMessage, setStoreRequiredMessage] = useState(null);
 
   const ibanValid = useMemo(() => isValidIban(form.iban), [form.iban]);
 
@@ -81,6 +86,9 @@ export default function SellerFinanceInfoCard() {
       setMode(p && (p.bankName || p.iban) ? "view" : "edit");
     } catch (err) {
       console.error("Finance info fetch error:", err);
+      if (isStoreNotFoundError(err)) {
+        setStoreRequiredMessage(err?.message || "Mağaza bulunamadı. Önce mağaza oluşturmanız gerekiyor.");
+      }
     } finally {
       setLoading(false);
     }
@@ -130,7 +138,11 @@ export default function SellerFinanceInfoCard() {
       await refresh();
       setMode("view");
     } catch (err) {
-      setMsg("Kayıt sırasında hata oluştu: " + (err?.message || ""));
+      if (isStoreNotFoundError(err)) {
+        setStoreRequiredMessage(err?.message || "Mağaza bulunamadı. Önce mağaza oluşturmanız gerekiyor.");
+      } else {
+        setMsg("Kayıt sırasında hata oluştu: " + (err?.message || ""));
+      }
     } finally {
       setBusy(false);
     }
@@ -141,6 +153,27 @@ export default function SellerFinanceInfoCard() {
       <div className="p-6 text-gray-500 text-sm flex items-center gap-2">
         <Loader2 className="w-4 h-4 animate-spin" />
         Bilgiler yükleniyor...
+      </div>
+    );
+  }
+
+  if (storeRequiredMessage) {
+    return (
+      <div className="bg-white shadow-sm border border-amber-200 rounded-2xl p-6 w-full">
+        <div className="flex items-start gap-3">
+          <AlertCircle className="w-6 h-6 text-amber-600 flex-shrink-0 mt-0.5" />
+          <div>
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">Ödeme Bilgileri</h2>
+            <p className="text-sm text-amber-900 mb-4">{storeRequiredMessage}</p>
+            <button
+              type="button"
+              onClick={() => navigate(STORE_CREATE_PATH)}
+              className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-sm font-semibold rounded-lg transition-colors"
+            >
+              Mağaza Oluştur
+            </button>
+          </div>
+        </div>
       </div>
     );
   }

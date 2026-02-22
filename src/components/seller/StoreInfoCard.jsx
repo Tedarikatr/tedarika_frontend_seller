@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { getMyStore } from "@/api/sellerStoreService";
 import { useNavigate } from "react-router-dom";
 import { StoreIcon, PlusCircle } from "lucide-react";
+import { isStoreNotFoundError } from "@/utils/storeNotFound";
 
 const StatusBadge = ({
   status,
@@ -27,13 +28,20 @@ const Field = ({ label, value, children }) => (
 
 const StoreInfoCard = () => {
   const [store, setStore] = useState(null);
+  const [storeError, setStoreError] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
     getMyStore()
-      .then(setStore)
-      .catch(() => setStore(null))
+      .then((data) => {
+        setStore(data);
+        setStoreError(null);
+      })
+      .catch((err) => {
+        setStore(null);
+        setStoreError(isStoreNotFoundError(err) ? err.message : null);
+      })
       .finally(() => setLoading(false));
   }, []);
 
@@ -55,7 +63,7 @@ const StoreInfoCard = () => {
           Henüz bir mağazanız bulunmuyor
         </h3>
         <p className="text-gray-600 mb-4 text-sm">
-          Platformda ürün yayınlamak için bir mağaza oluşturmanız gerekiyor.
+          {storeError || "Platformda ürün yayınlamak için bir mağaza oluşturmanız gerekiyor."}
         </p>
         <button
           onClick={() => navigate("/seller/store/create")}

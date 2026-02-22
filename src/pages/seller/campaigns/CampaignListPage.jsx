@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import SellerCampaignService from "@/api/sellerCampaignService";
 import { PlusCircle, Search, Calendar, RefreshCw } from "lucide-react";
 import { getMyStore } from "@/api/sellerStoreService";
+import { isStoreNotFoundError } from "@/utils/storeNotFound";
 import { AlertCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -11,6 +12,7 @@ export default function CampaignListPage() {
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [hasStore, setHasStore] = useState(true);
+  const [storeNotFoundMessage, setStoreNotFoundMessage] = useState(null);
   const navigate = useNavigate();
 
   const fetchCampaigns = async () => {
@@ -27,6 +29,7 @@ export default function CampaignListPage() {
     } catch (err) {
       console.error("Kampanyalar alınamadı:", err);
       setHasStore(false);
+      setStoreNotFoundMessage(isStoreNotFoundError(err) ? err.message : null);
     } finally {
       setLoading(false);
     }
@@ -61,7 +64,7 @@ export default function CampaignListPage() {
             Henüz bir mağazanız yok
           </h2>
           <p className="text-xs sm:text-sm text-gray-600">
-            Kampanyaları yönetebilmek için önce bir mağaza oluşturmalısınız.
+            {storeNotFoundMessage || "Kampanyaları yönetebilmek için önce bir mağaza oluşturmalısınız."}
           </p>
           <button
             onClick={() => navigate("/seller/store/create")}

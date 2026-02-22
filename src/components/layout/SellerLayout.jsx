@@ -6,6 +6,7 @@ import Topbar from "./Topbar";
 import { hasCompany } from "@/api/sellerCompanyService";
 import { getMyStore } from "@/api/sellerStoreService";
 import { usePaymentInfoNotificationSync } from "@/hooks/usePaymentInfoNotificationSync";
+import { isStoreNotFoundError } from "@/utils/storeNotFound";
 import { AlertCircle, Lock } from "lucide-react";
 import { getDecodedSellerPayload } from "@/utils/auth";
 import { toast } from "react-hot-toast";
@@ -14,6 +15,7 @@ const SellerLayout = () => {
   const [checking, setChecking] = useState(true);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [showStoreNotification, setShowStoreNotification] = useState(false);
+  const [storeNotFoundMessage, setStoreNotFoundMessage] = useState(null);
   const [isRestricted, setIsRestricted] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
@@ -47,12 +49,12 @@ const SellerLayout = () => {
           const store = await getMyStore();
           if (!store || !store.id) {
             setShowStoreNotification(true);
+            setStoreNotFoundMessage(null);
           }
         } catch (err) {
           console.warn("Mağaza bilgisi alınamadı:", err);
           setShowStoreNotification(true);
-          if (err?.message?.includes("500"))
-            toast.error("Mağaza bilgisi geçici olarak alınamadı (500).");
+          setStoreNotFoundMessage(isStoreNotFoundError(err) ? err.message : null);
         }
       } catch (err) {
         console.error("Yetkili durum kontrolünde hata:", err);
@@ -104,6 +106,7 @@ const SellerLayout = () => {
 
   const handleCreateStore = () => {
     setShowStoreNotification(false);
+    setStoreNotFoundMessage(null);
     navigate("/seller/store/create");
   };
 
@@ -176,10 +179,9 @@ const SellerLayout = () => {
       {showStoreNotification && !isRestricted && (
         <div className="fixed top-4 sm:top-6 left-1/2 transform -translate-x-1/2 z-[9999] w-[95%] sm:w-[90%] md:w-auto max-w-lg">
           <div className="bg-white border border-yellow-400 shadow-xl rounded-xl px-4 sm:px-6 py-3 sm:py-4 flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 animate-fade-in-down backdrop-blur-lg bg-opacity-90">
-            <AlertCircle className="w-6 h-6 text-yellow-500" />
+            <AlertCircle className="w-6 h-6 text-yellow-500 flex-shrink-0" />
             <div className="text-sm text-gray-800 font-medium flex-1">
-              Henüz bir mağazanız yok. Satışa başlayabilmek için bir mağaza
-              oluşturmalısınız.
+              {storeNotFoundMessage || "Henüz bir mağazanız yok. Satışa başlayabilmek için bir mağaza oluşturmalısınız."}
             </div>
             <button
               onClick={handleCreateStore}

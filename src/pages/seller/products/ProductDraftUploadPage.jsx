@@ -33,6 +33,8 @@ import {
   ChevronRight,
   Image as ImageIcon,
   Trash2,
+  ListTree,
+  Copy,
 } from "lucide-react";
 
 // Tedarika_Urun_Yukleme_Sablon_guncel.xlsx ile birebir aynı sıralama
@@ -73,6 +75,7 @@ const ProductDraftUploadPage = () => {
   const [drafts, setDrafts] = useState([]);
   const [loadingDrafts, setLoadingDrafts] = useState(false);
   const [showTemplatePreview, setShowTemplatePreview] = useState(false);
+  const [showCategoryListModal, setShowCategoryListModal] = useState(false);
   // Ortak yükleme state - tek state ile progress bar ve buton kontrolü
   const [uploadState, setUploadState] = useState({ active: false, type: null }); // type: 'excel'|'xml'|'json'|'xml-url'|null
   const [uploadProgress, setUploadProgress] = useState(0); // 0-100, process bar
@@ -812,6 +815,26 @@ const ProductDraftUploadPage = () => {
 
         {/* Content */}
         <div className="bg-white rounded-2xl sm:rounded-3xl shadow-2xl border-2 border-gray-200 p-4 sm:p-6 lg:p-8">
+          {/* Kategori ID listesi butonu - Excel, JSON, XML, XML URL sekmelerinde */}
+          {(activeTab === "excel" || activeTab === "json" || activeTab === "xml" || activeTab === "xml-url") && (
+            <div className="mb-6 p-4 bg-gradient-to-r from-slate-50 to-gray-50 border-2 border-slate-200 rounded-xl flex flex-wrap items-center justify-between gap-3">
+              <div className="flex items-center gap-2 text-slate-700">
+                <ListTree className="w-5 h-5 text-emerald-600 flex-shrink-0" />
+                <span className="text-sm font-medium">
+                  Şablonda <strong>KategoriId</strong> ve <strong>KategoriSubId</strong> kullanacaksanız, geçerli ID’leri görmek için:
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowCategoryListModal(true)}
+                className="inline-flex items-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-semibold transition-colors shadow-sm"
+              >
+                <ListTree className="w-4 h-4" />
+                Ana ve Alt Kategori ID Listesi
+              </button>
+            </div>
+          )}
+
           {/* Manual Upload - İlk sırada */}
           {activeTab === "manual" && (
             <div className="space-y-6">
@@ -1861,6 +1884,87 @@ const ProductDraftUploadPage = () => {
                   Kapat
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Kategori ID listesi modal */}
+      {showCategoryListModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+            <div className="bg-gradient-to-r from-emerald-600 to-teal-600 px-6 py-4 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <ListTree className="w-6 h-6 text-white" />
+                <h2 className="text-xl font-bold text-white">Ana ve Alt Kategori ID Listesi</h2>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowCategoryListModal(false)}
+                className="text-white/80 hover:text-white transition-colors p-1"
+                aria-label="Kapat"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+            <div className="flex-1 overflow-auto p-6">
+              <p className="text-sm text-gray-600 mb-4">
+                Excel, JSON veya XML şablonlarında <strong>KategoriId</strong> (ana kategori) ve <strong>KategoriSubId</strong> (alt kategori) alanlarına aşağıdaki ID’leri yazabilirsiniz.
+              </p>
+              {loadingCategories ? (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="w-8 h-8 animate-spin text-emerald-600" />
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {categories.map((cat) => (
+                    <div key={cat.id} className="border border-gray-200 rounded-xl overflow-hidden bg-gray-50">
+                      <div className="px-4 py-3 bg-emerald-50 border-b border-emerald-100 font-semibold text-gray-900 flex items-center gap-2">
+                        <span className="text-emerald-700 font-mono text-sm">ID: {cat.id}</span>
+                        <span>{cat.name}</span>
+                      </div>
+                      <div className="divide-y divide-gray-100">
+                        {(cat.subCategories && cat.subCategories.length > 0) ? (
+                          cat.subCategories.map((sub) => (
+                            <div key={sub.id} className="px-4 py-2.5 flex items-center gap-3 pl-8 text-sm">
+                              <span className="font-mono text-gray-600 w-12">ID: {sub.id}</span>
+                              <span className="text-gray-800">{sub.name}</span>
+                            </div>
+                          ))
+                        ) : (
+                          <div className="px-4 py-2.5 pl-8 text-sm text-gray-500">Alt kategori yok</div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+            <div className="p-4 border-t bg-gray-50 flex flex-wrap items-center justify-between gap-2">
+              <button
+                type="button"
+                onClick={() => setShowCategoryListModal(false)}
+                className="px-4 py-2 text-gray-700 hover:bg-gray-200 rounded-lg transition-colors font-medium"
+              >
+                Kapat
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  const header = "KategoriId\tKategoriSubId\tAna Kategori\tAlt Kategori";
+                  const rows = categories.flatMap((cat) => {
+                    const subs = cat.subCategories && cat.subCategories.length > 0 ? cat.subCategories : [{ id: "", name: "-" }];
+                    return subs.map((sub) => [cat.id, sub.id, cat.name, sub.name].join("\t"));
+                  });
+                  const text = [header, ...rows].join("\n");
+                  navigator.clipboard.writeText(text).then(() => toast.success("Liste panoya kopyalandı.")).catch(() => {});
+                }}
+                disabled={loadingCategories || categories.length === 0}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-semibold transition-colors disabled:opacity-50"
+              >
+                <Copy className="w-4 h-4" />
+                Listeyi panoya kopyala
+              </button>
             </div>
           </div>
         </div>
