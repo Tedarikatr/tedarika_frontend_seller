@@ -50,10 +50,10 @@ const CompanyCreate = () => {
       return;
     }
 
-    // Şahıs firması (type=1) ise TCKN 11 hane zorunlu; ilk hane 0 olamaz
+    // Şahıs firması (type=1) ise TCKN 11 hane zorunlu (sadece rakam)
     if (typeNum === COMPANY_TYPE_SAHIS) {
-      if (!tcknVal || tcknVal.length !== 11 || !/^[1-9]\d{10}$/.test(tcknVal)) {
-        setMessage("⚠️ Şahıs firması için T.C. Kimlik No (TCKN) 11 haneli olmalı ve 0 ile başlamamalıdır.");
+      if (!tcknVal || tcknVal.length !== 11 || !/^\d{11}$/.test(tcknVal)) {
+        setMessage("⚠️ Şahıs firması için T.C. Kimlik No (TCKN) 11 haneli rakamlardan oluşmalıdır.");
         return;
       }
     }
@@ -161,12 +161,12 @@ const CompanyCreate = () => {
                     const v = e.target.value.replace(/\D/g, "").slice(0, 11);
                     setForm((prev) => ({ ...prev, tckn: v }));
                   }}
-                  placeholder="TCKN - 11 haneli (0 ile başlamaz)"
+                  placeholder="TCKN - 11 haneli"
                   required
                   className="input"
                   maxLength={11}
-                  pattern="[1-9]\\d{10}"
-                  title="Şahıs firması için TCKN 11 haneli olmalı ve 0 ile başlamamalıdır"
+                  pattern="[0-9]{11}"
+                  title="Şahıs firması için TCKN 11 haneli rakamlardan oluşmalıdır"
                 />
               </div>
             )}

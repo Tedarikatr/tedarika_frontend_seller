@@ -81,10 +81,10 @@ export default function CompanyUpdate() {
     const taxNum = (form.taxNumber ?? "").trim();
     // Her tip için VKN 10 hane zorunlu
     if (!taxNum || taxNum.length !== 10 || !/^\d{10}$/.test(taxNum)) return false;
-    // Şahıs (type=1) ise TCKN 11 hane zorunlu, ilk hane 0 olamaz
+    // Şahıs (type=1) ise TCKN 11 hane zorunlu (sadece rakam)
     if (isSahis) {
       const tcknVal = (form.tckn ?? "").trim();
-      if (!tcknVal || tcknVal.length !== 11 || !/^[1-9]\d{10}$/.test(tcknVal)) return false;
+      if (!tcknVal || tcknVal.length !== 11 || !/^\d{11}$/.test(tcknVal)) return false;
     }
     return (
       form.name?.trim() &&
@@ -115,8 +115,8 @@ export default function CompanyUpdate() {
     }
     if (isSahis) {
       const tcknVal = (form.tckn ?? "").trim();
-      if (!tcknVal || tcknVal.length !== 11 || !/^[1-9]\d{10}$/.test(tcknVal)) {
-        setMessage("⚠️ Şahıs firması için T.C. Kimlik No (TCKN) 11 haneli olmalı ve 0 ile başlamamalıdır.");
+      if (!tcknVal || tcknVal.length !== 11 || !/^\d{11}$/.test(tcknVal)) {
+        setMessage("⚠️ Şahıs firması için T.C. Kimlik No (TCKN) 11 haneli rakamlardan oluşmalıdır.");
         setLoading(false);
         return;
       }
@@ -249,11 +249,11 @@ export default function CompanyUpdate() {
                     const v = e.target.value.replace(/\D/g, "").slice(0, 11);
                     setForm((prev) => ({ ...prev, tckn: v }));
                   }}
-                  placeholder="TCKN - 11 haneli (0 ile başlamaz)"
+                  placeholder="TCKN - 11 haneli"
                   required
                   maxLength={11}
-                  pattern="[1-9]\\d{10}"
-                  title="Şahıs firması için TCKN 11 haneli olmalı ve 0 ile başlamamalıdır"
+                  pattern="[0-9]{11}"
+                  title="Şahıs firması için TCKN 11 haneli rakamlardan oluşmalıdır"
                   className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 transition-all"
                 />
               </Field>
@@ -347,7 +347,7 @@ export default function CompanyUpdate() {
                 <AlertTriangle className="w-5 h-5 mt-0.5 flex-shrink-0" />
                 <p className="text-sm font-semibold">
                   {isSahis
-                    ? "Lütfen tüm zorunlu alanları doldurun. Vergi numarası 10, T.C. Kimlik No 11 haneli olmalıdır (TCKN 0 ile başlamaz)."
+                    ? "Lütfen tüm zorunlu alanları doldurun. Vergi numarası 10, T.C. Kimlik No 11 haneli rakamlardan oluşmalıdır."
                     : "Lütfen tüm zorunlu alanları doldurun ve vergi numarasının 10 haneli olduğundan emin olun."}
                 </p>
               </motion.div>
