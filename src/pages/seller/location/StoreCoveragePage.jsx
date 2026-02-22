@@ -7,10 +7,12 @@ import StoreCoverageList from "@/components/storeCoverage/StoreCoverageList";
 import { MapPin, ListChecks, AlertCircle, Globe, Sparkles, Map } from "lucide-react";
 import { getMyStore } from "@/api/sellerStoreService";
 import { useNavigate } from "react-router-dom";
+import { isStoreNotFoundError } from "@/utils/storeNotFound";
 
 const StoreCoveragePage = () => {
   const [refreshKey, setRefreshKey] = useState(0);
   const [hasStore, setHasStore] = useState(true);
+  const [storeNotFoundMessage, setStoreNotFoundMessage] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
@@ -24,11 +26,13 @@ const StoreCoveragePage = () => {
         const store = await getMyStore();
         if (!store || !store.id) {
           setHasStore(false);
+          setStoreNotFoundMessage(null);
           return;
         }
       } catch (err) {
         console.warn("Mağaza bilgisi alınamadı:", err);
         setHasStore(false);
+        setStoreNotFoundMessage(isStoreNotFoundError(err) ? err.message : null);
       } finally {
         setLoading(false);
       }
@@ -64,7 +68,7 @@ const StoreCoveragePage = () => {
               Henüz Mağaza Bulunmuyor
             </h2>
             <p className="text-gray-600">
-              Lokasyon ekleyebilmek için öncelikle bir mağaza oluşturmalısınız.
+              {storeNotFoundMessage || "Lokasyon ekleyebilmek için öncelikle bir mağaza oluşturmalısınız."}
             </p>
             <button
               onClick={() => navigate("/seller/store/create")}

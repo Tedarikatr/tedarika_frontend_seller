@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { getSenderAddress, putSenderAddress } from "@/api/sellerShippingService";
 import { TURKEY_PROVINCES } from "@/constants/turkeyProvinces";
+import { isStoreNotFoundError, STORE_CREATE_PATH } from "@/utils/storeNotFound";
 import CargoAgreementsAccordion from "./CargoAgreementsAccordion";
 import {
   Truck,
@@ -10,6 +12,7 @@ import {
   XCircle,
   Save,
   Pencil,
+  AlertCircle,
 } from "lucide-react";
 
 const COUNTRY_CODE_DEFAULT = "TR";
@@ -31,12 +34,15 @@ const defaultForm = {
 };
 
 export default function ShippingSettingsCard() {
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState("success");
   const [form, setForm] = useState(defaultForm);
   const [hasAddress, setHasAddress] = useState(false);
+  /** Mağaza yok 404: backend mesajı ve mağaza oluştur CTA */
+  const [storeRequiredMessage, setStoreRequiredMessage] = useState(null);
   /** Adres kayıtlıyken formu kapalı tutar; "Düzenle" ile açılır */
   const [formExpanded, setFormExpanded] = useState(false);
 
@@ -63,10 +69,16 @@ export default function ShippingSettingsCard() {
         isDefaultReturnAddress: data.isDefaultReturnAddress !== false,
       });
     } catch (err) {
-      if (err?.message?.includes("404") || err?.message?.toLowerCase?.().includes("tanımlı değil")) {
+      if (isStoreNotFoundError(err)) {
+        setStoreRequiredMessage(err?.message || "Mağaza bulunamadı. Önce mağaza oluşturmanız gerekiyor.");
+        setHasAddress(false);
+        setForm(defaultForm);
+      } else if (err?.message?.includes("404") || err?.message?.toLowerCase?.().includes("tanımlı değil")) {
+        setStoreRequiredMessage(null);
         setHasAddress(false);
         setForm(defaultForm);
       } else {
+        setStoreRequiredMessage(null);
         setMessageType("error");
         setMessage(err?.message || "Gönderici adresi yüklenemedi.");
       }
@@ -130,8 +142,12 @@ export default function ShippingSettingsCard() {
       setMessage("Gönderici adresi kaydedildi.");
       await loadSenderAddress();
     } catch (err) {
-      setMessageType("error");
-      setMessage(err?.message || "Kayıt başarısız.");
+      if (isStoreNotFoundError(err)) {
+        setStoreRequiredMessage(err?.message || "Mağaza bulunamadı. Önce mağaza oluşturmanız gerekiyor.");
+      } else {
+        setMessageType("error");
+        setMessage(err?.message || "Kayıt başarısız.");
+      }
     } finally {
       setSaving(false);
     }
@@ -155,6 +171,22 @@ export default function ShippingSettingsCard() {
         <div className="mb-6 flex items-center gap-2 rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-600">
           <Loader2 className="w-4 h-4 animate-spin" />
           Gönderici adresi yükleniyor...
+        </div>
+      )}
+
+      {storeRequiredMessage && !loading && (
+        <div className="mb-6 rounded-xl border-2 border-amber-200 bg-amber-50 px-4 py-4 flex flex-col sm:flex-row items-start sm:items-center gap-3">
+          <AlertCircle className="w-6 h-6 text-amber-600 flex-shrink-0" />
+          <div className="flex-1">
+            <p className="text-sm font-medium text-amber-900">{storeRequiredMessage}</p>
+            <button
+              type="button"
+              onClick={() => navigate(STORE_CREATE_PATH)}
+              className="mt-3 px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-sm font-semibold rounded-lg transition-colors"
+            >
+              Mağaza Oluştur
+            </button>
+          </div>
         </div>
       )}
 

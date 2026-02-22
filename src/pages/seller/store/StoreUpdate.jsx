@@ -1,12 +1,15 @@
 // src/pages/seller/store/StoreUpdate.jsx
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   getMyStore,
   updateStore,
   getAllCategories,
 } from "@/api/sellerStoreService";
+import { isStoreNotFoundError, STORE_CREATE_PATH } from "@/utils/storeNotFound";
 import { Store, Sparkles, Upload, Image as ImageIcon, CheckCircle } from "lucide-react";
 import { motion } from "framer-motion";
+import { toast } from "react-hot-toast";
 
 const normalizeCats = (catsRes) => {
   const arr = Array.isArray(catsRes) ? catsRes : catsRes?.items || [];
@@ -28,6 +31,7 @@ const toNumberArray = (val) => {
 };
 
 const StoreUpdate = () => {
+  const navigate = useNavigate();
   const [form, setForm] = useState(null);
   const [categories, setCategories] = useState([]);
   const [message, setMessage] = useState("");
@@ -56,12 +60,17 @@ const StoreUpdate = () => {
         // (opsiyonel) mevcut resimler
         setCurrentLogoUrl(store?.logoUrl ?? store?.LogoUrl ?? "");
         setCurrentBannerUrl(store?.bannerImageUrl ?? store?.BannerImageUrl ?? "");
-      } catch {
+      } catch (err) {
+        if (isStoreNotFoundError(err)) {
+          toast.error(err.message || "Mağaza bulunamadı. Önce mağaza oluşturmanız gerekiyor.");
+          navigate(STORE_CREATE_PATH);
+          return;
+        }
         setMessage("❌ Mağaza veya kategori bilgileri alınamadı.");
       }
     };
     fetchData();
-  }, []);
+  }, [navigate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;

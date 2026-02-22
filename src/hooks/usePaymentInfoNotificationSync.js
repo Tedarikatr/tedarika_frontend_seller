@@ -3,10 +3,12 @@
  * Satıcı alanı yüklendiğinde payout profilini kontrol eder:
  * - Eksikse: "Ödeme bilgileri eksik" bildirimi merkeze eklenir.
  * - Doluysa: Bu konudaki hatırlatma bildirimi kaldırılır (artık gönderilmez).
+ * - Mağaza yoksa (404): "Ödeme bilgisi eksik" eklenmez; kullanıcı önce mağaza oluşturmalı.
  */
 import { useEffect, useRef } from "react";
 import { getPayoutProfile } from "@/api/sellerPayoutProfileService";
 import { useNotification, PAYMENT_INFO_MISSING_ID } from "@/contexts/NotificationContext";
+import { isStoreNotFoundError } from "@/utils/storeNotFound";
 
 const hasValidPayoutProfile = (p) => {
   if (!p || typeof p !== "object") return false;
@@ -37,8 +39,10 @@ export function usePaymentInfoNotificationSync() {
           ensurePaymentInfoMissingNotification();
         }
       })
-      .catch(() => {
-        // API hatası: eksik kabul edip bildirim ekle
+      .catch((err) => {
+        // Mağaza yoksa (404) ödeme eksik bildirimi ekleme; kullanıcı önce mağaza oluşturmalı
+        if (isStoreNotFoundError(err)) return;
+        // Diğer API hatalarında eksik kabul edip bildirim ekle
         ensurePaymentInfoMissingNotification();
       });
   }, [ensurePaymentInfoMissingNotification, removeNotification]);

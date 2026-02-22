@@ -14,6 +14,7 @@ import {
 import { useEffect, useState } from "react";
 import { getDashboardSnapshot, getWeeklySnapshot } from "@/api/sellerSalesSnapshotService";
 import { getMyStore } from "@/api/sellerStoreService";
+import { isStoreNotFoundError } from "@/utils/storeNotFound";
 import { motion } from "framer-motion";
 import {
   FaBoxOpen,
@@ -84,6 +85,7 @@ const DashboardPage = () => {
   const [summary, setSummary] = useState(null);
   const [weeklyChart, setWeeklyChart] = useState([]);
   const [hasStore, setHasStore] = useState(true);
+  const [storeNotFoundMessage, setStoreNotFoundMessage] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
@@ -110,6 +112,7 @@ const DashboardPage = () => {
       } catch (err) {
         console.error("Dashboard verileri alınamadı:", err);
         setHasStore(false);
+        setStoreNotFoundMessage(isStoreNotFoundError(err) ? err.message : null);
       } finally {
         setLoading(false);
       }
@@ -140,7 +143,7 @@ const DashboardPage = () => {
           <AlertCircle className="w-10 h-10 text-yellow-500" />
           <h2 className="text-xl font-semibold text-gray-800">Henüz bir mağazanız yok</h2>
           <p className="text-sm text-gray-600">
-            Satışa başlayabilmek için bir mağaza oluşturmalısınız.
+            {storeNotFoundMessage || "Satışa başlayabilmek için bir mağaza oluşturmalısınız."}
           </p>
           <button
             onClick={() => navigate("/seller/store/create")}
