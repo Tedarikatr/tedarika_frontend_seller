@@ -81,11 +81,6 @@ export default function CompanyUpdate() {
     const taxNum = (form.taxNumber ?? "").trim();
     // Her tip için VKN 10 hane zorunlu
     if (!taxNum || taxNum.length !== 10 || !/^\d{10}$/.test(taxNum)) return false;
-    // Şahıs (type=1) ise TCKN 11 hane zorunlu (sadece rakam)
-    if (isSahis) {
-      const tcknVal = (form.tckn ?? "").trim();
-      if (!tcknVal || tcknVal.length !== 11 || !/^\d{11}$/.test(tcknVal)) return false;
-    }
     return (
       form.name?.trim() &&
       form.taxOffice?.trim() &&
@@ -94,7 +89,7 @@ export default function CompanyUpdate() {
       form.address?.trim() &&
       (form.type !== "" && form.type !== null && form.type !== undefined)
     );
-  }, [form, isSahis]);
+  }, [form]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -113,14 +108,6 @@ export default function CompanyUpdate() {
       setLoading(false);
       return;
     }
-    if (isSahis) {
-      const tcknVal = (form.tckn ?? "").trim();
-      if (!tcknVal || tcknVal.length !== 11 || !/^\d{11}$/.test(tcknVal)) {
-        setMessage("⚠️ Şahıs firması için T.C. Kimlik No (TCKN) 11 haneli rakamlardan oluşmalıdır.");
-        setLoading(false);
-        return;
-      }
-    }
 
     try {
       // CompanyUpdateDto: id, name, taxNumber, taxOffice, country, province, address, type, tckn (şahıs için zorunlu)
@@ -135,7 +122,7 @@ export default function CompanyUpdate() {
         address: form.address.trim(),
         type: typeNum,
       };
-      if (typeNum === COMPANY_TYPE_SAHIS) {
+      if (typeNum === COMPANY_TYPE_SAHIS && (form.tckn ?? "").trim()) {
         payload.tckn = (form.tckn ?? "").trim();
       }
       await updateCompany(payload);
@@ -241,19 +228,13 @@ export default function CompanyUpdate() {
           {/* T.C. Kimlik No – sadece Şahıs firması (type=1) için */}
           {isSahis && (
             <div>
-              <Field label="T.C. Kimlik Numarası (TCKN, 11 hane)" required>
+              <Field label="T.C. Kimlik Numarası (TCKN)">
                 <input
                   name="tckn"
                   value={form.tckn ?? ""}
-                  onChange={(e) => {
-                    const v = e.target.value.replace(/\D/g, "").slice(0, 11);
-                    setForm((prev) => ({ ...prev, tckn: v }));
-                  }}
-                  placeholder="TCKN - 11 haneli"
-                  required
+                  onChange={(e) => setForm((prev) => ({ ...prev, tckn: e.target.value.replace(/\D/g, "").slice(0, 11) }))}
+                  placeholder="TCKN (opsiyonel)"
                   maxLength={11}
-                  pattern="[0-9]{11}"
-                  title="Şahıs firması için TCKN 11 haneli rakamlardan oluşmalıdır"
                   className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 transition-all"
                 />
               </Field>
@@ -346,9 +327,7 @@ export default function CompanyUpdate() {
               >
                 <AlertTriangle className="w-5 h-5 mt-0.5 flex-shrink-0" />
                 <p className="text-sm font-semibold">
-                  {isSahis
-                    ? "Lütfen tüm zorunlu alanları doldurun. Vergi numarası 10, T.C. Kimlik No 11 haneli rakamlardan oluşmalıdır."
-                    : "Lütfen tüm zorunlu alanları doldurun ve vergi numarasının 10 haneli olduğundan emin olun."}
+                  Lütfen tüm zorunlu alanları doldurun ve vergi numarasının 10 haneli olduğundan emin olun.
                 </p>
               </motion.div>
             )}

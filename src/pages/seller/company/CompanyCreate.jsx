@@ -42,7 +42,6 @@ const CompanyCreate = () => {
     e.preventDefault();
     const typeNum = Number(form.type);
     const taxNum = form.taxNumber.trim();
-    const tcknVal = form.tckn.trim();
 
     // Her şirket tipinde VKN (vergi numarası) 10 hane zorunlu
     if (!taxNum || taxNum.length !== 10 || !/^\d{10}$/.test(taxNum)) {
@@ -50,17 +49,9 @@ const CompanyCreate = () => {
       return;
     }
 
-    // Şahıs firması (type=1) ise TCKN 11 hane zorunlu (sadece rakam)
-    if (typeNum === COMPANY_TYPE_SAHIS) {
-      if (!tcknVal || tcknVal.length !== 11 || !/^\d{11}$/.test(tcknVal)) {
-        setMessage("⚠️ Şahıs firması için T.C. Kimlik No (TCKN) 11 haneli rakamlardan oluşmalıdır.");
-        return;
-      }
-    }
-
     setMessage("Kaydediliyor...");
 
-    // CompanyCreateDto: name, taxNumber, taxOffice, country, province, address, type, tckn (şahıs için zorunlu)
+    // CompanyCreateDto: name, taxNumber, taxOffice, country, province, address, type, tckn (şahıs için opsiyonel)
     const payload = {
       name: form.name.trim(),
       taxNumber: taxNum,
@@ -70,8 +61,8 @@ const CompanyCreate = () => {
       address: form.address.trim(),
       type: typeNum,
     };
-    if (typeNum === COMPANY_TYPE_SAHIS) {
-      payload.tckn = tcknVal;
+    if (typeNum === COMPANY_TYPE_SAHIS && form.tckn?.trim()) {
+      payload.tckn = form.tckn.trim();
     }
 
     try {
@@ -148,25 +139,19 @@ const CompanyCreate = () => {
               />
             </div>
 
-            {/* T.C. Kimlik No (TCKN) – sadece Şahıs firması (type=1) için zorunlu */}
+            {/* T.C. Kimlik No (TCKN) – sadece Şahıs firması (type=1) için, opsiyonel */}
             {isSahis && (
               <div className="md:col-span-2">
                 <label className="block text-sm font-semibold text-[#003032] mb-1">
-                  T.C. Kimlik Numarası (TCKN, 11 hane) *
+                  T.C. Kimlik Numarası (TCKN)
                 </label>
                 <input
                   name="tckn"
                   value={form.tckn}
-                  onChange={(e) => {
-                    const v = e.target.value.replace(/\D/g, "").slice(0, 11);
-                    setForm((prev) => ({ ...prev, tckn: v }));
-                  }}
-                  placeholder="TCKN - 11 haneli"
-                  required
+                  onChange={(e) => setForm((prev) => ({ ...prev, tckn: e.target.value.replace(/\D/g, "").slice(0, 11) }))}
+                  placeholder="TCKN (opsiyonel)"
                   className="input"
                   maxLength={11}
-                  pattern="[0-9]{11}"
-                  title="Şahıs firması için TCKN 11 haneli rakamlardan oluşmalıdır"
                 />
               </div>
             )}
