@@ -1,54 +1,21 @@
 import { Award, CheckCircle, Clock, Calendar, FileText, XCircle, Ban } from "lucide-react";
-import { BrandOwnershipStatus, BrandOwnershipType } from "@/constants/brandEnums";
+import { getBrandOwnershipStatusDisplay, BrandOwnershipTypeTr } from "@/constants/brandEnums";
 
 export default function OwnedBrandsSection({ ownedBrands }) {
-  const getStatusIcon = (status) => {
-    const statusNum = typeof status === "number" ? status : 
-      Object.keys(BrandOwnershipStatus).find(key => BrandOwnershipStatus[key] === status) || 0;
-    
+  const getStatusIcon = (statusNum) => {
     switch (statusNum) {
-      case 0: // Pending
-        return <Clock className="w-4 h-4 text-amber-600" />;
-      case 1: // Approved
-        return <CheckCircle className="w-4 h-4 text-green-600" />;
-      case 2: // Rejected
-        return <XCircle className="w-4 h-4 text-red-600" />;
-      case 3: // Revoked
-        return <Ban className="w-4 h-4 text-gray-600" />;
-      case 4: // Expired
-        return <Calendar className="w-4 h-4 text-orange-600" />;
-      default:
-        return <Clock className="w-4 h-4 text-gray-600" />;
-    }
-  };
-
-  const getStatusColor = (status) => {
-    const statusNum = typeof status === "number" ? status : 
-      Object.keys(BrandOwnershipStatus).find(key => BrandOwnershipStatus[key] === status) || 0;
-    
-    switch (statusNum) {
-      case 0: // Pending
-        return "bg-amber-100 text-amber-800 border-amber-300";
-      case 1: // Approved
-        return "bg-green-100 text-green-800 border-green-300";
-      case 2: // Rejected
-        return "bg-red-100 text-red-800 border-red-300";
-      case 3: // Revoked
-        return "bg-gray-100 text-gray-800 border-gray-300";
-      case 4: // Expired
-        return "bg-orange-100 text-orange-800 border-orange-300";
-      default:
-        return "bg-gray-100 text-gray-800 border-gray-300";
+      case 0: return <Clock className="w-4 h-4 text-amber-600" />;
+      case 1: return <CheckCircle className="w-4 h-4 text-green-600" />;
+      case 2: return <XCircle className="w-4 h-4 text-red-600" />;
+      case 3: return <Ban className="w-4 h-4 text-gray-600" />;
+      case 4: return <Calendar className="w-4 h-4 text-orange-600" />;
+      default: return <Clock className="w-4 h-4 text-gray-600" />;
     }
   };
 
   const getTypeColor = (type) => {
-    const typeNum = typeof type === "number" ? type : 
-      Object.keys(BrandOwnershipType).find(key => BrandOwnershipType[key] === type) || 0;
-    
-    return typeNum === 0
-      ? "bg-blue-100 text-blue-800 border-blue-300"
-      : "bg-purple-100 text-purple-800 border-purple-300";
+    const typeNum = typeof type === "number" ? type : (type === "Owner" ? 0 : 1);
+    return typeNum === 0 ? "bg-blue-100 text-blue-800 border-blue-300" : "bg-purple-100 text-purple-800 border-purple-300";
   };
 
   const formatDate = (dateString) => {
@@ -69,20 +36,6 @@ export default function OwnedBrandsSection({ ownedBrands }) {
     return new Date(expiryDate) < new Date();
   };
 
-  const getStatusText = (status) => {
-    if (typeof status === "number") {
-      return BrandOwnershipStatus[status] || status;
-    }
-    return status;
-  };
-
-  const getTypeText = (type) => {
-    if (typeof type === "number") {
-      return BrandOwnershipType[type] || type;
-    }
-    return type;
-  };
-
   return (
     <div>
       {ownedBrands.length === 0 ? (
@@ -98,43 +51,37 @@ export default function OwnedBrandsSection({ ownedBrands }) {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {ownedBrands.map((b) => {
-            const statusNum = typeof b.status === "number" ? b.status : 
-              Object.keys(BrandOwnershipStatus).find(key => BrandOwnershipStatus[key] === b.status) || 0;
+            const { statusNum, label: statusLabel, color: statusColor, colorCard } = getBrandOwnershipStatusDisplay(b.status);
             const isApproved = statusNum === 1;
-            
+            const typeLabel = BrandOwnershipTypeTr[b.ownershipType] ?? (b.ownershipType === 0 ? "Sahip" : "Yetkili Satıcı");
+
             return (
               <div
                 key={b.id}
-                className={`bg-gradient-to-br rounded-2xl p-6 border-2 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 ${
-                  isApproved
-                    ? "from-green-50 to-emerald-50 border-green-300"
-                    : "from-white to-gray-50 border-gray-200"
-                }`}
+                className={`bg-gradient-to-br rounded-2xl p-6 border-2 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 ${colorCard}`}
               >
                 <div className="flex items-start gap-3 mb-4">
                   <div className={`w-12 h-12 rounded-xl bg-gradient-to-br flex items-center justify-center shadow-lg flex-shrink-0 ${
-                    isApproved
-                      ? "from-green-500 to-emerald-600"
-                      : "from-gray-400 to-gray-500"
+                    statusNum === 1 ? "from-green-500 to-emerald-600" : statusNum === 0 ? "from-amber-500 to-orange-500" : statusNum === 2 ? "from-red-500 to-red-600" : "from-gray-400 to-gray-500"
                   }`}>
                     <Award className="w-6 h-6 text-white" />
                   </div>
                   <div className="flex-1">
                     <h4 className="font-bold text-xl text-gray-900 mb-2">{b.brandName}</h4>
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-lg border-2 text-xs font-bold ${getStatusColor(b.status)}`}>
-                        {getStatusIcon(b.status)}
-                        {getStatusText(b.status)}
+                      <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-lg border-2 text-xs font-bold ${statusColor}`}>
+                        {getStatusIcon(statusNum)}
+                        {statusLabel}
                       </span>
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="space-y-2">
                   <div className="flex items-center justify-between px-3 py-2 bg-white rounded-lg border border-gray-200">
                     <span className="text-sm text-gray-600 font-medium">Tür:</span>
                     <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-lg border-2 text-xs font-bold ${getTypeColor(b.ownershipType)}`}>
-                      {getTypeText(b.ownershipType)}
+                      {typeLabel}
                     </span>
                   </div>
                   

@@ -1,45 +1,20 @@
 import { Clock, CheckCircle, XCircle, Ban, Calendar, FileText } from "lucide-react";
-import { BrandOwnershipStatus, BrandOwnershipType } from "@/constants/brandEnums";
+import { getBrandOwnershipStatusDisplay, BrandOwnershipTypeTr } from "@/constants/brandEnums";
 
 export default function OwnershipStatusSection({ ownerships }) {
-  const getStatusIcon = (status) => {
-    switch (status) {
-      case 0: // Pending
-        return <Clock className="w-5 h-5 text-amber-600" />;
-      case 1: // Approved
-        return <CheckCircle className="w-5 h-5 text-green-600" />;
-      case 2: // Rejected
-        return <XCircle className="w-5 h-5 text-red-600" />;
-      case 3: // Revoked
-        return <Ban className="w-5 h-5 text-gray-600" />;
-      case 4: // Expired
-        return <Calendar className="w-5 h-5 text-orange-600" />;
-      default:
-        return <Clock className="w-5 h-5 text-gray-600" />;
-    }
-  };
-
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 0: // Pending
-        return "bg-amber-100 text-amber-800 border-amber-300";
-      case 1: // Approved
-        return "bg-green-100 text-green-800 border-green-300";
-      case 2: // Rejected
-        return "bg-red-100 text-red-800 border-red-300";
-      case 3: // Revoked
-        return "bg-gray-100 text-gray-800 border-gray-300";
-      case 4: // Expired
-        return "bg-orange-100 text-orange-800 border-orange-300";
-      default:
-        return "bg-gray-100 text-gray-800 border-gray-300";
+  const getStatusIcon = (statusNum) => {
+    switch (statusNum) {
+      case 0: return <Clock className="w-5 h-5 text-amber-600" />;
+      case 1: return <CheckCircle className="w-5 h-5 text-green-600" />;
+      case 2: return <XCircle className="w-5 h-5 text-red-600" />;
+      case 3: return <Ban className="w-5 h-5 text-gray-600" />;
+      case 4: return <Calendar className="w-5 h-5 text-orange-600" />;
+      default: return <Clock className="w-5 h-5 text-gray-600" />;
     }
   };
 
   const getTypeColor = (type) => {
-    return type === 0
-      ? "bg-blue-100 text-blue-800 border-blue-300"
-      : "bg-purple-100 text-purple-800 border-purple-300";
+    return type === 0 ? "bg-blue-100 text-blue-800 border-blue-300" : "bg-purple-100 text-purple-800 border-purple-300";
   };
 
   const formatDate = (dateString) => {
@@ -91,23 +66,19 @@ export default function OwnershipStatusSection({ ownerships }) {
                   {ownership.brandName || "Marka"}
                 </h4>
                 <div className="flex items-center gap-3 flex-wrap">
-                  {/* Status Badge */}
-                  <span
-                    className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl border-2 font-bold text-sm ${getStatusColor(
-                      ownership.status
-                    )}`}
-                  >
-                    {getStatusIcon(ownership.status)}
-                    {BrandOwnershipStatus[ownership.status] || "Bilinmeyen"}
-                  </span>
-
+                  {/* Status Badge — Onay / Red / Beklemede ilgili renklerde */}
+                  {(() => {
+                    const disp = getBrandOwnershipStatusDisplay(ownership.status);
+                    return (
+                      <span className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl border-2 font-bold text-sm ${disp.color}`}>
+                        {getStatusIcon(disp.statusNum)}
+                        {disp.label}
+                      </span>
+                    );
+                  })()}
                   {/* Type Badge */}
-                  <span
-                    className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl border-2 font-bold text-sm ${getTypeColor(
-                      ownership.ownershipType
-                    )}`}
-                  >
-                    {BrandOwnershipType[ownership.ownershipType] || "Bilinmeyen"}
+                  <span className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl border-2 font-bold text-sm ${getTypeColor(ownership.ownershipType)}`}>
+                    {BrandOwnershipTypeTr[ownership.ownershipType] ?? "Bilinmeyen"}
                   </span>
                 </div>
               </div>
