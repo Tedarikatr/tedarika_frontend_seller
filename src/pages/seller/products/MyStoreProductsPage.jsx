@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import {
   getStoreCoverage,
   removeProductsFromStore,
+  setOnSaleBulk,
 } from "@/api/sellerStoreService";
 import {
   bulkUpdatePrices,
@@ -32,7 +33,8 @@ import {
   Square,
   DollarSign,
   ArrowRightLeft,
-  X
+  X,
+  Tag,
 } from "lucide-react";
 import { CURRENCY_OPTIONS } from "@/constants/currencyCode";
 
@@ -77,6 +79,10 @@ const MyStoreProductsPage = () => {
   });
   const [convertLoading, setConvertLoading] = useState(false);
   const [convertError, setConvertError] = useState(null);
+
+  // Toplu satışa aç / kapat
+  const [bulkOnSaleLoading, setBulkOnSaleLoading] = useState(false);
+  const [bulkOnSaleAction, setBulkOnSaleAction] = useState("on"); // "on" | "off"
 
   const loadProducts = async (forceRefresh = false) => {
     const isLoadingState = forceRefresh ? setRefreshing : setLoading;
@@ -128,6 +134,43 @@ const MyStoreProductsPage = () => {
 
   const handleDeselectAll = () => {
     setSelectedIds(new Set());
+  };
+
+  const handleBulkSetOnSale = async () => {
+    const ids = Array.from(selectedIds);
+    if (ids.length === 0) {
+      showFeedback("En az bir ürün seçin.", "error");
+      return;
+    }
+    const isOnSale = bulkOnSaleAction === "on";
+    setBulkOnSaleLoading(true);
+    try {
+      const res = await setOnSaleBulk(ids, isOnSale);
+      const total = res?.totalRequested ?? 0;
+      const success = res?.successCount ?? 0;
+      const fail = res?.failCount ?? 0;
+      const results = res?.results ?? [];
+      await loadProducts(true);
+      setSelectedIds(new Set());
+      if (fail > 0) {
+        const failMessages = results.filter((r) => !r.success).map((r) => r.message);
+        const uniqueReasons = [...new Set(failMessages)];
+        showFeedback(
+          `${success} ürün ${isOnSale ? "satışa açıldı" : "satıştan kaldırıldı"}, ${fail} ürün güncellenemedi.${uniqueReasons.length ? ` Sebepler: ${uniqueReasons.slice(0, 2).join("; ")}` : ""}`,
+          "error"
+        );
+      } else {
+        showFeedback(
+          `${success} ürün ${isOnSale ? "satışa açıldı" : "satıştan kaldırıldı"}.`,
+          "success"
+        );
+      }
+    } catch (err) {
+      const msg = err?.message ?? err?.errors?.[0] ?? "Toplu satış durumu güncellenirken bir hata oluştu.";
+      showFeedback(msg, "error");
+    } finally {
+      setBulkOnSaleLoading(false);
+    }
   };
 
   const handleBulkRemove = async () => {
@@ -504,6 +547,25 @@ const MyStoreProductsPage = () => {
               </div>
               {/* Aksiyon butonları */}
               <div className="flex flex-wrap items-center gap-3 pt-2 border-t border-gray-100">
+                <div className="inline-flex items-center gap-2 flex-wrap">
+                  <select
+                    value={bulkOnSaleAction}
+                    onChange={(e) => setBulkOnSaleAction(e.target.value)}
+                    className="px-3 py-2.5 rounded-xl border-2 border-gray-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 bg-white text-gray-800 text-sm font-medium min-w-[200px]"
+                  >
+                    <option value="on">Seçilenleri satışa aç</option>
+                    <option value="off">Seçilenleri satıştan kaldır</option>
+                  </select>
+                  <button
+                    type="button"
+                    onClick={handleBulkSetOnSale}
+                    disabled={bulkOnSaleLoading || selectedIds.size === 0}
+                    className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white text-sm font-bold shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <Tag size={18} />
+                    {bulkOnSaleLoading ? "İşleniyor..." : "Uygula"}
+                  </button>
+                </div>
                 <button
                   type="button"
                   onClick={() => { setShowBulkPriceModal(true); setBulkPriceError(null); }}
