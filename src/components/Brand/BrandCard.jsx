@@ -37,25 +37,35 @@ export default function BrandCard({ brand, ownership, sending, onRequest }) {
             )}
           </div>
           <div className="flex-1">
-            <h4 className="font-bold text-xl text-gray-900 mb-3">{brand.name}</h4>
+            <h4 className="font-bold text-xl text-gray-900 mb-1">{brand.name}</h4>
             {ownership ? (
-              <div className="space-y-2">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className="text-sm text-gray-600 font-medium">Tür:</span>
-                  <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-lg border-2 text-xs font-bold ${getTypeColor(ownership.type)}`}>
-                    {typeLabel ?? ownership.type}
-                  </span>
+              <>
+                <p className="text-xs text-gray-500 font-mono mb-2" title={brand.id}>
+                  Marka ID: {brand.id ? String(brand.id).slice(0, 8) + "…" : "—"}
+                </p>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-sm text-gray-600 font-medium">Tür:</span>
+                    <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-lg border-2 text-xs font-bold ${getTypeColor(ownership.type)}`}>
+                      {typeLabel ?? ownership.type}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-sm text-gray-600 font-medium">Durum:</span>
+                    <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-lg border-2 text-xs font-bold ${statusDisplay.color}`}>
+                      {getStatusIcon(statusNum)}
+                      {statusDisplay.label}
+                    </span>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className="text-sm text-gray-600 font-medium">Durum:</span>
-                  <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-lg border-2 text-xs font-bold ${statusDisplay.color}`}>
-                    {getStatusIcon(statusNum)}
-                    {statusDisplay.label}
-                  </span>
-                </div>
-              </div>
+              </>
             ) : (
-              <p className="text-sm text-gray-500 italic">Henüz başvuru yapılmamış.</p>
+              <div className="text-sm text-gray-500 italic space-y-1">
+                <p>Henüz başvuru yapılmamış.</p>
+                <p className="text-xs font-mono not-italic" title={brand.id}>
+                  Marka ID: {brand.id ? String(brand.id).slice(0, 8) + "…" : "—"}
+                </p>
+              </div>
             )}
           </div>
         </div>
