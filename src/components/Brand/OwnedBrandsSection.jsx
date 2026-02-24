@@ -84,6 +84,14 @@ export default function OwnedBrandsSection({ ownedBrands }) {
                       {typeLabel}
                     </span>
                   </div>
+
+                  <div className="flex flex-col gap-1 px-3 py-2 bg-white rounded-lg border border-gray-200">
+                    <span className="text-sm text-gray-600 font-medium">ID bilgisi</span>
+                    <div className="text-xs font-mono text-gray-700 space-y-0.5">
+                      <p title={b.brandId}>Marka ID: {b.brandId ? String(b.brandId).slice(0, 8) + "…" : "—"}</p>
+                      <p title={b.id}>Kayıt ID: {b.id ? String(b.id).slice(0, 8) + "…" : "—"}</p>
+                    </div>
+                  </div>
                   
                   {b.requestedAt && (
                     <div className="flex items-center justify-between px-3 py-2 bg-white rounded-lg border border-gray-200">

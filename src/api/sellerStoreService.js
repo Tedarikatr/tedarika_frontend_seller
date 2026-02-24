@@ -96,6 +96,20 @@ export const toggleProductOnSale = (storeProductId, isOnSale) =>
     true
   );
 
+/**
+ * Seçili mağaza ürünlerini toplu satışa açar veya satıştan kaldırır.
+ * @param {string[]} storeProductIds - Mağaza ürün ID'leri (UUID), en az 1 eleman
+ * @param {boolean} isOnSale - true = satışa aç, false = satıştan kaldır
+ * @returns {Promise<{totalRequested, successCount, failCount, results}>}
+ */
+export const setOnSaleBulk = (storeProductIds, isOnSale = true) =>
+  apiRequest(
+    "/SellerStoreProduct/set-on-sale-bulk",
+    "PUT",
+    { storeProductIds, isOnSale },
+    true
+  );
+
 export const updateProductQuantityLimits = (storeProductId, minQty, maxQty) =>
   apiRequest(
     "/SellerStoreProduct/set-quantity-limits",
