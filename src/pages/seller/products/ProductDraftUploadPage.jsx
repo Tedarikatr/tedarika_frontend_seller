@@ -70,6 +70,8 @@ const ProductDraftUploadPage = () => {
     notifySingleProductError,
   } = useProductUploadNotifications();
   const mountedRef = useRef(true);
+  /** Manuel yükleme hata aldığında form listesini geri yüklemek için (ürünler silinmesin) */
+  const productsBeforeManualUploadRef = useRef(null);
   const [activeTab, setActiveTab] = useState("manual"); // manual, excel, json, xml, xml-url
   const [showHistory, setShowHistory] = useState(false);
   const [drafts, setDrafts] = useState([]);
@@ -206,6 +208,8 @@ const ProductDraftUploadPage = () => {
       const successMessage = response?.message ?? (productCount != null ? `${productCount} ürün başarıyla yüklendi.` : "Yükleme tamamlandı.");
 
       if (mountedRef.current) {
+        setUploadState({ active: false, type: null });
+        setUploadProgress(0);
         setUploadSuccessModal({ type, productCount, message: successMessage });
         setSealedTypes((prev) => ({ ...prev, [type]: true }));
         notifySuccess({
@@ -412,6 +416,7 @@ const ProductDraftUploadPage = () => {
     }
 
     setUploadErrorDisplay(null);
+    productsBeforeManualUploadRef.current = products.map((p) => ({ ...p, store: { ...p.store }, images: p.images ? [...p.images] : [], colorVariants: p.colorVariants ? [...(p.colorVariants || [])] : [] }));
     setLoadingManual(true);
     setUploadProgress(getUploadProgress("validating"));
     try {
@@ -475,6 +480,8 @@ const ProductDraftUploadPage = () => {
       });
       if (productCount > 0) {
         setSealedTypes((prev) => ({ ...prev, manual: true }));
+        setLoadingManual(false);
+        setUploadProgress(0);
         navigate("/seller/products/drafts");
       } else {
         setUploadErrorDisplay({
@@ -484,6 +491,10 @@ const ProductDraftUploadPage = () => {
       }
     } catch (err) {
       console.error("Manuel yükleme başarısız:", err);
+      if (productsBeforeManualUploadRef.current != null) {
+        setProducts(productsBeforeManualUploadRef.current);
+        productsBeforeManualUploadRef.current = null;
+      }
       const errMsg = err?.message || err?.response?.data || "Beklenmeyen hata";
       const errStr = typeof errMsg === "string" ? errMsg : JSON.stringify(errMsg);
       notifyError({ message: `Ürünler yüklenemedi: ${errStr}`, uploadType: "manual", errorDetail: errStr });
@@ -1849,9 +1860,9 @@ const ProductDraftUploadPage = () => {
         </div>
       </div>
 
-      {/* Tamamlandı - Full Screen Success Modal */}
+      {/* Tamamlandı - Full Screen Success Modal (z-[250] yükleme modalının üstünde kalır) */}
       {uploadSuccessModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+        <div className="fixed inset-0 z-[250] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
           <div className="bg-white rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden animate-[fadeInDown_0.3s_ease-out]">
             <div className="bg-gradient-to-r from-emerald-600 via-teal-600 to-green-600 px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-10 text-center">
               <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-white/20 flex items-center justify-center">

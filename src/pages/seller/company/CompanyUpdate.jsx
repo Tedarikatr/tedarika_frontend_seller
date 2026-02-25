@@ -53,7 +53,7 @@ export default function CompanyUpdate() {
         setForm({
           id: data.id,
           name: data.name || "",
-          taxNumber: data.taxNumber || "",
+          taxNumber: data.taxNumber != null ? String(data.taxNumber) : "",
           tckn: data.tckn ?? "",
           taxOffice: data.taxOffice || "",
           country: data.country || "TR",
@@ -78,9 +78,9 @@ export default function CompanyUpdate() {
 
   const requiredOk = useMemo(() => {
     if (!form) return false;
-    const taxNum = (form.taxNumber ?? "").trim();
-    // Her tip için VKN 10 hane zorunlu
-    if (!taxNum || taxNum.length !== 10 || !/^\d{10}$/.test(taxNum)) return false;
+    const taxNum = String(form.taxNumber ?? "").trim();
+    // Sadece 10 karakter (rakam) kontrolü; vergi numarası doğruluğu kontrol edilmez
+    if (taxNum.length !== 10 || !/^\d{10}$/.test(taxNum)) return false;
     return (
       form.name?.trim() &&
       form.taxOffice?.trim() &&
@@ -102,9 +102,9 @@ export default function CompanyUpdate() {
       return;
     }
 
-    const taxNum = form.taxNumber.trim();
+    const taxNum = String(form.taxNumber ?? "").trim();
     if (taxNum.length !== 10 || !/^\d{10}$/.test(taxNum)) {
-      setMessage("⚠️ Vergi numarası (VKN) 10 haneli rakamlardan oluşmalıdır.");
+      setMessage("⚠️ Vergi numarası (VKN) tam 10 haneli rakamlardan oluşmalıdır.");
       setLoading(false);
       return;
     }
