@@ -41,11 +41,11 @@ const CompanyCreate = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const typeNum = Number(form.type);
-    const taxNum = form.taxNumber.trim();
+    const taxNum = String(form.taxNumber ?? "").trim();
 
-    // Her şirket tipinde VKN (vergi numarası) 10 hane zorunlu
-    if (!taxNum || taxNum.length !== 10 || !/^\d{10}$/.test(taxNum)) {
-      setMessage("⚠️ Vergi numarası (VKN) 10 haneli rakamlardan oluşmalıdır.");
+    // Sadece 10 karakter (rakam) kontrolü; vergi numarası doğruluğu kontrol edilmez
+    if (taxNum.length !== 10 || !/^\d{10}$/.test(taxNum)) {
+      setMessage("⚠️ Vergi numarası (VKN) tam 10 haneli rakamlardan oluşmalıdır.");
       return;
     }
 
