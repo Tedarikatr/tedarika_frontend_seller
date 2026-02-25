@@ -123,10 +123,6 @@ const MyStoreProductTable = ({
   const handleToggleSale = async (product) => {
     const storeId = getStoreProductId(product);
     if (!storeId) return;
-    if (!hasCoverage) {
-      onFeedback?.("Satışa açmak için önce hizmet bölgenizi tanımlayın.", "error");
-      return;
-    }
     setTogglingSaleId(storeId);
     try {
       await toggleProductOnSale(storeId, !product.isOnSale);
@@ -292,12 +288,12 @@ const MyStoreProductTable = ({
                         role="switch"
                         aria-checked={product.isOnSale}
                         aria-label={product.isOnSale ? "Satışta — Kapatmak için tıklayın" : "Pasif — Açmak için tıklayın"}
-                        disabled={!hasCoverage || togglingSaleId === storeId}
+                        disabled={togglingSaleId === storeId}
                         onClick={() => handleToggleSale(product)}
-                        title={!hasCoverage ? "Satışa açmak için hizmet bölgesi tanımlayın" : product.isOnSale ? "Satışı kapat" : "Satışa aç"}
+                        title={product.isOnSale ? "Satışı kapat" : "Satışa aç"}
                         className={`relative inline-flex h-6 w-10 flex-shrink-0 cursor-pointer rounded-full border-2 transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-60 ${
                           product.isOnSale ? "border-green-500 bg-green-500" : "border-gray-300 bg-gray-200"
-                        } ${!hasCoverage ? "opacity-70" : ""}`}
+                        }`}
                       >
                         <span
                           className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition-transform ${
@@ -406,12 +402,12 @@ const MyStoreProductTable = ({
                           role="switch"
                           aria-checked={product.isOnSale}
                           aria-label={product.isOnSale ? "Satışta — Kapatmak için tıklayın" : "Pasif — Açmak için tıklayın"}
-                          disabled={!hasCoverage || togglingSaleId === storeId}
+                          disabled={togglingSaleId === storeId}
                           onClick={() => handleToggleSale(product)}
-                          title={!hasCoverage ? "Satışa açmak için hizmet bölgesi tanımlayın" : product.isOnSale ? "Satışı kapat" : "Satışa aç"}
+                          title={product.isOnSale ? "Satışı kapat" : "Satışa aç"}
                           className={`relative inline-flex h-7 w-12 flex-shrink-0 cursor-pointer rounded-full border-2 transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-60 ${
                             product.isOnSale ? "border-green-500 bg-green-500" : "border-gray-300 bg-gray-200"
-                          } ${!hasCoverage ? "opacity-70" : ""}`}
+                          }`}
                         >
                           <span
                             className={`pointer-events-none inline-block h-6 w-6 transform rounded-full bg-white shadow ring-0 transition-transform ${
