@@ -43,12 +43,6 @@ const CompanyCreate = () => {
     const typeNum = Number(form.type);
     const taxNum = String(form.taxNumber ?? "").trim();
 
-    // Sadece 10 karakter (rakam) kontrolü; vergi numarası doğruluğu kontrol edilmez
-    if (taxNum.length !== 10 || !/^\d{10}$/.test(taxNum)) {
-      setMessage("⚠️ Vergi numarası (VKN) tam 10 haneli rakamlardan oluşmalıdır.");
-      return;
-    }
-
     setMessage("Kaydediliyor...");
 
     // CompanyCreateDto: name, taxNumber, taxOffice, country, province, address, type, tckn (şahıs için opsiyonel)
@@ -118,24 +112,18 @@ const CompanyCreate = () => {
               ))}
             </select>
 
-            {/* Vergi Numarası (VKN) – her şirket tipinde 10 hane zorunlu */}
+            {/* Vergi Numarası (VKN) */}
             <div className="md:col-span-2">
               <label className="block text-sm font-semibold text-[#003032] mb-1">
-                Vergi Numarası (VKN, 10 hane) *
+                Vergi Numarası (VKN) *
               </label>
               <input
                 name="taxNumber"
                 value={form.taxNumber}
-                onChange={(e) => {
-                  const v = e.target.value.replace(/\D/g, "").slice(0, 10);
-                  setForm((prev) => ({ ...prev, taxNumber: v }));
-                }}
-                placeholder="Vergi No - 10 haneli"
+                onChange={(e) => setForm((prev) => ({ ...prev, taxNumber: e.target.value }))}
+                placeholder="Vergi numarası"
                 required
                 className="input"
-                maxLength={10}
-                pattern="\\d{10}"
-                title="Vergi numarası 10 haneli olmalıdır"
               />
             </div>
 

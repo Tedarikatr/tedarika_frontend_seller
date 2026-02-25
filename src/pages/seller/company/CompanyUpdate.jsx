@@ -79,8 +79,7 @@ export default function CompanyUpdate() {
   const requiredOk = useMemo(() => {
     if (!form) return false;
     const taxNum = String(form.taxNumber ?? "").trim();
-    // Sadece 10 karakter (rakam) kontrolü; vergi numarası doğruluğu kontrol edilmez
-    if (taxNum.length !== 10 || !/^\d{10}$/.test(taxNum)) return false;
+    if (!taxNum) return false;
     return (
       form.name?.trim() &&
       form.taxOffice?.trim() &&
@@ -103,11 +102,6 @@ export default function CompanyUpdate() {
     }
 
     const taxNum = String(form.taxNumber ?? "").trim();
-    if (taxNum.length !== 10 || !/^\d{10}$/.test(taxNum)) {
-      setMessage("⚠️ Vergi numarası (VKN) tam 10 haneli rakamlardan oluşmalıdır.");
-      setLoading(false);
-      return;
-    }
 
     try {
       // CompanyUpdateDto: id, name, taxNumber, taxOffice, country, province, address, type, tckn (şahıs için zorunlu)
@@ -154,7 +148,7 @@ export default function CompanyUpdate() {
 
   const fields = [
     { name: "name", label: "Şirket Adı", required: true },
-    { name: "taxNumber", label: "Vergi Numarası (VKN, 10 hane)", required: true, maxLength: 10, isTax: true },
+    { name: "taxNumber", label: "Vergi Numarası (VKN)", required: true },
     { name: "country", label: "Ülke", required: true },
     { name: "province", label: "Şehir", required: true },
   ];
@@ -208,18 +202,10 @@ export default function CompanyUpdate() {
                 <input
                   name={f.name}
                   value={form[f.name]}
-                  onChange={f.isTax ? (e) => {
-                    const v = e.target.value.replace(/\D/g, "").slice(0, f.maxLength);
-                    setForm((prev) => ({ ...prev, [f.name]: v }));
-                  } : handleChange}
+                  onChange={handleChange}
                   placeholder={f.label}
                   required={f.required}
                   className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 transition-all"
-                  {...(f.isTax && {
-                    maxLength: f.maxLength,
-                    pattern: "\\d{10}",
-                    title: "Vergi numarası 10 haneli olmalıdır"
-                  })}
                 />
               </Field>
             ))}
@@ -327,7 +313,7 @@ export default function CompanyUpdate() {
               >
                 <AlertTriangle className="w-5 h-5 mt-0.5 flex-shrink-0" />
                 <p className="text-sm font-semibold">
-                  Lütfen tüm zorunlu alanları doldurun ve vergi numarasının 10 haneli olduğundan emin olun.
+                  Lütfen tüm zorunlu alanları doldurun.
                 </p>
               </motion.div>
             )}
