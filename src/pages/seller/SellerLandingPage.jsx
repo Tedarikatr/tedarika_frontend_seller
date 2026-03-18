@@ -18,6 +18,7 @@ import {
   createSeoMeta,
   getOrganizationSchema,
   getWebsiteSchema,
+  getWebApplicationSchema,
   getHreflangUrls
 } from "@/utils/seo";
 
@@ -29,11 +30,12 @@ const SellerLandingPage = () => {
     title: "Tedarika Satıcı Paneli - B2B Pazaryeri ile İhracat Yapın | Ücretsiz Mağaza",
     description: "Türkiye'nin en hızlı büyüyen B2B pazaryerinde mağazanızı ücretsiz açın. Global alıcılara ulaşın, güvenli ödeme alın, kolay ürün yönetimi. KOBİ'ler ve üreticiler için dijital ihracat platformu.",
     path: location.pathname,
-    keywords: "B2B pazaryeri, ihracat platformu, tedarika satıcı, mağaza açma, toptan satış, KOBİ ihracat, üretici satış, global ticaret, online satış, B2B e-ticaret, Türkiye ihracat, dijital ticaret"
+    keywords: "tedarika satıcı paneli, B2B pazaryeri, ihracat platformu, mağaza açma, toptan satış, KOBİ ihracat, üretici satış, global ticaret, B2B e-ticaret, e-ihracat, Türkiye ihracat, dijital ticaret, satıcı kayıt, Tedarika mağaza"
   });
 
   const organizationSchema = getOrganizationSchema();
   const websiteSchema = getWebsiteSchema(location.pathname);
+  const webAppSchema = getWebApplicationSchema();
 
   return (
     <>
@@ -74,6 +76,9 @@ const SellerLandingPage = () => {
         
         <script type="application/ld+json">
           {JSON.stringify(organizationSchema)}
+        </script>
+        <script type="application/ld+json">
+          {JSON.stringify(webAppSchema)}
         </script>
       </Helmet>
 

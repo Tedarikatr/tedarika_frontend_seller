@@ -9,7 +9,7 @@ import {
   SellerCenterSection,
   SellerCenterFaqItem,
 } from "./components";
-import { createSeoMeta, getBreadcrumbSchema } from "@/utils/seo";
+import { createSeoMeta, getBreadcrumbSchema, getFAQPageSchema } from "@/utils/seo";
 import { SSS_FAQS } from "@/constants/sssFaqs";
 
 const SssPage = () => {
@@ -56,15 +56,7 @@ const SssPage = () => {
         <meta name="twitter:title" content={seoMeta.twitter.title} />
         <meta name="twitter:description" content={seoMeta.twitter.description} />
         <meta name="twitter:image" content={seoMeta.twitter.image} />
-        <script type="application/ld+json">{JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "FAQPage",
-          "mainEntity": faqs.map(faq => ({
-            "@type": "Question",
-            "name": faq.question,
-            "acceptedAnswer": { "@type": "Answer", "text": faq.answer }
-          }))
-        })}</script>
+        <script type="application/ld+json">{JSON.stringify(getFAQPageSchema(faqs))}</script>
         <script type="application/ld+json">{JSON.stringify(getBreadcrumbSchema(breadcrumbItems))}</script>
       </Helmet>
       <SellerCenterLayout>

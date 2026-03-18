@@ -8,6 +8,12 @@
       content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=no, viewport-fit=cover"
     />
 
+    <!-- Performans: Kritik origin'lere ön bağlantı (Core Web Vitals / LCP) -->
+    <link rel="preconnect" href="https://www.seller.tedarika.com.tr" crossorigin />
+    <link rel="dns-prefetch" href="https://www.seller.tedarika.com.tr" />
+    <link rel="preconnect" href="https://www.tedarika.com.tr" crossorigin />
+    <link rel="dns-prefetch" href="https://www.tedarika.com.tr" />
+
     <!-- Favicon (PNG fallback - logo.svg yoksa /images/logo.png kullan) -->
     <link rel="icon" type="image/png" href="/images/logo.png" />
     <link rel="apple-touch-icon" href="/images/logo.png" />
@@ -21,18 +27,20 @@
       content="black-translucent"
     />
 
-    <!-- SEO Meta -->
+    <!-- SEO Meta (Google snippet ve sıralama için: başlık ~60 karakter, açıklama ~155 karakter) -->
     <meta
       name="description"
-      content="Tedarika ile B2B pazaryerinde mağazanızı açın. Türkiye'den dünyaya ihracat yapın, güvenli ödeme alın, kolay ürün yönetimi. KOBİ'ler ve üreticiler için en hızlı büyüyen B2B platformu."
+      content="Tedarika Satıcı Paneli: B2B pazaryerinde mağazanızı ücretsiz açın. Türkiye'den dünyaya ihracat, güvenli ödeme, kolay ürün yönetimi. KOBİ ve üreticiler için dijital e-ihracat platformu."
     />
     <meta
       name="keywords"
-      content="tedarika, B2B pazaryeri, ihracat platformu, satıcı paneli, mağaza yönetimi, ürün satışı, toptan satış, KOBİ ihracat, B2B e-ticaret, online satış platformu, global ticaret, dijital ticaret"
+      content="tedarika satıcı paneli, B2B pazaryeri, ihracat platformu, satıcı paneli, mağaza açma, ürün yönetimi, toptan satış, KOBİ ihracat, B2B e-ticaret, e-ihracat, dijital ticaret, Türkiye ihracat, global ticaret, satıcı kayıt, Tedarika mağaza, toptan satış platformu, üretici satış, ihracat yazılımı, B2B satış paneli"
     />
     <meta name="author" content="Tedarika" />
     <meta name="robots" content="index, follow" />
     <meta name="language" content="Turkish" />
+    <meta name="revisit-after" content="7 days" />
+    <meta name="rating" content="general" />
     
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
@@ -68,7 +76,7 @@
 
     <!-- Google Search Console: Doğrulama için meta tag ekleyin (Örnek: <meta name="google-site-verification" content="XXXXXXXX" />) -->
 
-    <!-- Yapısal veri (JSON-LD) - Google arama sonuçları için -->
+    <!-- Yapısal veri (JSON-LD) - Google zengin sonuçlar ve snippet için -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -98,11 +106,22 @@
           "url": "https://www.seller.tedarika.com.tr",
           "description": "Türkiye'nin B2B pazaryeri satıcı paneli. Mağazanızı açın, ihracat yapın, global alıcılara ulaşın.",
           "publisher": { "@id": "https://www.seller.tedarika.com.tr/#organization" },
+          "inLanguage": "tr",
           "potentialAction": {
             "@type": "SearchAction",
             "target": { "@type": "EntryPoint", "urlTemplate": "https://www.seller.tedarika.com.tr/seller/landing?q={search_term_string}" },
             "query-input": "required name=search_term_string"
           }
+        },
+        {
+          "@type": "WebApplication",
+          "name": "Tedarika Satıcı Paneli",
+          "url": "https://www.seller.tedarika.com.tr/seller/landing",
+          "applicationCategory": "BusinessApplication",
+          "operatingSystem": "Any",
+          "description": "B2B pazaryerinde mağaza açma, ürün yönetimi, sipariş takibi ve e-ihracat için satıcı paneli. KOBİ ve üreticiler için ücretsiz kayıt.",
+          "offers": { "@type": "Offer", "price": "0", "priceCurrency": "TRY" },
+          "publisher": { "@id": "https://www.seller.tedarika.com.tr/#organization" }
         }
       ]
     }

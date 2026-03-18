@@ -1,7 +1,10 @@
-# Tedarika Satıcı Paneli - Robots.txt (varsayılan / fallback)
+# Tedarika Satıcı Paneli - Robots.txt
+# Google Arama Merkezi: https://developers.google.com/search/docs/crawling-indexing/robots/intro
 # Production'da host'a göre robots-seller.txt veya robots-satici.txt sunulur (vercel.json)
 
 User-agent: *
+User-agent: Googlebot
+User-agent: Googlebot-Image
 Allow: /
 Allow: /seller/landing
 Allow: /seller/register
@@ -11,6 +14,7 @@ Allow: /seller/appointment
 Allow: /seller/apply
 Allow: /corporate/
 Allow: /satici-merkezi/
+Allow: /images/
 
 # Özel alanlar - indexlenmemeli
 Disallow: /seller/dashboard
