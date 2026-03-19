@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import {
   SendHorizonal,
   Mail,
@@ -66,54 +65,37 @@ const SupportFormSection = () => {
 
   return (
     <section className="relative bg-white py-12 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-10 overflow-hidden">
-      {/* Arka Plan Efektleri */}
-      <div className="absolute top-0 left-0 w-72 h-72 bg-emerald-500 opacity-30 blur-3xl rounded-full animate-pulse-slow"></div>
-      <div className="absolute bottom-0 right-0 w-72 h-72 bg-teal-600 opacity-30 blur-3xl rounded-full animate-pulse-slow"></div>
+      <div className="absolute top-0 left-0 w-72 h-72 bg-emerald-500 opacity-30 blur-3xl rounded-full" />
+      <div className="absolute bottom-0 right-0 w-72 h-72 bg-teal-600 opacity-30 blur-3xl rounded-full" />
 
       <div className="max-w-4xl mx-auto relative z-10 text-center">
-        <motion.h2
-          className="text-2xl sm:text-3xl lg:text-5xl font-extrabold text-[#003636] mb-4 sm:mb-6"
-          initial={{ opacity: 0, y: -20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-        >
+        <h2 className="text-2xl sm:text-3xl lg:text-5xl font-extrabold text-[#003636] mb-4 sm:mb-6">
           İhracat İçin Profesyonel Destek Alın
-        </motion.h2>
+        </h2>
         <p className="text-gray-600 text-base sm:text-lg mb-10 max-w-2xl mx-auto">
           Sorularınız mı var? Formu doldurun, uzman ekibimiz size yardımcı olmak için en kısa sürede iletişime geçsin.
         </p>
 
-        {/* Toast Bildirimi */}
-        <AnimatePresence>
-          {isSuccess !== null && (
-            <motion.div
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.3 }}
-              className={`fixed top-6 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-xl shadow-lg text-white font-semibold z-50 ${
-                isSuccess ? "bg-emerald-600" : "bg-red-600"
-              }`}
-            >
-              <div className="flex items-center gap-2">
-                {isSuccess ? (
-                  <CheckCircle2 className="w-5 h-5" />
-                ) : (
-                  <XCircle className="w-5 h-5" />
-                )}
-                <span>{responseMsg}</span>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {isSuccess !== null && (
+          <div
+            className={`fixed top-6 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-xl shadow-lg text-white font-semibold z-50 ${
+              isSuccess ? "bg-emerald-600" : "bg-red-600"
+            }`}
+          >
+            <div className="flex items-center gap-2">
+              {isSuccess ? (
+                <CheckCircle2 className="w-5 h-5" />
+              ) : (
+                <XCircle className="w-5 h-5" />
+              )}
+              <span>{responseMsg}</span>
+            </div>
+          </div>
+        )}
 
-        {/* Form */}
-        <motion.form
+        <form
           onSubmit={handleSubmit}
           className="bg-white rounded-3xl shadow-xl p-8 sm:p-10 flex flex-col gap-5 text-left max-w-2xl mx-auto border border-gray-100"
-          initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
         >
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
@@ -218,15 +200,9 @@ const SupportFormSection = () => {
             <SendHorizonal className="w-5 h-5" />
             {loading ? "Gönderiliyor..." : "Talebi Gönder"}
           </button>
-        </motion.form>
+        </form>
 
-        {/* Şirket Bilgileri */}
-        <motion.div
-          className="mt-16 text-gray-700"
-          initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3, duration: 0.8 }}
-        >
+        <div className="mt-16 text-gray-700">
           <div className="flex flex-col sm:flex-row justify-center items-center gap-6 text-center sm:text-left">
             <div className="flex items-center gap-3">
               <Building2 className="text-emerald-700 w-6 h-6" />
@@ -245,7 +221,7 @@ const SupportFormSection = () => {
               </p>
             </div>
           </div>
-        </motion.div>
+        </div>
       </div>
     </section>
   );

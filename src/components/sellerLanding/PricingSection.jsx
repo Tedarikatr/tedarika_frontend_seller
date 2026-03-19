@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
 import { useToast } from "@/contexts/ToastContext";
 import { Check } from "lucide-react";
 import { getSubscriptionPackages } from "@/api/sellerSubscriptionService";
@@ -45,38 +44,20 @@ export default function PricingSection() {
       className="py-12 sm:py-16 md:py-24 bg-gradient-to-br from-emerald-50 to-teal-50 scroll-mt-20 sm:scroll-mt-24 px-4 sm:px-6"
     >
       <div className="max-w-5xl mx-auto px-6 text-center">
-        <motion.h2
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-4 sm:mb-6 text-[#002222]"
-        >
+        <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-4 sm:mb-6 text-[#002222]">
           Ücretsiz Başlayın
-        </motion.h2>
+        </h2>
 
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-          className="text-lg md:text-xl text-gray-700 mb-16 max-w-2xl mx-auto"
-        >
+        <p className="text-lg md:text-xl text-gray-700 mb-16 max-w-2xl mx-auto">
           Hiçbir ödeme yapmadan mağazanızı açın, ürünlerinizi yükleyin ve satışa başlayın.
           <br />
           <span className="font-semibold text-emerald-700">
             {displayPlan.name}
           </span>{" "}
           ile tüm özelliklere tam erişim.
-        </motion.p>
+        </p>
 
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="bg-white rounded-3xl shadow-2xl p-6 sm:p-8 md:p-10 max-w-lg mx-auto border border-emerald-100"
-        >
+        <div className="bg-white rounded-3xl shadow-2xl p-6 sm:p-8 md:p-10 max-w-lg mx-auto border border-emerald-100">
           <div className="mb-6">
             <h3 className="text-3xl font-bold text-emerald-700 mb-2">
               {displayPlan.name}
@@ -105,7 +86,7 @@ export default function PricingSection() {
 
           <button
             onClick={() => navigate("/seller/register")}
-            className="w-full py-4 rounded-xl font-bold text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 transition-all transform hover:scale-105 shadow-lg hover:shadow-emerald-500/50"
+            className="w-full py-4 rounded-xl font-bold text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 transition shadow-lg hover:shadow-emerald-500/50"
           >
             Hemen Başlayın
           </button>
@@ -113,7 +94,7 @@ export default function PricingSection() {
           <p className="text-xs text-gray-500 mt-4">
             Kredi kartı bilgisi gerekmez • İstediğiniz zaman iptal edebilirsiniz
           </p>
-        </motion.div>
+        </div>
       </div>
     </section>
   );
