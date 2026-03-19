@@ -44,6 +44,18 @@ const SellerHeader = () => {
 
   const closeMenu = () => setIsOpen(false);
 
+  const handleNavClick = (link, e) => {
+    if (link.href === "#pricing") {
+      e.preventDefault();
+      closeMenu();
+      requestAnimationFrame(() => {
+        document.getElementById("pricing")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    } else {
+      closeMenu();
+    }
+  };
+
   return (
     <header className="bg-[#003032] border-b border-white/10 shadow-sm w-full relative z-[100]">
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
@@ -53,7 +65,7 @@ const SellerHeader = () => {
             className="flex items-center gap-3 group"
             aria-label="Tedarika Satıcı Paneli"
           >
-            <img src={Logo} alt="Tedarika Logo" className="h-12 sm:h-20 md:h-28 -my-2 sm:-my-4 md:-my-6 group-hover:scale-110 transition-transform duration-300" />
+            <img src={Logo} alt="Tedarika Logo" className="h-12 sm:h-20 md:h-28 -my-2 sm:-my-4 md:-my-6" />
           </a>
 
           <nav
@@ -188,7 +200,7 @@ const SellerHeader = () => {
                   <a
                     key={link.label}
                     href={link.href}
-                    onClick={closeMenu}
+                    onClick={(e) => handleNavClick(link, e)}
                     className="flex items-center gap-3 min-h-[48px] px-4 py-3 rounded-xl text-white font-medium text-base active:bg-white/10 transition-colors touch-manipulation"
                   >
                     {link.icon && <link.icon className="w-5 h-5 text-emerald-400 flex-shrink-0" />}

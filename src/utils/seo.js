@@ -205,8 +205,7 @@ export const getWebsiteSchema = (path = '') => {
  * @returns {Object} - JSON-LD objesi
  */
 export const getBreadcrumbSchema = (items = []) => {
-  const currentDomain = getCurrentDomain();
-  
+  const domain = getCurrentDomain();
   return {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
@@ -214,8 +213,59 @@ export const getBreadcrumbSchema = (items = []) => {
       '@type': 'ListItem',
       'position': index + 1,
       'name': item.name,
-      'item': item.url.startsWith('http') ? item.url : `${currentDomain}${item.url}`
+      'item': item.url.startsWith('http') ? item.url : `${domain}${item.url}`
     }))
   };
 };
 
+/**
+ * WebApplication JSON-LD - Satıcı paneli için (Google'da uygulama/servis snippet'i)
+ */
+export const getWebApplicationSchema = () => {
+  const currentDomain = getCurrentDomain();
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'WebApplication',
+    'name': 'Tedarika Satıcı Paneli',
+    'url': `${currentDomain}/seller/landing`,
+    'applicationCategory': 'BusinessApplication',
+    'operatingSystem': 'Any',
+    'description': 'B2B pazaryerinde mağaza açma, ürün yönetimi, sipariş takibi ve e-ihracat için satıcı paneli. KOBİ ve üreticiler için ücretsiz kayıt.',
+    'offers': { '@type': 'Offer', 'price': '0', 'priceCurrency': 'TRY' },
+    'publisher': { '@id': `${currentDomain}/#organization` }
+  };
+};
+
+/**
+ * FAQPage JSON-LD - SSS sayfaları için zengin snippet (Google genişletilmiş SSS)
+ * @param {Array} faqs - [{ question, answer }]
+ */
+export const getFAQPageSchema = (faqs = []) => ({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  'mainEntity': faqs.map(({ question, answer }) => ({
+    '@type': 'Question',
+    'name': question,
+    'acceptedAnswer': { '@type': 'Answer', 'text': answer }
+  }))
+});
+
+/**
+ * Article JSON-LD - Satıcı Merkezi makaleleri için snippet potansiyeli
+ * @param {Object} opts - { headline, description, datePublished, dateModified, url }
+ */
+export const getArticleSchema = (opts = {}) => {
+  const domain = getCurrentDomain();
+  const url = opts.url ? (opts.url.startsWith('http') ? opts.url : `${domain}${opts.url}`) : domain;
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    'headline': opts.headline || 'Tedarika Satıcı Merkezi',
+    'description': opts.description || '',
+    'datePublished': opts.datePublished || '2024-01-01',
+    'dateModified': opts.dateModified || opts.datePublished || '2024-01-01',
+    'author': { '@type': 'Organization', 'name': 'Tedarika' },
+    'publisher': { '@type': 'Organization', 'name': 'Tedarika', 'logo': { '@type': 'ImageObject', 'url': `${domain}/images/logo.png` } },
+    'mainEntityOfPage': { '@type': 'WebPage', '@id': url }
+  };
+};

@@ -1,44 +1,34 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
 import { useToast } from "@/contexts/ToastContext";
 import { Check } from "lucide-react";
 import { getSubscriptionPackages } from "@/api/sellerSubscriptionService";
 
+const DEFAULT_PLAN = {
+  name: "6 Ay Ücretsiz Deneme",
+  price: 0,
+  description: "İlk 6 ay tamamen ücretsiz",
+};
+
 export default function PricingSection() {
   const navigate = useNavigate();
   const toast = useToast();
-  const [plan, setPlan] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [plan, setPlan] = useState(DEFAULT_PLAN);
 
-  // 🎯 Sadece mevcut ücretsiz planı çek
+  // API yanıtı gelince güncelle; anasayfa tek seferde yüklensin, yükleme engeli yok
   useEffect(() => {
-    (async () => {
-      try {
-        const packageList = await getSubscriptionPackages();
+    getSubscriptionPackages()
+      .then((packageList) => {
         const freePlan = packageList?.find((p) => p.isFree || p.price === 0);
-        setPlan(freePlan || packageList?.[0] || null);
-      } catch (err) {
+        if (freePlan || packageList?.[0]) setPlan(freePlan || packageList[0]);
+      })
+      .catch((err) => {
         console.error("Plan yüklenemedi:", err);
         toast.error("Plan bilgisi alınamadı.");
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, []);
+      });
+  }, [toast]);
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center py-20 text-gray-500">
-        Yükleniyor...
-      </div>
-    );
-  }
-
-  if (!plan) {
-    return null;
-  }
-
+  const displayPlan = plan || DEFAULT_PLAN;
   const benefits = [
     "Sınırsız ürün yükleme",
     "Global alıcı ağına erişim",
@@ -54,50 +44,32 @@ export default function PricingSection() {
       className="py-12 sm:py-16 md:py-24 bg-gradient-to-br from-emerald-50 to-teal-50 scroll-mt-20 sm:scroll-mt-24 px-4 sm:px-6"
     >
       <div className="max-w-5xl mx-auto px-6 text-center">
-        <motion.h2
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-4 sm:mb-6 text-[#002222]"
-        >
+        <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-4 sm:mb-6 text-[#002222]">
           Ücretsiz Başlayın
-        </motion.h2>
+        </h2>
 
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-          className="text-lg md:text-xl text-gray-700 mb-16 max-w-2xl mx-auto"
-        >
+        <p className="text-lg md:text-xl text-gray-700 mb-16 max-w-2xl mx-auto">
           Hiçbir ödeme yapmadan mağazanızı açın, ürünlerinizi yükleyin ve satışa başlayın.
           <br />
           <span className="font-semibold text-emerald-700">
-            {plan.name || "6 Ay Ücretsiz Deneme"}
+            {displayPlan.name}
           </span>{" "}
           ile tüm özelliklere tam erişim.
-        </motion.p>
+        </p>
 
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="bg-white rounded-3xl shadow-2xl p-6 sm:p-8 md:p-10 max-w-lg mx-auto border border-emerald-100"
-        >
+        <div className="bg-white rounded-3xl shadow-2xl p-6 sm:p-8 md:p-10 max-w-lg mx-auto border border-emerald-100">
           <div className="mb-6">
             <h3 className="text-3xl font-bold text-emerald-700 mb-2">
-              {plan.name || "Freemium Paketi"}
+              {displayPlan.name}
             </h3>
             <div className="flex items-baseline justify-center gap-2">
               <span className="text-5xl font-extrabold text-gray-900">
-                ₺{plan.price ?? 0}
+                ₺{displayPlan.price ?? 0}
               </span>
               <span className="text-lg text-gray-500">/ay</span>
             </div>
             <p className="text-sm text-gray-600 mt-3">
-              {plan.description || "İlk 6 ay tamamen ücretsiz"}
+              {displayPlan.description}
             </p>
           </div>
 
@@ -114,7 +86,7 @@ export default function PricingSection() {
 
           <button
             onClick={() => navigate("/seller/register")}
-            className="w-full py-4 rounded-xl font-bold text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 transition-all transform hover:scale-105 shadow-lg hover:shadow-emerald-500/50"
+            className="w-full py-4 rounded-xl font-bold text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 transition shadow-lg hover:shadow-emerald-500/50"
           >
             Hemen Başlayın
           </button>
@@ -122,7 +94,7 @@ export default function PricingSection() {
           <p className="text-xs text-gray-500 mt-4">
             Kredi kartı bilgisi gerekmez • İstediğiniz zaman iptal edebilirsiniz
           </p>
-        </motion.div>
+        </div>
       </div>
     </section>
   );
