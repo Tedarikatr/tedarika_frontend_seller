@@ -5,40 +5,31 @@ import { useToast } from "@/contexts/ToastContext";
 import { Check } from "lucide-react";
 import { getSubscriptionPackages } from "@/api/sellerSubscriptionService";
 
+const DEFAULT_PLAN = {
+  name: "6 Ay Ücretsiz Deneme",
+  price: 0,
+  description: "İlk 6 ay tamamen ücretsiz",
+};
+
 export default function PricingSection() {
   const navigate = useNavigate();
   const toast = useToast();
-  const [plan, setPlan] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [plan, setPlan] = useState(DEFAULT_PLAN);
 
-  // 🎯 Sadece mevcut ücretsiz planı çek
+  // API yanıtı gelince güncelle; anasayfa tek seferde yüklensin, yükleme engeli yok
   useEffect(() => {
-    (async () => {
-      try {
-        const packageList = await getSubscriptionPackages();
+    getSubscriptionPackages()
+      .then((packageList) => {
         const freePlan = packageList?.find((p) => p.isFree || p.price === 0);
-        setPlan(freePlan || packageList?.[0] || null);
-      } catch (err) {
+        if (freePlan || packageList?.[0]) setPlan(freePlan || packageList[0]);
+      })
+      .catch((err) => {
         console.error("Plan yüklenemedi:", err);
         toast.error("Plan bilgisi alınamadı.");
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, []);
+      });
+  }, [toast]);
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center py-20 text-gray-500">
-        Yükleniyor...
-      </div>
-    );
-  }
-
-  if (!plan) {
-    return null;
-  }
-
+  const displayPlan = plan || DEFAULT_PLAN;
   const benefits = [
     "Sınırsız ürün yükleme",
     "Global alıcı ağına erişim",
@@ -74,7 +65,7 @@ export default function PricingSection() {
           Hiçbir ödeme yapmadan mağazanızı açın, ürünlerinizi yükleyin ve satışa başlayın.
           <br />
           <span className="font-semibold text-emerald-700">
-            {plan.name || "6 Ay Ücretsiz Deneme"}
+            {displayPlan.name}
           </span>{" "}
           ile tüm özelliklere tam erişim.
         </motion.p>
@@ -88,16 +79,16 @@ export default function PricingSection() {
         >
           <div className="mb-6">
             <h3 className="text-3xl font-bold text-emerald-700 mb-2">
-              {plan.name || "Freemium Paketi"}
+              {displayPlan.name}
             </h3>
             <div className="flex items-baseline justify-center gap-2">
               <span className="text-5xl font-extrabold text-gray-900">
-                ₺{plan.price ?? 0}
+                ₺{displayPlan.price ?? 0}
               </span>
               <span className="text-lg text-gray-500">/ay</span>
             </div>
             <p className="text-sm text-gray-600 mt-3">
-              {plan.description || "İlk 6 ay tamamen ücretsiz"}
+              {displayPlan.description}
             </p>
           </div>
 
