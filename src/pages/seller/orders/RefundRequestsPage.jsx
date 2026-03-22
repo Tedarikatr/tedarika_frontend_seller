@@ -17,7 +17,6 @@ import {
   Search,
   AlertCircle,
   Lock,
-  Loader2,
   Eye,
   ThumbsUp,
   ThumbsDown,
@@ -475,7 +474,7 @@ const RefundRequestsPage = () => {
                     className="flex-1 py-3 bg-green-600 hover:bg-green-700 text-white rounded-xl font-semibold transition disabled:opacity-50 flex items-center justify-center gap-2"
                   >
                     {processing ? (
-                      <Loader2 className="w-5 h-5 animate-spin" />
+                      <TedarikaLoader variant="micro" light className="h-5 w-5" label="İşleniyor" />
                     ) : (
                       <ThumbsUp className="w-5 h-5" />
                     )}
@@ -545,7 +544,7 @@ const RefundRequestsPage = () => {
                     className="flex-1 py-3 bg-green-600 hover:bg-green-700 text-white rounded-xl font-semibold transition disabled:opacity-50 flex items-center justify-center gap-2"
                   >
                     {processing ? (
-                      <Loader2 className="w-5 h-5 animate-spin" />
+                      <TedarikaLoader variant="micro" light className="h-5 w-5" label="İşleniyor" />
                     ) : (
                       <CheckCircle className="w-5 h-5" />
                     )}

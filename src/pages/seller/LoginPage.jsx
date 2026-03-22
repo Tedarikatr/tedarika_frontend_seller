@@ -7,6 +7,7 @@ import { useToast } from "@/contexts/ToastContext";
 import { createSeoMeta } from "@/utils/seo";
 import SellerHeader from "@/components/sellerLanding/SellerHeader";
 import Footer from "@/components/corporate/Footer";
+import TedarikaLoader from "@/components/ui/TedarikaLoader";
 
 const LoginPage = () => {
   const location = useLocation();
@@ -134,7 +135,14 @@ const LoginPage = () => {
             disabled={isSubmitting}
             className="mt-8 sm:mt-10 w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 sm:py-4 rounded-xl sm:rounded-2xl text-base sm:text-lg transition disabled:opacity-50 shadow-lg"
           >
-            {isSubmitting ? "Giriş Yapılıyor..." : "Giriş Yap"}
+            {isSubmitting ? (
+              <span className="flex items-center justify-center gap-2">
+                <TedarikaLoader variant="micro" light className="h-5 w-5" label="Giriş yapılıyor" />
+                Giriş Yapılıyor...
+              </span>
+            ) : (
+              "Giriş Yap"
+            )}
           </button>
 
           <p className="mt-8 text-center text-base text-gray-600">

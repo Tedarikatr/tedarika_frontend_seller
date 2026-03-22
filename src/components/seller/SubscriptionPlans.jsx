@@ -191,13 +191,20 @@ export default function SubscriptionPlans() {
                 <button
                   onClick={() => handleSubscribe(plan.id)}
                   disabled={loadingId === plan.id}
-                  className={`mt-8 w-full py-3 rounded-lg font-semibold text-white transition ${
+                  className={`mt-8 w-full py-3 rounded-lg font-semibold text-white transition inline-flex items-center justify-center gap-2 ${
                     loadingId === plan.id
                       ? "bg-emerald-400 cursor-wait"
                       : "bg-emerald-600 hover:bg-emerald-700"
                   }`}
                 >
-                  {loadingId === plan.id ? "İşleniyor..." : "Abone Ol"}
+                  {loadingId === plan.id ? (
+                    <>
+                      <TedarikaLoader variant="micro" light className="h-5 w-5" label="İşleniyor" />
+                      İşleniyor...
+                    </>
+                  ) : (
+                    "Abone Ol"
+                  )}
                 </button>
               </div>
             ))

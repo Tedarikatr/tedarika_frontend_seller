@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { X, Loader2, Send, Calendar, FileText } from "lucide-react";
+import { X, Send, Calendar, FileText } from "lucide-react";
+import TedarikaLoader from "@/components/ui/TedarikaLoader";
 import { requestBrandOwnership } from "@/api/brandservice";
 import { BrandOwnershipTypeTr } from "@/constants/brandEnums";
 
@@ -273,7 +274,7 @@ export default function OwnershipRequestModal({
             >
               {loading ? (
                 <>
-                  <Loader2 className="w-5 h-5 animate-spin" />
+                  <TedarikaLoader variant="micro" light className="h-5 w-5" label="Gönderiliyor" />
                   Gönderiliyor...
                 </>
               ) : (

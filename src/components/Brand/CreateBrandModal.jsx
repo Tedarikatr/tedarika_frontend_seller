@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { X, Loader2, Award, Upload, Image as ImageIcon } from "lucide-react";
+import { X, Award, Upload, Image as ImageIcon } from "lucide-react";
+import TedarikaLoader from "@/components/ui/TedarikaLoader";
 import { createBrand } from "@/api/brandservice";
 
 export default function CreateBrandModal({ isOpen, onClose, onSuccess }) {
@@ -218,7 +219,7 @@ export default function CreateBrandModal({ isOpen, onClose, onSuccess }) {
             >
               {loading ? (
                 <>
-                  <Loader2 className="w-5 h-5 animate-spin" />
+                  <TedarikaLoader variant="micro" light className="h-5 w-5" label="Oluşturuluyor" />
                   Oluşturuluyor...
                 </>
               ) : (

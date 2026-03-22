@@ -10,6 +10,7 @@ import {
   SellerCenterCard,
 } from "./components";
 import { createSeoMeta, getBreadcrumbSchema, getContactPageSchema } from "@/utils/seo";
+import TedarikaLoader from "@/components/ui/TedarikaLoader";
 
 const ContactPage = () => {
   const location = useLocation();
@@ -132,7 +133,7 @@ const ContactPage = () => {
               >
                 {loading ? (
                   <span className="flex items-center gap-2">
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <TedarikaLoader variant="micro" light className="h-4 w-4" label="Gönderiliyor" />
                     Gönderiliyor...
                   </span>
                 ) : (

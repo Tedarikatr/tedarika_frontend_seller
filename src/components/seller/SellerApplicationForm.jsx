@@ -3,6 +3,7 @@ import { applySeller } from "@/api/sellerService";
 import { useToast } from "@/contexts/ToastContext";
 import { CheckCircle } from "lucide-react";
 import TaxOfficeSelect from "@/components/seller/TaxOfficeSelect";
+import TedarikaLoader from "@/components/ui/TedarikaLoader";
 
 // API string enum'ları (Swagger ile uyumlu)
 const COMPANY_TYPES = [
@@ -197,7 +198,14 @@ const SellerApplicationForm = () => {
             disabled={isSubmitting || !isValid}
             className="w-full mt-4 bg-gradient-to-r from-[#00d18c] to-[#00a980] hover:opacity-90 text-white font-semibold py-3 rounded-xl transition disabled:opacity-50"
           >
-            {isSubmitting ? "Gönderiliyor..." : "Başvuru Yap"}
+            {isSubmitting ? (
+              <span className="flex items-center justify-center gap-2">
+                <TedarikaLoader variant="micro" light className="h-5 w-5" label="Gönderiliyor" />
+                Gönderiliyor...
+              </span>
+            ) : (
+              "Başvuru Yap"
+            )}
           </button>
         </form>
       </div>

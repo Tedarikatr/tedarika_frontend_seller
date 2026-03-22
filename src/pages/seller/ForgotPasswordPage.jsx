@@ -10,6 +10,7 @@ import { useToast } from "@/contexts/ToastContext";
 import { createSeoMeta } from "@/utils/seo";
 import SellerHeader from "@/components/sellerLanding/SellerHeader";
 import Footer from "@/components/corporate/Footer";
+import TedarikaLoader from "@/components/ui/TedarikaLoader";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const CODE_REGEX = /^\d{6}$/;
@@ -154,7 +155,14 @@ const ForgotPasswordPage = () => {
                   disabled={isSubmitting}
                   className="mt-8 sm:mt-10 w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 sm:py-4 rounded-xl sm:rounded-2xl text-base sm:text-lg transition disabled:opacity-50 shadow-lg"
                 >
-                  {isSubmitting ? "Kod Gönderiliyor..." : "Kod Gönder"}
+                  {isSubmitting ? (
+                    <span className="flex items-center justify-center gap-2">
+                      <TedarikaLoader variant="micro" light className="h-5 w-5" label="Kod gönderiliyor" />
+                      Kod Gönderiliyor...
+                    </span>
+                  ) : (
+                    "Kod Gönder"
+                  )}
                 </button>
               </form>
             ) : (
@@ -197,7 +205,14 @@ const ForgotPasswordPage = () => {
                   disabled={isSubmitting}
                   className="mt-8 sm:mt-10 w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 sm:py-4 rounded-xl sm:rounded-2xl text-base sm:text-lg transition disabled:opacity-50 shadow-lg"
                 >
-                  {isSubmitting ? "Sıfırlanıyor..." : "Şifreyi Sıfırla"}
+                  {isSubmitting ? (
+                    <span className="flex items-center justify-center gap-2">
+                      <TedarikaLoader variant="micro" light className="h-5 w-5" label="Sıfırlanıyor" />
+                      Sıfırlanıyor...
+                    </span>
+                  ) : (
+                    "Şifreyi Sıfırla"
+                  )}
                 </button>
               </form>
             )}

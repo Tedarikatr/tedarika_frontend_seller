@@ -345,8 +345,17 @@ const QuotationDetailPage = () => {
               disabled={submitting}
               className="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-4 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold hover:shadow-xl hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
             >
-              <Send className="w-5 h-5" />
-              {submitting ? "Gönderiliyor..." : "Karşı Teklifi Gönder"}
+              {submitting ? (
+                <>
+                  <TedarikaLoader variant="micro" light className="h-5 w-5" label="Gönderiliyor" />
+                  Gönderiliyor...
+                </>
+              ) : (
+                <>
+                  <Send className="w-5 h-5" />
+                  Karşı Teklifi Gönder
+                </>
+              )}
             </button>
 
             {statusMessage && (

@@ -7,6 +7,7 @@ import { useToast } from "@/contexts/ToastContext";
 import { createSeoMeta } from "@/utils/seo";
 import SellerHeader from "@/components/sellerLanding/SellerHeader";
 import Footer from "@/components/corporate/Footer";
+import TedarikaLoader from "@/components/ui/TedarikaLoader";
 
 const RegisterPage = () => {
   const location = useLocation();
@@ -148,7 +149,14 @@ const handleSubmit = async (e) => {
               isSubmitting ? "opacity-50 cursor-not-allowed" : ""
             }`}
           >
-            {isSubmitting ? "Kayıt Yapılıyor..." : "Hesap Oluştur"}
+            {isSubmitting ? (
+              <span className="flex items-center justify-center gap-2">
+                <TedarikaLoader variant="micro" light className="h-5 w-5" label="Kayıt yapılıyor" />
+                Kayıt Yapılıyor...
+              </span>
+            ) : (
+              "Hesap Oluştur"
+            )}
           </button>
 
           <p className="mt-8 text-center text-base text-gray-600">

@@ -19,7 +19,6 @@ import {
   FileSpreadsheet,
   FileCode,
   Upload,
-  Loader2,
   Link as LinkIcon,
   FileText,
   CheckCircle,
@@ -36,6 +35,7 @@ import {
   ListTree,
   Copy,
 } from "lucide-react";
+import TedarikaLoader from "@/components/ui/TedarikaLoader";
 
 // Tedarika_Urun_Yukleme_Sablon_guncel.xlsx ile birebir aynı sıralama
 const EXCEL_TEMPLATE_HEADERS = [
@@ -733,8 +733,7 @@ const ProductDraftUploadPage = () => {
             </div>
             {loadingDrafts ? (
               <div className="text-center py-8">
-                <Loader2 className="w-8 h-8 animate-spin text-emerald-600 mx-auto mb-2" />
-                <p className="text-gray-600 text-sm">Yükleniyor...</p>
+                <TedarikaLoader variant="compact" />
               </div>
             ) : drafts.length === 0 ? (
               <div className="text-center py-8">
@@ -1415,7 +1414,7 @@ const ProductDraftUploadPage = () => {
               >
                 {loadingManual ? (
                   <>
-                    <Loader2 className="w-5 h-5 animate-spin" />
+                    <TedarikaLoader variant="micro" light className="h-5 w-5" label="Yükleniyor" />
                     Yükleniyor...
                   </>
                 ) : (
@@ -1564,7 +1563,7 @@ const ProductDraftUploadPage = () => {
               >
                 {isUploading ? (
                   <>
-                    <Loader2 className="w-5 h-5 animate-spin" />
+                    <TedarikaLoader variant="micro" light className="h-5 w-5" label="Yükleniyor" />
                     Yükleniyor...
                   </>
                 ) : (
@@ -1641,7 +1640,7 @@ const ProductDraftUploadPage = () => {
               >
                 {isUploading ? (
                   <>
-                    <Loader2 className="w-5 h-5 animate-spin" />
+                    <TedarikaLoader variant="micro" light className="h-5 w-5" label="Gönderiliyor" />
                     Gönderiliyor...
                   </>
                 ) : (
@@ -1746,7 +1745,7 @@ const ProductDraftUploadPage = () => {
               >
                 {isUploading ? (
                   <>
-                    <Loader2 className="w-5 h-5 animate-spin" />
+                    <TedarikaLoader variant="micro" light className="h-5 w-5" label="Yükleniyor" />
                     Yükleniyor...
                   </>
                 ) : (
@@ -1845,7 +1844,7 @@ const ProductDraftUploadPage = () => {
               >
                 {isUploading ? (
                   <>
-                    <Loader2 className="w-5 h-5 animate-spin" />
+                    <TedarikaLoader variant="micro" light className="h-5 w-5" label="İşleniyor" />
                     İşleniyor...
                   </>
                 ) : (
@@ -1924,7 +1923,7 @@ const ProductDraftUploadPage = () => {
               </p>
               {loadingCategories ? (
                 <div className="flex items-center justify-center py-8">
-                  <Loader2 className="w-8 h-8 animate-spin text-emerald-600" />
+                  <TedarikaLoader variant="compact" label="Kategoriler yükleniyor..." />
                 </div>
               ) : (
                 <div className="space-y-4">

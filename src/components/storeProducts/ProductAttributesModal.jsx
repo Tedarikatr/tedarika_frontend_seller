@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
-import { X, Loader2, Info, CheckCircle2 } from "lucide-react";
+import { X, Info, CheckCircle2 } from "lucide-react";
+import TedarikaLoader from "@/components/ui/TedarikaLoader";
 import { getProductAttributes } from "@/api/sellerProductAttributeService";
 import { useToast } from "@/contexts/ToastContext";
 
@@ -68,8 +69,7 @@ const ProductAttributesModal = ({ productId, productName, isOpen, onClose }) => 
         <div className="flex-1 overflow-y-auto p-4 sm:p-6">
           {loading ? (
             <div className="flex flex-col items-center justify-center py-8 sm:py-12">
-              <Loader2 className="w-10 h-10 sm:w-12 sm:h-12 text-emerald-600 animate-spin mb-3 sm:mb-4" />
-              <p className="text-gray-600 font-medium text-sm sm:text-base">Özellikler yükleniyor...</p>
+              <TedarikaLoader variant="compact" label="Özellikler yükleniyor..." />
             </div>
           ) : attributes.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-8 sm:py-12">

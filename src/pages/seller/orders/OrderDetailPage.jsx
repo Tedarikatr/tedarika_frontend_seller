@@ -40,7 +40,6 @@ import {
   Sparkles,
   Edit,
   Ban,
-  Loader2,
   Send,
   RefreshCw,
   Upload,
@@ -482,7 +481,7 @@ const OrderDetailPage = () => {
                     className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white rounded-lg sm:rounded-xl font-semibold transition-all disabled:opacity-50 border border-white/30 text-xs sm:text-sm"
                   >
                     {statusLoading ? (
-                      <Loader2 className="w-3 h-3 sm:w-4 sm:h-4 animate-spin" />
+                      <TedarikaLoader variant="micro" light className="h-3 w-3 sm:h-4 sm:w-4" label="Yükleniyor" />
                     ) : (
                       <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4" />
                     )}
@@ -509,7 +508,7 @@ const OrderDetailPage = () => {
                         className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white rounded-lg sm:rounded-xl font-semibold transition-all disabled:opacity-50 border border-white/30 text-xs sm:text-sm"
                       >
                         {labelLoading ? (
-                          <Loader2 className="w-3 h-3 sm:w-4 sm:h-4 animate-spin" />
+                          <TedarikaLoader variant="micro" light className="h-3 w-3 sm:h-4 sm:w-4" label="Yükleniyor" />
                         ) : (
                           <FileText className="w-3 h-3 sm:w-4 sm:h-4" />
                         )}
@@ -524,7 +523,7 @@ const OrderDetailPage = () => {
                       className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-red-500/20 hover:bg-red-500/30 backdrop-blur-sm text-white rounded-lg sm:rounded-xl font-semibold transition-all disabled:opacity-50 border border-red-300/30 text-xs sm:text-sm"
                     >
                       {cancelLoading ? (
-                        <Loader2 className="w-3 h-3 sm:w-4 sm:h-4 animate-spin" />
+                        <TedarikaLoader variant="micro" light className="h-3 w-3 sm:h-4 sm:w-4" label="Yükleniyor" />
                       ) : (
                         <Ban className="w-3 h-3 sm:w-4 sm:h-4" />
                       )}
@@ -691,7 +690,7 @@ const OrderDetailPage = () => {
                       disabled={offersLoading}
                       className="inline-flex items-center gap-2 px-4 py-2.5 bg-sky-600 text-white rounded-xl font-semibold hover:bg-sky-700 disabled:opacity-50"
                     >
-                      {offersLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Truck className="w-4 h-4" />}
+                      {offersLoading ? <TedarikaLoader variant="micro" light className="h-4 w-4" label="Yükleniyor" /> : <Truck className="w-4 h-4" />}
                       Kargo Teklifi Al
                     </button>
                   </div>
@@ -711,7 +710,7 @@ const OrderDetailPage = () => {
                         disabled={refreshOffersLoading}
                         className="inline-flex items-center gap-2 px-4 py-2 bg-sky-600 text-white rounded-xl font-semibold hover:bg-sky-700 disabled:opacity-50"
                       >
-                        {refreshOffersLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
+                        {refreshOffersLoading ? <TedarikaLoader variant="micro" light className="h-4 w-4" label="Yükleniyor" /> : <RefreshCw className="w-4 h-4" />}
                         Teklifleri Yenile
                       </button>
                     </div>
@@ -759,7 +758,7 @@ const OrderDetailPage = () => {
                           disabled={acceptOfferLoading || !selectedOfferId}
                           className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-xl font-semibold hover:bg-emerald-700 disabled:opacity-50"
                         >
-                          {acceptOfferLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
+                          {acceptOfferLoading ? <TedarikaLoader variant="micro" light className="h-4 w-4" label="Yükleniyor" /> : <CheckCircle className="w-4 h-4" />}
                           Seçilen Teklifi Kabul Et
                         </button>
                         <button
@@ -767,7 +766,7 @@ const OrderDetailPage = () => {
                           disabled={refreshOffersLoading}
                           className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-xl text-gray-700 font-semibold hover:bg-gray-50 disabled:opacity-50"
                         >
-                          {refreshOffersLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
+                          {refreshOffersLoading ? <TedarikaLoader variant="micro" className="h-4 w-4" label="Yükleniyor" /> : <RefreshCw className="w-4 h-4" />}
                           Teklifleri Yenile
                         </button>
                         <button
@@ -801,7 +800,7 @@ const OrderDetailPage = () => {
                         disabled={labelLoading}
                         className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 text-white text-xs font-semibold rounded-lg hover:bg-indigo-700 disabled:opacity-50"
                       >
-                        {labelLoading ? <Loader2 className="w-3 h-3 animate-spin" /> : <FileText className="w-3 h-3" />}
+                        {labelLoading ? <TedarikaLoader variant="micro" light className="h-3 w-3" label="Yükleniyor" /> : <FileText className="w-3 h-3" />}
                         Etiket Görüntüle
                       </button>
                       <button
@@ -809,7 +808,7 @@ const OrderDetailPage = () => {
                         disabled={shippingLabelLoading}
                         className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-indigo-200 text-indigo-700 text-xs font-semibold rounded-lg hover:bg-indigo-50 disabled:opacity-50"
                       >
-                        {shippingLabelLoading ? <Loader2 className="w-3 h-3 animate-spin" /> : <RefreshCw className="w-3 h-3" />}
+                        {shippingLabelLoading ? <TedarikaLoader variant="micro" className="h-3 w-3" label="Yükleniyor" /> : <RefreshCw className="w-3 h-3" />}
                         Yenile
                       </button>
                     </div>
@@ -946,7 +945,10 @@ const OrderDetailPage = () => {
                 className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white text-sm font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all disabled:opacity-50"
               >
                 {paymentLoading ? (
-                  <>Yükleniyor...</>
+                  <span className="inline-flex items-center gap-2">
+                    <TedarikaLoader variant="micro" light className="h-4 w-4" label="Yükleniyor" />
+                    Yükleniyor...
+                  </span>
                 ) : (
                   <>
                     <Eye size={16} />
@@ -1177,10 +1179,7 @@ const OrderDetailPage = () => {
             <div className="flex-1 overflow-hidden bg-gray-100">
               {labelLoading ? (
                 <div className="h-full flex items-center justify-center">
-                  <div className="text-center">
-                    <Loader2 className="w-12 h-12 animate-spin text-sky-600 mx-auto mb-4" />
-                    <p className="text-gray-600 font-medium">Kargo etiketi yükleniyor...</p>
-                  </div>
+                  <TedarikaLoader variant="compact" label="Kargo etiketi yükleniyor..." />
                 </div>
               ) : labelPdfUrl ? (
                 <iframe
@@ -1282,7 +1281,7 @@ const OrderDetailPage = () => {
               >
                 {carrierLoading ? (
                   <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <TedarikaLoader variant="micro" light className="h-4 w-4" label="Kaydediliyor" />
                     Kaydediliyor...
                   </>
                 ) : (

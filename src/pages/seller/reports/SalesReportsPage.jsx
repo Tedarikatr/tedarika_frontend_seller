@@ -20,7 +20,6 @@ import {
   FileSpreadsheet,
   TrendingUp,
   BarChart3,
-  Loader2,
   Mail,
   RefreshCw,
   CheckCircle,
@@ -477,7 +476,7 @@ const SalesReportsPage = () => {
               >
                 {loading ? (
                   <>
-                    <Loader2 className="w-5 h-5 animate-spin" />
+                    <TedarikaLoader variant="micro" light className="h-5 w-5" label="Rapor oluşturuluyor" />
                     <span className="hidden sm:inline">Rapor Oluşturuluyor...</span>
                     <span className="sm:hidden">Oluşturuluyor...</span>
                   </>
@@ -601,10 +600,7 @@ const SalesReportsPage = () => {
 
           {loadingHistory ? (
             <div className="flex justify-center py-12">
-              <div className="flex flex-col items-center gap-3">
-                <Loader2 className="w-8 h-8 animate-spin text-emerald-600" />
-                <p className="text-sm text-gray-500">Rapor geçmişi yükleniyor...</p>
-              </div>
+              <TedarikaLoader variant="compact" label="Rapor geçmişi yükleniyor..." />
             </div>
           ) : exportHistory.length === 0 ? (
             <div className="text-center py-12">

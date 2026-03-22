@@ -6,7 +6,8 @@
  * - Hatalar için açılır menü
  */
 import React, { useState, useEffect } from "react";
-import { Loader2, AlertCircle, ChevronDown, ChevronUp } from "lucide-react";
+import { AlertCircle, ChevronDown, ChevronUp, CheckCircle } from "lucide-react";
+import TedarikaLoader from "@/components/ui/TedarikaLoader";
 
 const ProductUploadModal = ({
   isOpen,
@@ -60,9 +61,13 @@ const ProductUploadModal = ({
         {/* Header - Uyarı */}
         <div className="bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 px-6 py-5 text-center">
           <div className="w-14 h-14 mx-auto mb-3 rounded-full bg-white/25 flex items-center justify-center">
-            <Loader2
-              className={`w-8 h-8 text-white ${!isComplete ? "animate-spin" : ""}`}
-            />
+            {!isComplete ? (
+              <TedarikaLoader variant="micro" light className="h-8 w-8" label="Yükleniyor" />
+            ) : status === "success" ? (
+              <CheckCircle className="w-8 h-8 text-white" aria-hidden />
+            ) : (
+              <AlertCircle className="w-8 h-8 text-white" aria-hidden />
+            )}
           </div>
           <h2 className="text-xl font-bold text-white mb-1">
             {isComplete

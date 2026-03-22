@@ -12,7 +12,6 @@ import {
   AlertCircle,
   Calendar,
   Tag,
-  Loader2,
   Eye,
   SkipForward,
 } from "lucide-react";
@@ -66,7 +65,7 @@ const ProductDraftDetailPage = () => {
       case "XCircle":
         return <XCircle className="w-5 h-5" />;
       case "Loader2":
-        return <Loader2 className="w-5 h-5 animate-spin" />;
+        return <TedarikaLoader variant="micro" className="h-5 w-5" label="İşleniyor" />;
       case "SkipForward":
         return <SkipForward className="w-5 h-5" />;
       default:

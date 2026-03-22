@@ -3,7 +3,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { getMyCompany } from "@/api/sellerCompanyService";
 import { getMyDocuments, addDocument, deleteDocument } from "@/api/sellerCompanyDocumentService";
 import { REQUIRED_DOC_TYPES, DOC_DEFS, DOC_LABELS, normalizeDocType } from "@/constants/companyDocuments";
-import { Upload, CheckCircle, AlertTriangle, Trash2, Shield, Loader2, X } from "lucide-react";
+import { Upload, CheckCircle, AlertTriangle, Trash2, Shield, X } from "lucide-react";
+import TedarikaLoader from "@/components/ui/TedarikaLoader";
 
 export default function SellerCompanyDocuments() {
   const [company, setCompany] = useState(null);
@@ -173,7 +174,7 @@ export default function SellerCompanyDocuments() {
           <button className="w-full bg-sky-700 hover:bg-sky-800 transition text-white py-3 rounded-xl flex items-center gap-2 justify-center" disabled={saving}>
             {saving ? (
               <>
-                <Loader2 className="w-5 h-5 animate-spin" /> Kaydediliyor…
+                <TedarikaLoader variant="micro" light className="h-5 w-5" label="Kaydediliyor" /> Kaydediliyor…
               </>
             ) : (
               <>

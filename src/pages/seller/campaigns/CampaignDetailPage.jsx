@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import SellerCampaignService from "@/api/sellerCampaignService";
 import StepPreview from "@/components/campaignWizard/StepPreview";
+import TedarikaLoader from "@/components/ui/TedarikaLoader";
 
 export default function CampaignDetailPage() {
   const { id } = useParams();
@@ -103,12 +104,9 @@ export default function CampaignDetailPage() {
     }
   };
 
-  if (!data)
-    return (
-      <div className="flex items-center justify-center min-h-[70vh] text-gray-500 text-sm">
-        Kampanya verisi yükleniyor...
-      </div>
-    );
+  if (!data) {
+    return <TedarikaLoader variant="section" label="Kampanya verisi yükleniyor..." />;
+  }
 
   return (
     <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 md:px-8 py-6 sm:py-8 md:py-10 space-y-6 sm:space-y-8 md:space-y-10 animate-fadeIn">

@@ -7,13 +7,13 @@ import CargoAgreementsAccordion from "./CargoAgreementsAccordion";
 import {
   Truck,
   MapPin,
-  Loader2,
   CheckCircle,
   XCircle,
   Save,
   Pencil,
   AlertCircle,
 } from "lucide-react";
+import TedarikaLoader from "@/components/ui/TedarikaLoader";
 
 const COUNTRY_CODE_DEFAULT = "TR";
 const COUNTRY_NAME_DEFAULT = "Türkiye";
@@ -169,7 +169,7 @@ export default function ShippingSettingsCard() {
 
       {loading && (
         <div className="mb-6 flex items-center gap-2 rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-600">
-          <Loader2 className="w-4 h-4 animate-spin" />
+          <TedarikaLoader variant="micro" className="h-4 w-4" label="Gönderici adresi yükleniyor" />
           Gönderici adresi yükleniyor...
         </div>
       )}
@@ -369,7 +369,7 @@ export default function ShippingSettingsCard() {
                   className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-sm font-semibold hover:shadow-lg transition disabled:opacity-50"
                 >
                   {saving ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <TedarikaLoader variant="micro" light className="h-4 w-4" label="Kaydediliyor" />
                   ) : (
                     <Save className="w-4 h-4" />
                   )}

@@ -1,12 +1,30 @@
 /**
- * Tedarika logosu + dönen halka — sayfa, bölüm ve tablo yüklemelerinde ortak kullanım.
+ * Tedarika logosu + dönen halka — sayfa, bölüm, tablo ve buton yüklemelerinde ortak kullanım.
+ *
+ * @param {"fullscreen"|"section"|"compact"|"inline"|"micro"} [props.variant]
+ * @param {boolean} [props.light] — variant="micro" iken koyu/renkli buton üzerinde beyaz halka
  */
 export default function TedarikaLoader({
   variant = "section",
   label = "Yükleniyor...",
   className = "",
+  light = false,
 }) {
   const logoSrc = `${import.meta.env.BASE_URL}images/logo.svg`.replace(/\/{2,}/g, "/");
+
+  if (variant === "micro") {
+    const ringClass = light
+      ? "border-2 border-white/90 border-t-transparent"
+      : "border-2 border-emerald-500/35 border-t-emerald-600";
+    return (
+      <span
+        className={`inline-block shrink-0 rounded-full animate-spin ${ringClass} ${className || "h-5 w-5"}`}
+        role="status"
+        aria-busy="true"
+        aria-label={label || "Yükleniyor"}
+      />
+    );
+  }
 
   const sizes = {
     fullscreen: { logo: "h-20 w-20 sm:h-24 sm:w-24", ring: "h-11 w-11" },
