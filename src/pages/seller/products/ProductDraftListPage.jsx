@@ -6,10 +6,10 @@ import {
   FileText,
   Package,
   Calendar,
-  Loader2,
   ChevronRight,
   ArrowLeft,
 } from "lucide-react";
+import TedarikaLoader from "@/components/ui/TedarikaLoader";
 
 const ProductDraftListPage = () => {
   const navigate = useNavigate();
@@ -37,10 +37,7 @@ const ProductDraftListPage = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="w-8 h-8 animate-spin text-gray-600 mx-auto mb-2" />
-          <p className="text-gray-600 text-sm">Yükleniyor...</p>
-        </div>
+        <TedarikaLoader variant="compact" />
       </div>
     );
   }

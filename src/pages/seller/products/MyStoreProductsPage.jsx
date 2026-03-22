@@ -36,6 +36,7 @@ import {
   X,
 } from "lucide-react";
 import { CURRENCY_OPTIONS } from "@/constants/currencyCode";
+import TedarikaLoader from "@/components/ui/TedarikaLoader";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -143,7 +144,6 @@ const MyStoreProductsPage = () => {
     setBulkOnSaleLoading(true);
     try {
       const res = await setOnSaleBulk(ids, isOnSale);
-      const total = res?.totalRequested ?? 0;
       const success = res?.successCount ?? 0;
       const fail = res?.failCount ?? 0;
       const results = res?.results ?? [];
@@ -552,7 +552,11 @@ const MyStoreProductsPage = () => {
                   className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white text-sm font-bold shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   title="Seçili ürünleri satışa açar"
                 >
-                  <TrendingUp size={18} />
+                  {bulkOnSaleLoading ? (
+                    <TedarikaLoader variant="micro" light className="h-4 w-4" label="İşleniyor" />
+                  ) : (
+                    <TrendingUp size={18} />
+                  )}
                   {bulkOnSaleLoading ? "İşleniyor..." : "Seçilenleri satışa aç"}
                 </button>
                 <button
@@ -599,11 +603,8 @@ const MyStoreProductsPage = () => {
         <div className="bg-white rounded-3xl shadow-2xl border-2 border-gray-200 overflow-hidden">
           {loading ? (
             <div className="text-center py-20">
-              <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 mb-4 animate-pulse shadow-xl">
-                <Package size={40} className="text-white" />
-              </div>
-              <p className="text-gray-600 font-medium text-lg">Ürünler yükleniyor...</p>
-              <p className="text-gray-400 text-sm mt-1">Lütfen bekleyin</p>
+              <TedarikaLoader variant="compact" label="Ürünler yükleniyor..." />
+              <p className="text-gray-400 text-sm mt-2">Lütfen bekleyin</p>
             </div>
           ) : products.length === 0 ? (
             <div className="text-center py-20">
@@ -652,7 +653,6 @@ const MyStoreProductsPage = () => {
               getStoreProductId={getStoreProductId}
               onRefresh={() => loadProducts(true)}
               onFeedback={showFeedback}
-              hasCoverage={hasCoverage}
             />
           )}
         </div>
@@ -771,7 +771,14 @@ const MyStoreProductsPage = () => {
                 disabled={bulkPriceLoading}
                 className="flex-1 px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold hover:from-amber-600 hover:to-orange-600 disabled:opacity-50 transition-colors"
               >
-                {bulkPriceLoading ? "Güncelleniyor..." : "Güncelle"}
+                {bulkPriceLoading ? (
+                  <span className="inline-flex items-center justify-center gap-2">
+                    <TedarikaLoader variant="micro" light className="h-5 w-5" label="Güncelleniyor" />
+                    Güncelleniyor...
+                  </span>
+                ) : (
+                  "Güncelle"
+                )}
               </button>
             </div>
           </div>
@@ -857,7 +864,14 @@ const MyStoreProductsPage = () => {
                 disabled={convertLoading}
                 className="flex-1 px-4 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 transition-colors"
               >
-                {convertLoading ? "Çevriliyor..." : "Çevir"}
+                {convertLoading ? (
+                  <span className="inline-flex items-center justify-center gap-2">
+                    <TedarikaLoader variant="micro" light className="h-5 w-5" label="Çevriliyor" />
+                    Çevriliyor...
+                  </span>
+                ) : (
+                  "Çevir"
+                )}
               </button>
             </div>
           </div>

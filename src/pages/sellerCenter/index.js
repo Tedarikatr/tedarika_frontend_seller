@@ -1,7 +1,4 @@
 export { default as SellerCenterIndexPage } from "./SellerCenterIndexPage";
-export { default as AboutPage } from "./AboutPage";
-export { default as ContactPage } from "./ContactPage";
-export { default as SssPage } from "./SssPage";
 export { default as Ilk7GunPage } from "./Ilk7GunPage";
 export { default as MagazaDogrulamaPage } from "./MagazaDogrulamaPage";
 export { default as UrunListelemePage } from "./UrunListelemePage";

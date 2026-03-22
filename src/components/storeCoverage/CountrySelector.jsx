@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { getCountriesByRegionId } from "@/api/sellerLocationService";
-import { Loader2 } from "lucide-react";
+import TedarikaLoader from "@/components/ui/TedarikaLoader";
 
 const CountrySelector = ({ regionId, selectedCountries, onChange }) => {
   const [countries, setCountries] = useState([]);
@@ -80,8 +80,8 @@ const CountrySelector = ({ regionId, selectedCountries, onChange }) => {
       </div>
 
       {loading && (
-        <div className="flex items-center gap-2 text-xs text-gray-500 mt-1 animate-pulse">
-          <Loader2 className="w-4 h-4 animate-spin" />
+        <div className="flex items-center gap-2 text-xs text-gray-500 mt-1">
+          <TedarikaLoader variant="micro" className="h-4 w-4" label="Ülkeler yükleniyor" />
           Ülkeler yükleniyor...
         </div>
       )}

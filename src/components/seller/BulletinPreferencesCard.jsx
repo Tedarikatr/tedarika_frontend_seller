@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { toast } from "react-hot-toast";
-import { Mail, MessageSquare, Phone, Save, Loader2 } from "lucide-react";
+import { Mail, MessageSquare, Phone, Save } from "lucide-react";
+import TedarikaLoader from "@/components/ui/TedarikaLoader";
 import { getSellerBulletinPreferences, updateSellerBulletinPreferences } from "@/api/sellerBulletinService";
 
 const BulletinPreferencesCard = () => {
@@ -57,7 +58,7 @@ const BulletinPreferencesCard = () => {
     return (
       <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
         <div className="flex items-center justify-center py-12">
-          <Loader2 className="w-8 h-8 text-emerald-600 animate-spin" />
+          <TedarikaLoader variant="compact" />
         </div>
       </div>
     );
@@ -157,7 +158,7 @@ const BulletinPreferencesCard = () => {
           >
             {saving ? (
               <>
-                <Loader2 className="w-5 h-5 animate-spin" />
+                <TedarikaLoader variant="micro" light className="h-5 w-5" label="Kaydediliyor" />
                 Kaydediliyor...
               </>
             ) : (

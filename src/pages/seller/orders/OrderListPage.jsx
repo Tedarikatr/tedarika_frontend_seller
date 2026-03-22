@@ -18,6 +18,7 @@ import {
   Sparkles,
   Truck
 } from "lucide-react";
+import TedarikaLoader from "@/components/ui/TedarikaLoader";
 
 const StatusBadge = ({ status }) => {
   const statusConfig = {
@@ -203,11 +204,8 @@ const OrderListPage = () => {
         <div className="bg-white rounded-xl sm:rounded-2xl lg:rounded-3xl shadow-2xl border border-gray-200 overflow-hidden">
           {loading ? (
             <div className="text-center py-12 sm:py-20">
-              <div className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 mb-4 animate-pulse shadow-xl">
-                <ShoppingCart size={32} className="sm:w-10 sm:h-10 text-white" />
-              </div>
-              <p className="text-gray-600 font-medium text-base sm:text-lg">Siparişler yükleniyor...</p>
-              <p className="text-gray-400 text-xs sm:text-sm mt-1">Lütfen bekleyin</p>
+              <TedarikaLoader variant="compact" label="Siparişler yükleniyor..." />
+              <p className="text-gray-400 text-xs sm:text-sm mt-2">Lütfen bekleyin</p>
             </div>
           ) : orders.length === 0 ? (
             <div className="text-center py-12 sm:py-20">

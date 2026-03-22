@@ -13,7 +13,6 @@ import {
   MapPin,
   ChevronLeft,
   Gift,
-  // MessageCircle, // Chat özelliği geçici olarak askıya alındı
   Tags,
   FileText,
   Upload,
@@ -49,7 +48,7 @@ const Sidebar = ({ isOpen, onClose }) => {
 
   return (
     <aside
-      className={`fixed md:static inset-y-0 left-0 z-50 bg-gradient-to-b from-[#003131] to-[#001e1e] text-white shadow-2xl backdrop-blur-md transition-all duration-300 ease-in-out
+      className={`fixed md:static inset-y-0 left-0 z-50 pt-[env(safe-area-inset-top,0px)] md:pt-0 bg-gradient-to-b from-[#003131] to-[#001e1e] text-white shadow-2xl backdrop-blur-md transition-all duration-300 ease-in-out
         ${isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
         ${collapsed ? "w-20" : "w-64"}`}
     >
@@ -147,10 +146,6 @@ const Sidebar = ({ isOpen, onClose }) => {
             <SidebarLink to="/seller/reviews" icon={<MessageSquare size={18} />} collapsed={collapsed} onClick={onClose}>
               Yorumlar
             </SidebarLink>
-            {/* Chat özelliği geçici olarak askıya alındı */}
-            {/* <SidebarLink to="/seller/chat" icon={<MessageCircle size={18} />} collapsed={collapsed} onClick={onClose}>
-              Mesajlar
-            </SidebarLink> */}
           </CollapsibleSection>
 
           {/* RAPORLAR */}

@@ -3,7 +3,8 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getMyCompany, updateCompany } from "@/api/sellerCompanyService";
 import TaxOfficeSelect from "@/components/seller/TaxOfficeSelect";
-import { Building2, Loader2, CheckCircle, AlertTriangle, Sparkles, FileText } from "lucide-react";
+import { Building2, CheckCircle, AlertTriangle, Sparkles, FileText } from "lucide-react";
+import TedarikaLoader from "@/components/ui/TedarikaLoader";
 import { motion } from "framer-motion";
 
 // Raporda type number: 1=Şahıs, 2=Limited, 3=Anonim, 4=Kooperatif, 5=Şube, 6=Yabancı, 99=Diğer
@@ -61,7 +62,7 @@ export default function CompanyUpdate() {
           address: data.address || "",
           type: uiType,
         });
-      } catch (err) {
+      } catch {
         setMessage("❌ Şirket bilgileri alınamadı.");
       } finally {
         setInitializing(false);
@@ -282,7 +283,7 @@ export default function CompanyUpdate() {
             >
               {loading ? (
                 <span className="flex items-center justify-center gap-2">
-                  <Loader2 className="w-5 h-5 animate-spin" />
+                  <TedarikaLoader variant="micro" light className="h-5 w-5" label="Güncelleniyor" />
                   Güncelleniyor...
                 </span>
               ) : (

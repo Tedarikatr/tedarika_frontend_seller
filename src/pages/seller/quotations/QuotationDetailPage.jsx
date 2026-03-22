@@ -22,6 +22,7 @@ import {
   Clock,
   AlertCircle,
 } from "lucide-react";
+import TedarikaLoader from "@/components/ui/TedarikaLoader";
 
 const QuotationDetailPage = () => {
   const { id } = useParams();
@@ -143,12 +144,7 @@ const QuotationDetailPage = () => {
   if (loading)
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50/30 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-20 h-20 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center shadow-xl animate-pulse mx-auto mb-4">
-            <FileText className="w-10 h-10 text-white" />
-          </div>
-          <p className="text-gray-600 text-lg font-medium">Yükleniyor...</p>
-        </div>
+        <TedarikaLoader variant="compact" />
       </div>
     );
 
@@ -349,8 +345,17 @@ const QuotationDetailPage = () => {
               disabled={submitting}
               className="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-4 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold hover:shadow-xl hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
             >
-              <Send className="w-5 h-5" />
-              {submitting ? "Gönderiliyor..." : "Karşı Teklifi Gönder"}
+              {submitting ? (
+                <>
+                  <TedarikaLoader variant="micro" light className="h-5 w-5" label="Gönderiliyor" />
+                  Gönderiliyor...
+                </>
+              ) : (
+                <>
+                  <Send className="w-5 h-5" />
+                  Karşı Teklifi Gönder
+                </>
+              )}
             </button>
 
             {statusMessage && (

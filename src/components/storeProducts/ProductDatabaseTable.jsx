@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { CheckCircle, Plus, Tag, Package, List } from "lucide-react";
-import DataTable, { TABLE_STYLES } from "@/components/ui/DataTable";
+import DataTable from "@/components/ui/DataTable";
+import { TABLE_STYLES } from "@/constants/tableStyles";
 import ProductAttributesModal from "./ProductAttributesModal";
 
 const ProductDatabaseTable = ({

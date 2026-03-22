@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import {
   fetchRefundRequests,
   decideRefundRequest,
@@ -7,6 +6,7 @@ import {
 } from "@/api/sellerOrderService";
 import { REFUND_REQUEST_STATUS_LABELS } from "@/constants/refundStatus";
 import { useToast } from "@/contexts/ToastContext";
+import TedarikaLoader from "@/components/ui/TedarikaLoader";
 import {
   PackageX,
   Clock,
@@ -16,7 +16,6 @@ import {
   Search,
   AlertCircle,
   Lock,
-  Loader2,
   Eye,
   ThumbsUp,
   ThumbsDown,
@@ -28,7 +27,6 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 
 const RefundRequestsPage = () => {
-  const navigate = useNavigate();
   const toast = useToast();
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -161,10 +159,7 @@ const RefundRequestsPage = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 flex items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="w-12 h-12 animate-spin text-emerald-600 mx-auto mb-4" />
-          <p className="text-gray-600">Yükleniyor...</p>
-        </div>
+        <TedarikaLoader variant="compact" />
       </div>
     );
   }
@@ -477,7 +472,7 @@ const RefundRequestsPage = () => {
                     className="flex-1 py-3 bg-green-600 hover:bg-green-700 text-white rounded-xl font-semibold transition disabled:opacity-50 flex items-center justify-center gap-2"
                   >
                     {processing ? (
-                      <Loader2 className="w-5 h-5 animate-spin" />
+                      <TedarikaLoader variant="micro" light className="h-5 w-5" label="İşleniyor" />
                     ) : (
                       <ThumbsUp className="w-5 h-5" />
                     )}
@@ -547,7 +542,7 @@ const RefundRequestsPage = () => {
                     className="flex-1 py-3 bg-green-600 hover:bg-green-700 text-white rounded-xl font-semibold transition disabled:opacity-50 flex items-center justify-center gap-2"
                   >
                     {processing ? (
-                      <Loader2 className="w-5 h-5 animate-spin" />
+                      <TedarikaLoader variant="micro" light className="h-5 w-5" label="İşleniyor" />
                     ) : (
                       <CheckCircle className="w-5 h-5" />
                     )}

@@ -7,6 +7,7 @@ import StepProductSelect from "@/components/campaignWizard/StepProductSelect";
 import StepCriteria from "@/components/campaignWizard/StepCriteria";
 import StepPreview from "@/components/campaignWizard/StepPreview";
 import { CheckCircle2, AlertCircle } from "lucide-react";
+import TedarikaLoader from "@/components/ui/TedarikaLoader";
 
 export default function CampaignCreatePage() {
   const [step, setStep] = useState(0);
@@ -70,12 +71,7 @@ export default function CampaignCreatePage() {
     }
   };
 
-  if (loading)
-    return (
-      <div className="flex items-center justify-center min-h-[70vh] text-gray-500 text-lg">
-        Metadata yükleniyor...
-      </div>
-    );
+  if (loading) return <TedarikaLoader variant="section" label="Metadata yükleniyor..." />;
 
   if (!metadata)
     return (

@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import {
   exportSalesReport,
   createReportSchedule,
@@ -20,15 +19,16 @@ import {
   FileSpreadsheet,
   TrendingUp,
   BarChart3,
-  Loader2,
   Mail,
   RefreshCw,
   CheckCircle,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import TedarikaLoader from "@/components/ui/TedarikaLoader";
+
+const SCHEDULE_TIMEZONE = "Europe/Istanbul";
 
 const SalesReportsPage = () => {
-  const navigate = useNavigate();
   const toast = useToast();
 
   // Export Form State
@@ -44,7 +44,6 @@ const SalesReportsPage = () => {
   const [scheduleFormat, setScheduleFormat] = useState(0); // 0 = Pdf, 1 = Xlsx
   const [scheduleEmail, setScheduleEmail] = useState("");
   const [scheduleCron, setScheduleCron] = useState("0 8 * * *"); // Her gün 08:00
-  const [scheduleTimezone, setScheduleTimezone] = useState("Europe/Istanbul");
   const [scheduleStartDate, setScheduleStartDate] = useState("");
   const [scheduleEndDate, setScheduleEndDate] = useState("");
 
@@ -161,7 +160,7 @@ const SalesReportsPage = () => {
         reportType: scheduleReportType,
         format: scheduleFormat,
         cronExpression: scheduleCron,
-        timezone: scheduleTimezone,
+        timezone: SCHEDULE_TIMEZONE,
       };
 
       // Email opsiyonel - varsa ekle
@@ -476,7 +475,7 @@ const SalesReportsPage = () => {
               >
                 {loading ? (
                   <>
-                    <Loader2 className="w-5 h-5 animate-spin" />
+                    <TedarikaLoader variant="micro" light className="h-5 w-5" label="Rapor oluşturuluyor" />
                     <span className="hidden sm:inline">Rapor Oluşturuluyor...</span>
                     <span className="sm:hidden">Oluşturuluyor...</span>
                   </>
@@ -508,10 +507,7 @@ const SalesReportsPage = () => {
 
             {loadingSchedules ? (
               <div className="flex justify-center py-12">
-                <div className="flex flex-col items-center gap-3">
-                  <Loader2 className="w-8 h-8 animate-spin text-emerald-600" />
-                  <p className="text-sm text-gray-500">Yükleniyor...</p>
-                </div>
+                <TedarikaLoader variant="compact" />
               </div>
             ) : schedules.length === 0 ? (
               <div className="text-center py-12">
@@ -603,10 +599,7 @@ const SalesReportsPage = () => {
 
           {loadingHistory ? (
             <div className="flex justify-center py-12">
-              <div className="flex flex-col items-center gap-3">
-                <Loader2 className="w-8 h-8 animate-spin text-emerald-600" />
-                <p className="text-sm text-gray-500">Rapor geçmişi yükleniyor...</p>
-              </div>
+              <TedarikaLoader variant="compact" label="Rapor geçmişi yükleniyor..." />
             </div>
           ) : exportHistory.length === 0 ? (
             <div className="text-center py-12">

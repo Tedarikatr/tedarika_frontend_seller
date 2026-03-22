@@ -35,7 +35,7 @@ const StepsSection = () => (
       </p>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 md:gap-10 text-center">
-        {steps.map(({ number, title, desc, icon: Icon, bg }, i) => (
+        {steps.map(({ title, desc, icon: Icon, bg }, i) => (
           <div
             key={i}
             className="bg-white border border-emerald-100 rounded-2xl p-6 sm:p-8 shadow-lg hover:shadow-xl transition-shadow duration-200"

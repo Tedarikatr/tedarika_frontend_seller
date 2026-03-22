@@ -43,7 +43,6 @@ const MyStoreProductTable = ({
   getStoreProductId = (p) => p.id ?? p.storeProductId,
   onRefresh,
   onFeedback,
-  hasCoverage = true,
 }) => {
   const navigate = useNavigate();
   const [selectedProductForAttributes, setSelectedProductForAttributes] = useState(null);

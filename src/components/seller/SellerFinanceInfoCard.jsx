@@ -9,7 +9,8 @@ import {
 } from "@/api/sellerPayoutProfileService";
 import { useNotification } from "@/contexts/NotificationContext";
 import { isStoreNotFoundError, STORE_CREATE_PATH } from "@/utils/storeNotFound";
-import { Loader2, Copy, Check, Pencil, X, AlertCircle } from "lucide-react";
+import { Copy, Check, Pencil, X, AlertCircle } from "lucide-react";
+import TedarikaLoader from "@/components/ui/TedarikaLoader";
 
 // Boş form şablonu
 const EMPTY = {
@@ -113,7 +114,9 @@ export default function SellerFinanceInfoCard() {
       await navigator.clipboard.writeText(normalizeIban(form.iban));
       setCopied(true);
       setTimeout(() => setCopied(false), 1200);
-    } catch {}
+    } catch {
+      void 0;
+    }
   };
 
   const onSave = async (e) => {
@@ -150,9 +153,8 @@ export default function SellerFinanceInfoCard() {
 
   if (loading) {
     return (
-      <div className="p-6 text-gray-500 text-sm flex items-center gap-2">
-        <Loader2 className="w-4 h-4 animate-spin" />
-        Bilgiler yükleniyor...
+      <div className="p-6">
+        <TedarikaLoader variant="inline" label="Bilgiler yükleniyor..." />
       </div>
     );
   }
@@ -313,7 +315,7 @@ export default function SellerFinanceInfoCard() {
               disabled={busy}
               className="bg-emerald-700 text-white px-4 py-2 rounded-md hover:bg-emerald-800 text-sm font-medium transition disabled:opacity-50"
             >
-              {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : "Kaydet"}
+              {busy ? <TedarikaLoader variant="micro" light className="h-4 w-4" label="Kaydediliyor" /> : "Kaydet"}
             </button>
 
             <button

@@ -12,11 +12,11 @@ import {
   AlertCircle,
   Calendar,
   Tag,
-  Loader2,
   Eye,
   SkipForward,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import TedarikaLoader from "@/components/ui/TedarikaLoader";
 
 const ProductDraftDetailPage = () => {
   const { draftId } = useParams();
@@ -50,7 +50,7 @@ const ProductDraftDetailPage = () => {
       const detail = await fetchDraftProductDetail(productDraftId);
       setSelectedProduct(detail);
       setShowDetailModal(true);
-    } catch (err) {
+    } catch {
       toast.error("Ürün detayı yüklenemedi");
     }
   };
@@ -65,7 +65,7 @@ const ProductDraftDetailPage = () => {
       case "XCircle":
         return <XCircle className="w-5 h-5" />;
       case "Loader2":
-        return <Loader2 className="w-5 h-5 animate-spin" />;
+        return <TedarikaLoader variant="micro" className="h-5 w-5" label="İşleniyor" />;
       case "SkipForward":
         return <SkipForward className="w-5 h-5" />;
       default:
@@ -111,10 +111,7 @@ const ProductDraftDetailPage = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 flex items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="w-12 h-12 animate-spin text-emerald-600 mx-auto mb-4" />
-          <p className="text-gray-600">Yükleniyor...</p>
-        </div>
+        <TedarikaLoader variant="compact" />
       </div>
     );
   }

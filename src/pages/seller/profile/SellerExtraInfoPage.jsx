@@ -49,7 +49,9 @@ export default function SellerExtraInfoPage() {
       try {
         const c = await getMyCompany();
         setCompany(c);
-      } catch {}
+      } catch {
+        void 0;
+      }
 
       try {
         const info = await getMyExtraInfo();

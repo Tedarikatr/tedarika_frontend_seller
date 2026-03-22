@@ -13,6 +13,7 @@ import {
   Search,
   Filter
 } from "lucide-react";
+import TedarikaLoader from "@/components/ui/TedarikaLoader";
 
 // ✅ Numeric-based status map with icons
 const statusMap = {
@@ -169,10 +170,7 @@ const QuotationListPage = () => {
         {/* Content */}
         {loading ? (
           <div className="flex flex-col items-center justify-center py-12 sm:py-20 bg-white rounded-xl sm:rounded-2xl lg:rounded-3xl shadow-lg">
-            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center shadow-xl animate-pulse mb-4">
-              <FileText className="w-7 h-7 sm:w-8 sm:h-8 text-white" />
-            </div>
-            <p className="text-gray-500 text-base sm:text-lg font-medium">Yükleniyor...</p>
+            <TedarikaLoader variant="compact" />
           </div>
         ) : filteredQuotations.length === 0 ? (
           <div className="bg-gradient-to-br from-white to-gray-50 rounded-xl sm:rounded-2xl lg:rounded-3xl shadow-lg p-8 sm:p-12 text-center border-2 border-gray-200">

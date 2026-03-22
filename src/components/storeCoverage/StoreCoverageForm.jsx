@@ -6,6 +6,7 @@ import RegionSelector from "./RegionSelector";
 import CountrySelector from "./CountrySelector";
 import { addStoreCoverage } from "@/api/sellerLocationService";
 import { MapPin, Globe, CheckCircle, XCircle, Save } from "lucide-react";
+import TedarikaLoader from "@/components/ui/TedarikaLoader";
 
 const StoreCoverageForm = ({ onSuccess }) => {
   const [selectedRegionId, setSelectedRegionId] = useState(null);
@@ -41,7 +42,7 @@ const StoreCoverageForm = ({ onSuccess }) => {
       setSelectedRegionId(null);
       setSelectedCountryIds([]);
       onSuccess?.();
-    } catch (err) {
+    } catch {
       setMessage({
         type: "error",
         text: "Kapsama alanı eklenirken hata oluştu.",
@@ -101,7 +102,10 @@ const StoreCoverageForm = ({ onSuccess }) => {
           className="w-full inline-flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? (
-            <>Kaydediliyor...</>
+            <span className="inline-flex items-center gap-2">
+              <TedarikaLoader variant="micro" light className="h-5 w-5" label="Kaydediliyor" />
+              Kaydediliyor...
+            </span>
           ) : (
             <>
               <Save size={18} />

@@ -54,7 +54,6 @@ import MyStoreProductsPage from "@/pages/seller/products/MyStoreProductsPage";
 import ProductDatabasePage from "@/pages/seller/products/ProductDatabasePage";
 import ProductRequestListPage from "@/pages/seller/products/ProductRequestListPage";
 import ProductEditRequestPage from "@/pages/seller/products/ProductEditRequestPage";
-import ProductDraftsPage from "@/pages/seller/products/ProductDraftsPage";
 import ProductDraftListPage from "@/pages/seller/products/ProductDraftListPage";
 import ProductDraftDetailPage from "@/pages/seller/products/ProductDraftDetailPage";
 import ProductDraftUploadPage from "@/pages/seller/products/ProductDraftUploadPage";
@@ -72,8 +71,6 @@ import ProductImagesPage from "@/pages/seller/products/ProductImagesPage";
 import CampaignListPage from "@/pages/seller/campaigns/CampaignListPage";
 import CampaignCreatePage from "@/pages/seller/campaigns/CampaignCreatePage";
 import CampaignDetailPage from "@/pages/seller/campaigns/CampaignDetailPage";
-// import ChatPage from "@/pages/seller/chat/ChatPage";
-// import ChatDebug from "@/pages/seller/chat/ChatDebug";
 import SalesReportsPage from "@/pages/seller/reports/SalesReportsPage";
 import SellerLayout from "@/components/layout/SellerLayout";
 import PrivateRoute from "@/routes/PrivateRoute";
@@ -81,6 +78,7 @@ import SemiPrivateRoute from "@/routes/SemiPrivateRoute";
 import SellerRouteWrapper from "@/components/SellerRouteWrapper";
 import SellerAppointment from "@/pages/seller/SellerAppointment";
 import ScrollToTop from "@/components/ScrollToTop";
+import NotFoundPage from "@/pages/NotFoundPage";
 
 
 function App() {
@@ -90,6 +88,9 @@ function App() {
         <NotificationProvider>
           <ScrollToTop />
       <Routes>
+      {/* Kamu dizin URL’leri: src/constants/seo (SEO_INDEXABLE_ROUTES) + sitemap ile senkron */}
+      {/* Kök URL: index.html canonical /seller/landing ile uyum; 404+noindex yerine tek giriş noktası */}
+      <Route path="/" element={<Navigate to="/seller/landing" replace />} />
       {/* ── Public seller routes ───────────────────────────── */}
       <Route path="/seller/landing" element={<SellerLandingPage />} />
       <Route path="/seller/register" element={<RegisterPage />} />
@@ -180,9 +181,6 @@ function App() {
         <Route path="campaigns" element={<CampaignListPage />} />
         <Route path="campaigns/new" element={<CampaignCreatePage />} />
         <Route path="campaigns/:id" element={<CampaignDetailPage />} />
-        {/* Chat özelliği geçici olarak askıya alındı */}
-        {/* <Route path="chat" element={<ChatPage />} /> */}
-        {/* <Route path="chat/debug" element={<ChatDebug />} /> */}
 
         {/* Raporlar */}
         <Route path="reports/sales" element={<SalesReportsPage />} />
@@ -192,8 +190,8 @@ function App() {
         <Route path="brands" element={<SellerBrandListPage />} />
       </Route>
 
-      {/* ── 404 redirect ───────────────────────────── */}
-      <Route path="*" element={<Navigate to="/seller/landing" replace />} />
+      {/* Bilinmeyen URL — noindex (NotFoundPage içinde SeoHelmet) */}
+      <Route path="*" element={<NotFoundPage />} />
     </Routes>
         </NotificationProvider>
       </ProductCacheProvider>

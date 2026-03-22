@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { useNavigate, Link, useLocation } from "react-router-dom";
-import { Helmet } from "react-helmet-async";
+import { SeoHelmet, SEO_ROBOTS } from "@/components/seo";
 import { registerSeller } from "@/api/sellerAuthService";
 import { Mail, Lock, User, Phone, Eye, EyeOff } from "lucide-react";
 import { useToast } from "@/contexts/ToastContext";
 import { createSeoMeta } from "@/utils/seo";
 import SellerHeader from "@/components/sellerLanding/SellerHeader";
 import Footer from "@/components/corporate/Footer";
+import TedarikaLoader from "@/components/ui/TedarikaLoader";
 
 const RegisterPage = () => {
   const location = useLocation();
@@ -125,33 +126,7 @@ const handleSubmit = async (e) => {
 
   return (
     <>
-      <Helmet>
-        <title>{seoMeta.title}</title>
-        <meta name="description" content={seoMeta.description} />
-        <meta name="keywords" content={seoMeta.keywords} />
-        <link rel="canonical" href={seoMeta.canonical} />
-        <meta name="robots" content="index, follow" />
-        
-        {/* Hreflang Tags */}
-        {seoMeta.hreflang.map(({ hreflang, href }) => (
-          <link key={hreflang} rel="alternate" hreflang={hreflang} href={href} />
-        ))}
-        
-        {/* Open Graph */}
-        <meta property="og:title" content={seoMeta.og.title} />
-        <meta property="og:description" content={seoMeta.og.description} />
-        <meta property="og:type" content={seoMeta.og.type} />
-        <meta property="og:url" content={seoMeta.og.url} />
-        <meta property="og:image" content={seoMeta.og.image} />
-        <meta property="og:locale" content={seoMeta.og.locale} />
-        <meta property="og:site_name" content={seoMeta.og.siteName} />
-        
-        {/* Twitter */}
-        <meta name="twitter:card" content={seoMeta.twitter.card} />
-        <meta name="twitter:title" content={seoMeta.twitter.title} />
-        <meta name="twitter:description" content={seoMeta.twitter.description} />
-        <meta name="twitter:image" content={seoMeta.twitter.image} />
-      </Helmet>
+      <SeoHelmet seoMeta={seoMeta} robots={SEO_ROBOTS.INDEX_FOLLOW} />
       
     <div className="min-h-screen flex flex-col bg-white">
       <SellerHeader />
@@ -174,7 +149,14 @@ const handleSubmit = async (e) => {
               isSubmitting ? "opacity-50 cursor-not-allowed" : ""
             }`}
           >
-            {isSubmitting ? "Kayıt Yapılıyor..." : "Hesap Oluştur"}
+            {isSubmitting ? (
+              <span className="flex items-center justify-center gap-2">
+                <TedarikaLoader variant="micro" light className="h-5 w-5" label="Kayıt yapılıyor" />
+                Kayıt Yapılıyor...
+              </span>
+            ) : (
+              "Hesap Oluştur"
+            )}
           </button>
 
           <p className="mt-8 text-center text-base text-gray-600">

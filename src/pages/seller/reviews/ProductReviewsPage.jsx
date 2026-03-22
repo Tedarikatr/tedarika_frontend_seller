@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { fetchProductReviews, replyToProductReview } from "@/api/sellerReviewService";
-import ProductReviewItem from "@/components/storeProducts/ProductReviewItem";
-import { LoaderCircle, MessageSquare } from "lucide-react";
+import ProductReviewItem from "@/components/reviews/ProductReviewItem";
+import { MessageSquare } from "lucide-react";
+import TedarikaLoader from "@/components/ui/TedarikaLoader";
 import toast from "react-hot-toast";
 
 const ProductReviewsPage = ({ productId: defaultId }) => {
@@ -51,9 +52,8 @@ const ProductReviewsPage = ({ productId: defaultId }) => {
 
       {/* İçerik */}
       {loading ? (
-        <div className="flex justify-center items-center h-40 text-gray-500">
-          <LoaderCircle className="animate-spin w-6 h-6 mr-2" />
-          Yorumlar yükleniyor...
+        <div className="flex justify-center items-center min-h-[10rem]">
+          <TedarikaLoader variant="inline" label="Yorumlar yükleniyor..." />
         </div>
       ) : reviews.length === 0 ? (
         <div className="flex flex-col items-center justify-center text-center py-12 text-gray-500">

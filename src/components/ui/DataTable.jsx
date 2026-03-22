@@ -5,6 +5,7 @@
  */
 import React from "react";
 import { TABLE_STYLES } from "@/constants/tableStyles";
+import TedarikaLoader from "@/components/ui/TedarikaLoader";
 
 /**
  * @param {Object} props
@@ -35,8 +36,7 @@ const DataTable = ({
     return (
       <div className={`${TABLE_STYLES.container} ${className}`}>
         <div className="flex items-center justify-center py-16">
-          <div className="animate-spin w-10 h-10 border-2 border-emerald-500 border-t-transparent rounded-full" />
-          <span className="ml-3 text-gray-500 text-sm">Yükleniyor...</span>
+          <TedarikaLoader variant="inline" />
         </div>
       </div>
     );
@@ -155,4 +155,3 @@ const DataTable = ({
 };
 
 export default DataTable;
-export { TABLE_STYLES };

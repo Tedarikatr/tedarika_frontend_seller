@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import { createStore, getAllCategories } from "@/api/sellerStoreService";
 import { refreshToken } from "@/api/sellerAuthService";
 import { useNavigate } from "react-router-dom";
-import { Store, Upload, Image as ImageIcon, X, CheckCircle, Loader2, Sparkles, Award } from "lucide-react";
+import { Store, Upload, Image as ImageIcon, X, CheckCircle, Sparkles, Award } from "lucide-react";
+import TedarikaLoader from "@/components/ui/TedarikaLoader";
 
 const StoreCreate = () => {
   const [form, setForm] = useState({
@@ -358,7 +359,7 @@ const StoreCreate = () => {
               >
                 {submitting ? (
                   <>
-                    <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" />
+                    <TedarikaLoader variant="micro" light className="h-4 w-4 sm:h-5 sm:w-5" label="Mağaza oluşturuluyor" />
                     <span className="hidden sm:inline">Mağaza Oluşturuluyor...</span>
                     <span className="sm:hidden">Oluşturuluyor...</span>
                   </>

@@ -52,7 +52,6 @@ export default function OwnedBrandsSection({ ownedBrands }) {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {ownedBrands.map((b) => {
             const { statusNum, label: statusLabel, color: statusColor, colorCard } = getBrandOwnershipStatusDisplay(b.status);
-            const isApproved = statusNum === 1;
             const typeLabel = BrandOwnershipTypeTr[b.ownershipType] ?? (b.ownershipType === 0 ? "Sahip" : "Yetkili Satıcı");
 
             return (

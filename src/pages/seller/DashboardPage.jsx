@@ -16,6 +16,7 @@ import { getDashboardSnapshot, getWeeklySnapshot } from "@/api/sellerSalesSnapsh
 import { getMyStore } from "@/api/sellerStoreService";
 import { isStoreNotFoundError } from "@/utils/storeNotFound";
 import { motion } from "framer-motion";
+import TedarikaLoader from "@/components/ui/TedarikaLoader";
 import {
   FaBoxOpen,
   FaLiraSign,
@@ -122,18 +123,7 @@ const DashboardPage = () => {
   }, []);
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[70vh] text-gray-500 text-lg">
-        <motion.div
-          className="flex items-center gap-2"
-          animate={{ opacity: [0.5, 1, 0.5] }}
-          transition={{ repeat: Infinity, duration: 1.2 }}
-        >
-          <span className="w-3 h-3 bg-[#00A982] rounded-full" />
-          <span>Yükleniyor...</span>
-        </motion.div>
-      </div>
-    );
+    return <TedarikaLoader variant="section" />;
   }
 
   if (!hasStore) {

@@ -6,6 +6,7 @@ import { getMyStore } from "@/api/sellerStoreService";
 import { isStoreNotFoundError } from "@/utils/storeNotFound";
 import { AlertCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import TedarikaLoader from "@/components/ui/TedarikaLoader";
 
 export default function CampaignListPage() {
   const [rows, setRows] = useState([]);
@@ -45,11 +46,7 @@ export default function CampaignListPage() {
 
   // 🕒 Yükleniyor
   if (loading) {
-    return (
-      <div className="p-8 sm:p-10 text-center text-gray-500 text-base sm:text-lg animate-pulse">
-        Yükleniyor...
-      </div>
-    );
+    return <TedarikaLoader variant="section" />;
   }
 
   // ⚠️ Mağaza Yoksa

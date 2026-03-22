@@ -57,7 +57,7 @@ const SellerHeader = () => {
   };
 
   return (
-    <header className="bg-[#003032] border-b border-white/10 shadow-sm w-full relative z-[100]">
+    <header className="bg-[#003032] border-b border-white/10 shadow-sm w-full relative z-[100] pt-[env(safe-area-inset-top,0px)]">
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         <div className="flex items-center justify-between gap-4 py-1">
           <a
@@ -189,7 +189,7 @@ const SellerHeader = () => {
 
           {/* Panel - header altından, safe-area destekli */}
           <div
-            className={`relative mt-[72px] mx-3 rounded-2xl bg-[#002829] border border-white/10 shadow-2xl overflow-hidden flex flex-col max-h-[calc(100vh-88px)] transition-transform duration-300 ease-out ${
+            className={`relative mt-[72px] mx-3 rounded-2xl bg-[#002829] border border-white/10 shadow-2xl overflow-hidden flex flex-col max-h-[calc(100dvh-88px-env(safe-area-inset-top)-env(safe-area-inset-bottom))] transition-transform duration-300 ease-out ${
               isOpen ? "translate-y-0" : "-translate-y-4"
             }`}
             style={{ paddingBottom: "env(safe-area-inset-bottom, 0)" }}

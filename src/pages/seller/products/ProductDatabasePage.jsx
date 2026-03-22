@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   addProductToStore,
@@ -6,13 +6,13 @@ import {
 import { useProductCache } from "@/contexts/ProductCacheContext";
 import ProductDatabaseTable from "@/components/storeProducts/ProductDatabaseTable";
 import Pagination from "@/components/ui/Pagination";
-import { 
+import {
   Search,
   Tag,
   ShoppingCart,
-  List,
   ArrowRight,
 } from "lucide-react";
+import TedarikaLoader from "@/components/ui/TedarikaLoader";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -23,13 +23,11 @@ const ProductDatabasePage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(false);
-  const [refreshing, setRefreshing] = useState(false);
   const [addedProductNames, setAddedProductNames] = useState([]);
   const [addingId, setAddingId] = useState(null);
 
   const loadProducts = async (forceRefresh = false) => {
-    const isLoadingState = forceRefresh ? setRefreshing : setLoading;
-    isLoadingState(true);
+    setLoading(true);
     try {
       const [allProducts, myStoreProducts] = await Promise.all([
         getProductDatabase(forceRefresh),
@@ -45,12 +43,8 @@ const ProductDatabasePage = () => {
     } catch (err) {
       console.error("Ürünler alınamadı:", err.response?.data || err.message);
     } finally {
-      isLoadingState(false);
+      setLoading(false);
     }
-  };
-
-  const handleRefresh = async () => {
-    await loadProducts(true);
   };
 
   const handleAddProduct = async (productId, productName) => {
@@ -171,10 +165,7 @@ const ProductDatabasePage = () => {
         {/* Products Table */}
         {loading ? (
           <div className="flex flex-col items-center justify-center py-12 sm:py-20 bg-white rounded-xl sm:rounded-2xl shadow-lg">
-            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-xl animate-pulse mb-4">
-              <Search className="w-7 h-7 sm:w-8 sm:h-8 text-white" />
-            </div>
-            <p className="text-gray-500 text-base sm:text-lg font-medium">Ürünler yükleniyor...</p>
+            <TedarikaLoader variant="compact" label="Ürünler yükleniyor..." />
           </div>
         ) : filteredProducts.length === 0 && searchTerm ? (
           <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg p-8 sm:p-12 text-center border border-gray-200">

@@ -11,6 +11,7 @@ import {
   FileText,
 } from "lucide-react";
 import { sendSellerNonSupport } from "../../api/sellerNonSupportService";
+import TedarikaLoader from "@/components/ui/TedarikaLoader";
 
 const SupportFormSection = () => {
   const [form, setForm] = useState({
@@ -197,8 +198,17 @@ const SupportFormSection = () => {
             disabled={loading}
             className="w-full flex justify-center items-center gap-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded-full py-3 font-semibold text-lg transition shadow-lg hover:shadow-emerald-400/40"
           >
-            <SendHorizonal className="w-5 h-5" />
-            {loading ? "Gönderiliyor..." : "Talebi Gönder"}
+            {loading ? (
+              <>
+                <TedarikaLoader variant="micro" light className="h-5 w-5" label="Gönderiliyor" />
+                Gönderiliyor...
+              </>
+            ) : (
+              <>
+                <SendHorizonal className="w-5 h-5" />
+                Talebi Gönder
+              </>
+            )}
           </button>
         </form>
 

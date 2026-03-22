@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Globe, Layers, Package } from "lucide-react";
 import { fetchMyStoreProducts } from "@/api/sellerStoreService";
+import TedarikaLoader from "@/components/ui/TedarikaLoader";
 
 export default function StepProductSelect({ data, setData, next, prev }) {
   const [products, setProducts] = useState([]);
@@ -114,7 +115,9 @@ export default function StepProductSelect({ data, setData, next, prev }) {
           </h3>
 
           {loading ? (
-            <div className="text-gray-500 text-sm">Ürünler yükleniyor...</div>
+            <div className="flex justify-start py-4">
+              <TedarikaLoader variant="inline" label="Ürünler yükleniyor..." />
+            </div>
           ) : error ? (
             <div className="text-red-500 text-sm">{error}</div>
           ) : products.length === 0 ? (

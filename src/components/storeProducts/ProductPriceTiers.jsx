@@ -7,9 +7,9 @@ import {
   upsertPriceTiers,
   deactivatePriceTier,
 } from "@/api/sellerStoreProductPriceTiersService";
-import { getProductPrice } from "@/api/sellerStoreProductPricesService";
 import { PlusCircle, Trash2, Save, ChevronDown, ChevronUp } from "lucide-react";
 import { CURRENCY_CODES } from "@/constants/currencyCode";
+import TedarikaLoader from "@/components/ui/TedarikaLoader";
 
 // Basit Input bileşeni
 const Input = ({ type = "text", value, onChange, placeholder, className = "" }) => (
@@ -186,7 +186,9 @@ const ProductPriceTiers = ({ storeProductId, productPrices = [], onFeedback }) =
 
                   {/* İçerik */}
                   {loading ? (
-                    <p className="text-gray-500 text-sm italic">Yükleniyor...</p>
+                    <div className="py-2">
+                      <TedarikaLoader variant="inline" />
+                    </div>
                   ) : tiers.length === 0 ? (
                     <p className="text-gray-400 text-sm">Henüz fiyat aralığı eklenmemiş.</p>
                   ) : (

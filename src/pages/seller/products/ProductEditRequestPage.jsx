@@ -19,6 +19,7 @@ import {
   CheckCircle,
   XCircle,
 } from "lucide-react";
+import TedarikaLoader from "@/components/ui/TedarikaLoader";
 
 // GTIP regex: 6-12 hane
 const GTIP_REGEX = /^\d{6}(\d{2}(\d{4})?)?$/;
@@ -160,12 +161,7 @@ const ProductEditRequestPage = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 flex items-center justify-center">
-        <div className="text-center">
-          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 mb-4 animate-pulse shadow-xl">
-            <Package size={40} className="text-white" />
-          </div>
-          <p className="text-gray-600 font-medium">Yükleniyor...</p>
-        </div>
+        <TedarikaLoader variant="compact" />
       </div>
     );
   }
@@ -350,7 +346,10 @@ const ProductEditRequestPage = () => {
               className="px-6 py-3 rounded-xl font-semibold bg-gradient-to-r from-emerald-600 to-emerald-700 text-white hover:shadow-lg hover:from-emerald-700 hover:to-emerald-800 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               {submitting ? (
-                <>Yükleniyor...</>
+                <span className="inline-flex items-center gap-2">
+                  <TedarikaLoader variant="micro" light className="h-5 w-5" label="Gönderiliyor" />
+                  Yükleniyor...
+                </span>
               ) : (
                 <>
                   <Save size={18} />

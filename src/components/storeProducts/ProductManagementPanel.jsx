@@ -41,6 +41,11 @@ import { useNavigate } from "react-router-dom";
 import ProductPriceTiers from "@/components/storeProducts/ProductPriceTiers";
 import { UNIT_TYPE_OPTIONS } from "@/constants/unitTypes";
 import { CURRENCY_OPTIONS, CURRENCY_CODES } from "@/constants/currencyCode";
+import TedarikaLoader from "@/components/ui/TedarikaLoader";
+
+const UploadSpinnerIcon = () => (
+  <TedarikaLoader variant="micro" light className="h-4 w-4" label="Yükleniyor" />
+);
 
 // ============ Ultra Modern UI Components ============
 
@@ -746,7 +751,7 @@ const ProductManagementPanel = ({
                   variant="primary"
                   onClick={handleUpload}
                   disabled={uploading || !selectedFiles?.length}
-                  icon={uploading ? null : Save}
+                  icon={uploading ? UploadSpinnerIcon : Save}
                 >
                   {uploading ? "Yükleniyor..." : "Yükle"}
                 </Button>

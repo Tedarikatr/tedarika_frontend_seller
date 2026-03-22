@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, Link, useLocation } from "react-router-dom";
-import { Helmet } from "react-helmet-async";
+import { SeoHelmet, SEO_ROBOTS } from "@/components/seo";
 import {
   requestForgetPasswordReset,
   forgetPassword,
@@ -10,6 +10,7 @@ import { useToast } from "@/contexts/ToastContext";
 import { createSeoMeta } from "@/utils/seo";
 import SellerHeader from "@/components/sellerLanding/SellerHeader";
 import Footer from "@/components/corporate/Footer";
+import TedarikaLoader from "@/components/ui/TedarikaLoader";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const CODE_REGEX = /^\d{6}$/;
@@ -121,27 +122,7 @@ const ForgotPasswordPage = () => {
 
   return (
     <>
-      <Helmet>
-        <title>{seoMeta.title}</title>
-        <meta name="description" content={seoMeta.description} />
-        <meta name="keywords" content={seoMeta.keywords} />
-        <link rel="canonical" href={seoMeta.canonical} />
-        <meta name="robots" content="index, follow" />
-        {seoMeta.hreflang.map(({ hreflang, href }) => (
-          <link key={hreflang} rel="alternate" hreflang={hreflang} href={href} />
-        ))}
-        <meta property="og:title" content={seoMeta.og.title} />
-        <meta property="og:description" content={seoMeta.og.description} />
-        <meta property="og:type" content={seoMeta.og.type} />
-        <meta property="og:url" content={seoMeta.og.url} />
-        <meta property="og:image" content={seoMeta.og.image} />
-        <meta property="og:locale" content={seoMeta.og.locale} />
-        <meta property="og:site_name" content={seoMeta.og.siteName} />
-        <meta name="twitter:card" content={seoMeta.twitter.card} />
-        <meta name="twitter:title" content={seoMeta.twitter.title} />
-        <meta name="twitter:description" content={seoMeta.twitter.description} />
-        <meta name="twitter:image" content={seoMeta.twitter.image} />
-      </Helmet>
+      <SeoHelmet seoMeta={seoMeta} robots={SEO_ROBOTS.INDEX_FOLLOW} />
 
       <div className="min-h-screen flex flex-col bg-white">
         <SellerHeader />
@@ -174,7 +155,14 @@ const ForgotPasswordPage = () => {
                   disabled={isSubmitting}
                   className="mt-8 sm:mt-10 w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 sm:py-4 rounded-xl sm:rounded-2xl text-base sm:text-lg transition disabled:opacity-50 shadow-lg"
                 >
-                  {isSubmitting ? "Kod Gönderiliyor..." : "Kod Gönder"}
+                  {isSubmitting ? (
+                    <span className="flex items-center justify-center gap-2">
+                      <TedarikaLoader variant="micro" light className="h-5 w-5" label="Kod gönderiliyor" />
+                      Kod Gönderiliyor...
+                    </span>
+                  ) : (
+                    "Kod Gönder"
+                  )}
                 </button>
               </form>
             ) : (
@@ -217,7 +205,14 @@ const ForgotPasswordPage = () => {
                   disabled={isSubmitting}
                   className="mt-8 sm:mt-10 w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 sm:py-4 rounded-xl sm:rounded-2xl text-base sm:text-lg transition disabled:opacity-50 shadow-lg"
                 >
-                  {isSubmitting ? "Sıfırlanıyor..." : "Şifreyi Sıfırla"}
+                  {isSubmitting ? (
+                    <span className="flex items-center justify-center gap-2">
+                      <TedarikaLoader variant="micro" light className="h-5 w-5" label="Sıfırlanıyor" />
+                      Sıfırlanıyor...
+                    </span>
+                  ) : (
+                    "Şifreyi Sıfırla"
+                  )}
                 </button>
               </form>
             )}

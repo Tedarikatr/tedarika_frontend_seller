@@ -4,11 +4,11 @@ import {
   getBrandOwnership,
   getOwnedBrands,
 } from "@/api/brandservice";
-import OwnedBrandsSection from "@/components/Brand/OwnedBrandsSection";
-import BrandList from "@/components/Brand/BrandList";
-import OwnershipStatusSection from "@/components/Brand/OwnershipStatusSection";
-import CreateBrandModal from "@/components/Brand/CreateBrandModal";
-import OwnershipRequestModal from "@/components/Brand/OwnershipRequestModal";
+import OwnedBrandsSection from "@/components/brand/OwnedBrandsSection";
+import BrandList from "@/components/brand/BrandList";
+import OwnershipStatusSection from "@/components/brand/OwnershipStatusSection";
+import CreateBrandModal from "@/components/brand/CreateBrandModal";
+import OwnershipRequestModal from "@/components/brand/OwnershipRequestModal";
 import Pagination from "@/components/ui/Pagination";
 import Toast from "@/components/ui/Toast";
 import {
@@ -20,6 +20,7 @@ import {
   TrendingUp,
   Plus
 } from "lucide-react";
+import TedarikaLoader from "@/components/ui/TedarikaLoader";
 
 export default function SellerBrandPage() {
   const [brands, setBrands] = useState([]);
@@ -84,7 +85,7 @@ export default function SellerBrandPage() {
     showToast(result?.message || "Başvuru başarıyla gönderildi!", "success");
   };
 
-  const handleCreateSuccess = (result) => {
+  const handleCreateSuccess = () => {
     fetchData();
     showToast("Marka başarıyla oluşturuldu! Admin onayı bekleniyor.", "success");
   };
@@ -185,10 +186,7 @@ export default function SellerBrandPage() {
         {/* Content */}
         {loading ? (
           <div className="flex flex-col items-center justify-center py-20 bg-white rounded-3xl shadow-lg">
-            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center shadow-xl animate-pulse mb-4">
-              <Award className="w-8 h-8 text-white" />
-            </div>
-            <p className="text-gray-500 text-lg font-medium">Yükleniyor...</p>
+            <TedarikaLoader variant="compact" />
           </div>
         ) : activeTab === "owned" ? (
           <OwnedBrandsSection ownedBrands={ownedBrands} />

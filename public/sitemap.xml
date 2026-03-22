@@ -3,12 +3,13 @@
               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
               xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
               http://www.sitemaps.org/schemas/sitemap/0.9/sitemap-index.xsd">
+  <!-- İki host için ayrı urlset; Vercel host başına /sitemap.xml rewrite ile doğru dosya sunulur -->
   <sitemap>
-    <loc>https://www.seller.tedarika.com.tr/sitemap.xml</loc>
-    <lastmod>2025-03-18</lastmod>
+    <loc>https://www.seller.tedarika.com.tr/sitemap-seller.xml</loc>
+    <lastmod>2026-03-22</lastmod>
   </sitemap>
   <sitemap>
-    <loc>https://www.satici.tedarika.com.tr/sitemap.xml</loc>
-    <lastmod>2025-03-18</lastmod>
+    <loc>https://www.satici.tedarika.com.tr/sitemap-satici.xml</loc>
+    <lastmod>2026-03-22</lastmod>
   </sitemap>
 </sitemapindex>

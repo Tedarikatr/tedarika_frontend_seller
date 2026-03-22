@@ -1,6 +1,3 @@
-
-// src/pages/seller/company/index.js
-export { default as CompanyCreate } from "./CompanyCreate";
+// src/pages/seller/company/index.js — CompanyCreate doğrudan sayfa dosyasından import edilir
 export { default as CompanyUpdate } from "./CompanyUpdate";
-
 

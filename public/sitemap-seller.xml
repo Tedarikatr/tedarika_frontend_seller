@@ -4,11 +4,11 @@
         xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
         xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
         http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
-  
-  <!-- Ana sayfa / Landing - En yüksek öncelik -->
+
+  <!-- Otomatik üretildi: scripts/generate-seo.mjs | 2026-03-22 -->
   <url>
-    <loc>https://www.seller.tedarika.com.tr/</loc>
-    <lastmod>2025-03-18</lastmod>
+    <loc>https://www.seller.tedarika.com.tr/seller/landing</loc>
+    <lastmod>2026-03-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
     <image:image>
@@ -17,173 +17,160 @@
       <image:caption>Tedarika B2B Pazaryeri Satıcı Paneli. Mağazanızı açın, ihracat yapın.</image:caption>
     </image:image>
   </url>
-  
-  <!-- Kamuya açık sayfalar -->
-  <url>
-    <loc>https://www.seller.tedarika.com.tr/seller/landing</loc>
-    <lastmod>2025-03-18</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>1.0</priority>
-  </url>
   <url>
     <loc>https://www.seller.tedarika.com.tr/seller/register</loc>
-    <lastmod>2025-03-18</lastmod>
+    <lastmod>2026-03-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://www.seller.tedarika.com.tr/seller/login</loc>
-    <lastmod>2025-03-18</lastmod>
+    <lastmod>2026-03-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://www.seller.tedarika.com.tr/seller/forgot-password</loc>
-    <lastmod>2025-03-18</lastmod>
+    <lastmod>2026-03-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://www.seller.tedarika.com.tr/seller/apply</loc>
-    <lastmod>2025-03-18</lastmod>
+    <lastmod>2026-03-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://www.seller.tedarika.com.tr/seller/appointment</loc>
-    <lastmod>2025-03-18</lastmod>
+    <lastmod>2026-03-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
-  
-  <!-- Kurumsal sayfalar -->
   <url>
     <loc>https://www.seller.tedarika.com.tr/corporate/about</loc>
-    <lastmod>2025-03-18</lastmod>
+    <lastmod>2026-03-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://www.seller.tedarika.com.tr/corporate/contact</loc>
-    <lastmod>2025-03-18</lastmod>
+    <lastmod>2026-03-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://www.seller.tedarika.com.tr/corporate/kvkk</loc>
-    <lastmod>2025-03-18</lastmod>
+    <lastmod>2026-03-22</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://www.seller.tedarika.com.tr/corporate/sss</loc>
-    <lastmod>2025-03-18</lastmod>
+    <lastmod>2026-03-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://www.seller.tedarika.com.tr/corporate/contracts</loc>
-    <lastmod>2025-03-18</lastmod>
+    <lastmod>2026-03-22</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
-  
-  <!-- Satıcı Merkezi - SEO içerik sayfaları -->
   <url>
     <loc>https://www.seller.tedarika.com.tr/satici-merkezi</loc>
-    <lastmod>2025-03-18</lastmod>
+    <lastmod>2026-03-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://www.seller.tedarika.com.tr/satici-merkezi/ilk-7-gun</loc>
-    <lastmod>2025-03-18</lastmod>
+    <lastmod>2026-03-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://www.seller.tedarika.com.tr/satici-merkezi/magaza-dogrulama</loc>
-    <lastmod>2025-03-18</lastmod>
+    <lastmod>2026-03-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://www.seller.tedarika.com.tr/satici-merkezi/urun-listeleme</loc>
-    <lastmod>2025-03-18</lastmod>
+    <lastmod>2026-03-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://www.seller.tedarika.com.tr/satici-merkezi/gorsel-standartlari</loc>
-    <lastmod>2025-03-18</lastmod>
+    <lastmod>2026-03-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://www.seller.tedarika.com.tr/satici-merkezi/fiyatlandirma-teklif</loc>
-    <lastmod>2025-03-18</lastmod>
+    <lastmod>2026-03-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://www.seller.tedarika.com.tr/satici-merkezi/siparis-yonetimi</loc>
-    <lastmod>2025-03-18</lastmod>
+    <lastmod>2026-03-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://www.seller.tedarika.com.tr/satici-merkezi/lojistik</loc>
-    <lastmod>2025-03-18</lastmod>
+    <lastmod>2026-03-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://www.seller.tedarika.com.tr/satici-merkezi/gumruk-evrak-gtip</loc>
-    <lastmod>2025-03-18</lastmod>
+    <lastmod>2026-03-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://www.seller.tedarika.com.tr/satici-merkezi/odeme-tahsilat</loc>
-    <lastmod>2025-03-18</lastmod>
+    <lastmod>2026-03-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://www.seller.tedarika.com.tr/satici-merkezi/uyusmazlik-iade</loc>
-    <lastmod>2025-03-18</lastmod>
+    <lastmod>2026-03-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://www.seller.tedarika.com.tr/satici-merkezi/satici-politikalari</loc>
-    <lastmod>2025-03-18</lastmod>
+    <lastmod>2026-03-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://www.seller.tedarika.com.tr/satici-merkezi/marka-korumasi</loc>
-    <lastmod>2025-03-18</lastmod>
+    <lastmod>2026-03-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://www.seller.tedarika.com.tr/satici-merkezi/satici-performans</loc>
-    <lastmod>2025-03-18</lastmod>
+    <lastmod>2026-03-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://www.seller.tedarika.com.tr/satici-merkezi/entegrasyonlar</loc>
-    <lastmod>2025-03-18</lastmod>
+    <lastmod>2026-03-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://www.seller.tedarika.com.tr/satici-merkezi/guvenlik</loc>
-    <lastmod>2025-03-18</lastmod>
+    <lastmod>2026-03-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 </urlset>
-

@@ -10,6 +10,7 @@ import { isStoreNotFoundError, STORE_CREATE_PATH } from "@/utils/storeNotFound";
 import { Store, Sparkles, Upload, Image as ImageIcon, CheckCircle } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "react-hot-toast";
+import TedarikaLoader from "@/components/ui/TedarikaLoader";
 
 const normalizeCats = (catsRes) => {
   const arr = Array.isArray(catsRes) ? catsRes : catsRes?.items || [];
@@ -126,8 +127,8 @@ const StoreUpdate = () => {
 
   if (!form) {
     return (
-      <div className="flex justify-center items-center h-64 text-gray-500 animate-pulse">
-        Mağaza bilgileri yükleniyor...
+      <div className="flex justify-center items-center min-h-[16rem]">
+        <TedarikaLoader variant="compact" label="Mağaza bilgileri yükleniyor..." />
       </div>
     );
   }
@@ -365,7 +366,7 @@ const StoreUpdate = () => {
               >
                 {submitting ? (
                   <span className="flex items-center justify-center gap-2">
-                    <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <TedarikaLoader variant="micro" light className="h-4 w-4 sm:h-5 sm:w-5" label="Güncelleniyor" />
                     <span className="hidden sm:inline">Güncelleniyor...</span>
                     <span className="sm:hidden">Yükleniyor...</span>
                   </span>

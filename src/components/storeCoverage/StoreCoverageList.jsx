@@ -4,6 +4,7 @@
 import React, { useEffect, useState } from "react";
 import { fetchMyStoreCoverage } from "@/api/sellerLocationService";
 import { Globe2, MapPin, Flag, Sparkles } from "lucide-react";
+import TedarikaLoader from "@/components/ui/TedarikaLoader";
 
 const StoreCoverageList = () => {
   const [coverage, setCoverage] = useState([]);
@@ -19,10 +20,7 @@ const StoreCoverageList = () => {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center py-12">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 mb-4 animate-pulse shadow-xl">
-          <Globe2 size={32} className="text-white" />
-        </div>
-        <p className="text-gray-500 text-sm font-medium">Yükleniyor...</p>
+        <TedarikaLoader variant="compact" />
       </div>
     );
   }

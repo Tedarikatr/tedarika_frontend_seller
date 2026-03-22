@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Helmet } from "react-helmet-async";
+import { SeoHelmet } from "@/components/seo";
 import { ArrowLeft } from "lucide-react"; // minimalist ikon
 import { createSeoMeta, getBreadcrumbSchema } from "@/utils/seo";
 
@@ -22,37 +22,7 @@ const SellerAppointment = () => {
 
   return (
     <>
-      <Helmet>
-        <title>{seoMeta.title}</title>
-        <meta name="description" content={seoMeta.description} />
-        <meta name="keywords" content={seoMeta.keywords} />
-        <link rel="canonical" href={seoMeta.canonical} />
-        
-        {/* Hreflang Tags */}
-        {seoMeta.hreflang.map(({ hreflang, href }) => (
-          <link key={hreflang} rel="alternate" hreflang={hreflang} href={href} />
-        ))}
-        
-        {/* Open Graph */}
-        <meta property="og:title" content={seoMeta.og.title} />
-        <meta property="og:description" content={seoMeta.og.description} />
-        <meta property="og:type" content={seoMeta.og.type} />
-        <meta property="og:url" content={seoMeta.og.url} />
-        <meta property="og:image" content={seoMeta.og.image} />
-        <meta property="og:locale" content={seoMeta.og.locale} />
-        <meta property="og:site_name" content={seoMeta.og.siteName} />
-        
-        {/* Twitter */}
-        <meta name="twitter:card" content={seoMeta.twitter.card} />
-        <meta name="twitter:title" content={seoMeta.twitter.title} />
-        <meta name="twitter:description" content={seoMeta.twitter.description} />
-        <meta name="twitter:image" content={seoMeta.twitter.image} />
-        
-        {/* Structured Data */}
-        <script type="application/ld+json">
-          {JSON.stringify(breadcrumbSchema)}
-        </script>
-      </Helmet>
+      <SeoHelmet seoMeta={seoMeta} jsonLd={[breadcrumbSchema]} />
       
       <div className="min-h-screen bg-gradient-to-b from-emerald-50 to-gray-100 flex flex-col items-center pt-12 px-4">
       {/* Geri butonu */}
