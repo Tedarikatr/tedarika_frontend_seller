@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Helmet } from "react-helmet-async";
+import { SeoHelmet } from "@/components/seo";
+import { SEO_ROBOTS } from "@/constants/seoDefaults";
 import { toast } from "react-hot-toast";
 import {
   createSubscription,
@@ -107,10 +108,10 @@ export default function SubscriptionPage() {
 
   return (
     <>
-      <Helmet>
-        <meta name="robots" content="noindex, nofollow" />
-        <title>Abonelik Planları | Tedarika Satıcı Paneli</title>
-      </Helmet>
+      <SeoHelmet
+        pageTitle="Abonelik Planları | Tedarika Satıcı Paneli"
+        robots={SEO_ROBOTS.NOINDEX_NOFOLLOW}
+      />
     <section className="min-h-screen py-8 sm:py-12 lg:py-20 bg-gradient-to-b from-green-950 to-green-800 text-white">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 text-center">
         <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-3 sm:mb-4">Abonelik Planları</h2>

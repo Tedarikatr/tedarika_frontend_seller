@@ -1,5 +1,5 @@
 import React from "react";
-import { Helmet } from "react-helmet-async";
+import { SeoHelmet } from "@/components/seo";
 import { useLocation } from "react-router-dom";
 import { Shield, Lock, Eye, FileText, Bell, UserCheck } from "lucide-react";
 import SellerHeader from "@/components/sellerLanding/SellerHeader";
@@ -19,72 +19,10 @@ const KvkkPage = () => {
     { name: "Ana Sayfa", url: "/" },
     { name: "KVKK", url: location.pathname }
   ]);
-  const sections = [
-    {
-      title: "Kişisel Verilerin Toplanması",
-      icon: FileText,
-      content: "Tedarika olarak, satıcı panelimizde sunduğumuz hizmetler kapsamında, satıcı hesabı oluşturma, ürün yönetimi, sipariş takibi ve iletişim süreçlerinde kişisel verilerinizi topluyoruz."
-    },
-    {
-      title: "Verilerin İşlenme Amacı",
-      icon: Eye,
-      content: "Toplanan kişisel veriler, hizmet kalitesini artırmak, yasal yükümlülükleri yerine getirmek, kullanıcı deneyimini iyileştirmek ve güvenli bir platform sunmak amacıyla işlenmektedir."
-    },
-    {
-      title: "Veri Güvenliği",
-      icon: Lock,
-      content: "Kişisel verileriniz, en üst düzeyde güvenlik önlemleriyle korunmaktadır. Verilerinize yetkisiz erişim, kayıp veya ifşa durumlarına karşı teknik ve idari tedbirler alınmıştır."
-    },
-    {
-      title: "Haklarınız",
-      icon: UserCheck,
-      content: "KVKK kapsamında, kişisel verilerinize erişim, düzeltme, silme ve işlemenin durdurulmasını talep etme haklarına sahipsiniz. Taleplerinizi info@tedarika.com.tr adresine iletebilirsiniz."
-    },
-    {
-      title: "Veri Paylaşımı",
-      icon: Bell,
-      content: "Kişisel verileriniz, yasal zorunluluklar haricinde üçüncü şahıslarla paylaşılmamaktadır. İş ortaklarımızla yalnızca hizmet kalitesini artırmak için gerekli veriler paylaşılır."
-    },
-    {
-      title: "Yasal Düzenlemeler",
-      icon: Shield,
-      content: "Kişisel verileriniz, 6698 sayılı Kişisel Verilerin Korunması Kanunu ve ilgili mevzuat çerçevesinde işlenmekte ve korunmaktadır."
-    }
-  ];
 
   return (
     <>
-      <Helmet>
-        <title>{seoMeta.title}</title>
-        <meta name="description" content={seoMeta.description} />
-        <meta name="keywords" content={seoMeta.keywords} />
-        <link rel="canonical" href={seoMeta.canonical} />
-        
-        {/* Hreflang Tags */}
-        {seoMeta.hreflang.map(({ hreflang, href }) => (
-          <link key={hreflang} rel="alternate" hreflang={hreflang} href={href} />
-        ))}
-        
-        {/* Open Graph */}
-        <meta property="og:title" content={seoMeta.og.title} />
-        <meta property="og:description" content={seoMeta.og.description} />
-        <meta property="og:type" content={seoMeta.og.type} />
-        <meta property="og:url" content={seoMeta.og.url} />
-        <meta property="og:image" content={seoMeta.og.image} />
-        <meta property="og:locale" content={seoMeta.og.locale} />
-        <meta property="og:site_name" content={seoMeta.og.siteName} />
-        
-        {/* Twitter */}
-        <meta name="twitter:card" content={seoMeta.twitter.card} />
-        <meta name="twitter:title" content={seoMeta.twitter.title} />
-        <meta name="twitter:description" content={seoMeta.twitter.description} />
-        <meta name="twitter:image" content={seoMeta.twitter.image} />
-        
-        {/* Structured Data */}
-        <script type="application/ld+json">
-          {JSON.stringify(breadcrumbSchema)}
-        </script>
-      </Helmet>
+      <SeoHelmet seoMeta={seoMeta} jsonLd={[breadcrumbSchema]} />
 
       <div className="bg-white min-h-screen">
         <SellerHeader />

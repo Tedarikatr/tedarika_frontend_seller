@@ -1,5 +1,5 @@
 import React from "react";
-import { Helmet } from "react-helmet-async";
+import { SeoHelmet } from "@/components/seo";
 import { useLocation } from "react-router-dom";
 import { Target, Users, Award, Zap } from "lucide-react";
 import SellerCenterLayout from "./SellerCenterLayout";
@@ -10,7 +10,7 @@ import {
   SellerCenterSection,
   SellerCenterProse,
 } from "./components";
-import { createSeoMeta, getBreadcrumbSchema } from "@/utils/seo";
+import { createSeoMeta, getBreadcrumbSchema, getAboutPageOrganizationSchema } from "@/utils/seo";
 
 const AboutPage = () => {
   const location = useLocation();
@@ -35,38 +35,13 @@ const AboutPage = () => {
 
   return (
     <>
-      <Helmet>
-        <title>{seoMeta.title}</title>
-        <meta name="description" content={seoMeta.description} />
-        <meta name="keywords" content={seoMeta.keywords} />
-        <link rel="canonical" href={seoMeta.canonical} />
-        {seoMeta.hreflang.map(({ hreflang, href }) => (
-          <link key={hreflang} rel="alternate" hreflang={hreflang} href={href} />
-        ))}
-        <meta property="og:title" content={seoMeta.og.title} />
-        <meta property="og:description" content={seoMeta.og.description} />
-        <meta property="og:type" content={seoMeta.og.type} />
-        <meta property="og:url" content={seoMeta.og.url} />
-        <meta property="og:image" content={seoMeta.og.image} />
-        <meta property="og:locale" content={seoMeta.og.locale} />
-        <meta property="og:site_name" content={seoMeta.og.siteName} />
-        <meta name="twitter:card" content={seoMeta.twitter.card} />
-        <meta name="twitter:title" content={seoMeta.twitter.title} />
-        <meta name="twitter:description" content={seoMeta.twitter.description} />
-        <meta name="twitter:image" content={seoMeta.twitter.image} />
-        <script type="application/ld+json">{JSON.stringify(getBreadcrumbSchema(breadcrumbItems))}</script>
-        <script type="application/ld+json">{JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "Organization",
-          "name": "Tedarika Satıcı Platformu",
-          "url": "https://seller.tedarika.com.tr",
-          "logo": "https://www.seller.tedarika.com.tr/images/logo.png",
-          "description": "Tedarika Satıcı Platformu, ihracat yapmak isteyen KOBİ'lere ve üreticilere özel olarak tasarlanmış dijital bir pazaryeri çözümüdür.",
-          "slogan": "Üret, biz dünyaya taşıyalım",
-          "sameAs": ["https://www.tedarika.com.tr"],
-          "contactPoint": { "@type": "ContactPoint", "email": "info@tedarika.com.tr", "contactType": "customer service" }
-        })}</script>
-      </Helmet>
+      <SeoHelmet
+        seoMeta={seoMeta}
+        jsonLd={[
+          getBreadcrumbSchema(breadcrumbItems),
+          getAboutPageOrganizationSchema(),
+        ]}
+      />
       <SellerCenterLayout>
         <SellerCenterBreadcrumb items={breadcrumbItems} />
         <SellerCenterHero

@@ -1,5 +1,5 @@
 import React from "react";
-import { Helmet } from "react-helmet-async";
+import { SeoHelmet } from "@/components/seo";
 import { useLocation } from "react-router-dom";
 import SellerCenterLayout from "./SellerCenterLayout";
 import {
@@ -51,27 +51,12 @@ const SellerCenterArticle = ({
 
   return (
     <>
-      <Helmet>
-        <title>{seoMeta.title}</title>
-        <meta name="description" content={seoMeta.description} />
-        {keywords && <meta name="keywords" content={seoMeta.keywords} />}
-        <link rel="canonical" href={seoMeta.canonical} />
-        {seoMeta.hreflang.map(({ hreflang, href }) => (
-          <link key={hreflang} rel="alternate" hreflang={hreflang} href={href} />
-        ))}
-        <meta property="og:title" content={seoMeta.og.title} />
-        <meta property="og:description" content={seoMeta.og.description} />
-        <meta property="og:type" content="article" />
-        <meta property="og:url" content={seoMeta.og.url} />
-        <meta property="og:image" content={seoMeta.og.image} />
-        <meta property="og:locale" content={seoMeta.og.locale} />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={seoMeta.twitter.title} />
-        <meta name="twitter:description" content={seoMeta.twitter.description} />
-        <meta name="twitter:image" content={seoMeta.twitter.image} />
-        <script type="application/ld+json">{JSON.stringify(breadcrumbSchema)}</script>
-        <script type="application/ld+json">{JSON.stringify(articleSchema)}</script>
-      </Helmet>
+      <SeoHelmet
+        seoMeta={seoMeta}
+        includeKeywords={Boolean(keywords)}
+        ogType="article"
+        jsonLd={[breadcrumbSchema, articleSchema]}
+      />
       <SellerCenterLayout>
         <SellerCenterBreadcrumb items={breadcrumbItems} />
         <SellerCenterHero h1={h1} subtitle={subtitle} description={heroDescription} icon={icon} />

@@ -1,5 +1,5 @@
-import { Helmet } from "react-helmet-async";
 import { useLocation } from "react-router-dom";
+import { SeoHelmet } from "@/components/seo";
 import SellerHeader from "@/components/sellerLanding/SellerHeader";
 import HeroSection from "@/components/sellerLanding/HeroSection";
 import FeaturesSection from "@/components/sellerLanding/FeaturesSection";
@@ -19,7 +19,6 @@ import {
   getOrganizationSchema,
   getWebsiteSchema,
   getWebApplicationSchema,
-  getHreflangUrls
 } from "@/utils/seo";
 
 
@@ -34,53 +33,16 @@ const SellerLandingPage = () => {
   });
 
   const organizationSchema = getOrganizationSchema();
-  const websiteSchema = getWebsiteSchema(location.pathname);
+  const websiteSchema = getWebsiteSchema();
   const webAppSchema = getWebApplicationSchema();
 
   return (
     <>
-      <Helmet>
-        <title>{seoMeta.title}</title>
-        <meta name="description" content={seoMeta.description} />
-        <meta name="keywords" content={seoMeta.keywords} />
-        <link rel="canonical" href={seoMeta.canonical} />
-        
-        {/* Hreflang Tags */}
-        {seoMeta.hreflang.map(({ hreflang, href }) => (
-          <link key={hreflang} rel="alternate" hreflang={hreflang} href={href} />
-        ))}
-        
-        {/* Open Graph */}
-        <meta property="og:title" content={seoMeta.og.title} />
-        <meta property="og:description" content={seoMeta.og.description} />
-        <meta property="og:type" content={seoMeta.og.type} />
-        <meta property="og:url" content={seoMeta.og.url} />
-        <meta property="og:image" content={seoMeta.og.image} />
-        <meta property="og:image:width" content="1200" />
-        <meta property="og:image:height" content="630" />
-        <meta property="og:image:alt" content="Tedarika Satıcı Paneli - B2B Pazaryeri" />
-        <meta property="og:locale" content={seoMeta.og.locale} />
-        <meta property="og:site_name" content={seoMeta.og.siteName} />
-        
-        {/* Twitter */}
-        <meta name="twitter:card" content={seoMeta.twitter.card} />
-        <meta name="twitter:title" content={seoMeta.twitter.title} />
-        <meta name="twitter:description" content={seoMeta.twitter.description} />
-        <meta name="twitter:image" content={seoMeta.twitter.image} />
-        <meta name="twitter:image:alt" content="Tedarika Satıcı Paneli - B2B Pazaryeri" />
-        
-        {/* Structured Data - JSON-LD */}
-        <script type="application/ld+json">
-          {JSON.stringify(websiteSchema)}
-        </script>
-        
-        <script type="application/ld+json">
-          {JSON.stringify(organizationSchema)}
-        </script>
-        <script type="application/ld+json">
-          {JSON.stringify(webAppSchema)}
-        </script>
-      </Helmet>
+      <SeoHelmet
+        seoMeta={seoMeta}
+        ogImageEnhancement
+        jsonLd={[websiteSchema, organizationSchema, webAppSchema]}
+      />
 
     <div className="bg-white">
       <SellerHeader />

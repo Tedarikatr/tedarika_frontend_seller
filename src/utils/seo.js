@@ -3,6 +3,8 @@
  * Domain yönetimi ve SEO meta tag'leri için yardımcı fonksiyonlar
  */
 
+import { SEO_DEFAULTS } from "@/constants/seoDefaults";
+
 /**
  * Mevcut domain'i tespit eder
  * @returns {string} - Mevcut domain (seller.tedarika.com.tr veya satici.tedarika.com.tr)
@@ -48,7 +50,7 @@ export const getCanonicalUrl = (path = '') => {
  * @param {string} imagePath - Resim yolu (opsiyonel)
  * @returns {string} - Tam image URL
  */
-export const getOgImageUrl = (imagePath = '/images/logo.png') => {
+export const getOgImageUrl = (imagePath = SEO_DEFAULTS.ogImagePath) => {
   const domain = getCurrentDomain();
   const cleanPath = imagePath.startsWith('/') ? imagePath : `/${imagePath}`;
   return `${domain}${cleanPath}`;
@@ -110,34 +112,38 @@ export const createSeoMeta = ({
   title,
   description,
   path = '',
-  image = '/images/logo.png',
+  image = SEO_DEFAULTS.ogImagePath,
   type = 'website',
   keywords = ''
 }) => {
   const canonicalUrl = getCanonicalUrl(path);
   const ogImageUrl = getOgImageUrl(image);
-  const domain = getCurrentDomain();
-  
+  const resolvedTitle = (title && String(title).trim()) || SEO_DEFAULTS.defaultTitle;
+  const resolvedDescription =
+    (description && String(description).trim()) || SEO_DEFAULTS.defaultDescription;
+  const resolvedKeywords =
+    (keywords && String(keywords).trim()) || SEO_DEFAULTS.defaultKeywords;
+
   return {
-    title: title || 'Tedarika Satıcı Paneli - B2B Pazaryeri ile İhracat Yapın',
-    description: description || 'Tedarika ile B2B pazaryerinde mağazanızı açın. Türkiye\'den dünyaya ihracat yapın, güvenli ödeme alın, kolay ürün yönetimi.',
+    title: resolvedTitle,
+    description: resolvedDescription,
     canonical: canonicalUrl,
     og: {
-      title,
-      description,
+      title: resolvedTitle,
+      description: resolvedDescription,
       url: canonicalUrl,
       image: ogImageUrl,
       type,
-      siteName: 'Tedarika',
-      locale: 'tr_TR'
+      siteName: SEO_DEFAULTS.siteName,
+      locale: SEO_DEFAULTS.locale
     },
     twitter: {
       card: 'summary_large_image',
-      title,
-      description,
+      title: resolvedTitle,
+      description: resolvedDescription,
       image: ogImageUrl
     },
-    keywords: keywords || 'tedarika, B2B pazaryeri, ihracat platformu, satıcı paneli, mağaza yönetimi, ürün satışı, toptan satış, KOBİ ihracat, B2B e-ticaret',
+    keywords: resolvedKeywords,
     hreflang: getHreflangUrls(path)
   };
 };
@@ -172,15 +178,11 @@ export const getOrganizationSchema = () => {
 };
 
 /**
- * WebSite için JSON-LD structured data oluşturur
- * @param {string} path - Sayfa yolu
- * @returns {Object} - JSON-LD objesi
- */
-/**
  * WebSite + SearchAction: Google'da sitelinks arama kutusu (Rich Result) için.
  * urlTemplate, sayfada gerçekten kullanılan arama URL'i ile eşleşmeli (yoksa landing ile query).
+ * @returns {Object} - JSON-LD objesi
  */
-export const getWebsiteSchema = (path = '') => {
+export const getWebsiteSchema = () => {
   const currentDomain = getCurrentDomain();
   return {
     '@context': 'https://schema.org',
@@ -267,5 +269,51 @@ export const getArticleSchema = (opts = {}) => {
     'author': { '@type': 'Organization', 'name': 'Tedarika' },
     'publisher': { '@type': 'Organization', 'name': 'Tedarika', 'logo': { '@type': 'ImageObject', 'url': `${domain}/images/logo.png` } },
     'mainEntityOfPage': { '@type': 'WebPage', '@id': url }
+  };
+};
+
+/**
+ * İletişim sayfası — ContactPage + JSON-LD
+ * @param {ReturnType<createSeoMeta>} seoMeta
+ */
+export const getContactPageSchema = (seoMeta) => ({
+  '@context': 'https://schema.org',
+  '@type': 'ContactPage',
+  name: 'İletişim',
+  description: seoMeta.description,
+  url: seoMeta.canonical,
+  mainEntity: {
+    '@type': 'Organization',
+    name: 'Tedarika',
+    contactPoint: {
+      '@type': 'ContactPoint',
+      telephone: '+90-538-236-26-05',
+      contactType: 'Customer Service',
+      email: 'info@tedarika.com.tr',
+      availableLanguage: ['Turkish', 'English']
+    }
+  }
+});
+
+/**
+ * Hakkımızda sayfası — Organization snippet (domain tek kaynaktan)
+ */
+export const getAboutPageOrganizationSchema = () => {
+  const domain = getCurrentDomain();
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: 'Tedarika Satıcı Platformu',
+    url: domain,
+    logo: `${domain}/images/logo.png`,
+    description:
+      "Tedarika Satıcı Platformu, ihracat yapmak isteyen KOBİ'lere ve üreticilere özel olarak tasarlanmış dijital bir pazaryeri çözümüdür.",
+    slogan: 'Üret, biz dünyaya taşıyalım',
+    sameAs: ['https://www.tedarika.com.tr'],
+    contactPoint: {
+      '@type': 'ContactPoint',
+      email: 'info@tedarika.com.tr',
+      contactType: 'customer service'
+    }
   };
 };

@@ -1,6 +1,6 @@
 import React, { useRef, useState } from "react";
 import { useToast } from "@/contexts/ToastContext";
-import { Helmet } from "react-helmet-async";
+import { SeoHelmet } from "@/components/seo";
 import { useLocation } from "react-router-dom";
 import { Mail, MessageSquare, Phone } from "lucide-react";
 import SellerCenterLayout from "./SellerCenterLayout";
@@ -9,7 +9,7 @@ import {
   SellerCenterHero,
   SellerCenterCard,
 } from "./components";
-import { createSeoMeta, getBreadcrumbSchema } from "@/utils/seo";
+import { createSeoMeta, getBreadcrumbSchema, getContactPageSchema } from "@/utils/seo";
 
 const ContactPage = () => {
   const location = useLocation();
@@ -60,45 +60,13 @@ const ContactPage = () => {
 
   return (
     <>
-      <Helmet>
-        <title>{seoMeta.title}</title>
-        <meta name="description" content={seoMeta.description} />
-        <meta name="keywords" content={seoMeta.keywords} />
-        <link rel="canonical" href={seoMeta.canonical} />
-        {seoMeta.hreflang.map(({ hreflang, href }) => (
-          <link key={hreflang} rel="alternate" hreflang={hreflang} href={href} />
-        ))}
-        <meta property="og:title" content={seoMeta.og.title} />
-        <meta property="og:description" content={seoMeta.og.description} />
-        <meta property="og:type" content={seoMeta.og.type} />
-        <meta property="og:url" content={seoMeta.og.url} />
-        <meta property="og:image" content={seoMeta.og.image} />
-        <meta property="og:locale" content={seoMeta.og.locale} />
-        <meta property="og:site_name" content={seoMeta.og.siteName} />
-        <meta name="twitter:card" content={seoMeta.twitter.card} />
-        <meta name="twitter:title" content={seoMeta.twitter.title} />
-        <meta name="twitter:description" content={seoMeta.twitter.description} />
-        <meta name="twitter:image" content={seoMeta.twitter.image} />
-        <script type="application/ld+json">{JSON.stringify(getBreadcrumbSchema(breadcrumbItems))}</script>
-        <script type="application/ld+json">{JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "ContactPage",
-          "name": "İletişim",
-          "description": seoMeta.description,
-          "url": seoMeta.canonical,
-          "mainEntity": {
-            "@type": "Organization",
-            "name": "Tedarika",
-            "contactPoint": {
-              "@type": "ContactPoint",
-              "telephone": "+90-538-236-26-05",
-              "contactType": "Customer Service",
-              "email": "info@tedarika.com.tr",
-              "availableLanguage": ["Turkish", "English"]
-            }
-          }
-        })}</script>
-      </Helmet>
+      <SeoHelmet
+        seoMeta={seoMeta}
+        jsonLd={[
+          getBreadcrumbSchema(breadcrumbItems),
+          getContactPageSchema(seoMeta),
+        ]}
+      />
       <SellerCenterLayout>
         <SellerCenterBreadcrumb items={breadcrumbItems} />
         <SellerCenterHero h1="İletişim" subtitle="Bizimle iletişime geçin" icon={MessageSquare} />

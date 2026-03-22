@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useNavigate, useLocation, Outlet } from "react-router-dom";
-import { Helmet } from "react-helmet-async";
+import { SeoHelmet } from "@/components/seo";
+import { SEO_ROBOTS } from "@/constants/seoDefaults";
 import Sidebar from "./Sidebar";
 import Topbar from "./Topbar";
 import { hasCompany } from "@/api/sellerCompanyService";
@@ -124,9 +125,7 @@ const SellerLayout = () => {
 
   return (
     <>
-      <Helmet>
-        <meta name="robots" content="noindex, nofollow" />
-      </Helmet>
+      <SeoHelmet robots={SEO_ROBOTS.NOINDEX_NOFOLLOW} />
     <div className="flex h-screen w-full overflow-hidden relative">
       {/* Sidebar */}
       <Sidebar
