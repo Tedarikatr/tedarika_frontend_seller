@@ -26,6 +26,7 @@ import {
   CheckCircle,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import TedarikaLoader from "@/components/ui/TedarikaLoader";
 
 const SalesReportsPage = () => {
   const navigate = useNavigate();
@@ -508,10 +509,7 @@ const SalesReportsPage = () => {
 
             {loadingSchedules ? (
               <div className="flex justify-center py-12">
-                <div className="flex flex-col items-center gap-3">
-                  <Loader2 className="w-8 h-8 animate-spin text-emerald-600" />
-                  <p className="text-sm text-gray-500">Yükleniyor...</p>
-                </div>
+                <TedarikaLoader variant="compact" />
               </div>
             ) : schedules.length === 0 ? (
               <div className="text-center py-12">

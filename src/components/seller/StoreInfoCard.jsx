@@ -3,6 +3,7 @@ import { getMyStore } from "@/api/sellerStoreService";
 import { useNavigate } from "react-router-dom";
 import { StoreIcon, PlusCircle } from "lucide-react";
 import { isStoreNotFoundError } from "@/utils/storeNotFound";
+import TedarikaLoader from "@/components/ui/TedarikaLoader";
 
 const StatusBadge = ({
   status,
@@ -47,8 +48,8 @@ const StoreInfoCard = () => {
 
   if (loading) {
     return (
-      <div className="bg-white p-6 rounded-xl border shadow text-center text-gray-500">
-        Mağaza bilgileri yükleniyor...
+      <div className="bg-white p-6 rounded-xl border shadow text-center">
+        <TedarikaLoader variant="compact" label="Mağaza bilgileri yükleniyor..." />
       </div>
     );
   }

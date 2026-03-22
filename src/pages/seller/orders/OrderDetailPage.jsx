@@ -55,6 +55,7 @@ import {
   ChevronUp,
   Copy
 } from "lucide-react";
+import TedarikaLoader from "@/components/ui/TedarikaLoader";
 
 // Modern Status Badge
 const StatusBadge = ({ status }) => {
@@ -411,12 +412,7 @@ const OrderDetailPage = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 flex items-center justify-center px-4">
-        <div className="text-center">
-          <div className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 mb-4 animate-pulse shadow-xl">
-            <Package size={32} className="sm:w-10 sm:h-10 text-white" />
-          </div>
-          <p className="text-gray-600 font-medium text-base sm:text-lg">Yükleniyor...</p>
-        </div>
+        <TedarikaLoader variant="compact" />
       </div>
     );
   }

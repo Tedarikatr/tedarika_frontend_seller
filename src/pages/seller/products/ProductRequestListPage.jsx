@@ -6,6 +6,7 @@ import {
   getSubCategoriesByCategoryId,
 } from "@/api/sellerStoreService";
 import { ChevronDown, ChevronUp } from "lucide-react";
+import TedarikaLoader from "@/components/ui/TedarikaLoader";
 
 const ProductRequestListPage = () => {
   const [requests, setRequests] = useState([]);
@@ -84,7 +85,9 @@ const ProductRequestListPage = () => {
       <h1 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4 sm:mb-6">Ürün Başvurularım</h1>
 
       {loading ? (
-        <p className="text-sm text-gray-500">Yükleniyor...</p>
+        <div className="py-8 flex justify-center">
+          <TedarikaLoader variant="compact" />
+        </div>
       ) : requests.length === 0 ? (
         <p className="text-sm text-gray-500">Herhangi bir başvuru bulunamadı.</p>
       ) : (

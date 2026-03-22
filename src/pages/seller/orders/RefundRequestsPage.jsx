@@ -7,6 +7,7 @@ import {
 } from "@/api/sellerOrderService";
 import { REFUND_REQUEST_STATUS_LABELS } from "@/constants/refundStatus";
 import { useToast } from "@/contexts/ToastContext";
+import TedarikaLoader from "@/components/ui/TedarikaLoader";
 import {
   PackageX,
   Clock,
@@ -161,10 +162,7 @@ const RefundRequestsPage = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 flex items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="w-12 h-12 animate-spin text-emerald-600 mx-auto mb-4" />
-          <p className="text-gray-600">Yükleniyor...</p>
-        </div>
+        <TedarikaLoader variant="compact" />
       </div>
     );
   }

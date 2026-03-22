@@ -20,6 +20,7 @@ import {
   TrendingUp,
   Plus
 } from "lucide-react";
+import TedarikaLoader from "@/components/ui/TedarikaLoader";
 
 export default function SellerBrandPage() {
   const [brands, setBrands] = useState([]);
@@ -185,10 +186,7 @@ export default function SellerBrandPage() {
         {/* Content */}
         {loading ? (
           <div className="flex flex-col items-center justify-center py-20 bg-white rounded-3xl shadow-lg">
-            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center shadow-xl animate-pulse mb-4">
-              <Award className="w-8 h-8 text-white" />
-            </div>
-            <p className="text-gray-500 text-lg font-medium">Yükleniyor...</p>
+            <TedarikaLoader variant="compact" />
           </div>
         ) : activeTab === "owned" ? (
           <OwnedBrandsSection ownedBrands={ownedBrands} />

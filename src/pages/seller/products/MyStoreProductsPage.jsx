@@ -36,6 +36,7 @@ import {
   X,
 } from "lucide-react";
 import { CURRENCY_OPTIONS } from "@/constants/currencyCode";
+import TedarikaLoader from "@/components/ui/TedarikaLoader";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -599,11 +600,8 @@ const MyStoreProductsPage = () => {
         <div className="bg-white rounded-3xl shadow-2xl border-2 border-gray-200 overflow-hidden">
           {loading ? (
             <div className="text-center py-20">
-              <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 mb-4 animate-pulse shadow-xl">
-                <Package size={40} className="text-white" />
-              </div>
-              <p className="text-gray-600 font-medium text-lg">Ürünler yükleniyor...</p>
-              <p className="text-gray-400 text-sm mt-1">Lütfen bekleyin</p>
+              <TedarikaLoader variant="compact" label="Ürünler yükleniyor..." />
+              <p className="text-gray-400 text-sm mt-2">Lütfen bekleyin</p>
             </div>
           ) : products.length === 0 ? (
             <div className="text-center py-20">

@@ -1,7 +1,8 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { fetchStoreReviews, replyToStoreReview } from "@/api/sellerReviewService";
 import StoreReviewItem from "@/components/storeProducts/StoreReviewItem";
-import { LoaderCircle, Star, MessageSquare, Sparkles, TrendingUp, Award } from "lucide-react";
+import { Star, MessageSquare, Sparkles, TrendingUp, Award } from "lucide-react";
+import TedarikaLoader from "@/components/ui/TedarikaLoader";
 import toast from "react-hot-toast";
 
 const StoreReviewsPage = () => {
@@ -108,10 +109,7 @@ const StoreReviewsPage = () => {
         {/* Content */}
         {loading ? (
           <div className="flex flex-col items-center justify-center py-20 bg-white rounded-3xl shadow-lg">
-            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-xl animate-spin mb-4">
-              <LoaderCircle className="w-8 h-8 text-white" />
-            </div>
-            <p className="text-gray-500 text-lg font-medium">Yorumlar yükleniyor...</p>
+            <TedarikaLoader variant="compact" label="Yorumlar yükleniyor..." />
           </div>
         ) : reviews.length === 0 ? (
           <div className="bg-gradient-to-br from-white to-gray-50 rounded-3xl shadow-lg p-12 text-center border-2 border-gray-200">

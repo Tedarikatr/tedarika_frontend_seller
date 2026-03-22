@@ -10,6 +10,7 @@ import {
 import { useNotification } from "@/contexts/NotificationContext";
 import { isStoreNotFoundError, STORE_CREATE_PATH } from "@/utils/storeNotFound";
 import { Loader2, Copy, Check, Pencil, X, AlertCircle } from "lucide-react";
+import TedarikaLoader from "@/components/ui/TedarikaLoader";
 
 // Boş form şablonu
 const EMPTY = {
@@ -150,9 +151,8 @@ export default function SellerFinanceInfoCard() {
 
   if (loading) {
     return (
-      <div className="p-6 text-gray-500 text-sm flex items-center gap-2">
-        <Loader2 className="w-4 h-4 animate-spin" />
-        Bilgiler yükleniyor...
+      <div className="p-6">
+        <TedarikaLoader variant="inline" label="Bilgiler yükleniyor..." />
       </div>
     );
   }

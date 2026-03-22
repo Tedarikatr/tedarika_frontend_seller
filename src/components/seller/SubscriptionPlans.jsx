@@ -7,6 +7,7 @@ import {
   getSubscriptionPackages,
 } from "@/api/sellerSubscriptionService";
 import { refreshToken } from "@/api/sellerAuthService";
+import TedarikaLoader from "@/components/ui/TedarikaLoader";
 
 export default function SubscriptionPlans() {
   const toast = useToast();
@@ -100,9 +101,7 @@ export default function SubscriptionPlans() {
   if (loading) {
     return (
       <div className="flex justify-center items-center py-20">
-        <p className="text-gray-600 animate-pulse text-lg">
-          Planlar yükleniyor...
-        </p>
+        <TedarikaLoader variant="compact" label="Planlar yükleniyor..." />
       </div>
     );
   }

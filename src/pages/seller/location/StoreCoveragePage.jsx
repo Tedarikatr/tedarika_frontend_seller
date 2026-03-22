@@ -4,10 +4,11 @@
 import React, { useState, useEffect } from "react";
 import StoreCoverageForm from "@/components/storeCoverage/StoreCoverageForm";
 import StoreCoverageList from "@/components/storeCoverage/StoreCoverageList";
-import { MapPin, ListChecks, AlertCircle, Globe, Sparkles, Map } from "lucide-react";
+import { MapPin, ListChecks, AlertCircle, Globe, Sparkles } from "lucide-react";
 import { getMyStore } from "@/api/sellerStoreService";
 import { useNavigate } from "react-router-dom";
 import { isStoreNotFoundError } from "@/utils/storeNotFound";
+import TedarikaLoader from "@/components/ui/TedarikaLoader";
 
 const StoreCoveragePage = () => {
   const [refreshKey, setRefreshKey] = useState(0);
@@ -45,12 +46,7 @@ const StoreCoveragePage = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 flex items-center justify-center">
-        <div className="text-center">
-          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 mb-4 animate-pulse shadow-xl">
-            <Map size={40} className="text-white" />
-          </div>
-          <p className="text-gray-600 font-medium text-lg">Yükleniyor...</p>
-        </div>
+        <TedarikaLoader variant="compact" />
       </div>
     );
   }

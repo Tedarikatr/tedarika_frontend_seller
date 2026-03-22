@@ -10,6 +10,7 @@ import { isStoreNotFoundError } from "@/utils/storeNotFound";
 import { AlertCircle, Lock } from "lucide-react";
 import { getDecodedSellerPayload } from "@/utils/auth";
 import { toast } from "react-hot-toast";
+import TedarikaLoader from "@/components/ui/TedarikaLoader";
 
 const SellerLayout = () => {
   const [checking, setChecking] = useState(true);
@@ -112,11 +113,7 @@ const SellerLayout = () => {
 
   // 🔄 Yükleniyor ekranı
   if (checking) {
-    return (
-      <div className="h-screen flex items-center justify-center bg-gradient-to-br from-indigo-100 via-purple-100 to-white text-[#003636] text-lg font-semibold animate-pulse">
-        Yükleniyor...
-      </div>
-    );
+    return <TedarikaLoader variant="fullscreen" />;
   }
 
   const isProfilePage = location.pathname.startsWith("/seller/profile");

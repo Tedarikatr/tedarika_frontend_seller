@@ -78,6 +78,7 @@ import SemiPrivateRoute from "@/routes/SemiPrivateRoute";
 import SellerRouteWrapper from "@/components/SellerRouteWrapper";
 import SellerAppointment from "@/pages/seller/SellerAppointment";
 import ScrollToTop from "@/components/ScrollToTop";
+import NotFoundPage from "@/pages/NotFoundPage";
 
 
 function App() {
@@ -187,8 +188,8 @@ function App() {
         <Route path="brands" element={<SellerBrandListPage />} />
       </Route>
 
-      {/* ── 404 redirect ───────────────────────────── */}
-      <Route path="*" element={<Navigate to="/seller/landing" replace />} />
+      {/* Bilinmeyen URL — noindex (NotFoundPage içinde SeoHelmet) */}
+      <Route path="*" element={<NotFoundPage />} />
     </Routes>
         </NotificationProvider>
       </ProductCacheProvider>
