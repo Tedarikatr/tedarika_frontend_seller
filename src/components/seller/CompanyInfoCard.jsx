@@ -67,19 +67,25 @@ const CompanyInfoCard = () => {
         try {
           const ei = await getMyExtraInfo();
           if (ei && (ei.id || ei.companyId)) setExtra(ei);
-        } catch {}
+        } catch {
+          void 0;
+        }
         try {
           const d = await getMyDocuments();
           setDocs(Array.isArray(d) ? d : d?.items || []);
-        } catch {}
+        } catch {
+          void 0;
+        }
       } finally {
         setLoading(false);
       }
     })();
   }, []);
 
-  const have = (t) => docs.some((x) => x.documentType === t);
-  const missingDocs = useMemo(() => REQUIRED_DOC_TYPES.filter((t) => !have(t)), [docs]);
+  const missingDocs = useMemo(
+    () => REQUIRED_DOC_TYPES.filter((t) => !docs.some((x) => x.documentType === t)),
+    [docs]
+  );
 
   if (loading || !company)
     return (

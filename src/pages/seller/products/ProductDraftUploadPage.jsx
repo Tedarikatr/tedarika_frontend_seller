@@ -67,7 +67,6 @@ const ProductDraftUploadPage = () => {
     notifyError,
     notifyValidationError,
     notifyManualResult,
-    notifySingleProductError,
   } = useProductUploadNotifications();
   const mountedRef = useRef(true);
   /** Manuel yükleme hata aldığında form listesini geri yüklemek için (ürünler silinmesin) */
@@ -426,10 +425,10 @@ const ProductDraftUploadPage = () => {
         const imageCount = p.images?.length ?? 0;
         const storeRow = {
           unitType: Number(p.store.unitType) || 1,
-          stockQuantity: Number(p.store.stockQuantity) ?? 0,
-          minOrderQuantity: Number(p.store.minOrderQuantity) ?? 1,
+          stockQuantity: Number(p.store.stockQuantity) || 0,
+          minOrderQuantity: Number(p.store.minOrderQuantity) || 1,
           maxOrderQuantity: p.store.maxOrderQuantity !== "" && p.store.maxOrderQuantity != null ? Number(p.store.maxOrderQuantity) : undefined,
-          unitPrice: Number(p.store.unitPrice) ?? 0,
+          unitPrice: Number(p.store.unitPrice) || 0,
           currencyCode: (p.store.currencyCode || "TRY").trim(),
           mainProductCode: p.store.mainProductCode?.trim() || undefined,
           stockCode: p.store.stockCode?.trim() || undefined,

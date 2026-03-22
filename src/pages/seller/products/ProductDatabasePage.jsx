@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   addProductToStore,
@@ -6,11 +6,10 @@ import {
 import { useProductCache } from "@/contexts/ProductCacheContext";
 import ProductDatabaseTable from "@/components/storeProducts/ProductDatabaseTable";
 import Pagination from "@/components/ui/Pagination";
-import { 
+import {
   Search,
   Tag,
   ShoppingCart,
-  List,
   ArrowRight,
 } from "lucide-react";
 import TedarikaLoader from "@/components/ui/TedarikaLoader";
@@ -24,13 +23,11 @@ const ProductDatabasePage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(false);
-  const [refreshing, setRefreshing] = useState(false);
   const [addedProductNames, setAddedProductNames] = useState([]);
   const [addingId, setAddingId] = useState(null);
 
   const loadProducts = async (forceRefresh = false) => {
-    const isLoadingState = forceRefresh ? setRefreshing : setLoading;
-    isLoadingState(true);
+    setLoading(true);
     try {
       const [allProducts, myStoreProducts] = await Promise.all([
         getProductDatabase(forceRefresh),
@@ -46,12 +43,8 @@ const ProductDatabasePage = () => {
     } catch (err) {
       console.error("Ürünler alınamadı:", err.response?.data || err.message);
     } finally {
-      isLoadingState(false);
+      setLoading(false);
     }
-  };
-
-  const handleRefresh = async () => {
-    await loadProducts(true);
   };
 
   const handleAddProduct = async (productId, productName) => {

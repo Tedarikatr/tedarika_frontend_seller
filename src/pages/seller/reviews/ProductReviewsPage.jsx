@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { fetchProductReviews, replyToProductReview } from "@/api/sellerReviewService";
-import ProductReviewItem from "@/components/storeProducts/ProductReviewItem";
+import ProductReviewItem from "@/components/reviews/ProductReviewItem";
 import { MessageSquare } from "lucide-react";
 import TedarikaLoader from "@/components/ui/TedarikaLoader";
 import toast from "react-hot-toast";

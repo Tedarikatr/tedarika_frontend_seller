@@ -42,7 +42,7 @@ const StoreCoverageForm = ({ onSuccess }) => {
       setSelectedRegionId(null);
       setSelectedCountryIds([]);
       onSuccess?.();
-    } catch (err) {
+    } catch {
       setMessage({
         type: "error",
         text: "Kapsama alanı eklenirken hata oluştu.",

@@ -62,7 +62,7 @@ export default function CompanyUpdate() {
           address: data.address || "",
           type: uiType,
         });
-      } catch (err) {
+      } catch {
         setMessage("❌ Şirket bilgileri alınamadı.");
       } finally {
         setInitializing(false);

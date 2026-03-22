@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import {
   fetchRefundRequests,
   decideRefundRequest,
@@ -28,7 +27,6 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 
 const RefundRequestsPage = () => {
-  const navigate = useNavigate();
   const toast = useToast();
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);

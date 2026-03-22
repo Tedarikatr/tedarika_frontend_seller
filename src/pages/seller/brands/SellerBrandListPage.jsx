@@ -4,11 +4,11 @@ import {
   getBrandOwnership,
   getOwnedBrands,
 } from "@/api/brandservice";
-import OwnedBrandsSection from "@/components/Brand/OwnedBrandsSection";
-import BrandList from "@/components/Brand/BrandList";
-import OwnershipStatusSection from "@/components/Brand/OwnershipStatusSection";
-import CreateBrandModal from "@/components/Brand/CreateBrandModal";
-import OwnershipRequestModal from "@/components/Brand/OwnershipRequestModal";
+import OwnedBrandsSection from "@/components/brand/OwnedBrandsSection";
+import BrandList from "@/components/brand/BrandList";
+import OwnershipStatusSection from "@/components/brand/OwnershipStatusSection";
+import CreateBrandModal from "@/components/brand/CreateBrandModal";
+import OwnershipRequestModal from "@/components/brand/OwnershipRequestModal";
 import Pagination from "@/components/ui/Pagination";
 import Toast from "@/components/ui/Toast";
 import {
@@ -85,7 +85,7 @@ export default function SellerBrandPage() {
     showToast(result?.message || "Başvuru başarıyla gönderildi!", "success");
   };
 
-  const handleCreateSuccess = (result) => {
+  const handleCreateSuccess = () => {
     fetchData();
     showToast("Marka başarıyla oluşturuldu! Admin onayı bekleniyor.", "success");
   };

@@ -50,7 +50,7 @@ const ProductDraftDetailPage = () => {
       const detail = await fetchDraftProductDetail(productDraftId);
       setSelectedProduct(detail);
       setShowDetailModal(true);
-    } catch (err) {
+    } catch {
       toast.error("Ürün detayı yüklenemedi");
     }
   };

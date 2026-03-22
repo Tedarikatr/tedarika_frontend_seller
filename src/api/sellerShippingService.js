@@ -71,7 +71,7 @@ export const downloadShippingLabel = async (orderId) => {
     try {
       const j = JSON.parse(text);
       msg = j.message || j.title || msg;
-    } catch (_) {
+    } catch {
       if (text) msg = text;
     }
     throw new Error(msg);

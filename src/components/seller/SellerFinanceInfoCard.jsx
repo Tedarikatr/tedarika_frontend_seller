@@ -114,7 +114,9 @@ export default function SellerFinanceInfoCard() {
       await navigator.clipboard.writeText(normalizeIban(form.iban));
       setCopied(true);
       setTimeout(() => setCopied(false), 1200);
-    } catch {}
+    } catch {
+      void 0;
+    }
   };
 
   const onSave = async (e) => {

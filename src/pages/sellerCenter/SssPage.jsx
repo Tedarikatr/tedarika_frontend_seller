@@ -59,7 +59,7 @@ const SssPage = () => {
             return (
               <SellerCenterSection key={catIndex} title={category}>
                 <div className="space-y-3">
-                  {categoryFaqs.map((faq, index) => {
+                  {categoryFaqs.map((faq) => {
                     const globalIndex = faqs.indexOf(faq);
                     return (
                       <SellerCenterFaqItem

@@ -7,7 +7,6 @@ import {
   upsertPriceTiers,
   deactivatePriceTier,
 } from "@/api/sellerStoreProductPriceTiersService";
-import { getProductPrice } from "@/api/sellerStoreProductPricesService";
 import { PlusCircle, Trash2, Save, ChevronDown, ChevronUp } from "lucide-react";
 import { CURRENCY_CODES } from "@/constants/currencyCode";
 import TedarikaLoader from "@/components/ui/TedarikaLoader";

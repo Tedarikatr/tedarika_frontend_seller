@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { fetchStoreReviews, replyToStoreReview } from "@/api/sellerReviewService";
-import StoreReviewItem from "@/components/storeProducts/StoreReviewItem";
+import StoreReviewItem from "@/components/reviews/StoreReviewItem";
 import { Star, MessageSquare, Sparkles, TrendingUp, Award } from "lucide-react";
 import TedarikaLoader from "@/components/ui/TedarikaLoader";
 import toast from "react-hot-toast";

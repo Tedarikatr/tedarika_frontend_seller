@@ -144,7 +144,6 @@ const MyStoreProductsPage = () => {
     setBulkOnSaleLoading(true);
     try {
       const res = await setOnSaleBulk(ids, isOnSale);
-      const total = res?.totalRequested ?? 0;
       const success = res?.successCount ?? 0;
       const fail = res?.failCount ?? 0;
       const results = res?.results ?? [];
@@ -654,7 +653,6 @@ const MyStoreProductsPage = () => {
               getStoreProductId={getStoreProductId}
               onRefresh={() => loadProducts(true)}
               onFeedback={showFeedback}
-              hasCoverage={hasCoverage}
             />
           )}
         </div>

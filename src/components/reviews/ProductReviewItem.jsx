@@ -1,4 +1,4 @@
-// src/components/storeProducts/ProductReviewItem.jsx
+// src/components/reviews/ProductReviewItem.jsx
 import React, { useState } from "react";
 import { format } from "date-fns";
 

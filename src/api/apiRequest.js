@@ -159,7 +159,7 @@ export function apiRequestWithUploadProgress(
             } else {
               resolve({ message: xhr.responseText || "" });
             }
-          } catch (e) {
+          } catch {
             resolve({ message: xhr.responseText || "" });
           }
         } else {

@@ -7,7 +7,6 @@ import { Upload, CheckCircle, AlertTriangle, Trash2, Shield, X } from "lucide-re
 import TedarikaLoader from "@/components/ui/TedarikaLoader";
 
 export default function SellerCompanyDocuments() {
-  const [company, setCompany] = useState(null);
   const [docs, setDocs] = useState([]);
   const [docTypeName, setDocTypeName] = useState("");
   const [desc, setDesc] = useState("");
@@ -19,16 +18,19 @@ export default function SellerCompanyDocuments() {
 
   useEffect(() => {
     (async () => {
-      const c = await getMyCompany().catch(() => null);
-      setCompany(c);
+      await getMyCompany().catch(() => null);
       const d = await getMyDocuments();
       setDocs(Array.isArray(d) ? d : d?.items || []);
     })();
   }, []);
 
-  const haveTypeCode = (code) => docs.some((x) => normalizeDocType(x.documentType) === code);
-
-  const missingRequired = useMemo(() => REQUIRED_DOC_TYPES.filter((code) => !haveTypeCode(code)), [docs]);
+  const missingRequired = useMemo(
+    () =>
+      REQUIRED_DOC_TYPES.filter(
+        (code) => !docs.some((x) => normalizeDocType(x.documentType) === code)
+      ),
+    [docs]
+  );
 
   const pickFile = (f) => {
     if (!f) return;

@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import {
   exportSalesReport,
   createReportSchedule,
@@ -27,8 +26,9 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import TedarikaLoader from "@/components/ui/TedarikaLoader";
 
+const SCHEDULE_TIMEZONE = "Europe/Istanbul";
+
 const SalesReportsPage = () => {
-  const navigate = useNavigate();
   const toast = useToast();
 
   // Export Form State
@@ -44,7 +44,6 @@ const SalesReportsPage = () => {
   const [scheduleFormat, setScheduleFormat] = useState(0); // 0 = Pdf, 1 = Xlsx
   const [scheduleEmail, setScheduleEmail] = useState("");
   const [scheduleCron, setScheduleCron] = useState("0 8 * * *"); // Her gün 08:00
-  const [scheduleTimezone, setScheduleTimezone] = useState("Europe/Istanbul");
   const [scheduleStartDate, setScheduleStartDate] = useState("");
   const [scheduleEndDate, setScheduleEndDate] = useState("");
 
@@ -161,7 +160,7 @@ const SalesReportsPage = () => {
         reportType: scheduleReportType,
         format: scheduleFormat,
         cronExpression: scheduleCron,
-        timezone: scheduleTimezone,
+        timezone: SCHEDULE_TIMEZONE,
       };
 
       // Email opsiyonel - varsa ekle

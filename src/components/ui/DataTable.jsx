@@ -155,4 +155,3 @@ const DataTable = ({
 };
 
 export default DataTable;
-export { TABLE_STYLES };
