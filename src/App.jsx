@@ -54,7 +54,6 @@ import MyStoreProductsPage from "@/pages/seller/products/MyStoreProductsPage";
 import ProductDatabasePage from "@/pages/seller/products/ProductDatabasePage";
 import ProductRequestListPage from "@/pages/seller/products/ProductRequestListPage";
 import ProductEditRequestPage from "@/pages/seller/products/ProductEditRequestPage";
-import ProductDraftsPage from "@/pages/seller/products/ProductDraftsPage";
 import ProductDraftListPage from "@/pages/seller/products/ProductDraftListPage";
 import ProductDraftDetailPage from "@/pages/seller/products/ProductDraftDetailPage";
 import ProductDraftUploadPage from "@/pages/seller/products/ProductDraftUploadPage";

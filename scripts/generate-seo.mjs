@@ -1,6 +1,6 @@
 /**
  * public/sitemap-seller.xml, sitemap-satici.xml ve sitemap.xml (indeks) üretir.
- * Kaynak: src/constants/seoPublicRoutes.js — App.jsx ile senkron tutun.
+ * Kaynak: src/constants/seo/index.js (SEO_INDEXABLE_ROUTES) — App.jsx ile senkron tutun.
  *
  * Çalıştır: node scripts/generate-seo.mjs  |  npm run build (prebuild)
  */

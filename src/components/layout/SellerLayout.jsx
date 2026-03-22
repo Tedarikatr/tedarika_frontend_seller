@@ -1,7 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { useNavigate, useLocation, Outlet } from "react-router-dom";
-import { SeoHelmet } from "@/components/seo";
-import { SEO_ROBOTS } from "@/constants/seo";
+import { SeoHelmet, SEO_ROBOTS } from "@/components/seo";
 import Sidebar from "./Sidebar";
 import Topbar from "./Topbar";
 import { hasCompany } from "@/api/sellerCompanyService";
