@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import { SeoHelmet } from "@/components/seo";
-import { SEO_ROBOTS } from "@/constants/seoDefaults";
+import { SEO_ROBOTS } from "@/constants/seo";
 import { registerSeller } from "@/api/sellerAuthService";
 import { Mail, Lock, User, Phone, Eye, EyeOff } from "lucide-react";
 import { useToast } from "@/contexts/ToastContext";

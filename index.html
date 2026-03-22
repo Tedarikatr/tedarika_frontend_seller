@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- Varsayılan SEO metinleri: src/constants/seoDefaults.js ile uyumlu tutun (ilk HTML yanıtı / JS öncesi). -->
+<!-- Varsayılan SEO metinleri: src/constants/seoDefaults.js (barrel: constants/seo) ile uyumlu tutun. -->
 <html lang="tr">
   <head>
     <meta charset="UTF-8" />
@@ -75,7 +75,7 @@
     <meta name="geo.placename" content="Turkey" />
     <meta name="format-detection" content="telephone=no" />
 
-    <!-- Google Search Console: Doğrulama için meta tag ekleyin (Örnek: <meta name="google-site-verification" content="XXXXXXXX" />) -->
+    <!-- Google Search Console: doğrulama için .env → VITE_GOOGLE_SITE_VERIFICATION (SeoHelmet ile enjekte) veya buraya statik meta -->
 
     <!-- Yapısal veri (JSON-LD) - Google zengin sonuçlar ve snippet için -->
     <script type="application/ld+json">

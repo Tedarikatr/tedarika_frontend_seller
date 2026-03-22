@@ -90,6 +90,7 @@ function App() {
         <NotificationProvider>
           <ScrollToTop />
       <Routes>
+      {/* Kamu dizin URL’leri: src/constants/seo (SEO_INDEXABLE_ROUTES) + sitemap ile senkron */}
       {/* ── Public seller routes ───────────────────────────── */}
       <Route path="/seller/landing" element={<SellerLandingPage />} />
       <Route path="/seller/register" element={<RegisterPage />} />

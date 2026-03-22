@@ -1,6 +1,7 @@
 # Tedarika Satıcı Paneli - Robots.txt
 # Google Arama Merkezi: https://developers.google.com/search/docs/crawling-indexing/robots/intro
-# Production'da host'a göre robots-seller.txt veya robots-satici.txt sunulur (vercel.json)
+# Production: Vercel host'a göre robots-seller.txt / robots-satici.txt (vercel.json)
+# Dizine URL listesi tek kaynak: src/constants/seoPublicRoutes.js → npm run seo:generate
 
 User-agent: *
 User-agent: Googlebot
@@ -33,6 +34,6 @@ Disallow: /seller/reports
 Disallow: /seller/chat
 Disallow: /seller/subscription
 
-# Sitemap (production'da host'a göre doğru URL verilir)
+# Sitemap: her Search Console mülkü için kendi host'unun /sitemap.xml (rewrite → urlset)
 Sitemap: https://www.seller.tedarika.com.tr/sitemap.xml
 Sitemap: https://www.satici.tedarika.com.tr/sitemap.xml

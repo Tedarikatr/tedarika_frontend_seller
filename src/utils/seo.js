@@ -3,36 +3,28 @@
  * Domain yönetimi ve SEO meta tag'leri için yardımcı fonksiyonlar
  */
 
-import { SEO_DEFAULTS } from "@/constants/seoDefaults";
+import { SEO_DEFAULTS, SEO_MAIN_SITE_ORIGIN, SEO_ORIGINS } from "@/constants/seo";
 
 /**
- * Mevcut domain'i tespit eder
- * @returns {string} - Mevcut domain (seller.tedarika.com.tr veya satici.tedarika.com.tr)
+ * Mevcut domain'i tespit eder (SEO_ORIGINS tek kaynak)
+ * @returns {string} - Satıcı paneli origin (seller veya satici host)
  */
 export const getCurrentDomain = () => {
-  if (typeof window === 'undefined') {
-    // SSR durumunda varsayılan domain
-    return 'https://www.seller.tedarika.com.tr';
+  if (typeof window === "undefined") {
+    return SEO_ORIGINS.seller;
   }
-  
   const hostname = window.location.hostname;
-  
-  // Subdomain kontrolü
-  if (hostname.includes('satici.tedarika.com.tr')) {
-    return 'https://www.satici.tedarika.com.tr';
+  if (hostname.includes("satici.tedarika")) {
+    return SEO_ORIGINS.satici;
   }
-  
-  // Varsayılan olarak seller subdomain
-  return 'https://www.seller.tedarika.com.tr';
+  return SEO_ORIGINS.seller;
 };
 
 /**
- * Ana domain'i döndürür
- * @returns {string} - Ana domain
+ * Ana marka domain'i (tedarika.com.tr)
+ * @returns {string}
  */
-export const getMainDomain = () => {
-  return 'https://www.tedarika.com.tr';
-};
+export const getMainDomain = () => SEO_MAIN_SITE_ORIGIN;
 
 /**
  * Canonical URL oluşturur
@@ -63,16 +55,10 @@ export const getOgImageUrl = (imagePath = SEO_DEFAULTS.ogImagePath) => {
  */
 export const getHreflangUrls = (path = '') => {
   const cleanPath = path.startsWith('/') ? path : `/${path}`;
-  
+  const primary = `${SEO_ORIGINS.seller}${cleanPath}`;
   return [
-    {
-      hreflang: 'tr',
-      href: `https://www.seller.tedarika.com.tr${cleanPath}`
-    },
-    {
-      hreflang: 'x-default',
-      href: `https://www.seller.tedarika.com.tr${cleanPath}`
-    }
+    { hreflang: 'tr', href: primary },
+    { hreflang: 'x-default', href: primary }
   ];
 };
 

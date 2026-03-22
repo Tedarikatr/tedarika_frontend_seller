@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { SeoHelmet } from "@/components/seo";
-import { SEO_ROBOTS } from "@/constants/seoDefaults";
+import { SEO_ROBOTS } from "@/constants/seo";
 import { toast } from "react-hot-toast";
 import {
   createSubscription,

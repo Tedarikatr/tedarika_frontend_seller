@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import { SeoHelmet } from "@/components/seo";
-import { SEO_ROBOTS } from "@/constants/seoDefaults";
+import { SEO_ROBOTS } from "@/constants/seo";
 import {
   requestForgetPasswordReset,
   forgetPassword,

@@ -1,7 +1,13 @@
 /**
  * Tek kaynak: varsayılan SEO metinleri ve OG görsel sabitleri.
  * index.html içindeki ilk yükleme metinleriyle uyumlu tutulmalı (manuel senkron).
+ *
+ * Search Console: .env içinde VITE_GOOGLE_SITE_VERIFICATION=... (SeoHelmet enjekte eder).
+ * Kamu URL listesi: src/constants/seo/index.js → seoPublicRoutes (sitemap ile senkron).
  */
+
+/** Ana marka sitesi (Organization.url vb. şema alanları) */
+export const SEO_MAIN_SITE_ORIGIN = "https://www.tedarika.com.tr";
 
 export const SEO_DEFAULTS = {
   defaultTitle:

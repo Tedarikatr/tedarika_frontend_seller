@@ -1,5 +1,5 @@
 import { Helmet } from "react-helmet-async";
-import { SEO_DEFAULTS } from "@/constants/seoDefaults";
+import { SEO_DEFAULTS } from "@/constants/seo";
 
 /**
  * Tüm sayfalarda tekrarlanan meta/OG/Twitter etiketlerini tek bileşende toplar.
@@ -41,6 +41,7 @@ export default function SeoHelmet({
   const twUrl = includeTwitterUrl ? seoMeta.canonical : undefined;
   const imgAlt = ogImageAlt ?? SEO_DEFAULTS.defaultOgImageAlt;
   const ld = Array.isArray(jsonLd) ? jsonLd.filter(Boolean) : jsonLd ? [jsonLd] : [];
+  const googleSiteVerification = import.meta.env.VITE_GOOGLE_SITE_VERIFICATION;
 
   return (
     <Helmet>
@@ -49,9 +50,12 @@ export default function SeoHelmet({
       {includeKeywords ? <meta name="keywords" content={seoMeta.keywords} /> : null}
       <link rel="canonical" href={seoMeta.canonical} />
       {robots ? <meta name="robots" content={robots} /> : null}
+      {googleSiteVerification ? (
+        <meta name="google-site-verification" content={googleSiteVerification} />
+      ) : null}
 
-      {seoMeta.hreflang.map(({ hreflang, href }) => (
-        <link key={hreflang} rel="alternate" hreflang={hreflang} href={href} />
+      {seoMeta.hreflang.map(({ hreflang, href }, i) => (
+        <link key={`${hreflang}-${i}-${href}`} rel="alternate" hreflang={hreflang} href={href} />
       ))}
 
       <meta property="og:title" content={seoMeta.og.title} />
