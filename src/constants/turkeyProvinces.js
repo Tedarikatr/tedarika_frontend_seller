@@ -84,5 +84,3 @@ export const TURKEY_PROVINCES = [
   { code: "80", name: "Osmaniye" },
   { code: "81", name: "Düzce" },
 ];
-
-export default TURKEY_PROVINCES;

@@ -4,6 +4,10 @@ import reactHooks from 'eslint-plugin-react-hooks'
 import reactRefresh from 'eslint-plugin-react-refresh'
 import { defineConfig, globalIgnores } from 'eslint/config'
 
+/**
+ * Not: eslint-plugin-unused-imports, JSX içi bileşen kullanımını (ör. <Routes>) güvenilir
+ * çözümlemediği için burada kullanılmıyor. Ölü export / dosya taraması: `npm run knip`
+ */
 export default defineConfig([
   globalIgnores(['dist']),
   {
