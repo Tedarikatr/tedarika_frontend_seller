@@ -52,13 +52,14 @@ const Topbar = ({ onMenuClick }) => {
     "?";
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-gradient-to-r from-[#003131] via-[#004040] to-[#003131] border-b-2 border-emerald-500/30 shadow-2xl backdrop-blur-md">
+    <header className="sticky top-0 z-50 w-full pt-[env(safe-area-inset-top,0px)] bg-gradient-to-r from-[#003131] via-[#004040] to-[#003131] border-b-2 border-emerald-500/30 shadow-2xl backdrop-blur-md">
       <div className="flex items-center justify-between w-full px-3 sm:px-4 md:px-5 py-2.5 sm:py-3 md:py-4">
         {/* Sol Menü Butonu */}
         <div className="flex items-center gap-2 sm:gap-3 md:gap-4 min-w-0 flex-1">
           <button
+            type="button"
             onClick={onMenuClick}
-            className="md:hidden text-white/90 hover:text-white hover:bg-white/15 p-2 rounded-lg transition-all duration-300 hover:scale-110 flex-shrink-0"
+            className="md:hidden min-h-[44px] min-w-[44px] inline-flex items-center justify-center text-white/90 hover:text-white hover:bg-white/15 p-2 rounded-lg transition-all duration-300 hover:scale-110 flex-shrink-0 touch-manipulation"
             aria-label="Menü"
           >
             <Menu className="w-5 h-5 sm:w-6 sm:h-6" />

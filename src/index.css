@@ -2,6 +2,17 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Mobil: yatay taşmayı kes, metin boyutu zoom’da koru */
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+  body {
+    @apply overflow-x-hidden min-h-[100dvh];
+  }
+}
+
 .input {
   @apply w-full px-4 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500;
 }

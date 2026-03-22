@@ -75,6 +75,32 @@ const SellerLayout = () => {
     }
   }, [location.pathname]);
 
+  // Mobil: drawer açıkken arka plan kaydırmasını kilitle
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 767px)");
+    const apply = () => {
+      if (isSidebarOpen && mq.matches) {
+        document.body.style.overflow = "hidden";
+      } else {
+        document.body.style.overflow = "";
+      }
+    };
+    apply();
+    mq.addEventListener("change", apply);
+    return () => {
+      mq.removeEventListener("change", apply);
+      document.body.style.overflow = "";
+    };
+  }, [isSidebarOpen]);
+
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.key === "Escape") setIsSidebarOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
   // 🔒 Abonelik ve sistem aktiflik kontrolü
   useEffect(() => {
     const payload = getDecodedSellerPayload();
@@ -122,7 +148,16 @@ const SellerLayout = () => {
   return (
     <>
       <SeoHelmet robots={SEO_ROBOTS.NOINDEX_NOFOLLOW} />
-    <div className="flex h-screen w-full overflow-hidden relative">
+    <div className="flex h-[100dvh] min-h-0 w-full overflow-hidden relative">
+      {/* Mobil: menü dışı tıklanınca kapat */}
+      {isSidebarOpen ? (
+        <button
+          type="button"
+          className="fixed inset-0 z-40 bg-black/50 md:hidden touch-manipulation"
+          onClick={() => setIsSidebarOpen(false)}
+          aria-label="Menüyü kapat"
+        />
+      ) : null}
       {/* Sidebar */}
       <Sidebar
         isOpen={isSidebarOpen}
@@ -136,7 +171,7 @@ const SellerLayout = () => {
 
         <main
           ref={mainRef}
-          className={`flex-1 overflow-y-auto px-4 md:px-6 py-4 bg-white/60 backdrop-blur-2xl rounded-tl-2xl shadow-inner relative transition ${
+          className={`flex-1 overflow-y-auto overflow-x-hidden px-4 md:px-6 py-4 pb-[max(1rem,env(safe-area-inset-bottom,0px))] bg-white/60 backdrop-blur-2xl rounded-tl-2xl shadow-inner relative transition ${
             shouldShowOverlay ? "pointer-events-none opacity-40 blur-sm" : ""
           }`}
         >

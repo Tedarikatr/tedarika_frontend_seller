@@ -83,8 +83,9 @@ export default function UserMenu({ user, storeLogo, initials }) {
     <div className="relative" ref={menuRef}>
       {/* Avatar/Logo Butonu */}
       <button
+        type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="relative focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2 focus:ring-offset-[#003131] rounded-full flex-shrink-0"
+        className="relative min-h-[44px] min-w-[44px] inline-flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2 focus:ring-offset-[#003131] rounded-full flex-shrink-0 touch-manipulation"
         aria-label="Kullanıcı menüsü"
       >
         {storeLogo ? (
@@ -109,7 +110,7 @@ export default function UserMenu({ user, storeLogo, initials }) {
 
       {/* Dropdown Menü */}
       {isOpen && (
-        <div className="absolute right-0 top-full mt-2 w-[calc(100vw-2rem)] sm:w-64 md:w-72 max-w-xs bg-white rounded-xl sm:rounded-2xl shadow-2xl border-2 border-gray-200 overflow-hidden z-50 animate-slide-down">
+        <div className="absolute right-0 top-full mt-2 w-[min(calc(100vw-1rem),20rem)] sm:w-64 md:w-72 max-w-[calc(100vw-1rem)] bg-white rounded-xl sm:rounded-2xl shadow-2xl border-2 border-gray-200 overflow-hidden z-50 animate-slide-down">
           {/* Header */}
           <div className="bg-gradient-to-r from-emerald-600 to-teal-600 px-4 sm:px-5 py-3 sm:py-4 border-b border-white/20">
             <div className="flex items-center gap-2 sm:gap-3">

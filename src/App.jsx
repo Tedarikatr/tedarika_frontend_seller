@@ -89,6 +89,8 @@ function App() {
           <ScrollToTop />
       <Routes>
       {/* Kamu dizin URL’leri: src/constants/seo (SEO_INDEXABLE_ROUTES) + sitemap ile senkron */}
+      {/* Kök URL: index.html canonical /seller/landing ile uyum; 404+noindex yerine tek giriş noktası */}
+      <Route path="/" element={<Navigate to="/seller/landing" replace />} />
       {/* ── Public seller routes ───────────────────────────── */}
       <Route path="/seller/landing" element={<SellerLandingPage />} />
       <Route path="/seller/register" element={<RegisterPage />} />

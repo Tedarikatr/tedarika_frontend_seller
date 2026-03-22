@@ -91,8 +91,9 @@ export default function NotificationDropdown() {
     <div className="relative" ref={dropdownRef}>
       {/* Bildirim İkonu */}
       <button
+        type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="relative p-1.5 sm:p-2 rounded-lg sm:rounded-xl text-white/90 hover:text-white hover:bg-white/15 transition-all duration-300 hover:scale-110 flex-shrink-0"
+        className="relative min-h-[44px] min-w-[44px] inline-flex items-center justify-center p-1.5 sm:p-2 rounded-lg sm:rounded-xl text-white/90 hover:text-white hover:bg-white/15 transition-all duration-300 hover:scale-110 flex-shrink-0 touch-manipulation"
         aria-label="Bildirimler"
       >
         <Bell className="w-5 h-5 sm:w-6 sm:h-6" />
@@ -105,7 +106,7 @@ export default function NotificationDropdown() {
 
       {/* Dropdown Menü */}
       {isOpen && (
-        <div className="absolute right-0 top-full mt-2 w-[calc(100vw-2rem)] sm:w-80 md:w-96 max-w-sm bg-white rounded-xl sm:rounded-2xl shadow-2xl border-2 border-gray-200 overflow-hidden z-50 animate-slide-down">
+        <div className="absolute right-0 top-full mt-2 w-[min(calc(100vw-1rem),24rem)] sm:w-80 md:w-96 max-w-[calc(100vw-1rem)] bg-white rounded-xl sm:rounded-2xl shadow-2xl border-2 border-gray-200 overflow-hidden z-50 animate-slide-down">
           {/* Header */}
           <div className="bg-gradient-to-r from-emerald-600 to-teal-600 px-4 sm:px-5 py-3 sm:py-4 flex items-center justify-between">
             <div className="flex items-center gap-2 sm:gap-3 min-w-0">
