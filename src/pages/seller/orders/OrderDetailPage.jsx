@@ -16,6 +16,7 @@ import {
   refreshShippingOffers,
   acceptShippingOffer,
   downloadShippingLabel,
+  triggerAutoShippingLabel,
 } from "@/api/sellerShippingService";
 import { statusLabels } from "@/constants/orderStatus";
 import { CARRIER_OPTIONS } from "@/constants/carrierCompanies";
@@ -122,6 +123,10 @@ const InfoCard = ({ icon: Icon, label, value, colorClass = "text-gray-700" }) =>
   </div>
 );
 
+/** SellerShippingOrderController: etiket/teklif akışı için uygun sipariş durumları */
+const SHIPPING_ELIGIBLE_STATUSES = ["Created", "AwaitingPayment", "Paid", "Shipped", "Confirmed"];
+const SHIPPING_BLOCKED_STATUSES = ["Cancelled", "Refunded", "Delivered", "PaymentFailed"];
+
 const OrderDetailPage = () => {
   const { orderId } = useParams();
   const navigate = useNavigate();
@@ -153,6 +158,7 @@ const OrderDetailPage = () => {
     heightCm: "",
   });
   const [showPackageForm, setShowPackageForm] = useState(false);
+  const [autoLabelLoading, setAutoLabelLoading] = useState(false);
 
   // Kargo Modal State
   const [showCarrierModal, setShowCarrierModal] = useState(false);
@@ -223,6 +229,29 @@ const OrderDetailPage = () => {
       const data = await getShippingOffers(Number(orderId), Object.keys(body).length ? body : null);
       setOffers(data);
       if (data?.cheapestOfferId) setSelectedOfferId(data.cheapestOfferId);
+
+      // MD: Geliver teklifleri asenkron — boş dönüşte GET /offers ile 2 sn aralıkla en fazla ~12 sn bekle
+      const shipmentId = data?.providerShipmentId;
+      if (shipmentId && (!data?.offers || data.offers.length === 0)) {
+        toast("Teklifler hazırlanıyor, kısa süre bekleniyor…", { icon: "ℹ️", duration: 3500 });
+        for (let attempt = 1; attempt <= 6; attempt++) {
+          await new Promise((r) => setTimeout(r, 2000));
+          try {
+            const refreshed = await refreshShippingOffers(Number(orderId), shipmentId);
+            setOffers(refreshed);
+            if (refreshed?.cheapestOfferId) setSelectedOfferId(refreshed.cheapestOfferId);
+            if (refreshed?.offers?.length > 0) {
+              toast.success("Kargo teklifleri hazır.");
+              return;
+            }
+          } catch (pollErr) {
+            console.error("Teklif yenileme (polling):", pollErr);
+            toast.error(pollErr?.message || "Teklifler yenilenirken hata oluştu.");
+            break;
+          }
+        }
+        toast("Teklifler henüz gelmedi. Bir süre sonra «Teklifleri Yenile» ile tekrar deneyin.", { icon: "ℹ️" });
+      }
     } catch (err) {
       toast.error(err?.message || "Kargo teklifleri alınamadı.");
     } finally {
@@ -254,12 +283,27 @@ const OrderDetailPage = () => {
       toast.error("Lütfen bir teklif seçin.");
       return;
     }
+    const selectedOffer = offers.offers?.find((o) => o.id === selectedOfferId);
+    if (!selectedOffer) {
+      toast.error("Seçilen teklif bulunamadı.");
+      return;
+    }
+    const rawAmount = String(selectedOffer.totalAmount ?? "").replace(",", ".");
+    const acceptedOfferTotalAmount = Number.parseFloat(rawAmount);
+    if (!Number.isFinite(acceptedOfferTotalAmount) || acceptedOfferTotalAmount < 0) {
+      toast.error("Teklif tutarı geçersiz. Lütfen başka bir teklif seçin.");
+      return;
+    }
     setAcceptOfferLoading(true);
     try {
-      await acceptShippingOffer(Number(orderId), {
+      const labelDto = await acceptShippingOffer(Number(orderId), {
         providerShipmentId: offers.providerShipmentId,
         offerId: selectedOfferId,
+        acceptedOfferTotalAmount,
       });
+      if (labelDto && typeof labelDto === "object" && labelDto.orderId != null) {
+        setShippingLabel(labelDto);
+      }
       toast.success("Teklif kabul edildi, etiket oluşturuldu.");
       setOffers(null);
       setSelectedOfferId(null);
@@ -270,6 +314,36 @@ const OrderDetailPage = () => {
       setAcceptOfferLoading(false);
     }
   };
+
+  /** POST .../shipping/label/auto — Geliver otomatik etiket (201 yeni, 200 zaten var) */
+  const handleCreateAutoLabel = async () => {
+    setAutoLabelLoading(true);
+    try {
+      const { status, data } = await triggerAutoShippingLabel(Number(orderId));
+      if (data && typeof data === "object" && data.orderId != null) {
+        setShippingLabel(data);
+      }
+      if (status === 201) {
+        toast.success("Kargo etiketi oluşturuldu.");
+      } else {
+        toast("Bu sipariş için kargo etiketi zaten hazır.", { icon: "ℹ️" });
+      }
+      await loadShippingLabel();
+    } catch (err) {
+      toast.error(err?.message || "Kargo etiketi oluşturulamadı.");
+    } finally {
+      setAutoLabelLoading(false);
+    }
+  };
+
+  const orderEligibleForShippingActions =
+    order &&
+    !SHIPPING_BLOCKED_STATUSES.includes(order.status) &&
+    SHIPPING_ELIGIBLE_STATUSES.includes(order.status);
+
+  const hasShippingLabelPdf = Boolean(shippingLabel?.fileUrl);
+
+  const canShowAutoShippingLabelButton = orderEligibleForShippingActions && !hasShippingLabelPdf;
 
   useEffect(() => {
     loadOrder();
@@ -501,7 +575,7 @@ const OrderDetailPage = () => {
                       <span className="sm:hidden">Kargo</span>
                     </button>
 
-                    {shippingLabel && (
+                    {shippingLabel?.fileUrl && (
                       <button
                         onClick={handleViewLabel}
                         disabled={labelLoading}
@@ -592,11 +666,11 @@ const OrderDetailPage = () => {
               <div>
                 <h2 className="text-base sm:text-lg font-bold text-gray-800">Kargo İşlemleri</h2>
                 <p className="text-xs text-gray-500 mt-0.5">
-                  {shippingLabel
+                  {shippingLabel?.fileUrl
                     ? "Etiket oluşturuldu · Görüntüle / İndir"
                     : offers
-                    ? "Teklifler listelendi · Seçip kabul edin"
-                    : "Teklif al, etiket oluştur, takip et"}
+                    ? "Teklifler listelendi · Seçip kabul edin veya otomatik etiket"
+                    : "Otomatik etiket, teklif al veya manuel kargo bilgisi"}
                 </p>
               </div>
             </div>
@@ -616,11 +690,32 @@ const OrderDetailPage = () => {
                 </div>
               )}
 
-              {/* 1) Henüz etiket yok: Gönderi oluştur + Teklif al */}
-              {!shippingLabel && (order.status === "Created" || order.status === "Confirmed") && (
+              {/* POST .../shipping/label/auto — sade buton */}
+              {canShowAutoShippingLabelButton && (
+                <div className="flex flex-wrap justify-end">
+                  <button
+                    type="button"
+                    onClick={handleCreateAutoLabel}
+                    disabled={autoLabelLoading}
+                    className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white text-sm font-bold shadow-md hover:from-violet-700 hover:to-fuchsia-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {autoLabelLoading ? (
+                      <TedarikaLoader variant="micro" light className="h-4 w-4" label="Oluşturuluyor" />
+                    ) : (
+                      <FileText className="w-4 h-4" />
+                    )}
+                    {autoLabelLoading ? "Oluşturuluyor…" : "Etiket oluştur"}
+                  </button>
+                </div>
+              )}
+
+              {/* 1) Yol A — Paket boyutu + POST /offers → teklif seç → accept-offer (PDF yokken) */}
+              {!hasShippingLabelPdf && orderEligibleForShippingActions && (
                 <div className="rounded-xl border border-sky-100 bg-sky-50/50 p-4 sm:p-5">
-                  <h3 className="text-sm font-bold text-gray-800 mb-1">Kargo Etiketi Oluştur</h3>
-                  <p className="text-xs text-gray-600 mb-4">Kargo teklifi alıp birini kabul ederek etiket oluşturabilirsiniz. Alıcı adresi sipariş teslimat adresinden otomatik alınır.</p>
+                  <h3 className="text-sm font-bold text-gray-800 mb-1">Manuel kargo teklifi (Gelişmiş)</h3>
+                  <p className="text-xs text-gray-600 mb-4">
+                    Önce isteğe bağlı paket boyutlarını girin, «Kargo Teklifi Al» ile gönderi oluşturun. Teklifler boş dönerse sistem birkaç saniye yeniler. Bir teklifi seçip «Seçilen Teklifi Kabul Et» ile etiketi oluşturun. Üstteki «Etiket oluştur» ile tek adımda otomatik etiket de alabilirsiniz.
+                  </p>
                   <div className="mb-4">
                     <button
                       type="button"
@@ -697,8 +792,8 @@ const OrderDetailPage = () => {
                 </div>
               )}
 
-              {/* 2) Teklifler listesi: seç + kabul veya yenile */}
-              {offers && !shippingLabel && (
+              {/* 2) Teklifler listesi — PDF etiketi yokken göster (yarım kayıtta fileUrl boş olabilir) */}
+              {offers && !hasShippingLabelPdf && (
                 <div className="rounded-xl border border-emerald-100 bg-emerald-50/50 p-4 sm:p-5">
                   <h3 className="text-sm font-bold text-gray-800 mb-1">Kargo Teklifleri</h3>
                   <p className="text-xs text-gray-600 mb-4">Bir teklif seçip kabul edin. Kabul edilen tutar satıcı ödemesinden kesilir.</p>
@@ -733,7 +828,12 @@ const OrderDetailPage = () => {
                             />
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-2 flex-wrap">
-                                <span className="font-semibold text-gray-800">{offer.providerCode}</span>
+                                <span className="font-semibold text-gray-800">
+                                  {offer.providerName || offer.providerCode}
+                                </span>
+                                {offer.providerCode && offer.providerName && (
+                                  <span className="text-gray-500 text-sm">({offer.providerCode})</span>
+                                )}
                                 <span className="text-gray-500 text-sm">{offer.providerServiceCode}</span>
                                 {offers.cheapestOfferId === offer.id && (
                                   <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">En ucuz</span>
@@ -781,7 +881,7 @@ const OrderDetailPage = () => {
                 </div>
               )}
 
-              {/* 3) Etiket var: bilgi + görüntüle / indir + takip */}
+              {/* 3) GET /label ile gelen meta — PDF varsa görüntüle/indir; yoksa uyarı + yeniden dene */}
               {shippingLabel && (
                 <div className="rounded-xl border border-indigo-200 bg-gradient-to-br from-indigo-50/80 to-purple-50/80 overflow-hidden">
                   <div className="px-4 sm:px-5 py-3 border-b border-indigo-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
@@ -795,20 +895,28 @@ const OrderDetailPage = () => {
                       </div>
                     </div>
                     <div className="flex flex-wrap gap-2">
+                      {hasShippingLabelPdf ? (
+                        <button
+                          type="button"
+                          onClick={handleViewLabel}
+                          disabled={labelLoading}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 text-white text-xs font-semibold rounded-lg hover:bg-indigo-700 disabled:opacity-50"
+                        >
+                          {labelLoading ? <TedarikaLoader variant="micro" light className="h-3 w-3" label="Yükleniyor" /> : <FileText className="w-3 h-3" />}
+                          Etiket Görüntüle
+                        </button>
+                      ) : (
+                        <span className="text-xs font-medium text-amber-800 bg-amber-100 border border-amber-200 rounded-lg px-2 py-1.5">
+                          PDF henüz hazır değil. «Yenile» veya üstte «Etiket oluştur» deneyin.
+                        </span>
+                      )}
                       <button
-                        onClick={handleViewLabel}
-                        disabled={labelLoading}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 text-white text-xs font-semibold rounded-lg hover:bg-indigo-700 disabled:opacity-50"
-                      >
-                        {labelLoading ? <TedarikaLoader variant="micro" light className="h-3 w-3" label="Yükleniyor" /> : <FileText className="w-3 h-3" />}
-                        Etiket Görüntüle
-                      </button>
-                      <button
+                        type="button"
                         onClick={loadShippingLabel}
                         disabled={shippingLabelLoading}
                         className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-indigo-200 text-indigo-700 text-xs font-semibold rounded-lg hover:bg-indigo-50 disabled:opacity-50"
                       >
-                        {shippingLabelLoading ? <TedarikaLoader variant="micro" className="h-3 w-3" label="Yükleniyor" /> : <RefreshCw className="w-3 h-3" />}
+                        {shippingLabelLoading ? <TedarikaLoader variant="micro" className="h-3 w-3" label="Yükleniyor" /> : <RefreshCw className="h-3 w-3" />}
                         Yenile
                       </button>
                     </div>
