@@ -54,6 +54,45 @@ export const getShippingLabel = async (orderId) => {
   );
 };
 
+/**
+ * POST api/seller/orders/{orderId}/shipping/label/auto
+ * Geliver ile otomatik kargo etiketi üretir (boş body).
+ * @returns {Promise<{ status: number, data: object }>} status 201 = yeni, 200 = zaten vardı
+ */
+export const triggerAutoShippingLabel = async (orderId) => {
+  const base = (import.meta.env.VITE_API_URL || "").replace(/\/+$/, "");
+  const path = `${BASE_ORDER_SHIPPING(orderId)}/label/auto`.replace(/^\/+/, "");
+  const url = `${base}/${path}`;
+  const token = localStorage.getItem("sellerToken");
+  const response = await fetch(url, {
+    method: "POST",
+    headers: {
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      Accept: "application/json",
+    },
+  });
+  const text = await response.text().catch(() => "");
+  let data = {};
+  try {
+    data = text ? JSON.parse(text) : {};
+  } catch {
+    data = {};
+  }
+  if (!response.ok) {
+    const msg =
+      data.message ||
+      data.title ||
+      data.error ||
+      (response.status === 404
+        ? "Sipariş bulunamadı."
+        : "Kargo etiketi oluşturulamadı.");
+    const err = new Error(msg);
+    err.status = response.status;
+    throw err;
+  }
+  return { status: response.status, data };
+};
+
 /** GET api/seller/orders/{orderId}/shipping/label/download - Etiket dosyasını indir (blob) */
 export const downloadShippingLabel = async (orderId) => {
   const base = (import.meta.env.VITE_API_URL || "").replace(/\/+$/, "");

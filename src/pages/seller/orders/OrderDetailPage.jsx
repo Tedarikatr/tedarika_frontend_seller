@@ -16,6 +16,7 @@ import {
   refreshShippingOffers,
   acceptShippingOffer,
   downloadShippingLabel,
+  triggerAutoShippingLabel,
 } from "@/api/sellerShippingService";
 import { statusLabels } from "@/constants/orderStatus";
 import { CARRIER_OPTIONS } from "@/constants/carrierCompanies";
@@ -153,6 +154,7 @@ const OrderDetailPage = () => {
     heightCm: "",
   });
   const [showPackageForm, setShowPackageForm] = useState(false);
+  const [autoLabelLoading, setAutoLabelLoading] = useState(false);
 
   // Kargo Modal State
   const [showCarrierModal, setShowCarrierModal] = useState(false);
@@ -270,6 +272,30 @@ const OrderDetailPage = () => {
       setAcceptOfferLoading(false);
     }
   };
+
+  /** POST .../shipping/label/auto — Geliver otomatik etiket (201 yeni, 200 zaten var) */
+  const handleCreateAutoLabel = async () => {
+    setAutoLabelLoading(true);
+    try {
+      const { status } = await triggerAutoShippingLabel(Number(orderId));
+      if (status === 201) {
+        toast.success("Kargo etiketi oluşturuldu.");
+      } else {
+        toast("Bu sipariş için kargo etiketi zaten hazır.", { icon: "ℹ️" });
+      }
+      await loadShippingLabel();
+    } catch (err) {
+      toast.error(err?.message || "Kargo etiketi oluşturulamadı.");
+    } finally {
+      setAutoLabelLoading(false);
+    }
+  };
+
+  const canShowAutoShippingLabelButton =
+    order &&
+    !["Cancelled", "Refunded", "Delivered", "PaymentFailed"].includes(order.status) &&
+    ["Created", "AwaitingPayment", "Paid", "Shipped", "Confirmed"].includes(order.status) &&
+    !shippingLabel?.fileUrl;
 
   useEffect(() => {
     loadOrder();
@@ -592,11 +618,11 @@ const OrderDetailPage = () => {
               <div>
                 <h2 className="text-base sm:text-lg font-bold text-gray-800">Kargo İşlemleri</h2>
                 <p className="text-xs text-gray-500 mt-0.5">
-                  {shippingLabel
+                  {shippingLabel?.fileUrl
                     ? "Etiket oluşturuldu · Görüntüle / İndir"
                     : offers
-                    ? "Teklifler listelendi · Seçip kabul edin"
-                    : "Teklif al, etiket oluştur, takip et"}
+                    ? "Teklifler listelendi · Seçip kabul edin veya otomatik etiket"
+                    : "Otomatik etiket, teklif al veya manuel kargo bilgisi"}
                 </p>
               </div>
             </div>
@@ -613,6 +639,38 @@ const OrderDetailPage = () => {
                 <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 flex items-center gap-2 text-amber-800 text-sm">
                   <InfoIcon className="w-5 h-5 flex-shrink-0" />
                   {shippingLabelError}
+                </div>
+              )}
+
+              {/* Otomatik Geliver etiketi — POST .../shipping/label/auto */}
+              {canShowAutoShippingLabelButton && (
+                <div className="rounded-xl border border-violet-200 bg-gradient-to-br from-violet-50/90 to-fuchsia-50/60 p-4 sm:p-5">
+                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-3">
+                    <div className="flex items-start gap-3 min-w-0">
+                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-600 to-fuchsia-600 flex items-center justify-center text-white shadow-md flex-shrink-0">
+                        <Sparkles className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <h3 className="text-sm font-bold text-gray-900">Otomatik kargo etiketi</h3>
+                        <p className="text-xs text-gray-600 mt-1 leading-relaxed">
+                          Geliver üzerinden en uygun teklifle PDF etiket oluşturulur. Gönderici adresi, Geliver ayarları ve alıcı teslimat bilgilerinin eksiksiz olduğundan emin olun. İsterseniz aşağıdan teklif alıp manuel seçim de yapabilirsiniz.
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleCreateAutoLabel}
+                      disabled={autoLabelLoading}
+                      className="inline-flex items-center justify-center gap-2 px-4 py-2.5 sm:py-3 rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white text-sm font-bold shadow-lg hover:from-violet-700 hover:to-fuchsia-700 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap flex-shrink-0"
+                    >
+                      {autoLabelLoading ? (
+                        <TedarikaLoader variant="micro" light className="h-4 w-4" label="Oluşturuluyor" />
+                      ) : (
+                        <Sparkles className="w-4 h-4" />
+                      )}
+                      {autoLabelLoading ? "Oluşturuluyor…" : "Etiket oluştur"}
+                    </button>
+                  </div>
                 </div>
               )}
 
